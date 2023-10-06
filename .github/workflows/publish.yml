@@ -1,7 +1,7 @@
 name: LeiCoin Nginx Host 1.0
 
 on:
-  workflow_dispatch:
+  [push]
 
 jobs:
   push:
