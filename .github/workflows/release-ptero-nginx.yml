@@ -1,11 +1,11 @@
-name: LeiCoin Nginx Host 8.1
+name: LeiCoin Nginx Host 1.0
 
 on:
   workflow_dispatch:
 
 jobs:
   push:
-    name: "leicoin-node-pterodactly-egg:8.1"
+    name: "leicoin-node-pterodactly-egg:1.0"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -28,4 +28,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/leicraft/leicoin-node-pterodactly-egg:8.1
+            ghcr.io/leicraft/leicoin-node-pterodactly-egg:1.0
