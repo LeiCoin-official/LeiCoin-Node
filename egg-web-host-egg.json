@@ -10,7 +10,7 @@
     "description": "An egg to host any Website.\r\nit also has composer, just specify your packages in the packages box, and it will install the packages when you start the server, it also has wordpress, just turn on the slider when you make the server, and wordpress will get installed for you\r\n\r\n\u00a9 Sigma Productions 2023",
     "features": null,
     "docker_images": {
-        "PHP 8.1": " ghcr.io\/leicraft\/leicoin-node-pterodactly-egg:1.0"
+        "ghcr.io\/leicraft\/leicoin-node-pterodactly-egg:latest": " ghcr.io\/leicraft\/leicoin-node-pterodactly-egg:latest"
     },
     "file_denylist": [],
     "startup": "{{STARTUP_CMD}}; if [[ ! -z ${COMPOSER_MODULES} ]]; then composer require ${COMPOSER_MODULES} --working-dir=\/home\/container\/webroot; fi;",
