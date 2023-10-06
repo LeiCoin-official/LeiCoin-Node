@@ -28,4 +28,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/leicraft/leicoin-node-pterodactly-egg:1.0
+            ghcr.io/leicraft/leicoin-node-pterodactly-egg
