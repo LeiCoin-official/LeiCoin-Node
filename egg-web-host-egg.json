@@ -5,7 +5,7 @@
         "update_url": null
     },
     "exported_at": "2023-02-07T09:58:34+01:00",
-    "name": "WebHost Egg",
+    "name": "LeiCoin Node Host",
     "author": "leicraft@leicraftmc.de",
     "description": "An egg to host any Website.\r\nit also has composer, just specify your packages in the packages box, and it will install the packages when you start the server, it also has wordpress, just turn on the slider when you make the server, and wordpress will get installed for you\r\n\r\n\u00a9 Sigma Productions 2023",
     "features": null,
