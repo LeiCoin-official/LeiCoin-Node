@@ -4,7 +4,7 @@ server_name="$1"
 
 cert_dir="/home/container/cert"
 
-if [ ! -f "$cert_dir/fullchain.pem" ] && [ ! -f "$cert_dir/privkey.pem" ] && [ ! -d "$cert_dir" ]; then
+if [ ! -f "$cert_dir/fullchain.pem" ] || [ ! -f "$cert_dir/privkey.pem" ] || [ ! -d "$cert_dir" ]; then
     mkdir -p "$cert_dir"
 
     echo "ℹ️ Generating SSL certificate for $server_name..."
