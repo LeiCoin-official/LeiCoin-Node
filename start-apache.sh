@@ -4,9 +4,10 @@ cd /home/container
 
 echo "Cloning From Github"
 
-if [-d "/home/container/.git"]; then
+if [ -d "/home/container/.git" ]; then
     git pull
 else
+    rm -R 
     git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
 fi
 
@@ -58,7 +59,7 @@ while true; do
         read -p "Enter 'start' to start Apache, or 'exit' to quit: " ACTION    
     fi
     echo "${STARTUP}"
-    if [ -z "$STARTUP"]; then
+    if [ -z "$STARTUP" ]; then
         ACTION="start"
     fi
 
