@@ -2,11 +2,7 @@
 
 echo "Cloning From Github"
 
-if [ -d "/home/container/.git" ]; then
-    git pull
-else
-    git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
-fi
+git pull
 
 
 echo "Server starting..."
