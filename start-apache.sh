@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd /home/container
+
 echo "Cloning From Github"
 
 git pull
@@ -10,7 +12,6 @@ echo "Server starting..."
 # Function to start Apache server
 start_apache() {
     # Use the provided port or prompt for one if empty
-    cd /home/container
     # Symlink the Apache configuration file from the home directory
     ln -s /home/container/.apache/site-config.conf /etc/apache2/sites-available/leicoin-node.conf
     # Enable the site configuration
@@ -53,7 +54,7 @@ while true; do
     else
         read -p "Enter 'start' to start Apache, or 'exit' to quit: " ACTION    
     fi
-
+    echo "${STARTUP}"
     if [ -z "$STARTUP"]; then
         ACTION="start"
     fi
