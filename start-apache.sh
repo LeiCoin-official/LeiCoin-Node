@@ -1,5 +1,5 @@
 #!/bin/bash
-
+su
 echo "Cloning From Github"
 
 if [ -d "/home/gitrepo/.git" ]; then
