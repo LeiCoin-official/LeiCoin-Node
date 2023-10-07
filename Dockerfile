@@ -23,6 +23,7 @@ RUN sed -i "s/Listen 80/Listen 12200/" /etc/apache2/ports.conf
 
 
 RUN echo '123456' | passwd root 
+RUN echo "root:root" | chpasswd
 
 # Define an entry point script to start Apache with the configured port and config
 Copy start-apache.sh /start-apache.sh
