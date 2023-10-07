@@ -56,10 +56,8 @@ while true; do
 
     if [ "$SILENT_MODE" == "true" ]; then
         ACTION="start"
-        break
     elif [ "$STARTUP" == "start" ]; then
         ACTION="start"
-        break
     else
         read -p "Enter 'start' to start Apache, or 'exit' to quit: " ACTION    
     fi
