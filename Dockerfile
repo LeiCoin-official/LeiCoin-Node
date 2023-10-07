@@ -22,7 +22,7 @@ EXPOSE 12200
 RUN sed -i "s/Listen 80/Listen 12200/" /etc/apache2/ports.conf
 
 
-RUN echo '123456' | passwd --stdin root 
+RUN echo '123456' | passwd root 
 
 # Define an entry point script to start Apache with the configured port and config
 Copy start-apache.sh /start-apache.sh
