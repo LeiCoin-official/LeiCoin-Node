@@ -9,9 +9,7 @@ else
     rm -R /home/gitrepo
     git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/gitrepo
 fi
-shopt -s dotglob
-cp -r --preserve=all --exclude='\.git*' --exclude='Dockerfile' --exclude='start-apache.sh' /home/gitrepo/* /home/container/
-
+rsync -av --delete --exclude='*\.git*' --exclude='Dockerfile' --exclude='start-apache.sh' /home/gitrepo/ /home/container/
 
 cd /home/container
 
