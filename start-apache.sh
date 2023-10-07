@@ -26,7 +26,7 @@ start_apache() {
     echo "Server Stardet"
 
     # Start the Apache server in the background
-    apache2-foreground
+    sudo apache2-foreground
 }
 
 # Function to stop Apache server

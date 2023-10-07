@@ -2,6 +2,7 @@
 FROM php:8.1-apache
 
 RUN apt-get update && apt-get install -y git
+RUN apt-get install sudo -y
 
 # Set the working directory to /home/container
 WORKDIR /home/container
