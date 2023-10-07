@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "Pulling From Github"
+echo "Cloning From Github"
 
-git pull
+git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
 
 echo "Server starting..."
 
