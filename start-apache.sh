@@ -2,7 +2,12 @@
 
 echo "Cloning From Github"
 
-git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
+if [ -d "/home/container/.git" ]; then
+    git pull
+else
+    git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
+fi
+
 
 echo "Server starting..."
 
@@ -18,7 +23,7 @@ start_apache() {
     echo "Server Stardet"
 
     # Start the Apache server in the background
-    apache2-foreground
+    apache2-foreground &
 }
 
 # Function to stop Apache server
@@ -52,6 +57,11 @@ while true; do
     else
         read -p "Enter 'start' to start Apache, or 'exit' to quit: " ACTION    
     fi
+
+    if [ -z "$STARTUP"]; then
+        ACTION="start"
+    fi
+
 
     if [ "$ACTION" == "start" ]; then
         start_apache
