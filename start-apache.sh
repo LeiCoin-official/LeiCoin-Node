@@ -1,5 +1,9 @@
 #!/bin/bash
-git
+
+echo "Pulling From Github"
+
+git pull
+
 echo "Server starting..."
 
 # Function to start Apache server
