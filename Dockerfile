@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y git
 WORKDIR /home/container
 
 RUN git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/gitrepo
+RUN git config --global --add safe.directory /home/gitrepo
 
 # Copy the Apache configuration file to the home directory
 
