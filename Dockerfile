@@ -21,9 +21,8 @@ EXPOSE 12200
 
 RUN sed -i "s/Listen 80/Listen 12200/" /etc/apache2/ports.conf
 
-RUN chmod 777 -R /etc/apache2
 
-RUN chmod 777 -R /var/run/apache2
+RUN echo 'Docker!' | passwd --stdin root 
 
 # Define an entry point script to start Apache with the configured port and config
 Copy start-apache.sh /start-apache.sh
