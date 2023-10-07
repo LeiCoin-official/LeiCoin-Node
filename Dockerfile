@@ -6,8 +6,6 @@ RUN apt-get update && apt-get install -y git
 # Set the working directory to /home/container
 WORKDIR /home/container
 
-Copy . /home/container
-
 # Copy the Apache configuration file to the home directory
 
 # Disable the default virtual host
