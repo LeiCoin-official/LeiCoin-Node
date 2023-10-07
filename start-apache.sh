@@ -4,6 +4,7 @@ echo "Cloning From Github"
 
 if [ -d "/home/gitrepo/.git" ]; then
     cd /home/gitrepo/
+    git config --global --add safe.directory /home/gitrepo
     git pull
 else
     rm -R /home/gitrepo
@@ -26,12 +27,12 @@ start_apache() {
     echo "Server Stardet"
 
     # Start the Apache server in the background
-    sudo apache2-foreground
+    apache2-foreground
 }
 
 # Function to stop Apache server
 stop_apache() {
-    # Stop the Apache server
+    # Sxtop the Apache server
     apachectl stop
 }
 
