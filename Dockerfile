@@ -3,8 +3,6 @@ FROM php:8.1-apache
 
 RUN apt-get update && apt-get install -y git
 
-RUN git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
-
 # Set the working directory to /home/container
 WORKDIR /home/container
 

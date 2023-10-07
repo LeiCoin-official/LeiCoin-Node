@@ -4,8 +4,11 @@ cd /home/container
 
 echo "Cloning From Github"
 
-git pull
-
+if [-d "/home/container/.git"]; then
+    git pull
+else
+    git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
+fi
 
 echo "Server starting..."
 
