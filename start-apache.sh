@@ -53,16 +53,16 @@ done
 
 # Prompt the user for action (start or exit)
 while true; do
+    echo "${STARTUP}"
 
     if [ "$SILENT_MODE" == "true" ]; then
         ACTION="start"
         break
+    elif [ -z "$STARTUP" ]; then
+        ACTION="start"
+        break
     else
         read -p "Enter 'start' to start Apache, or 'exit' to quit: " ACTION    
-    fi
-    echo "${STARTUP}"
-    if [ -z "$STARTUP" ]; then
-        ACTION="start"
     fi
 
 
