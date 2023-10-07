@@ -7,7 +7,7 @@ echo "Cloning From Github"
 if [ -d "/home/container/.git" ]; then
     git pull
 else
-    rm -R 
+    rm -R /home/container
     git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
 fi
 
