@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y git
 # Set the working directory to /home/container
 WORKDIR /home/container
 
-RUN git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/gitrepo
-RUN git config --global --add safe.directory /home/gitrepo
+RUN git clone https://github.com/LeiCraft/LeiCoin-Node.git /tmp/gitrepo
+RUN git config --global --add safe.directory /tmp/gitrepo
 
 # Copy the Apache configuration file to the home directory
 
@@ -20,10 +20,6 @@ RUN a2dissite 000-default
 EXPOSE 12200
 
 RUN sed -i "s/Listen 80/Listen 12200/" /etc/apache2/ports.conf
-
-
-RUN echo '123456' | passwd root 
-RUN echo "root:root" | chpasswd
 
 # Define an entry point script to start Apache with the configured port and config
 Copy start-apache.sh /start-apache.sh
