@@ -53,12 +53,11 @@ done
 
 # Prompt the user for action (start or exit)
 while true; do
-    echo "${STARTUP}"
 
     if [ "$SILENT_MODE" == "true" ]; then
         ACTION="start"
         break
-    elif [ -z "$STARTUP" ]; then
+    elif [ "$STARTUP" == "start" ]; then
         ACTION="start"
         break
     else
