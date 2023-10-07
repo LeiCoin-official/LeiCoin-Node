@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y git
 # Set the working directory to /home/container
 WORKDIR /home/container
 
+RUN git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/gitrepo
+
 # Copy the Apache configuration file to the home directory
 
 # Disable the default virtual host

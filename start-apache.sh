@@ -1,15 +1,17 @@
 #!/bin/bash
 
-cd /home/container
-
 echo "Cloning From Github"
 
-if [ -d "/home/container/.git" ]; then
+if [ -d "/home/gitrepo/.git" ]; then
+    cd /home/gitrepo/
     git pull
 else
-    rm -R /home/container
-    git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container
+    rm -R /home/gitrepo
+    git clone https://github.com/LeiCraft/LeiCoin-Node.git /home/gitrepo
 fi
+rsync -av --delete --exclude='*\.git*' --exclude='Dockerfile' --exclude='start-apache.sh' /home/gitrepo/ /home/container/
+
+cd /home/container
 
 echo "Server starting..."
 
