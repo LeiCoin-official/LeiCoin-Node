@@ -19,7 +19,7 @@ function loadConfig() {
     } else {
       // If it doesn't exist, read and parse the default configuration
       const defaultConfigData = fs.readFileSync(defaultConfigFilePath, 'utf-8');
-      fs.writeFileSync(JSON.parse(defaultConfigData));
+      fs.writeFileSync(configFilePath, JSON.parse(defaultConfigData));
       loadConfig();
     }
   } catch (error) {
