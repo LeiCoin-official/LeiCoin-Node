@@ -26,7 +26,6 @@ fi
 rm -rf /home/container/gittmp
 
 # Extract the value of --internal-port from STARTUP if it exists
-internal_port=""
 
 if [ -n "$STARTUP" ] && [[ "$STARTUP" == "start"* ]]; then
     # Use parameter expansion to extract the value after --internal-port
@@ -48,12 +47,8 @@ if [ -z "$internal_port" ]; then
     done
 fi
 
-# Update the Nginx configuration if internal_port is set
-if [ -n "$internal_port" ]; then
-    sed -i "s/\"port\": [0-9]\+,\"port\": $internal_port,/" /home/container/config/config.json
-
-    echo "Updated config to listen on port $internal_port."
+if [ -z "$internal_port" ]; then
+    internal_port="12200"
 fi
 
-
-node index.js
+node index.js --internal-port "$internal_port"
