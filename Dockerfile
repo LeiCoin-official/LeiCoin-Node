@@ -12,9 +12,6 @@ WORKDIR /home/container
 
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
-#RUN chown container /docker-entrypoint.sh
-#RUN chmod +x /docker-entrypoint.sh
-
 EXPOSE 12200
 
 CMD ["/bin/bash", "/docker-entrypoint.sh"]

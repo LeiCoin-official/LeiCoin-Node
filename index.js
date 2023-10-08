@@ -19,7 +19,8 @@ function loadConfig() {
     } else {
       // If it doesn't exist, read and parse the default configuration
       const defaultConfigData = fs.readFileSync(defaultConfigFilePath, 'utf-8');
-      return JSON.parse(defaultConfigData);
+      fs.writeFileSync(JSON.parse(defaultConfigData));
+      loadConfig();
     }
   } catch (error) {
     console.error('Error loading configuration:', error);
@@ -36,7 +37,7 @@ if (config) {
   });
 
   app.listen(config.port, () => {
-    console.log(`Example app listening on port ${config.port}`);
+    console.log(`App listening on port ${config.port}`);
   });
 } else {
   console.error('Failed to load configuration. Exiting...');
