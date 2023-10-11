@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const util = require("./util.js");
+const util = require("../util.js");
 
 const app = express();
 app.use(bodyParser.json());
 
-const transactionRouter = require('./routes/transactions')
+const transactionRouter = require('./routes/transactions.js')
 
 app.use('/transactions', transactionRouter);
 

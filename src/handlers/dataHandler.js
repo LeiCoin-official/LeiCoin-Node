@@ -1,5 +1,5 @@
 const fs = require('fs');
-const util = require('./util.js');
+const util = require('../util.js');
 const path = require('path');
 
 let mempool = {
@@ -37,7 +37,7 @@ function readBlock(blockNumber) {
             const data = fs.readFileSync(blockFilePath, 'utf8');
             return {cb: "success", data: JSON.parse(data)};
         } else {
-            console.error(`Block ${blockNumber} was not found`);
+            console.error(`Block ${blockNumber} was not found.`);
             return {cb: 'none'};
         }
     } catch (err) {
@@ -71,10 +71,10 @@ function addBlockToMempool(blockNumber, blockData) {
   
   // Function to add a transaction to the Mempool
   function addTransactionToMempool(transaction) {
-    const transactionHash = transaction.hash;
+    const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
-      console.error('Transaction with the same hash already exists in the Mempool.');
+      console.error(`Transaction ${transactionHash} already exists in the Mempool.`);
       return { cb: 'error' };
     }
   
@@ -84,50 +84,58 @@ function addBlockToMempool(blockNumber, blockData) {
   
   // Function to remove a transaction from the Mempool
   function removeTransactionFromMempool(transaction) {
-    const transactionHash = transaction.hash;
+    const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
       delete mempool.transactions[transactionHash];
       return { cb: 'success' };
     }
   
-    console.error('Transaction not found in the Mempool.');
+    console.error(`Transaction ${transactionHash} not found in the Mempool.`);
     return { cb: 'error' };
   }
 
 // Function to write a transaction
 function writeTransaction(txID, transactionData) {
-    const txFilePath = `transactions/${txID}.json`;
+    const txFilePath = getBlockchainDataFilePath(`/transactions/${txID}.json`);
     try {
         if (!fs.existsSync(txFilePath)) {
             fs.writeFileSync(txFilePath, JSON.stringify(transactionData, null, 2));
-            console.log(`Transaktion ${txID} wurde erfolgreich gespeichert.`);
             success
         } else {
             console.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
             return {cb: 'error'}
         }
     } catch (err) {
-        console.error(`Fehler beim Schreiben von Transaktion ${txID}: ${err.message}`);
+        console.error(`Error writing transaction ${txID}: ${err.message}`);
         return {cb: 'error'}
     }
 }
 
 // Function to read a transaction
 function readTransaction(txID) {
-    const txFilePath = `transactions/${txID}.json`;
+    const txFilePath = getBlockchainDataFilePath(`/transactions/${txID}.json`);
     try {
         if (fs.existsSync(txFilePath)) {
             const data = fs.readFileSync(txFilePath, 'utf8');
-            console.log(`Inhalt von Transaktion ${txID}:`);
-            console.log();
-        return {cb: 'success', data: JSON.parse(data)}
+            return {cb: 'success', data: JSON.parse(data)}
         } else {
-            console.error(`Transaktion ${txID} wurde nicht gefunden.`);
+            console.error(`Transaktion ${txID} was not found`);
             return {cb: 'none'}
         }
     } catch (err) {
-        console.error(`Fehler beim Lesen von Transaktion ${txID}: ${err.message}`);
+        console.error(`Error reading transaction ${txID}: ${err.message}`);
+        return {cb: 'error'}
+    }
+}
+
+function getLatestBlockInfo() {
+    const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
+    try {
+        const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
+        return {cb: 'success', data: JSON.parse(data)}
+    } catch (err) {
+        console.error(`Error reading latest block info: ${err.message}`);
         return {cb: 'error'}
     }
 }
@@ -139,7 +147,9 @@ module.exports = {
     addBlockToMempool,
     removeBlockFromMempool,
     addTransactionToMempool,
+    removeTransactionFromMempool,
     removeBlockFromMempool,
     writeTransaction,
-    readTransaction
+    readTransaction,
+    getLatestBlockInfo
 }

@@ -14,6 +14,22 @@ async function sha256(data) {
     return hashHex;
 }
 
-module.exports = {
-    sha256
+function base64EncodeToString(data) {
+    return Buffer.from(data).toString('base64');
 }
+
+function base64DecodeToString(data) {
+    return Buffer.from(data, 'base64').toString();
+}
+
+function base64DecodeToBuffer(data) {
+    return Buffer.from(data, 'base64')
+}
+
+module.exports = {
+    sha256,
+    base64EncodeToString,
+    base64DecodeToString,
+    base64DecodeToBuffer
+}
+

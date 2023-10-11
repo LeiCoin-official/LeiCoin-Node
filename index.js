@@ -1,4 +1,4 @@
 console.log("Starting LeiCoin-Node Server ...");
 
-require("./server");
+require("./src/server");
 
