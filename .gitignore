@@ -1,3 +1,4 @@
 config/config.json
 config/.env
+config/knownnodes.json
 blockchain_data
