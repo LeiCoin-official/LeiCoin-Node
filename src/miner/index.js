@@ -2,7 +2,7 @@ const { Worker, isMainThread } = require('worker_threads');
 const blockMiningUtils = require('./block_mining_utils');
 const util = require('../util');
 
-const numberOfThreads = 16; // Adjust this to the number of threads you need.
+const numberOfThreads = 8; // Adjust this to the number of threads you need.
 
 async function runInMiningParallel() {
   const workerThreads = [];

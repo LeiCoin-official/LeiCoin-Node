@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const data = require('../handlers/dataHandler'); // Import the data-handler module
 
-const mining_difficulty = 10;
+const mining_difficulty = 6;
 
 // Function to create a new block
 function createBlock() {
