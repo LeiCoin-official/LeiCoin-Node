@@ -20,8 +20,10 @@ console.log(`Thread ${threadIndex} is mining a block`);
 const minedBlock = mineBlockWithCustomLogic(block, mining_difficulty);
 
 // Check if the mined block is valid
-if (blockMiningUtils.isValidBlock(minedBlock)) {
-  parentPort.postMessage(`Thread ${threadIndex} mined a valid block: ${JSON.stringify(minedBlock)}`);
-} else {
-  parentPort.postMessage(null); // Indicate that this thread did not find a valid block
-}
+// if (blockMiningUtils.isValidBlock(minedBlock)) {
+//   parentPort.postMessage(`Thread ${threadIndex} mined a valid block with hash: ${minedBlock.hash}`);
+// } else {
+//   parentPort.postMessage(null); // Indicate that this thread did not find a valid block
+// }
+
+parentPort.postMessage(`Thread ${threadIndex} mined a valid block with hash: ${minedBlock.hash}`);

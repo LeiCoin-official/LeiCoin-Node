@@ -28,10 +28,11 @@ async function runInMiningParallel() {
       });
 
       worker.on('exit', (code) => {
-        if (code !== 0) {
-          console.error(`Mining Worker ${i} exited with code ${code}`);
-          resolve(null);
-        }
+        // if (code !== 0) {
+        //   console.error(`Mining Worker ${i} exited with code ${code}`);
+        //   resolve(null);
+        // }
+		resolve(null);
       });
     })
   );
@@ -39,14 +40,15 @@ async function runInMiningParallel() {
   const winnerResult = await Promise.race(promises);
 
   // Terminate all worker threads.
-  for (const thread of workerThreads) {
-    thread.terminate();
+  for (const worker of workerThreads) {
+	worker.terminate();
   }
 
   return { results, winnerResult };
 }
 
 async function main() {
+
   while (true) {
     const { results, winnerResult } = await runInMiningParallel();
 
