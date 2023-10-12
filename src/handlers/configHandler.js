@@ -67,7 +67,7 @@ function loadConfig() {
     // Check for --internal-port and extract the value
     let internalPort = getInternalPort();
     if (internalPort !== null) {
-        config.port = internalPort;
+        config.server.port = internalPort;
     }
 
     config.knownNodes = loadKnownNodesConfig();

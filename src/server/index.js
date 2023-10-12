@@ -13,6 +13,6 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.listen(config.port, () => {
-    console.log(`App listening on port ${config.port}`);
+app.listen(config.server.port, () => {
+    console.log(`App listening on port ${config.server.port}`);
 });

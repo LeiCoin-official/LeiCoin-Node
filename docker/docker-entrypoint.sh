@@ -28,27 +28,15 @@ rm -rf /home/container/gittmp
 # Extract the value of --internal-port from STARTUP if it exists
 
 if [ -n "$STARTUP" ] && [[ "$STARTUP" == "start"* ]]; then
-    # Use parameter expansion to extract the value after --internal-port
-    raw_internal_port="${STARTUP#*--internal-port }"
-    # Replace placeholders in raw_internal_port using eval and sed
-    MODIFIED_STARTUP=$(eval echo $(echo ${raw_internal_port} | sed -e 's/{{/${/g' -e 's/}}/}/g'))
-    # Use parameter expansion again to extract the modified value
-    internal_port="${MODIFIED_STARTUP#*--internal-port }"
-fi
+    # Use parameter expansion to extract all content after "start"
+    args_after_start="${STARTUP#start }"
 
-# If --internal-port is not found in STARTUP, check regular shell arguments
-if [ -z "$internal_port" ]; then
-    for arg in "$@"; do
-        if [ "$arg" == "--internal-port" ]; then
-            # Get the port value after --internal-port
-            internal_port="$1"
-            break
-        fi
-    done
-fi
+    # Replace placeholders in args_after_start using eval and sed
+    MODIFIED_STARTUP=$(eval echo $(echo ${args_after_start} | sed -e 's/{{/${/g' -e 's/}}/}/g'))
 
-if [ -z "$internal_port" ]; then
-    internal_port="12200"
+    # Pass the modified arguments to node index.js
+    node index.js $MODIFIED_STARTUP
+else
+    # If the STARTUP condition is not met, pass all command line arguments directly to node index.js
+    node index.js "$@"
 fi
-
-node index.js --internal-port "$internal_port"
