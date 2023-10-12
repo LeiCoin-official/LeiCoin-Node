@@ -46,12 +46,6 @@ function loadKnownNodesConfig() {
             const configData = fs.readFileSync(configFilePath, 'utf-8');
             let configDataJSON = JSON.parse(configData);
 
-            // Check for --internal-port and extract the value
-            let internalPort = getInternalPort();
-            if (internalPort !== null) {
-                configDataJSON.port = internalPort;
-            }
-
             return configDataJSON;
         } else {
             // If it doesn't exist, read and parse the default configuration
@@ -67,8 +61,17 @@ function loadKnownNodesConfig() {
 
 function loadConfig() {
     let config;
+
     config = loadNormalConfig();
+
+    // Check for --internal-port and extract the value
+    let internalPort = getInternalPort();
+    if (internalPort !== null) {
+        config.port = internalPort;
+    }
+
     config.knownNodes = loadKnownNodesConfig();
+    
     return config;
 }
 
