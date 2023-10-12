@@ -1,78 +1,70 @@
 const crypto = require('crypto');
-const dataHandler = require('../handlers/dataHandler'); // Import the data-handler module
+const data = require('../handlers/dataHandler'); // Import the data-handler module
 
 const mining_difficulty = 6;
 
 // Function to create a new block
-function createBlock(previousBlock, transactions, difficulty) {
+function createBlock() {
+
+	data.getLatestBlockInfo
+
     const newBlock = {
       	index: previousBlock.index + 1,
 		previousHash: previousBlock.hash,
-		transactions: transactions,
+		transactions: data.mempool.transactions,
 		timestamp: new Date().getTime(),
 		nonce: 0,
 		hash: '',
     };
 
-    mineBlock(newBlock);
     return newBlock;
 }
 
 // Function to calculate the hash of a block
 function calculateBlockHash(block) {
-  return crypto
-    .createHash('sha256')
-    .update(
-      block.index +
-        block.previousHash +
-        JSON.stringify(block.transactions) +
-        block.timestamp +
-        block.nonce
-    )
-    .digest('hex');
+  	return crypto
+    	.createHash('sha256')
+    	.update(
+      		block.index +
+        	block.previousHash +
+        	JSON.stringify(block.transactions) +
+        	block.timestamp +
+        	block.nonce
+    	)
+    	.digest('hex');
 }
 
 // Function to mine a block
-function mineBlock(block) {
-  while (
-    block.hash.substring(0, mining_difficulty) !== '0'.repeat(mining_difficulty)
-  ) {
-    block.nonce++;
-    block.hash = calculateBlockHash(block);
-  }
-}
 
 // Function to mine a block with verified transactions from the Mempool
-function mineBlockWithTransactions(previousBlock, difficulty) {
-  const verifiedTransactions = dataHandler.mempool.transactions;
-  const newBlock = createBlock(
-    previousBlock,
-    verifiedTransactions,
-    difficulty
-  );
+function mineBlockWithTransactions(previousBlock) {
+  	const verifiedTransactions = dataHandler.mempool.transactions;
+  	const newBlock = createBlock(
+    	previousBlock,
+    	verifiedTransactions,
+    	difficulty
+  	);
 
-  // Remove mined transactions from the Mempool
-  for (const transactionHash in verifiedTransactions) {
-    dataHandler.removeTransactionFromMempool(
-      verifiedTransactions[transactionHash]
-    );
-  }
+  	// Remove mined transactions from the Mempool
+  	for (const transactionHash in verifiedTransactions) {
+    	dataHandler.removeTransactionFromMempool(
+      	verifiedTransactions[transactionHash]
+    	);
+  	}
 
-  return newBlock;
+  	return newBlock;
 }
 
 // Create a genesis block
 const genesisBlock = {
-  index: 0,
-  previousHash: '0',
-  transactions: [],
-  timestamp: new Date().getTime(),
-  nonce: 0,
-  hash: '',
+  	index: 0,
+  	previousHash: '0',
+  	transactions: [],
+  	timestamp: new Date().getTime(),
+  	nonce: 0,
+  	hash: '',
 };
 
 // Mine a new block with verified transactions from the Mempool
-const newBlock = mineBlockWithTransactions(genesisBlock, difficulty);
+const newBlock = mineBlockWithTransactions(genesisBlock);
 
-console.log('Mempool:', dataHandler.mempool.transactions);
-console.log('Blockchain:', [genesisBlock, newBlock]);
