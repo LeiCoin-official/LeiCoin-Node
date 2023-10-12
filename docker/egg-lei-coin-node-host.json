@@ -10,7 +10,7 @@
     "description": null,
     "features": null,
     "docker_images": {
-        "LeiCoin Node": "ghcr.io\/leicraft\/leicoin-node:latest"
+        "LeiCoin Node Latest": "ghcr.io\/leicraft\/leicoin-node:latest"
     },
     "file_denylist": [],
     "startup": "start --internal-port {{SERVER_PORT}}",
