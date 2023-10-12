@@ -66,6 +66,7 @@ function loadKnownNodesConfig() {
 }
 
 function loadConfig() {
+    let config;
     config = loadNormalConfig();
     config.knownNodes = loadKnownNodesConfig();
     return config;
