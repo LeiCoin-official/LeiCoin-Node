@@ -36,8 +36,8 @@ function loadNormalConfig() {
 }
 
 function loadKnownNodesConfig() {
-    const configFilePath = path.join(util.processRootDirectory, '/config/knownnodes.json');
-    const defaultConfigFilePath = path.join(util.processRootDirectory, '/config/sample.knownnodes.json');
+    const configFilePath = path.join(util.processRootDirectory, '/config/peers.json');
+    const defaultConfigFilePath = path.join(util.processRootDirectory, '/config/sample.peers.json');
 
     try {
         // Check if the configuration file exists
