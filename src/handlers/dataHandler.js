@@ -13,7 +13,8 @@ function getBlockchainDataFilePath(subpath) {
 
 
 // Function to write a block
-function writeBlock(blockNumber, data) {
+function writeBlock(data) {
+    const blockNumber = data.index;
     const blockFilePath = getBlockchainDataFilePath(`/${blockNumber}.json`);
     try {
         if (!fs.existsSync(blockFilePath)) {

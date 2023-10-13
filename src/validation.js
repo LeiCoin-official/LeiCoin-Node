@@ -12,7 +12,7 @@ function areTransactionArgsValid(transaction) {
   
     return true;
 }
-  
+
 
 function isTransactionSignatureValid(transaction) {
     const { signature, senderAddress } = transaction;
@@ -45,7 +45,7 @@ function isValidTransaction(transaction) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
     
-    return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
+    return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
 }
 
   
