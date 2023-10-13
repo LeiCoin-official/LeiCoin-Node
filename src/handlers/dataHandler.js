@@ -15,7 +15,7 @@ function getBlockchainDataFilePath(subpath) {
 // Function to write a block
 function writeBlock(blockData) {
     const blockNumber = blockData.index;
-    const blockFilePath = getBlockchainDataFilePath(`/${blockNumber}.json`);
+    const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
     try {
         if (!fs.existsSync(blockFilePath)) {
             fs.writeFileSync(blockFilePath, JSON.stringify(blockData));
@@ -32,7 +32,7 @@ function writeBlock(blockData) {
 
 // Function to read a block
 function readBlock(blockNumber) {
-    const blockFilePath = getBlockchainDataFilePath(`/${blockNumber}.json`);
+    const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
     try {
         if (fs.existsSync(blockFilePath)) {
             const data = fs.readFileSync(blockFilePath, 'utf8');
@@ -141,6 +141,23 @@ function getLatestBlockInfo() {
     }
 }
 
+function updateLatestBlockInfo(index, hash) {
+    const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
+    const data = {
+        hash: hash,
+        index: index,
+    }
+    data.data.hash = hash;
+    data.data.index = index;
+    try {
+        const data = fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data));
+        return {cb: 'success'};
+    } catch (err) {
+        console.error(`Error writing latest block info: ${err.message}`);
+        return {cb: 'error'};
+    }
+}
+
 module.exports = {
     mempool,
     writeBlock,
@@ -152,5 +169,6 @@ module.exports = {
     removeBlockFromMempool,
     writeTransaction,
     readTransaction,
-    getLatestBlockInfo
+    getLatestBlockInfo,
+    updateLatestBlockInfo
 }

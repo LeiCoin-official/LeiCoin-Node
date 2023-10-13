@@ -48,6 +48,11 @@ function isValidTransaction(transaction) {
     return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
 }
 
+
+function isValidBlock(block) {
+
+}
+
   
 module.exports = {
     isValidTransaction

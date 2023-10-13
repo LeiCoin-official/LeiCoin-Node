@@ -89,4 +89,4 @@ function getInternalPort() {
 
 let config = loadConfig();
 
-module.exports = config
+module.exports = config;
