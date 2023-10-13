@@ -8,9 +8,18 @@ function createBlock() {
 
 	previousBlock = data.getLatestBlockInfo();
 
+	let newIndex;
+	let previousHash;
+
+	if (previousBlock.index == NaN) newIndex = 0;
+	else newIndex = previousBlock.index;
+
+	if (previousBlock.hash == undefined) previousHash = '';
+	else previousHash = previousBlock.hash;
+
     const newBlock = {
-      	index: previousBlock.index + 1,
-		previousHash: previousBlock.hash,
+      	index: newIndex,
+		previousHash: previousHash,
 		transactions: data.mempool.transactions,
 		timestamp: new Date().getTime(),
 		nonce: 0,

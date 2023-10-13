@@ -13,12 +13,12 @@ function getBlockchainDataFilePath(subpath) {
 
 
 // Function to write a block
-function writeBlock(data) {
-    const blockNumber = data.index;
+function writeBlock(blockData) {
+    const blockNumber = blockData.index;
     const blockFilePath = getBlockchainDataFilePath(`/${blockNumber}.json`);
     try {
         if (!fs.existsSync(blockFilePath)) {
-            fs.writeFileSync(blockFilePath, data);
+            fs.writeFileSync(blockFilePath, JSON.stringify(blockData));
             return {cb: 'success'}
         } else {
             console.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
