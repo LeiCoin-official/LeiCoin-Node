@@ -4,6 +4,7 @@
     },
     "miner": {
         "active": true,
-        "number_of_threads": 8
+        "number_of_threads": 8,
+        "minerAddress": ""
     }
 }

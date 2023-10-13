@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const data = require('../handlers/dataHandler'); // Import the data-handler module
+const config = require('../handlers/configHandler');
 
 const mining_difficulty = 6;
 
@@ -23,6 +24,10 @@ function createBlock() {
 		transactions: data.mempool.transactions,
 		timestamp: new Date().getTime(),
 		nonce: 0,
+		coinbase: {
+			minerAdress: config.miner.minerAdress,
+			amount: 50
+		},
 		hash: '',
     };
 

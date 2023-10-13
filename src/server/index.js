@@ -5,9 +5,11 @@ const config = require('../handlers/configHandler');
 const app = express();
 app.use(bodyParser.json());
 
-const transactionRouter = require('./routes/transactions.js')
+const transactionRouter = require('./routes/sendTransactions')
+const blocksRouter = require('./routes/sendBlocks');
 
-app.use('/transactions', transactionRouter);
+app.use('/sendtransactions', transactionRouter);
+app.use('/sendblocks', transactionRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

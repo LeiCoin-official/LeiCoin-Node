@@ -49,11 +49,35 @@ function isValidTransaction(transaction) {
 }
 
 
-function isValidBlock(block) {
-
-}
-
+function isValidBlock(block, previousBlock) {
+    const { index, previousHash, transactions, timestamp, nonce, hash } = block;
+  
+    // Verify that the hash of the block meets the mining difficulty criteria
+    const mining_difficulty = 6; // Adjust as needed
+    const hashPrefix = '0'.repeat(mining_difficulty);
+    if (hash.substring(0, mining_difficulty) !== hashPrefix) {
+      return false;
+    }
+  
+    // Confirm that the block's index is greater than the previous block's index by one
+    if (index !== previousBlock.index + 1) {
+      return false;
+    }
+  
+    // Validate that the previous hash in the new block matches the hash of the previous block
+    if (previousHash !== previousBlock.hash) {
+      return false;
+    }
+  
+    // Ensure that the block contains valid transactions (add your validation logic here)
+    for (transaction in previousBlock.transactions) {
+        const transactionsValid = isValidTransaction(transactions);
+        if (!transactionsValid) return false;
+    }
+    return true;
+  }
   
 module.exports = {
-    isValidTransaction
+    isValidTransaction,
+    isValidBlock
 }
