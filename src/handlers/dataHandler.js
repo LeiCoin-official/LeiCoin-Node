@@ -143,14 +143,12 @@ function getLatestBlockInfo() {
 
 function updateLatestBlockInfo(index, hash) {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
-    const data = {
-        hash: hash,
-        index: index,
-    }
-    data.data.hash = hash;
-    data.data.index = index;
     try {
-        const data = fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data));
+        const data = {
+            hash: hash,
+            index: index,
+        }
+        fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data));
         return {cb: 'success'};
     } catch (err) {
         console.error(`Error writing latest block info: ${err.message}`);
