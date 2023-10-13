@@ -11,10 +11,10 @@ function createBlock() {
 	let newIndex;
 	let previousHash;
 
-	if (previousBlock.index == NaN) newIndex = 0;
+	if (typeof(previousBlock.index) !== Number) newIndex = 0;
 	else newIndex = previousBlock.index;
 
-	if (previousBlock.hash == undefined) previousHash = '';
+	if (typeof(previousBlock.hash) !== String) previousHash = '';
 	else previousHash = previousBlock.hash;
 
     const newBlock = {
