@@ -20,6 +20,7 @@ async function runInMiningParallel() {
 		workerThreads.push(worker);
 
 		worker.on('message', (data) => {
+			console.log(`Miner mined block with hash ${data.hash}. Waiting for verification`);
 			results[i] = data;
 			resolve(data);
 		});
@@ -66,8 +67,13 @@ async function main() {
 }
 
 function afterMiningLogic(blockResult) {
-	data.writeBlock(blockResult);
-	data.updateLatestBlockInfo(blockResult.index, blockResult.hash);
+	if (validation.isValidBlock(blockResult).cb) {
+		data.writeBlock(blockResult);
+		data.updateLatestBlockInfo(blockResult.index, blockResult.hash);
+		console.log(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
+	} else {
+		console.log(`Mined block with hash ${blockResult.hash} is invalid.`);
+	}
 }
 
 if (isMainThread && config.miner.active) {

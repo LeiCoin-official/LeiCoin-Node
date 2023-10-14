@@ -16,7 +16,7 @@ function mineBlock(block) {
   }
 }
 
-console.log(`Thread ${threadIndex} is mining a block`);
+//console.log(`Thread ${threadIndex} is mining a block`);
 const minedBlock = mineBlock(block);
 
 // Check if the mined block is valid

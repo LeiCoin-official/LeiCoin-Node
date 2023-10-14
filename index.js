@@ -1,7 +1,9 @@
-console.log("Starting LeiCoin-Node Server ...");
+const util = require('./src/utils');
+
+util.sendServerLogMessage("Starting LeiCoin-Node Server ...");
 require("./src/server");
+util.sendServerLogMessage("LeiCoin-Node Server started");
 
-console.log("Starting LeiCoin-Node Miner ...");
+util.sendMinerLogMessage("Starting LeiCoin-Node Miner ...");
 require("./src/miner");
-
-console.log("Server is ready now");
+util.sendMinerLogMessage("LeiCoin-Node Server started");
