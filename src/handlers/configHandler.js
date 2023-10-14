@@ -30,7 +30,7 @@ function loadNormalConfig() {
             return loadConfig();
         }
     } catch (error) {
-        console.error('Error loading configuration:', error);
+        util.data_message.error('Error loading configuration:', error);
         process.exit(1);
     }
 }
@@ -54,7 +54,7 @@ function loadKnownNodesConfig() {
             return loadKnownNodesConfig();
         }
     } catch (error) {
-        console.error('Error loading configuration:', error);
+        util.data_message.error('Error loading configuration:', error);
         process.exit(1);
     }
 }

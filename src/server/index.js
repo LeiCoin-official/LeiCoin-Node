@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const config = require('../handlers/configHandler');
 const cors = require('cors');
+const util = require('../utils');
 
 const app = express();
 
@@ -25,5 +26,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(config.server.port, () => {
-    console.log(`App listening on port ${config.server.port}`);
+    util.server_message.log(`App listening on port ${config.server.port}`);
 });

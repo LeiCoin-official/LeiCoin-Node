@@ -33,11 +33,11 @@ function writeBlock(blockData) {
 
             return { cb: 'success' };
         } else {
-            console.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
+            util.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
             return { cb: 'error' };
         }
     } catch (err) {
-        console.error(`Error writing block ${blockNumber}: ${err.message}.`);
+        util.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
         return { cb: 'error' };
     }
 }
@@ -50,11 +50,11 @@ function readBlock(blockNumber) {
             const data = fs.readFileSync(blockFilePath, 'utf8');
             return {cb: "success", data: JSON.parse(data)};
         } else {
-            console.error(`Block ${blockNumber} was not found.`);
+            util.data_message.error(`Block ${blockNumber} was not found.`);
             return {cb: 'none'};
         }
     } catch (err) {
-        console.error(`Error reading block ${blockNumber}: ${err.message}.`);
+        util.data_message.error(`Error reading block ${blockNumber}: ${err.message}.`);
         return {cb: 'error'}
     }
 }
@@ -63,7 +63,7 @@ function readBlock(blockNumber) {
 // Function to add a block to the Mempool
 function addBlockToMempool(blockNumber, blockData) {
     if (mempool.blocks[blockNumber]) {
-      console.error(`Block ${blockNumber} already exists in the Mempool.`);
+      util.data_message.error(`Block ${blockNumber} already exists in the Mempool.`);
       return { cb: 'error' };
     }
   
@@ -78,7 +78,7 @@ function addBlockToMempool(blockNumber, blockData) {
       return { cb: 'success' };
     }
   
-    console.error(`Block ${blockNumber} not found in the Mempool.`);
+    util.data_message.error(`Block ${blockNumber} not found in the Mempool.`);
     return { cb: 'error' };
   }
   
@@ -87,7 +87,7 @@ function addBlockToMempool(blockNumber, blockData) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
-      console.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+      util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
       return { cb: 'error' };
     }
   
@@ -104,7 +104,7 @@ function addBlockToMempool(blockNumber, blockData) {
       return { cb: 'success' };
     }
   
-    console.error(`Transaction ${transactionHash} not found in the Mempool.`);
+    util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
     return { cb: 'error' };
   }
 
@@ -116,11 +116,11 @@ function writeTransaction(txID, transactionData) {
             fs.writeFileSync(txFilePath, JSON.stringify(transactionData, null, 2));
             success
         } else {
-            console.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
+            util.data_message.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
             return {cb: 'error'}
         }
     } catch (err) {
-        console.error(`Error writing transaction ${txID}: ${err.message}`);
+        util.data_message.error(`Error writing transaction ${txID}: ${err.message}`);
         return {cb: 'error'}
     }
 }
@@ -133,11 +133,11 @@ function readTransaction(txID) {
             const data = fs.readFileSync(txFilePath, 'utf8');
             return {cb: 'success', data: JSON.parse(data)}
         } else {
-            console.error(`Transaktion ${txID} was not found`);
+            util.data_message.error(`Transaktion ${txID} was not found`);
             return {cb: 'none'}
         }
     } catch (err) {
-        console.error(`Error reading transaction ${txID}: ${err.message}`);
+        util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
         return {cb: 'error'}
     }
 }
@@ -148,7 +148,7 @@ function getLatestBlockInfo() {
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         return {cb: 'success', data: JSON.parse(data)}
     } catch (err) {
-        console.error(`Error reading latest block info: ${err.message}`);
+        util.data_message.error(`Error reading latest block info: ${err.message}`);
         return {cb: 'error'}
     }
 }
@@ -163,7 +163,7 @@ function updateLatestBlockInfo(index, hash) {
         fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data), {encoding:'utf8',flag:'w'});
         return {cb: 'success'};
     } catch (err) {
-        console.error(`Error writing latest block info: ${err.message}`);
+        util.data_message.error(`Error writing latest block info: ${err.message}`);
         return {cb: 'error'};
     }
 }
@@ -184,7 +184,7 @@ function existsBlock(blockHash, blockIndex) {
             return { cb: 'success', exists: false };
         }
     } catch (err) {
-        console.error(`Error reading latest block info: ${err.message}`);
+        util.data_message.error(`Error reading latest block info: ${err.message}`);
         return { cb: 'error' };
     }
 }
