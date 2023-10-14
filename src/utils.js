@@ -1,5 +1,6 @@
 const process = require('process');
 const chalk = require('chalk');
+cons data = require('./handlers/dataH')
 
 const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
@@ -35,6 +36,10 @@ for (const { object, prefix, color } of messageConfigs) {
             console.log(generateLogMessage(prefix, message, color, type));
         };
     }
+}
+
+function createStorageIfNotExists() {
+    
 }
 
 module.exports = {
