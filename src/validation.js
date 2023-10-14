@@ -56,7 +56,7 @@ function isValidBlock(block) {
 
     if (index == 0) {
 
-        
+        if (!data.isGenesisBlock()) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
 
     } else {
 
