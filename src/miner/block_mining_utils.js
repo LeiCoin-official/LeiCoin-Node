@@ -10,10 +10,10 @@ function createBlock() {
 	let newIndex;
 	let previousHash;
 
-	if (typeof(previousBlock.index) !== Number) newIndex = 0;
-	else newIndex = previousBlock.index;
+	if (typeof(previousBlock.index) !== 'number') newIndex = 0;
+	else newIndex = previousBlock.index + 1;
 
-	if (typeof(previousBlock.hash) !== String) previousHash = '';
+	if (typeof(previousBlock.hash) !== 'string') previousHash = '';
 	else previousHash = previousBlock.hash;
 
     const newBlock = {
