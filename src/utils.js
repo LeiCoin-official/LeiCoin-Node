@@ -8,41 +8,34 @@ const miner_message = {};
 const server_message = {};
 const data_message = {};
 
-function generateLogMessage(prefix, message, style = 'reset') {
-    const styles = {
-        reset: chalk.reset,
-        green: chalk.green,
-        red: chalk.red,
-    };
-
-    if (styles[style]) {
-        return `${chalk[style](`${prefix}`)} ${styles[style](message)}`;
-    } else {
-        return `${chalk[prefix]} ${chalk.reset(message)}`;
-    }
-}
-
-function logMessageWithPrefix(prefix, ...messages) {
-    const message = messages.join(' ');
-    console.log(generateLogMessage(prefix, message));
-}
+const styles = {
+    reset: chalk.reset,
+    success: chalk.green,
+    error: chalk.red,
+};
 
 const messageTypes = ['log', 'success', 'error'];
 
 const messageConfigs = [
-    { object: miner_message, prefix: chalk.cyan('[Miner]') },
-    { object: server_message, prefix: chalk.magenta('[Server]') },
-    { object: data_message, prefix: chalk.blue('[Data]') },
+    { object: miner_message, prefix: 'Miner', color: 'cyan' },
+    { object: server_message, prefix: 'Server', color: 'magenta' },
+    { object: data_message, prefix: 'Data', color: 'blue' },
 ];
 
-for (const type of messageTypes) {
-    for (const { object, prefix } of messageConfigs) {
-        object[type] = (...messages) => {
-            logMessageWithPrefix(prefix, ...messages);
+function generateLogMessage(prefix, message, color, type = 'log') {
+    const colorizedPrefix = chalk[color](`[${prefix}]`);
+    const styleFunction = styles[type] || styles.reset;
+    const styledMessage = styleFunction(message);
+    return `${colorizedPrefix} ${styledMessage}`;
+}
+
+for (const { object, prefix, color } of messageConfigs) {
+    for (const type of messageTypes) {
+        object[type] = (message) => {
+            console.log(generateLogMessage(prefix, message, color, type));
         };
     }
 }
-
 
 module.exports = {
     processRootDirectory,
