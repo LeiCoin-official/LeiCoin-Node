@@ -54,7 +54,7 @@ function ensureFileExists(filePath, content = '') {
 }
 
 // Function to check if a file is empty or contains an empty JSON object or array
-function isFileEmpty(filePath, jsonFormat = '[]') {
+function isFileNotEmpty(filePath, jsonFormat = '[]') {
     try {
         const content = fs.readFileSync(getBlockchainDataFilePath(filePath), 'utf8');
         let jsonData;
@@ -66,9 +66,9 @@ function isFileEmpty(filePath, jsonFormat = '[]') {
         }
 
         if (Array.isArray(jsonData)) {
-            return jsonData.length === 0;
+            return jsonData.length > 0;
         } else if (typeof jsonData === 'object') {
-            return Object.keys(jsonData).length === 0;
+            return Object.keys(jsonData).length > 0;
         }
         return false;
     } catch (err) {
@@ -79,11 +79,11 @@ function isFileEmpty(filePath, jsonFormat = '[]') {
 }
 
 // Function to check if a directory is empty
-function isDirectoryEmpty(directoryPath) {
+function isDirectoryNotEmpty(directoryPath) {
     try {
         const fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
         const files = fs.readdirSync(fullDirectoryPath);
-        return files.length === 0;
+        return files.length > 0;
     } catch (err) {
         ensureDirectoryExists(directoryPath);
     }
@@ -273,15 +273,15 @@ function isGenesisBlock() {
     const blocksIndexFile = '/indexes/blocks.json';
   
     try {
-        const blocksExist = isDirectoryEmpty(blocksDirectory);
+        const blocksExist = isDirectoryNotEmpty(blocksDirectory);
         const latestBlockInfoExists = fs.existsSync(latestBlockInfoFile);
         const blocksIndexFileExists = fs.existsSync(blocksIndexFile);
     
-        const isLatestBlockInfoEmpty = isFileEmpty(latestBlockInfoFile);
-        const isBlocksIndexEmpty = isFileEmpty(blocksIndexFile);
+        const isLatestBlockInfoEmpty = isFileNotEmpty(latestBlockInfoFile);
+        const isBlocksIndexEmpty = isFileNotEmpty(blocksIndexFile);
     
         // Check if all conditions are true
-        if (blocksExist || indexesExist || latestBlockInfoExists || blocksIndexFileExists || isLatestBlockInfoEmpty || isBlocksIndexEmpty) {
+        if (blocksExist || latestBlockInfoExists || blocksIndexFileExists || isLatestBlockInfoEmpty || isBlocksIndexEmpty) {
             return false;
         } else {
             return true;

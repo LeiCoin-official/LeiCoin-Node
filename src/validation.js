@@ -86,7 +86,7 @@ function isValidBlock(block) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
     }
 
-    if (data.existsBlock(hash, index)) {
+    if (data.existsBlock(hash, index).exists) {
         return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
     }
 
@@ -97,7 +97,7 @@ function isValidBlock(block) {
     }
   
     // Ensure that the block contains valid transactions (add your validation logic here)
-    for (let transaction of transactions) {
+    for (let transaction in transactions) {
         const transactionsValid = isValidTransaction(transaction);
         if (!transactionsValid) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }
