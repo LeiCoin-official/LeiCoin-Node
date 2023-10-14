@@ -14,29 +14,35 @@ function generateLogMessage(prefix, message, style = 'reset') {
         green: chalk.green,
         red: chalk.red,
     };
-  
+
     if (styles[style]) {
         return `${chalk[style](`${prefix}`)} ${styles[style](message)}`;
     } else {
         return `${chalk[prefix]} ${chalk.reset(message)}`;
     }
 }
-  
+
+function logMessageWithPrefix(prefix, ...messages) {
+    const message = messages.join(' ');
+    console.log(generateLogMessage(prefix, message));
+}
+
 const messageTypes = ['log', 'success', 'error'];
-  
+
 const messageConfigs = [
     { object: miner_message, prefix: chalk.cyan('[Miner]') },
     { object: server_message, prefix: chalk.magenta('[Server]') },
     { object: data_message, prefix: chalk.blue('[Data]') },
 ];
-  
+
 for (const type of messageTypes) {
     for (const { object, prefix } of messageConfigs) {
-        object[type] = (message) => {
-            console.log(generateLogMessage(prefix, message, type === 'log' ? 'reset' : type));
+        object[type] = (...messages) => {
+            logMessageWithPrefix(prefix, ...messages);
         };
     }
 }
+
 
 module.exports = {
     processRootDirectory,
