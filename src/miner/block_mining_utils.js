@@ -2,12 +2,10 @@ const crypto = require('crypto');
 const data = require('../handlers/dataHandler'); // Import the data-handler module
 const config = require('../handlers/configHandler');
 
-const mining_difficulty = 6;
-
 // Function to create a new block
 function createBlock() {
 
-	previousBlock = data.getLatestBlockInfo();
+	previousBlock = data.getLatestBlockInfo().data;
 
 	let newIndex;
 	let previousHash;

@@ -1,8 +1,8 @@
 const { parentPort, workerData } = require('worker_threads');
 const blockMiningUtils = require('./block_mining_utils');
+const util = require('../utils');
 
 const { block, threadIndex } = workerData;
-const mining_difficulty = 6; // Adjust the desired difficulty here
 
 // Function to mine a block with custom logic
 function mineBlock(block) {
@@ -10,7 +10,7 @@ function mineBlock(block) {
     block.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
     block.hash = blockMiningUtils.calculateBlockHash(block);
 
-    if (block.hash.substring(0, mining_difficulty) === '0'.repeat(mining_difficulty)) {
+    if (block.hash.substring(0, util.mining_difficulty) === '0'.repeat(util.mining_difficulty)) {
       return block;
     }
   }

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const util = require('../util.js');
+const util = require('../utils.js');
 const path = require('path');
 
 let mempool = {
@@ -18,7 +18,7 @@ function writeBlock(blockData) {
     const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
     try {
         if (!fs.existsSync(blockFilePath)) {
-            fs.writeFileSync(blockFilePath, JSON.stringify(blockData));
+            fs.writeFileSync(blockFilePath, JSON.stringify(blockData), {encoding:'utf8',flag:'w'});
             return {cb: 'success'}
         } else {
             console.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
@@ -148,7 +148,7 @@ function updateLatestBlockInfo(index, hash) {
             hash: hash,
             index: index,
         }
-        fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data));
+        fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data), {encoding:'utf8',flag:'w'});
         return {cb: 'success'};
     } catch (err) {
         console.error(`Error writing latest block info: ${err.message}`);

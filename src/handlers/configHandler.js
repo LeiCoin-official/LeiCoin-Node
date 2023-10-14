@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
-const util = require('../util');
+const util = require('../utils');
 
 // Function to load the configuration file or a default if it doesn't exist
 function loadNormalConfig() {

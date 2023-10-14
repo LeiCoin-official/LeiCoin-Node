@@ -23,7 +23,7 @@ function base64DecodeToString(data) {
 }
 
 function base64DecodeToBuffer(data) {
-    return Buffer.from(data, 'base64')
+    return Buffer.from(data, 'base64');
 }
 
 module.exports = {
