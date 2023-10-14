@@ -1,6 +1,5 @@
 const process = require('process');
 const chalk = require('chalk');
-const { ensureFileExists , ensureDirectoryExists } = require('./handlers/dataHandler');
 
 const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
@@ -38,21 +37,11 @@ for (const { object, prefix, color } of messageConfigs) {
     }
 }
 
-function createStorageIfNotExists() {
-    ensureDirectoryExists('/blocks');
-    ensureDirectoryExists('/utxos');
-    ensureDirectoryExists('/indexes');
-
-    ensureFileExists('/indexes/blocks.json');
-    ensureFileExists('/indexes/latestblockinfo.json');
-    ensureFileExists('/indexes/transactions.json');
-}
 
 module.exports = {
     processRootDirectory,
     mining_difficulty,
     miner_message,
     server_message,
-    data_message,
-    createStorageIfNotExists
+    data_message
 }

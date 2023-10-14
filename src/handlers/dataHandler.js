@@ -7,6 +7,17 @@ let mempool = {
     transactions: {}
 };
 
+function createStorageIfNotExists() {
+    ensureDirectoryExists('/blocks');
+    ensureDirectoryExists('/utxos');
+    ensureDirectoryExists('/indexes');
+
+    ensureFileExists('/indexes/blocks.json', '[]');
+    ensureFileExists('/indexes/latestblockinfo.json', '{}');
+    ensureFileExists('/indexes/transactions.json', '[]');
+}
+
+
 function getBlockchainDataFilePath(subpath) {
     return path.join(util.processRootDirectory, '/blockchain_data' + subpath);
 }
@@ -296,5 +307,8 @@ module.exports = {
     getLatestBlockInfo,
     updateLatestBlockInfo,
     existsBlock,
-    isGenesisBlock
+    isGenesisBlock,
+    ensureDirectoryExists,
+    ensureFileExists,
+    createStorageIfNotExists
 }

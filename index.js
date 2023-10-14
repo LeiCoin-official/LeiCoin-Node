@@ -1,4 +1,7 @@
 const util = require('./src/utils');
+const { createStorageIfNotExists } = require('./src/handlers/dataHandler');
+
+createStorageIfNotExists();
 
 util.server_message.log("Starting LeiCoin-Node Server ...");
 require("./src/server");
