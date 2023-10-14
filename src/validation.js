@@ -54,15 +54,32 @@ function isValidTransaction(transaction) {
 function isValidBlock(block) {
     const { index, previousHash, transactions, timestamp, nonce, hash } = block;
 
-    const previousBlock = data.readBlock(index - 1);
+    if (index == 0) {
 
-    if (previousBlock.cb !== "success") {
-        if (previousBlock.cb === "none") {
-            return {cb: false, status: 400, message: 'Bad Request. Previou Block does not exists.'};
-        } else if (previousBlock.cb === "error") {
-            return {cb: false, status: 500, message: 'Internal Server Error. Previou Block could not be readed.'};
+        
+
+    } else {
+
+        const previousBlock = data.readBlock(index - 1);
+
+        if (previousBlock.cb !== "success") {
+            if (previousBlock.cb === "none") {
+                return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+            } else if (previousBlock.cb === "error") {
+                return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
+            }
+            return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
         }
-        return {cb: false, status: 500, message: 'Internal Server Error. Previou Block could not be readed.'};
+
+        // Confirm that the block's index is greater than the previous block's index by one
+        if (index !== previousBlock.data.index + 1) {
+            return {cb: false, status: 400, message: 'Bad Request. Block index does not correspond to the previous blocks minus one.'};
+        }
+    
+        // Validate that the previous hash in the new block matches the hash of the previous block
+        if (previousHash !== previousBlock.data.hash) {
+            return {cb: false, status: 400, message: 'Bad Request. Previous Block hash is not the same as the previous block hash'};
+        }
     }
     
     if (crypto.createHash('sha256').update( index + previousHash + JSON.stringify(transactions) + timestamp + nonce).digest('hex') !== hash) {
@@ -78,20 +95,10 @@ function isValidBlock(block) {
     if (hash.substring(0, util.mining_difficulty) !== hashPrefix) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash is invalid.'};
     }
-    
-    // Confirm that the block's index is greater than the previous block's index by one
-    if (index !== previousBlock.data.index + 1) {
-      return {cb: false, status: 400, message: 'Bad Request. Block index does not correspond to the previous blocks minus one.'};
-    }
-  
-    // Validate that the previous hash in the new block matches the hash of the previous block
-    if (previousHash !== previousBlock.data.hash) {
-      return {cb: false, status: 400, message: 'Bad Request. Previous Block hash is not the same as the previous block hash'};
-    }
   
     // Ensure that the block contains valid transactions (add your validation logic here)
-    for (transaction in previousBlock.transactions) {
-        const transactionsValid = isValidTransaction(transactions);
+    for (let transaction of transactions) {
+        const transactionsValid = isValidTransaction(transaction);
         if (!transactionsValid) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }
     return {cb: true, status: 200, message: "Block received and added to the Blockchain."};

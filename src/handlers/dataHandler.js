@@ -11,6 +11,70 @@ function getBlockchainDataFilePath(subpath) {
     return path.join(util.processRootDirectory, '/blockchain_data' + subpath);
 }
 
+// Function to ensure the existence of a directory
+function ensureDirectoryExists(directoryPath) {
+    const fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
+    try {
+        if (!fs.existsSync(fullDirectoryPath)) {
+            fs.mkdirSync(fullDirectoryPath, { recursive: true });
+        }
+    } catch (err) {
+        util.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
+    }
+}
+
+// Function to ensure the existence of a file
+function ensureFileExists(filePath) {
+    const fullFilePath = getBlockchainDataFilePath(filePath);
+    try {
+        const dir = path.dirname(fullFilePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        if (!fs.existsSync(fullFilePath)) {
+            fs.writeFileSync(fullFilePath, '', 'utf8');
+        }
+    } catch (err) {
+        util.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
+    }
+}
+
+// Function to check if a file is empty or contains an empty JSON object or array
+function isFileEmpty(filePath, jsonFormat = '[]') {
+    try {
+        const content = fs.readFileSync(getBlockchainDataFilePath(filePath), 'utf8');
+        let jsonData;
+        try {
+            jsonData = JSON.parse(content);
+        } catch (err) {
+            jsonData = JSON.parse(jsonFormat);
+            fs.writeFileSync(getBlockchainDataFilePath(filePath), JSON.stringify(jsonData, null, 2), 'utf8');
+        }
+
+        if (Array.isArray(jsonData)) {
+            return jsonData.length === 0;
+        } else if (typeof jsonData === 'object') {
+            return Object.keys(jsonData).length === 0;
+        }
+        return false;
+    } catch (err) {
+        const jsonData = JSON.parse(jsonFormat);
+        fs.writeFileSync(getBlockchainDataFilePath(filePath), JSON.stringify(jsonData, null, 2), 'utf8');
+        return true;
+    }
+}
+
+// Function to check if a directory is empty
+function isDirectoryEmpty(directoryPath) {
+    try {
+        const fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
+        const files = fs.readdirSync(fullDirectoryPath);
+        return files.length === 0;
+    } catch (err) {
+        util.data_message.error(`Error checking if the directory is empty: ${err.message}`);
+    }
+}
+
 
 // Function to write a block
 function writeBlock(blockData) {
@@ -189,6 +253,32 @@ function existsBlock(blockHash, blockIndex) {
     }
 }
 
+function isGenesisBlock() {
+    const blocksDirectory = getBlockchainDataFilePath('/blocks');
+    const latestBlockInfoFile = getBlockchainDataFilePath('/indexes/latestblockinfo.json');
+    const blocksIndexFile = getBlockchainDataFilePath('/indexes/blocks.json');
+  
+    try {
+        const blocksExist = isDirectoryEmpty(blocksDirectory);
+        const latestBlockInfoExists = fs.existsSync(latestBlockInfoFile);
+        const blocksIndexFileExists = fs.existsSync(blocksIndexFile);
+    
+        const isLatestBlockInfoEmpty = isFileEmpty(latestBlockInfoFile);
+        const isBlocksIndexEmpty = isFileEmpty(blocksIndexFile);
+    
+        // Check if all conditions are true
+        if (blocksExist || indexesExist || latestBlockInfoExists || blocksIndexFileExists || isLatestBlockInfoEmpty || isBlocksIndexEmpty) {
+            return false;
+        } else {
+            return true;
+        }
+    } catch (err) {
+        util.data_message.error(`Error checking for existing blocks: ${err.message}`);
+        return false;
+    }
+}
+
+
 module.exports = {
     mempool,
     writeBlock,
@@ -202,5 +292,6 @@ module.exports = {
     readTransaction,
     getLatestBlockInfo,
     updateLatestBlockInfo,
-    existsBlock
+    existsBlock,
+    isGenesisBlock
 }
