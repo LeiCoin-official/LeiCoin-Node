@@ -9,9 +9,10 @@ const data = require("../../handlers/dataHandler");
 router.use('/', (req, res, next) => {
 
     if (req.method !== 'POST') {
-        res.status(405).json({ message: 'Method Not Allowed. Use POST instead' });
+        res.status(405);
+        res.json({ message: 'Method Not Allowed. Use POST instead' });
         return;
-      }
+    }
 
 	const blockData = req.body;
 	
@@ -25,8 +26,8 @@ router.use('/', (req, res, next) => {
 		return;
 	}
 
-	// Add the transaction to the mempool (replace with your blockchain logic)
-	data.writeBlock(blockData)
+    // Add the transaction to the mempool (replace with your blockchain logic)
+    data.writeBlock(blockData);
 
 });
 
