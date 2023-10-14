@@ -15,18 +15,30 @@ function getBlockchainDataFilePath(subpath) {
 // Function to write a block
 function writeBlock(blockData) {
     const blockNumber = blockData.index;
+    const blockHash = blockData.hash;
     const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
+    const blocksListFilePath = getBlockchainDataFilePath('/indexes/blocks.json');
+
     try {
+        // Check if the block file already exists.
         if (!fs.existsSync(blockFilePath)) {
-            fs.writeFileSync(blockFilePath, JSON.stringify(blockData), {encoding:'utf8',flag:'w'});
-            return {cb: 'success'}
+            // Write the block data to the block file.
+            fs.writeFileSync(blockFilePath, JSON.stringify(blockData), { encoding: 'utf8', flag: 'w' });
+  
+            // Update the list of blocks.
+            const blocksListData = fs.readFileSync(blocksListFilePath, 'utf8');
+            const blocksList = JSON.parse(blocksListData);
+            blocksList.push({ hash: blockHash, index: blockNumber });
+            fs.writeFileSync(blocksListFilePath, JSON.stringify(blocksList), { encoding: 'utf8', flag: 'w' });
+
+            return { cb: 'success' };
         } else {
             console.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
-            return {cb: 'error'}
+            return { cb: 'error' };
         }
     } catch (err) {
         console.error(`Error writing block ${blockNumber}: ${err.message}.`);
-        return {cb: 'error'}
+        return { cb: 'error' };
     }
 }
 
@@ -156,6 +168,27 @@ function updateLatestBlockInfo(index, hash) {
     }
 }
 
+// Define the function to check if a block with a specific hash and index exists.
+function existsBlock(blockHash, blockIndex) {
+    try {
+        const latestBlockInfoFilePath = getBlockchainDataFilePath('/indexes/blocks.json');
+        const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
+        const blockArray = JSON.parse(data);
+    
+        // Check if an object with the specified hash and index exists in the array.
+        const exists = blockArray.some(block => block.hash === blockHash && block.index === blockIndex);
+    
+        if (exists) {
+            return { cb: 'success', exists: true };
+        } else {
+            return { cb: 'success', exists: false };
+        }
+    } catch (err) {
+        console.error(`Error reading latest block info: ${err.message}`);
+        return { cb: 'error' };
+    }
+}
+
 module.exports = {
     mempool,
     writeBlock,
@@ -168,5 +201,6 @@ module.exports = {
     writeTransaction,
     readTransaction,
     getLatestBlockInfo,
-    updateLatestBlockInfo
+    updateLatestBlockInfo,
+    existsBlock
 }

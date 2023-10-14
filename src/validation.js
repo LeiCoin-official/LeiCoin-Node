@@ -1,6 +1,7 @@
 const crypto = require('crypto');
-const cryptoHandler = require('./handlers/cryptoHandlers.js');
+const cryptoHandler = require('./handlers/cryptoHandlers');
 const util = require('./utils.js');
+const data = require('./handlers/dataHandler');
 
 // Function to check if the transaction arguments are valid
 function areTransactionArgsValid(transaction) {
@@ -52,7 +53,21 @@ function isValidTransaction(transaction) {
 
 function isValidBlock(block) {
     const { index, previousHash, transactions, timestamp, nonce, hash } = block;
-  
+
+    const previousBlock = data.readBlock(index - 1);
+
+    if (previousBlock.cb !== "success") {
+        return false;
+    }
+    
+    if (crypto.createHash('sha256').update( index + previousHash + JSON.stringify(transactions) + timestamp + nonce).digest('hex') !== hash) {
+        return false;
+    }
+
+    if (data.existsBlock(hash, index)) {
+        return false;
+    }
+
     // Verify that the hash of the block meets the mining difficulty criteria
     const hashPrefix = '0'.repeat(util.mining_difficulty);
     if (hash.substring(0, util.mining_difficulty) !== hashPrefix) {
@@ -60,12 +75,12 @@ function isValidBlock(block) {
     }
     
     // Confirm that the block's index is greater than the previous block's index by one
-    if (index !== previousBlock.index + 1) {
+    if (index !== previousBlock.data.index + 1) {
       return false;
     }
   
     // Validate that the previous hash in the new block matches the hash of the previous block
-    if (previousHash !== previousBlock.hash) {
+    if (previousHash !== previousBlock.data.hash) {
       return false;
     }
   
