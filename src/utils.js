@@ -7,8 +7,9 @@ const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
 
 const miner_message = {};
-const server_message = {};
+const api_message = {};
 const data_message = {};
+const ws_message = {};
 
 const styles = {
     reset: chalk.reset,
@@ -19,9 +20,10 @@ const styles = {
 const messageTypes = ['log', 'success', 'error'];
 
 const messageConfigs = [
-    { object: miner_message, prefix: 'Miner', color: 'cyan' },
-    { object: server_message, prefix: 'Server', color: 'magenta' },
-    { object: data_message, prefix: 'Data', color: 'blue' },
+    { object: miner_message, prefix: 'Miner', color: '#00ffff' },
+    { object: api_message, prefix: 'API', color: '#c724b1' },
+    { object: data_message, prefix: 'Data', color: '#1711df' },
+    { object: ws_message, prefix: 'WebSocket', color: '#f47fff' },
 ];
 
 const rl = readline.createInterface({
@@ -31,7 +33,7 @@ const rl = readline.createInterface({
 });
 
 function generateLogMessage(prefix, message, color, type = 'log') {
-    const colorizedPrefix = chalk[color](`[${prefix}]`);
+    const colorizedPrefix = chalk.hex(color).visible(`[${prefix}]`);
     const styleFunction = styles[type] || styles.reset;
     const styledMessage = styleFunction(message);
     return `${colorizedPrefix} ${styledMessage}`;
@@ -86,6 +88,7 @@ module.exports = {
     processRootDirectory,
     mining_difficulty,
     miner_message,
-    server_message,
+    api_message,
+    ws_message,
     data_message,
 };
