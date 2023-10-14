@@ -4,6 +4,10 @@ const chalk = require('chalk');
 const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
 
+const miner_message = {};
+const server_message = {};
+const data_message = {};
+
 function generateLogMessage(prefix, message, style = 'reset') {
     const styles = {
       reset: chalk.reset,
