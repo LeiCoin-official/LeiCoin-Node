@@ -24,7 +24,7 @@ function ensureDirectoryExists(directoryPath) {
 }
 
 // Function to ensure the existence of a file
-function ensureFileExists(filePath) {
+function ensureFileExists(filePath, content = '') {
     const fullFilePath = getBlockchainDataFilePath(filePath);
     try {
         const dir = path.dirname(fullFilePath);
@@ -32,7 +32,7 @@ function ensureFileExists(filePath) {
             fs.mkdirSync(dir, { recursive: true });
         }
         if (!fs.existsSync(fullFilePath)) {
-            fs.writeFileSync(fullFilePath, '', 'utf8');
+            fs.writeFileSync(fullFilePath, content, 'utf8');
         }
     } catch (err) {
         util.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
@@ -48,7 +48,7 @@ function isFileEmpty(filePath, jsonFormat = '[]') {
             jsonData = JSON.parse(content);
         } catch (err) {
             jsonData = JSON.parse(jsonFormat);
-            fs.writeFileSync(getBlockchainDataFilePath(filePath), JSON.stringify(jsonData, null, 2), 'utf8');
+            ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
         }
 
         if (Array.isArray(jsonData)) {
@@ -59,7 +59,7 @@ function isFileEmpty(filePath, jsonFormat = '[]') {
         return false;
     } catch (err) {
         const jsonData = JSON.parse(jsonFormat);
-        fs.writeFileSync(getBlockchainDataFilePath(filePath), JSON.stringify(jsonData, null, 2), 'utf8');
+        ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
         return true;
     }
 }
@@ -71,7 +71,7 @@ function isDirectoryEmpty(directoryPath) {
         const files = fs.readdirSync(fullDirectoryPath);
         return files.length === 0;
     } catch (err) {
-        util.data_message.error(`Error checking if the directory is empty: ${err.message}`);
+        ensureDirectoryExists(directoryPath);
     }
 }
 
@@ -254,9 +254,9 @@ function existsBlock(blockHash, blockIndex) {
 }
 
 function isGenesisBlock() {
-    const blocksDirectory = getBlockchainDataFilePath('/blocks');
-    const latestBlockInfoFile = getBlockchainDataFilePath('/indexes/latestblockinfo.json');
-    const blocksIndexFile = getBlockchainDataFilePath('/indexes/blocks.json');
+    const blocksDirectory = '/blocks';
+    const latestBlockInfoFile = '/indexes/latestblockinfo.json';
+    const blocksIndexFile = '/indexes/blocks.json';
   
     try {
         const blocksExist = isDirectoryEmpty(blocksDirectory);
