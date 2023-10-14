@@ -1,4 +1,4 @@
 config/config.json
 config/.env
-config/knownnodes.json
+config/peers.json
 blockchain_data
