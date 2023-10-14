@@ -68,7 +68,6 @@ async function main() {
 function afterMiningLogic(blockResult) {
 	data.writeBlock(blockResult);
 	data.updateLatestBlockInfo(blockResult.index, blockResult.hash);
-	validation.isValidBlock(blockResult);
 }
 
 if (isMainThread && config.miner.active) {
