@@ -17,6 +17,7 @@ function ensureDirectoryExists(directoryPath) {
     try {
         if (!fs.existsSync(fullDirectoryPath)) {
             fs.mkdirSync(fullDirectoryPath, { recursive: true });
+            util.data_message.log(`Directory ${directoryPath} was created because it was missing.`);
         }
     } catch (err) {
         util.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
@@ -30,9 +31,11 @@ function ensureFileExists(filePath, content = '') {
         const dir = path.dirname(fullFilePath);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
+            util.data_message.log(`Directory ${dir} was created because it was missing.`);
         }
         if (!fs.existsSync(fullFilePath)) {
             fs.writeFileSync(fullFilePath, content, 'utf8');
+            util.data_message.log(`File ${filePath} was created because it was missing.`);
         }
     } catch (err) {
         util.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
