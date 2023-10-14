@@ -6,38 +6,36 @@ const mining_difficulty = 6;
 
 function generateLogMessage(prefix, message, style = 'reset') {
     const styles = {
-        reset: chalk.reset,
-        green: chalk.green,
-        red: chalk.red,
+      reset: chalk.reset,
+      green: chalk.green,
+      red: chalk.red,
+      blue: chalk.blue,
     };
   
     if (styles[style]) {
-        return `${chalk[prefix](`[${prefix}]`)} ${styles[style](message)}`;
+      return `${chalk[prefix](`[${prefix}]`)} ${styles[style](message)}`;
     } else {
-        return `${chalk[prefix](`[${prefix}]`)} ${chalk.reset(message)}`;
+      return `${chalk[prefix](`[${prefix}]`)} ${chalk.reset(message)}`;
     }
-}
+  }
   
-const messageTypes = ['log', 'success', 'error'];
+  const messageTypes = ['log', 'success', 'error'];
   
-// Create objects for miner and server messages using a loop
-const miner_message = {};
-const server_message = {};
-const data_message = {};
+  // Define mappings of prefixes and colors
+  const messageConfigs = [
+    { object: miner_message, prefix: 'Miner', color: 'cyan' },
+    { object: server_message, prefix: 'Server', color: 'magenta' },
+    { object: data_message, prefix: 'Data', color: 'blue' },
+  ];
   
-for (const type of messageTypes) {
-    miner_message[type] = (message) => {
-        console.log(generateLogMessage('cyan', message, type === 'log' ? 'reset' : type));
-    };
-  
-    server_message[type] = (message) => {
-        console.log(generateLogMessage('magenta', message, type === 'log' ? 'reset' : type));
-    };
-
-    data_message[type] = (message) => {
-        console.log(generateLogMessage('blue', message, type === 'log' ? 'reset' : type));
-    };
-}
+  // Create objects for miner, server, and data messages using a loop
+  for (const type of messageTypes) {
+    for (const { object, prefix, color } of messageConfigs) {
+      object[type] = (message) => {
+        console.log(generateLogMessage(color, message, type === 'log' ? 'reset' : type));
+      };
+    }
+  }
 
 module.exports = {
     processRootDirectory,
