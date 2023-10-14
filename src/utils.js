@@ -63,7 +63,7 @@ function handleCommand(command) {
       case 'help':
         console.log('Available commands:');
         console.log(' - help: Show available commands');
-        console.log(' - sayhello: Print "Hello, World!"');
+        console.log(' - stop: Stops The Server and Miner');
         break;
       case 'stop':
         process.exit(0);
