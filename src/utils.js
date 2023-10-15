@@ -80,7 +80,7 @@ rl.on('line', (input) => {
     handleCommand(input.trim().toLowerCase());
     rl.prompt();
 }).on('close', () => {
-    console.log('CLI closed.');
+    //console.log('CLI closed.');
     process.exit(0);
 });
 
