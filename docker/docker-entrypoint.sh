@@ -15,7 +15,7 @@ clone_exit_code=$?
 # Check if the clone was successful
 if [ $clone_exit_code -eq 0 ]; then
     # Copy all files to /home/container while excluding .git, .github, and files listed in .gitignore
-    rsync -avq --exclude='.git*' --exclude='docker' --filter=':- .gitignore' /home/container/gittmp/ /home/container/
+    rsync -avq --delete --exclude='.git*' --exclude='docker' --filter=':- .gitignore' /home/container/gittmp/ /home/container/
 
     echo "GitHub repository cloned and files copied successfully."
 else
