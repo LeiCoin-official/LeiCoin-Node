@@ -11,11 +11,14 @@ const api_message = {};
 const data_message = {};
 const ws_message = {};
 
+const ctx = new chalk.Instance({level: 3});
+
 const styles = {
-    reset: chalk.reset,
-    success: chalk.green,
-    error: chalk.red,
+    reset: ctx.reset,
+    success: ctx.green,
+    error: ctx.red,
 };
+
 
 const messageTypes = ['log', 'success', 'error'];
 
@@ -33,7 +36,7 @@ const rl = readline.createInterface({
 });
 
 function generateLogMessage(prefix, message, color, type = 'log') {
-    const colorizedPrefix = chalk.hex(color).visible(`[${prefix}]`);
+    const colorizedPrefix = ctx.hex(color).visible(`[${prefix}]`);
     const styleFunction = styles[type] || styles.reset;
     const styledMessage = styleFunction(message);
     return `${colorizedPrefix} ${styledMessage}`;
