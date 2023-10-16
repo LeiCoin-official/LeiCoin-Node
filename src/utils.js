@@ -7,9 +7,9 @@ const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
 
 const miner_message = {};
-const api_message = {};
+const server_message = {};
 const data_message = {};
-const ws_message = {};
+const ws_client_message = {};
 
 const ctx = new chalk.Instance({level: 3});
 
@@ -24,9 +24,9 @@ const messageTypes = ['log', 'success', 'error'];
 
 const messageConfigs = [
     { object: miner_message, prefix: 'Miner', color: '#00ffff' },
-    { object: api_message, prefix: 'API', color: '#c724b1' },
+    { object: server_message, prefix: 'Server', color: '#c724b1' },
     { object: data_message, prefix: 'Data', color: '#1711df' },
-    { object: ws_message, prefix: 'WebSocket', color: '#f47fff' },
+    { object: ws_client_message, prefix: 'WS Client', color: '#f47fff' },
 ];
 
 const rl = readline.createInterface({
@@ -91,7 +91,7 @@ module.exports = {
     processRootDirectory,
     mining_difficulty,
     miner_message,
-    api_message,
-    ws_message,
+    server_message,
+    ws_client_message,
     data_message,
 };

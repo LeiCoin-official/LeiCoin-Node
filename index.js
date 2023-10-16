@@ -3,13 +3,13 @@ const { createStorageIfNotExists } = require('./src/handlers/dataHandler');
 
 createStorageIfNotExists();
 
-util.api_message.log("Starting LeiCoin-Node API ...");
-require("./src/api");
-util.api_message.log("LeiCoin-Node API started");
+util.server_message.log("Starting LeiCoin-Node Server ...");
+require("./src/server");
+util.server_message.log("LeiCoin-Node Server started");
 
-util.ws_message.log("Starting LeiCoin-Node WebSocket ...");
-require("./src/websocket");
-util.ws_message.log("LeiCoin-Node WebSocket started");
+util.ws_message.log("Starting LeiCoin-Node WS ...");
+require("./src/ws-client");
+util.ws_message.log("LeiCoin-Node WS Client started");
 
 util.miner_message.log("Starting LeiCoin-Node Miner ...");
 require("./src/miner");

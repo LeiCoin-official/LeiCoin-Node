@@ -1,5 +1,5 @@
 {
-    "api": {
+    "server": {
         "port": 12200
     },
     "miner": {

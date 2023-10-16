@@ -95,10 +95,10 @@ function loadConfig() {
     // Check for --internal-port and extract the value
     let internalPort = getInternalPort();
     if (internalPort !== null) {
-        config.api.port = internalPort;
+        config.server.port = internalPort;
     }
 
-    config.knownNodes = loadKnownNodesConfig();
+    config.peers = loadKnownNodesConfig();
 
     return config;
 }
@@ -106,7 +106,7 @@ function loadConfig() {
 // Function to extract the value after --internal-port
 function getInternalPort() {
     const args = process.argv.slice(2);
-    const internalPortIndex = args.indexOf('--api-internal-port');
+    const internalPortIndex = args.indexOf('--internal-port');
 
     if (internalPortIndex !== -1 && internalPortIndex < args.length - 1) {
         return args[internalPortIndex + 1];

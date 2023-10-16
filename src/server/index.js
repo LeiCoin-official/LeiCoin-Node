@@ -25,6 +25,6 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.listen(config.api.port, () => {
-    util.api_message.log(`API listening on port ${config.api.port}`);
+app.listen(config.server.port, () => {
+    util.server_message.log(`Server listening on port ${config.server.port}`);
 });
