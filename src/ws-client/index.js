@@ -1,7 +1,7 @@
 const config = require('../handlers/configHandler');
 const WebSocket = require('ws');
 
-const socket = new WebSocket(`ws://0.0.0.0:${config.ws.port}`);
+const socket = new WebSocket(`ws://0.0.0.0:${config.server.port}/ws`);
 
 socket.on('open', () => {
   console.log('Connected to the server.');
@@ -14,7 +14,7 @@ socket.on('open', () => {
   // Send a message to all connected peers
   const message = 'Hello, peers!';
   config.peers.forEach((peerHost) => {
-    const peerURL = `ws://${peerHost}`;
+    const peerURL = `ws://${peerHost}/ws`;
     const peerSocket = new WebSocket(peerURL);
 
     peerSocket.on('open', () => {
