@@ -80,8 +80,8 @@ function loadENVConfig() {
         } else {
             // If it doesn't exist, read and parse the default configuration
             const defaultENVData = fs.readFileSync(defaultENVFilePath, 'utf-8');
-            fs.writeFileSync(configFilePath, defaultENVData);
-            return loadKnownNodesConfig();
+            fs.writeFileSync(envFilePath, defaultENVData);
+            return loadENVConfig();
         }
     } catch (error) {
         util.data_message.error('Error loading .env configuration:', error);

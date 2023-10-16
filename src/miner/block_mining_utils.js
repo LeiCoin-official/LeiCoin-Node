@@ -23,7 +23,7 @@ function createBlock() {
 		timestamp: new Date().getTime(),
 		nonce: 0,
 		coinbase: {
-			minerAdress: config.miner.minerAdress,
+			minerAdress: config.miner.minerAddress,
 			amount: 50
 		},
 		hash: '',
