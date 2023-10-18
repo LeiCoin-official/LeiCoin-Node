@@ -7,8 +7,7 @@ const { block, threadIndex } = workerData;
 // Function to mine a block with custom logic
 function mineBlock(block) {
   while (true) {
-    block.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
-    block.hash = blockMiningUtils.calculateBlockHash(block);
+    block = blockMiningUtils.createBlock(nonce)
 
     if (block.hash.substring(0, util.mining_difficulty) === '0'.repeat(util.mining_difficulty)) {
       return block;
