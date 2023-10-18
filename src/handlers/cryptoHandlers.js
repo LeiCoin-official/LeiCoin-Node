@@ -18,18 +18,28 @@ function base64EncodeToString(data) {
     return Buffer.from(data).toString('base64');
 }
 
+function base64EncodeToBuffer(data) {
+    return Buffer.from(data, 'base64');
+}
+
 function base64DecodeToString(data) {
     return Buffer.from(data, 'base64').toString();
 }
 
-function base64DecodeToBuffer(data) {
-    return Buffer.from(data, 'base64');
+function encodePublicKeyToAddress(public_key_pem) {
+    return base64EncodeToString(public_key_pem.replace('-----BEGIN PUBLIC KEY-----\n', '').replace('\n-----END PUBLIC KEY-----\n', ''));
+}
+
+function decodeAddressToPublicKey(address) {
+    return '-----BEGIN PUBLIC KEY-----\n' + base64DecodeToString(address) + '\n-----END PUBLIC KEY-----\n';
 }
 
 module.exports = {
     sha256,
     base64EncodeToString,
     base64DecodeToString,
-    base64DecodeToBuffer
+    base64EncodeToBuffer,
+    encodePublicKeyToAddress,
+    decodeAddressToPublicKey
 }
 

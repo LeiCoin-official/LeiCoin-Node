@@ -220,6 +220,57 @@ function readTransaction(txID) {
     }
 }
 
+// Function to write a UTXO
+function addUTXO(transactionData) {
+    const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
+    try {
+        if (!fs.existsSync(txFilePath)) {
+            fs.writeFileSync(txFilePath, JSON.stringify(transactionData, null, 2));
+            success
+        } else {
+            util.data_message.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
+            return {cb: 'error'}
+        }
+    } catch (err) {
+        util.data_message.error(`Error writing transaction ${txID}: ${err.message}`);
+        return {cb: 'error'}
+    }
+}
+
+// Function to read a UTXO
+function readUTXOS(transactionData) {
+    const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
+    try {
+        if (fs.existsSync(txFilePath)) {
+            const data = fs.readFileSync(txFilePath, 'utf8');
+            return {cb: 'success', data: JSON.parse(data)}
+        } else {
+            util.data_message.error(`Transaktion ${txID} was not found`);
+            return {cb: 'none'}
+        }
+    } catch (err) {
+        util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
+        return {cb: 'error'}
+    }
+}
+
+// Function to remove a UTXO
+function removeUTXO(transactionData) {
+    const txFilePath = getBlockchainDataFilePath(`/utcos/${txID}.json`);
+    try {
+        if (fs.existsSync(txFilePath)) {
+            const data = fs.readFileSync(txFilePath, 'utf8');
+            return {cb: 'success', data: JSON.parse(data)}
+        } else {
+            util.data_message.error(`Transaktion ${txID} was not found`);
+            return {cb: 'none'}
+        }
+    } catch (err) {
+        util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
+        return {cb: 'error'}
+    }
+}
+
 function getLatestBlockInfo() {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
     try {

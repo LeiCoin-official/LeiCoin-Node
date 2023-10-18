@@ -25,12 +25,12 @@ function isTransactionSignatureValid(transaction) {
     delete transactionData.txid;
   
     // decode the senderAddress
-    const publicKeyPEM = cryptoHandler.base64DecodeToString(senderAddress);
+    const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(senderAddress);
   
     // Verify the signature
     const verifier = crypto.createVerify('RSA-SHA256');
     verifier.update(JSON.stringify(transactionData));
-    const signatureBuffer = cryptoHandler.base64DecodeToBuffer(signature);
+    const signatureBuffer = cryptoHandler.base64EncodeToBuffer(signature);
     const isVerified = verifier.verify(publicKeyPEM, signatureBuffer);
   
     return isVerified;
