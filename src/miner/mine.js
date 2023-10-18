@@ -25,4 +25,4 @@ const minedBlock = mineBlock(block);
 //   parentPort.postMessage(null); // Indicate that this thread did not find a valid block
 // }
 
-parentPort.postMessage(block);
+parentPort.postMessage(minedBlock);
