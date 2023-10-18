@@ -28,6 +28,10 @@ router.use('/', (req, res, next) => {
 
     // Add the transaction to the mempool (replace with your blockchain logic)
     data.writeBlock(blockData);
+    data.updateLatestBlockInfo(blockData.index, blockData.hash);
+    for (let [transactionHash, transactionData] of Object.entries(blockData.transactions)) {
+    	data.removeTransactionFromMempool(transactionData);
+  	}
 
 });
 
