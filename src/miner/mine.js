@@ -2,7 +2,7 @@ const { parentPort, workerData } = require('worker_threads');
 const blockMiningUtils = require('./block_mining_utils');
 const util = require('../utils');
 
-const { block, threadIndex } = workerData;
+//const { block, threadIndex } = workerData;
 
 // Function to mine a block with custom logic
 function mineBlock(block) {

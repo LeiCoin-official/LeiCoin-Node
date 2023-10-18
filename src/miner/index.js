@@ -12,11 +12,12 @@ async function runInMiningParallel() {
 	let results = new Array(numberOfThreads).fill(null);
 
 	// Create a block to be mined by all threads
-	const block = blockMiningUtils.createBlock();
+	//const block = blockMiningUtils.createBlock();
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise((resolve) => {
-		const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { block, threadIndex: i } });
+		//const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { block, threadIndex: i } });
+		const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: {} });
 		workerThreads.push(worker);
 
 		worker.on('message', (data) => {
