@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const data = require('../handlers/dataHandler'); // Import the data-handler module
 const config = require('../handlers/configHandler');
-const { stringify } = require('querystring');
 
 // Function to create a new block
 function createBlock() {
@@ -22,15 +21,13 @@ function createBlock() {
 		previousHash: previousHash,
 		transactions: data.mempool.transactions,
 		timestamp: new Date().getTime(),
-		nonce: Math.floor(Math.random() * 4294967296),
+		nonce: 0,
 		coinbase: {
 			minerAdress: config.miner.minerAddress,
 			amount: 50
 		},
 		hash: '',
     };
-
-	newBlock.hash = calculateBlockHash(newBlock);
 
     return newBlock;
 }
@@ -61,5 +58,6 @@ function removeAddedTransactions(block) {
 
 module.exports = {
 	createBlock,
+	calculateBlockHash,
 	removeAddedTransactions,
 }

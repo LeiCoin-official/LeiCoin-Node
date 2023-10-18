@@ -52,7 +52,7 @@ function isValidTransaction(transaction) {
 
 
 function isValidBlock(block) {
-    const { index, previousHash, transactions, timestamp, nonce, hash } = block;
+    const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
 
     if (index == 0) {
 
@@ -82,7 +82,7 @@ function isValidBlock(block) {
         }
     }
     
-    if (crypto.createHash('sha256').update( index + previousHash + JSON.stringify(transactions) + timestamp + nonce).digest('hex') !== hash) {
+    if (crypto.createHash('sha256').update( index + previousHash + JSON.stringify(transactions) + timestamp + nonce + JSON.stringify(coinbase)).digest('hex') !== hash) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
     }
 

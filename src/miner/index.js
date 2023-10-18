@@ -12,12 +12,11 @@ async function runInMiningParallel() {
 	let results = new Array(numberOfThreads).fill(null);
 
 	// Create a block to be mined by all threads
-	//const block = blockMiningUtils.createBlock();
+	const block = blockMiningUtils.createBlock();
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise((resolve) => {
-		//const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { block, threadIndex: i } });
-		const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: {} });
+		const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { block, threadIndex: i } });
 		workerThreads.push(worker);
 
 		worker.on('message', (data) => {
@@ -71,6 +70,7 @@ function afterMiningLogic(blockResult) {
 	if (validation.isValidBlock(blockResult).cb) {
 		data.writeBlock(blockResult);
 		data.updateLatestBlockInfo(blockResult.index, blockResult.hash);
+		blockMiningUtils.removeAddedTransactions(blockResult);
 		util.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
 		util.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
