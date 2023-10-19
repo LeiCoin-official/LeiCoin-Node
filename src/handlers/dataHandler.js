@@ -11,6 +11,7 @@ function createStorageIfNotExists() {
     ensureDirectoryExists('/blocks');
     ensureDirectoryExists('/utxos');
     ensureDirectoryExists('/indexes');
+    ensureDirectoryExists('/forks');
 
     ensureFileExists('/indexes/blocks.json', '[]');
     ensureFileExists('/indexes/latestblockinfo.json', '{}');

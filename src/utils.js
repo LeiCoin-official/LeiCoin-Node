@@ -65,17 +65,17 @@ for (const { object, prefix } of messageConfigs) {
 
 function handleCommand(command) {
     switch (command) {
-      case 'help':
-        console.log('Available commands:');
-        console.log(' - help: Show available commands');
-        console.log(' - stop: Stops The Server and Miner');
-        break;
-      case 'stop':
-        process.exit(0);
-        break;
-      default:
-        console.log('Command not recognized. Type "help" for available commands.');
-        break;
+        case 'help':
+            console.log('Available commands:');
+            console.log(' - help: Show available commands');
+            console.log(' - stop: Stops The Server and Miner');
+            break;
+        case 'stop':
+            process.exit(0);
+            break;
+        default:
+            console.log('Command not recognized. Type "help" for available commands.');
+            break;
     }
 }
 
