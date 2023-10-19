@@ -99,7 +99,7 @@ function isValidBlock(block) {
     // Ensure that the block contains valid transactions (add your validation logic here)
     for (let transaction in transactions) {
         const transactionsValid = isValidTransaction(transaction);
-        if (!transactionsValid) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
+        if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }
     return {cb: true, status: 200, message: "Block received and added to the Blockchain."};
   }
