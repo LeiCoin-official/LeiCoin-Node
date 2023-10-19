@@ -3,40 +3,42 @@ const cryptoHandler = require('./handlers/cryptoHandlers');
 const util = require('./utils.js');
 const data = require('./handlers/dataHandler');
 
-// Function to check if the transaction arguments are valid
-function areTransactionArgsValid(transaction) {
-    const { txid, senderAddress, recipientAddress, amount, signature } = transaction;
-  
-    // Ensure that all required fields are present
-    if (!txid || !senderAddress || !recipientAddress || !amount || !signature) {
-        return false;
-    }
-  
-    return true;
-}
-
-
-function isTransactionSignatureValid(transaction) {
-    const { signature, senderAddress } = transaction;
-  
-    // Prepare transaction data for verification (exclude the signature)
-    const transactionData = { ...transaction };
-    delete transactionData.signature;
-    delete transactionData.txid;
-  
-    // decode the senderAddress
-    const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(senderAddress);
-  
-    // Verify the signature
-    const verifier = crypto.createVerify('RSA-SHA256');
-    verifier.update(JSON.stringify(transactionData));
-    const signatureBuffer = cryptoHandler.base64EncodeToBuffer(signature);
-    const isVerified = verifier.verify(publicKeyPEM, signatureBuffer);
-  
-    return isVerified;
-}
 
 function isValidTransaction(transaction) {
+
+    // Function to check if the transaction arguments are valid
+    function areTransactionArgsValid(transaction) {
+        const { txid, senderAddress, recipientAddress, amount, signature } = transaction;
+    
+        // Ensure that all required fields are present
+        if (!txid || !senderAddress || !recipientAddress || !amount || !signature) {
+            return false;
+        }
+    
+        return true;
+    }
+
+
+    function isTransactionSignatureValid(transaction) {
+        const { signature, senderAddress } = transaction;
+    
+        // Prepare transaction data for verification (exclude the signature)
+        const transactionData = { ...transaction };
+        delete transactionData.signature;
+        delete transactionData.txid;
+    
+        // decode the senderAddress
+        const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(senderAddress);
+    
+        // Verify the signature
+        const verifier = crypto.createVerify('RSA-SHA256');
+        verifier.update(JSON.stringify(transactionData));
+        const signatureBuffer = cryptoHandler.base64EncodeToBuffer(signature);
+        const isVerified = verifier.verify(publicKeyPEM, signatureBuffer);
+    
+        return isVerified;
+    }
+
 
 	if (areTransactionArgsValid(transaction)) {
 
@@ -50,9 +52,14 @@ function isValidTransaction(transaction) {
     return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
 }
 
+function isNewForkBlock() {
+    
+}
 
 function isValidBlock(block) {
     const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
+
+    let forktype = "none";
 
     if (index == 0) {
 
@@ -60,15 +67,22 @@ function isValidBlock(block) {
 
     } else {
 
-        const previousBlock = data.readBlock(index - 1);
+        let previousBlock = data.readBlock(index - 1);
 
         if (previousBlock.cb !== "success") {
-            if (previousBlock.cb === "none") {
-                return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
-            } else if (previousBlock.cb === "error") {
+
+            previousBlock = data.readBlockInForks(index - 1, previousHash);
+
+            forktype = "forkchild";
+
+            if (previousBlock.cb !== "success") {
+                if (previousBlock.cb === "none") {
+                    return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+                } else if (previousBlock.cb === "error") {
+                    return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
+                }
                 return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
             }
-            return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
         }
 
         // Confirm that the block's index is greater than the previous block's index by one
@@ -86,7 +100,17 @@ function isValidBlock(block) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
     }
 
-    if (data.existsBlock(hash, index).exists) {
+    const existsBlock = data.existsBlock(hash, index);
+    if (existsBlock.cb === "success" && !existsBlock.exists) {
+        if (existsBlock.fork) {
+            const latestblockinfo = data.getLatestBlockInfo();
+            if (latestblockinfo.cb === "success" && latestblockinfo.data.index === index) {
+                forktype = "newfork";
+            } else {
+                return {cb: false, status: 400, message: 'Bad Request. Forks for older Blocks are not allowed.'};
+            }
+        }
+    } else {
         return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
     }
 
@@ -101,8 +125,8 @@ function isValidBlock(block) {
         const transactionsValid = isValidTransaction(transactionData);
         if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }
-    return {cb: true, status: 200, message: "Block received and added to the Blockchain."};
-  }
+    return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forktype: forktype};
+}
   
 module.exports = {
     isValidTransaction,

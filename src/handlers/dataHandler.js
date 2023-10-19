@@ -305,13 +305,22 @@ function existsBlock(blockHash, blockIndex) {
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         const blockArray = JSON.parse(data);
     
-        // Check if an object with the specified hash and index exists in the array.
-        const exists = blockArray.some(block => block.hash === blockHash && block.index === blockIndex);
-    
-        if (exists) {
-            return { cb: 'success', exists: true };
+        // Check if an object with the specified index and hash exists in the array.
+        const block = blockArray.find(block => block.index === blockIndex && block.hash === blockHash);
+
+        if (block) {
+            // The block with the specified index and hash exists in the main chain
+            return { cb: 'success', exists: true};
         } else {
-            return { cb: 'success', exists: false };
+            // Check if there's a block with the specified index and a different hash in the provided JSON data
+            const forkedBlock = blockArray.find(block => block.index === blockIndex && block.hash !== blockHash);
+            if (forkedBlock) {
+                // The block with the same index but a different hash exists in the provided data
+                return { cb: 'success', exists: false, fork: true };
+            }
+            
+            // The block with the specified index and hash does not exist
+            return { cb: 'success', exists: false, fork: false };
         }
     } catch (err) {
         util.data_message.error(`Error reading latest block info: ${err.message}`);
@@ -344,6 +353,38 @@ function isGenesisBlock() {
     }
 }
 
+function readBlockInForks(index, hash) {
+
+    const forksDirectory = getBlockchainDataFilePath('/forks/');
+
+    try {
+        const forksFolders = fs.readdirSync(forksDirectory);
+    
+        for (const folder of forksFolders) {
+            const folderPath = path.join(forksDirectory, folder);
+            const blocksFolder = path.join(folderPath, 'blocks');
+        
+            if (fs.existsSync(blocksFolder)) {
+                const blockFilePath = path.join(blocksFolder, `${index}.json`);
+        
+                if (fs.existsSync(blockFilePath)) {
+                const blockData = JSON.parse(fs.readFileSync(blockFilePath, 'utf-8'));
+        
+                    if (blockData.hash === hash) {
+                        // Found a block with matching index and hash
+                        return {cb: "success", data: blockData};
+                    }
+                }
+            }
+        }
+    
+        // Block not found in any fork
+        return {cb: "none"};
+    } catch (err) {
+        console.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
+        return {cb: "error"};
+    }
+}
 
 module.exports = {
     mempool,
@@ -362,5 +403,6 @@ module.exports = {
     isGenesisBlock,
     ensureDirectoryExists,
     ensureFileExists,
-    createStorageIfNotExists
+    createStorageIfNotExists,
+    readBlockInForks
 }
