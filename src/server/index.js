@@ -20,10 +20,10 @@ app.use(function(req, res, next) {
 });
 
 const transactionRouter = require('./routes/sendTransactions')
-const blocksRouter = require('./routes/sendBlocks');
+//const blocksRouter = require('./routes/sendBlocks');
 
 app.use('/api/sendtransactions', transactionRouter);
-app.use('/api/sendblocks', blocksRouter);
+//app.use('/api/sendblocks', blocksRouter);
 
 // Create a route that upgrades to WebSocket
 app.ws('/ws', (ws, req) => {
