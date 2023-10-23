@@ -8,10 +8,10 @@ function isValidTransaction(transaction) {
 
     // Function to check if the transaction arguments are valid
     function areTransactionArgsValid(transaction) {
-        const { txid, senderAddress, recipientAddress, amount, signature } = transaction;
+        const { txid, senderAddress, output, input, signature } = transaction;
     
         // Ensure that all required fields are present
-        if (!txid || !senderAddress || !recipientAddress || !amount || !signature) {
+        if (!txid || !senderAddress || !output || !signature || !input) {
             return false;
         }
     

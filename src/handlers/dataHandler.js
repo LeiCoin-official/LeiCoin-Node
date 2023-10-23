@@ -103,7 +103,7 @@ function writeBlock(blockData) {
         if (!fs.existsSync(blockFilePath)) {
             // Write the block data to the block file.
             fs.writeFileSync(blockFilePath, JSON.stringify(blockData), { encoding: 'utf8', flag: 'w' });
-  
+
             // Update the list of blocks.
             const blocksListData = fs.readFileSync(blocksListFilePath, 'utf8');
             const blocksList = JSON.parse(blocksListData);
@@ -148,7 +148,7 @@ function addBlockToMempool(blockNumber, blockData) {
   
     mempool.blocks[blockNumber] = blockData;
     return { cb: 'success' };
-  }
+}
   
   // Function to remove a block from the Mempool
 function removeBlockFromMempool(blockNumber) {
@@ -159,10 +159,10 @@ function removeBlockFromMempool(blockNumber) {
   
     util.data_message.error(`Block ${blockNumber} not found in the Mempool.`);
     return { cb: 'error' };
-  }
+}
   
   // Function to add a transaction to the Mempool
-  function addTransactionToMempool(transaction) {
+function addTransactionToMempool(transaction) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
@@ -172,10 +172,10 @@ function removeBlockFromMempool(blockNumber) {
   
     mempool.transactions[transactionHash] = transaction;
     return { cb: 'success' };
-  }
+}
   
   // Function to remove a transaction from the Mempool
-  function removeTransactionFromMempool(transaction) {
+function removeTransactionFromMempool(transaction) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
@@ -185,7 +185,7 @@ function removeBlockFromMempool(blockNumber) {
   
     util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
     return { cb: 'error' };
-  }
+}
 
 // Function to write a transaction
 function writeTransaction(txID, transactionData) {
@@ -263,7 +263,7 @@ function addUTXO(transactionData) {
 }
 
 // Function to read a UTXO
-function readUTXOS(transactionData, txid = null, index =null) {
+function readUTXOS(ownerAddress, txid = null, index =null) {
     const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
     try {
         if (fs.existsSync(txFilePath)) {
