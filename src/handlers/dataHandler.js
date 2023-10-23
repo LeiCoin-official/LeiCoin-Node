@@ -142,8 +142,8 @@ function readBlock(blockNumber) {
 // Function to add a block to the Mempool
 function addBlockToMempool(blockNumber, blockData) {
     if (mempool.blocks[blockNumber]) {
-      util.data_message.error(`Block ${blockNumber} already exists in the Mempool.`);
-      return { cb: 'error' };
+        util.data_message.error(`Block ${blockNumber} already exists in the Mempool.`);
+        return { cb: 'error' };
     }
   
     mempool.blocks[blockNumber] = blockData;
@@ -151,10 +151,10 @@ function addBlockToMempool(blockNumber, blockData) {
   }
   
   // Function to remove a block from the Mempool
-  function removeBlockFromMempool(blockNumber) {
+function removeBlockFromMempool(blockNumber) {
     if (mempool.blocks[blockNumber]) {
-      delete mempool.blocks[blockNumber];
-      return { cb: 'success' };
+        delete mempool.blocks[blockNumber];
+        return { cb: 'success' };
     }
   
     util.data_message.error(`Block ${blockNumber} not found in the Mempool.`);
@@ -166,8 +166,8 @@ function addBlockToMempool(blockNumber, blockData) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
-      util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
-      return { cb: 'error' };
+        util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+        return { cb: 'error' };
     }
   
     mempool.transactions[transactionHash] = transaction;
@@ -179,8 +179,8 @@ function addBlockToMempool(blockNumber, blockData) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
-      delete mempool.transactions[transactionHash];
-      return { cb: 'success' };
+        delete mempool.transactions[transactionHash];
+        return { cb: 'success' };
     }
   
     util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
@@ -193,14 +193,14 @@ function writeTransaction(txID, transactionData) {
     try {
         if (!fs.existsSync(txFilePath)) {
             fs.writeFileSync(txFilePath, JSON.stringify(transactionData, null, 2));
-            success
+            return {cb: "success"};
         } else {
             util.data_message.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
             return {cb: 'error'}
         }
     } catch (err) {
         util.data_message.error(`Error writing transaction ${txID}: ${err.message}`);
-        return {cb: 'error'}
+        return {cb: 'error'};
     }
 }
 
@@ -217,29 +217,53 @@ function readTransaction(txID) {
         }
     } catch (err) {
         util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
-        return {cb: 'error'}
+        return {cb: 'error'};
     }
 }
 
 // Function to write a UTXO
 function addUTXO(transactionData) {
-    const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
+    const senderAddress = transactionData.senderAddress;
+    if (senderAddress.length < 54) {
+        util.data_message.error(`Sender address is not long enough for the specified format.`);
+        return { cb: 'error' };
+    }
+    
+    const directoryPath = `/utxos/${senderAddress.slice(50, 52)}`;
+    const filePath = `${senderAddress.slice(52, 54)}.json`;
+
+    // Ensure the existence of the directory and file
+    ensureDirectoryExists(directoryPath);
+    ensureFileExists(`${directoryPath}/${filePath}`, '[]');
+
     try {
-        if (!fs.existsSync(txFilePath)) {
-            fs.writeFileSync(txFilePath, JSON.stringify(transactionData, null, 2));
-            success
-        } else {
-            util.data_message.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
-            return {cb: 'error'}
+        // Read existing UTXOs from the file
+        const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
+        const existingData = fs.readFileSync(fullFilePath, 'utf8');
+        const existingUTXOs = JSON.parse(existingData);
+
+        // Extract output information from the transaction data and add it to the existing UTXOs
+        for (const output of transactionData.output) {
+            existingUTXOs.push({
+                txid: transactionData.txid,
+                index: output.index,
+                senderAddress: senderAddress,
+                amount: output.amount
+            });
         }
+
+        // Write the updated UTXOs back to the file
+        fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
+
+        return { cb: 'success' };
     } catch (err) {
-        util.data_message.error(`Error writing transaction ${txID}: ${err.message}`);
-        return {cb: 'error'}
+        util.data_message.error(`Error writing UTXOs for sender address ${senderAddress}: ${err.message}`);
+        return { cb: 'error' };
     }
 }
 
 // Function to read a UTXO
-function readUTXOS(transactionData) {
+function readUTXOS(transactionData, txid = null, index =null) {
     const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
     try {
         if (fs.existsSync(txFilePath)) {
@@ -257,7 +281,7 @@ function readUTXOS(transactionData) {
 
 // Function to remove a UTXO
 function removeUTXO(transactionData) {
-    const txFilePath = getBlockchainDataFilePath(`/utcos/${txID}.json`);
+    const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
     try {
         if (fs.existsSync(txFilePath)) {
             const data = fs.readFileSync(txFilePath, 'utf8');
@@ -404,5 +428,8 @@ module.exports = {
     ensureDirectoryExists,
     ensureFileExists,
     createStorageIfNotExists,
-    readBlockInForks
+    readBlockInForks,
+    addUTXO,
+    removeUTXO,
+    readUTXOS,
 }
