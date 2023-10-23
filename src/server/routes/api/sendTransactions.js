@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const validation = require('../../validation');
+const validation = require('../../../validation');
 
 const data = require("../../handlers/dataHandler");
 
