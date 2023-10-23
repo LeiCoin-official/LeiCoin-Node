@@ -16,5 +16,5 @@ util.server_message.log("LeiCoin-Node Server started");
 
 util.miner_message.log("Starting LeiCoin-Node Miner ...");
 require("./src/miner");
-util.miner_message.log("LeiCoin-Node Miner started");
+util.miner_message.log("LeiCoin-Node Miner started");   
 

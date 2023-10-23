@@ -228,38 +228,45 @@ function addUTXO(transactionData) {
         util.data_message.error(`Sender address is not long enough for the specified format.`);
         return { cb: 'error' };
     }
-    
-    const directoryPath = `/utxos/${senderAddress.slice(50, 52)}`;
-    const filePath = `${senderAddress.slice(52, 54)}.json`;
 
-    // Ensure the existence of the directory and file
-    ensureDirectoryExists(directoryPath);
-    ensureFileExists(`${directoryPath}/${filePath}`, '[]');
+    // Iterate through the recipients in the output array
+    for (const output of transactionData.output) {
+        const recipientAddress = output.recipientAddress;
 
-    try {
-        // Read existing UTXOs from the file
-        const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
-        const existingData = fs.readFileSync(fullFilePath, 'utf8');
-        const existingUTXOs = JSON.parse(existingData);
+        if (recipientAddress.length < 54) {
+            util.data_message.error(`Recipient address is not long enough for the specified format.`);
+            return { cb: 'error' };
+        }
 
-        // Extract output information from the transaction data and add it to the existing UTXOs
-        for (const output of transactionData.output) {
+        const directoryPath = `/utxos/${recipientAddress.slice(50, 52)}`;
+        const filePath = `${recipientAddress.slice(52, 54)}.json`;
+
+        // Ensure the existence of the directory and file for the recipient
+        ensureFileExists(`${directoryPath}/${filePath}`, '[]');
+
+        try {
+            // Read existing UTXOs from the recipient's file
+            const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
+            const existingData = fs.readFileSync(fullFilePath, 'utf8');
+            const existingUTXOs = JSON.parse(existingData);
+
+            // Add UTXOs to the recipient's file
             existingUTXOs.push({
                 txid: transactionData.txid,
                 index: output.index,
                 senderAddress: senderAddress,
                 amount: output.amount
             });
+
+            // Write the updated UTXOs back to the recipient's file
+            fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
+        } catch (err) {
+            util.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+            return { cb: 'error' };
         }
-
-        // Write the updated UTXOs back to the file
-        fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
-
-        return { cb: 'success' };
-    } catch (err) {
-        util.data_message.error(`Error writing UTXOs for sender address ${senderAddress}: ${err.message}`);
-        return { cb: 'error' };
     }
+
+    return { cb: 'success' };
 }
 
 // Function to read a UTXO
