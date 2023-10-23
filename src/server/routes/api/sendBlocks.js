@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const validation = require('../../validation');
+const validation = require('../../../validation');
 
-const data = require("../../handlers/dataHandler");
+const data = require("../../../handlers/dataHandler");
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {

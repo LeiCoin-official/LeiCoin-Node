@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const config = require('../handlers/configHandler');
 const cors = require('cors');
 const util = require('../utils');
-const WebSocket = require('ws');
 
 const app = express();
 
@@ -19,46 +18,9 @@ app.use(function(req, res, next) {
     next();
 });
 
-const transactionRouter = require('./routes/sendTransactions')
-//const blocksRouter = require('./routes/sendBlocks');
+app.use("/api", require('./routes/api'));
 
-app.use('/api/sendtransactions', transactionRouter);
-//app.use('/api/sendblocks', blocksRouter);
-
-// Create a route that upgrades to WebSocket
-app.ws('/ws', (ws, req) => {
-    // Handle WebSocket connections here
-  
-    // Listen for messages from the client
-    ws.on('message', (message) => {
-      console.log('Received:', message);
-  
-      // Send a response back to the client
-      ws.send('Hello, WebSocket client!');
-    });
-  
-    // Handle WebSocket disconnections
-    ws.on('close', () => {
-      console.log('WebSocket connection closed.');
-    });
-  
-    // Connect to other servers on server startup
-    otherServers.forEach((serverURL) => {
-      const wsclient = new WebSocket(serverURL);
-  
-      wsclient.on('open', () => {
-        console.log(`Connected to: ${serverURL}`);
-      });
-  
-      wsclient.on('message', (message) => {
-        console.log(`Received from ${serverURL}: ${message}`);
-      });
-  
-      wsclient.on('close', () => {
-        console.log(`Connection to ${serverURL} closed.`);
-      });
-    });
-  });
+app.use("/ws", require('./routes/ws'));
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
