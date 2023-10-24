@@ -222,13 +222,7 @@ function readTransaction(txID) {
 }
 
 // Function to write a UTXO
-function addUTXO(transactionData) {
-    const senderAddress = transactionData.senderAddress;
-    if (senderAddress.length < 54) {
-        util.data_message.error(`Sender address is not long enough for the specified format.`);
-        return { cb: 'error' };
-    }
-
+function addUTXOS(transactionData) {
     // Iterate through the recipients in the output array
     for (const output of transactionData.output) {
         const recipientAddress = output.recipientAddress;
@@ -242,7 +236,7 @@ function addUTXO(transactionData) {
         const filePath = `${recipientAddress.slice(52, 54)}.json`;
 
         // Ensure the existence of the directory and file for the recipient
-        ensureFileExists(`${directoryPath}/${filePath}`, '[]');
+        ensureFileExists(`${directoryPath}/${filePath}`, '{}');
 
         try {
             // Read existing UTXOs from the recipient's file
@@ -250,11 +244,12 @@ function addUTXO(transactionData) {
             const existingData = fs.readFileSync(fullFilePath, 'utf8');
             const existingUTXOs = JSON.parse(existingData);
 
+            if (!existingUTXOs[recipientAddress]) existingUTXOs[recipientAddress] = [];
+
             // Add UTXOs to the recipient's file
-            existingUTXOs.push({
+            existingUTXOs[recipientAddress].push({
                 txid: transactionData.txid,
                 index: output.index,
-                senderAddress: senderAddress,
                 amount: output.amount
             });
 
@@ -270,7 +265,7 @@ function addUTXO(transactionData) {
 }
 
 // Function to read a UTXO
-function readUTXOS(ownerAddress, txid = null, index =null) {
+function readUTXOS(ownerAddress, txid = null, index = null) {
     const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
     try {
         if (fs.existsSync(txFilePath)) {
@@ -284,6 +279,44 @@ function readUTXOS(ownerAddress, txid = null, index =null) {
         util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
         return {cb: 'error'}
     }
+}
+
+function existsUTXOS(transactionData) {
+    const inputs = transactionData.input;
+    
+    for (const input of inputs) {
+        const address = input.address;
+        if (address.length < 54) {
+            util.data_message.error(`Address is not long enough for the specified format.`);
+            return { cb: 'error' };
+        }
+
+        const directoryPath = `/utxos/${address.slice(50, 52)}`;
+        const filePath = `${address.slice(52, 54)}.json`;
+
+        try {
+            // Check if the UTXO file for the address exists
+            const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
+            if (fs.existsSync(fullFilePath)) {
+                const existingData = fs.readFileSync(fullFilePath, 'utf8');
+                const existingUTXOs = JSON.parse(existingData);
+
+                // Check if the specified UTXO index exists
+                const indexExists = existingUTXOs.some(utxo => utxo.index === input.index);
+
+                if (!indexExists) {
+                    return { cb: 'success', exists: false };
+                }
+            } else {
+                return { cb: 'success', exists: false };
+            }
+        } catch (err) {
+            util.data_message.error(`Error checking UTXOs for address ${address}: ${err.message}`);
+            return { cb: 'error' };
+        }
+    }
+
+    return { cb: 'success', exists: true };
 }
 
 // Function to remove a UTXO
@@ -412,7 +445,7 @@ function readBlockInForks(index, hash) {
         // Block not found in any fork
         return {cb: "none"};
     } catch (err) {
-        console.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
+        util.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
         return {cb: "error"};
     }
 }
@@ -436,7 +469,7 @@ module.exports = {
     ensureFileExists,
     createStorageIfNotExists,
     readBlockInForks,
-    addUTXO,
+    addUTXOS,
     removeUTXO,
     readUTXOS,
 }
