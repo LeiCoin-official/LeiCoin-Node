@@ -87,6 +87,9 @@ rl.on('line', (input) => {
     process.exit(0);
 });
 
+process.on("SIGINT", handleCommand);
+process.on("SIGTERM", handleCommand);
+
 module.exports = {
     processRootDirectory,
     mining_difficulty,
