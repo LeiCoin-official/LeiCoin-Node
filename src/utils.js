@@ -2,9 +2,8 @@ const readline = require('readline');
 const chalk = require('chalk');
 const process = require('process');
 const ansiEscapes = require('ansi-escapes');
-const node_events = require("events");
-//const events = require("events").EventEmitter();
-const events = node_events.EventEmitter();
+
+const events = require("events").EventEmitter();
 
 const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
