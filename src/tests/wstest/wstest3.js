@@ -8,7 +8,10 @@ const expressWsInstance = expressWs(app);
 const nodeConnections = [];
 
 // Configuration for other servers (nodes)
-const otherServers = ["localhost:12200", "localhost:12201", "localhost:12202"];
+const otherServers = [
+    { name: 'node1', port: 12210 },
+    { name: 'node2', port: 12211 },
+];
 
 // WebSocket route for nodes
 app.ws('/node', (ws, req) => {
@@ -17,12 +20,12 @@ app.ws('/node', (ws, req) => {
 
     // Listen for messages from clients connected to the node
     ws.on('message', (message) => {
-        console.log('Received at node:', message);
+        console.log(`Received at ${req.baseUrl}: ${message}`);
 
         // Relay the message to all other connected nodes (except the sender)
         nodeConnections.forEach((node) => {
             if (node !== ws && node.readyState === WebSocket.OPEN) {
-                node.send(message);
+                node.send(`Relayed from ${req.baseUrl}: ${message}`);
             }
         });
     });
@@ -34,34 +37,34 @@ app.ws('/node', (ws, req) => {
         if (index !== -1) {
             nodeConnections.splice(index, 1);
         }
-        console.log('WebSocket connection to node closed.');
+        console.log(`WebSocket connection to ${req.baseUrl} closed.`);
     });
 });
 
-// Connect to other servers (nodes)
-otherServers.forEach((serverURL) => {
-    const wsclient = new WebSocket(`ws://${serverURL}/node`);
+// Connect to other servers (nodes) and create peer-to-peer connections
+otherServers.forEach((server) => {
+    const wsclient = new WebSocket(`ws://localhost:${server.port}/node`);
   
     wsclient.on('open', () => {
-        console.log(`Connected to: ${serverURL}`);
+        console.log(`Connected to: ${server.name}`);
     });
   
     wsclient.on('message', (message) => {
-        console.log(`Received from ${serverURL}: ${message}`);
+        console.log(`Received from ${server.name}: ${message}`);
       
         // Relay the message to all connected nodes (except the sender)
         nodeConnections.forEach((node) => {
             if (node !== wsclient && node.readyState === WebSocket.OPEN) {
-                node.send(`Received from ${serverURL}: ${message}`);
+                node.send(`Relayed from ${server.name}: ${message}`);
             }
         });
     });
   
     wsclient.on('close', () => {
-        console.log(`Connection to ${serverURL} closed.`);
+        console.log(`Connection to ${server.name} closed.`);
     });
 });
 
-app.listen(12210, () => {
-    console.log('WebSocket server is running on port 3000');
+app.listen(12212, () => {
+    console.log('WebSocket server is running on port 12212');
 });
