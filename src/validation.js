@@ -31,7 +31,7 @@ function isValidTransaction(transaction) {
         const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
     
         if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
-            return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
+            return false;
         }
 
         // Verify the signature
