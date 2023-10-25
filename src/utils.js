@@ -3,7 +3,7 @@ const chalk = require('chalk');
 const process = require('process');
 const ansiEscapes = require('ansi-escapes');
 
-const events = require("events").EventEmitter();
+const events = new require("events").EventEmitter();
 
 const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
