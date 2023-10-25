@@ -8,8 +8,8 @@ const dotenv = require('dotenv');
 function parseArgs() {
     // Define default argument information with default values, types, and required flags
     const defaultArgInfo = {
-        'internal-port': { default: 12200, type: 'number', required: true },
-        'optional-arg': { type: 'string', required: false }, // This one is optional
+        'internal-port': { default: 12200, type: 'number', required: false },
+        //'optional-arg': { type: 'string', required: false }, // This one is optional
     };
 
     // Merge provided argInfo with defaultArgInfo
