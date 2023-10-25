@@ -4,6 +4,39 @@ const process = require('process');
 const util = require('../utils');
 const dotenv = require('dotenv');
 
+
+function parseArgs() {
+    // Define default argument information with default values, types, and required flags
+    const defaultArgInfo = {
+        'internal-port': { default: 12200, type: 'number', required: true },
+        'optional-arg': { type: 'string', required: false }, // This one is optional
+    };
+
+    // Merge provided argInfo with defaultArgInfo
+    const mergedArgInfo = defaultArgInfo;
+
+    const argsObj = {};
+
+    for (const arg of process.argv.slice(2)) {
+        try {
+            const [argName, argValue] = arg.split('=');
+
+            if (argName && mergedArgInfo[argName]) {
+                const { type, default: defaultValue, required } = mergedArgInfo[argName];
+                
+                argsObj[argName] =
+                    type === 'number' ? (argValue ? parseFloat(argValue) : defaultValue) : (argValue || defaultValue);
+            }
+        } catch (error) {
+            console.error(`Error parsing argument: ${arg}`);
+        }
+    }
+
+    return argsObj;
+}
+
+const processArgs = parseArgs();
+
 // Function to load the configuration file or a default if it doesn't exist
 function loadNormalConfig() {
     // Define the paths for the configuration files
@@ -18,9 +51,9 @@ function loadNormalConfig() {
             let configDataJSON = JSON.parse(configData);
 
             // Check for --internal-port and extract the value
-            let internalPort = getInternalPort();
+            let internalPort = processArgs['internal-port'];
             if (internalPort !== null) {
-                configDataJSON.port = internalPort;
+                configDataJSON.server.port = internalPort;
             }
 
             return configDataJSON;
@@ -92,27 +125,9 @@ function loadENVConfig() {
 function loadConfig() {
     const config = { ...loadNormalConfig(), ...loadENVConfig() };
 
-    // Check for --internal-port and extract the value
-    let internalPort = getInternalPort();
-    if (internalPort !== null) {
-        config.server.port = internalPort;
-    }
-
     config.peers = loadKnownNodesConfig();
 
     return config;
-}
-
-// Function to extract the value after --internal-port
-function getInternalPort() {
-    const args = process.argv.slice(2);
-    const internalPortIndex = args.indexOf('--internal-port');
-
-    if (internalPortIndex !== -1 && internalPortIndex < args.length - 1) {
-        return args[internalPortIndex + 1];
-    }
-
-    return null;
 }
 
 let config = loadConfig();

@@ -26,6 +26,11 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.listen(config.server.port, () => {
+const server = app.listen(config.server.port, () => {
     util.server_message.log(`Server listening on port ${config.server.port}`);
+});
+
+util.events.on("stop_server", function() {
+    util.server_message.log(`Server stopped`);
+    server.close();
 });

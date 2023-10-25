@@ -2,6 +2,7 @@ const readline = require('readline');
 const chalk = require('chalk');
 const process = require('process');
 const ansiEscapes = require('ansi-escapes');
+const events = require("events").EventEmitter();
 
 const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
@@ -71,13 +72,25 @@ function handleCommand(command) {
             console.log(' - stop: Stops The Server and Miner');
             break;
         case 'stop':
-            process.exit(0);
+            gracefulShutdown();
             break;
         default:
             console.log('Command not recognized. Type "help" for available commands.');
             break;
     }
 }
+
+
+function gracefulShutdown() {
+    console.log('Shutting down...');
+
+    events.emit("stop_server");
+
+    console.log('LeiCoin Node stopped.');
+    process.exit(0);
+  
+}
+  
 
 rl.on('line', (input) => {
     handleCommand(input.trim().toLowerCase());
@@ -87,8 +100,8 @@ rl.on('line', (input) => {
     process.exit(0);
 });
 
-process.on("SIGINT", handleCommand);
-process.on("SIGTERM", handleCommand);
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
 
 module.exports = {
     processRootDirectory,
@@ -97,4 +110,5 @@ module.exports = {
     server_message,
     ws_client_message,
     data_message,
+    events,
 };

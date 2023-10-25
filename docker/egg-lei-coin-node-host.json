@@ -13,7 +13,7 @@
         "LeiCoin Node Latest": "ghcr.io\/leicraft\/leicoin-node:latest"
     },
     "file_denylist": [],
-    "startup": "start --internal-port {{SERVER_PORT}}",
+    "startup": "start internal-port={{SERVER_PORT}}",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"\",\r\n    \"userInteraction\": []\r\n}",
