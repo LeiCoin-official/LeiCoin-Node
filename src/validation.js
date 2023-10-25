@@ -8,10 +8,10 @@ function isValidTransaction(transaction) {
 
     // Function to check if the transaction arguments are valid
     function areTransactionArgsValid(transaction) {
-        const { txid, senderAddress, output, input, signature } = transaction;
+        const { txid, senderAddress, publicKey, output, input, signature } = transaction;
     
         // Ensure that all required fields are present
-        if (!txid || !senderAddress || !output || !signature || !input) {
+        if (!txid || !senderAddress || !publicKey || !output || !signature || !input) {
             return false;
         }
     
@@ -20,7 +20,7 @@ function isValidTransaction(transaction) {
 
 
     function isTransactionSignatureValid(transaction) {
-        const { signature, senderAddress } = transaction;
+        const { signature, senderAddress, publicKey } = transaction;
     
         // Prepare transaction data for verification (exclude the signature)
         const transactionData = { ...transaction };
@@ -28,8 +28,12 @@ function isValidTransaction(transaction) {
         delete transactionData.txid;
     
         // decode the senderAddress
-        const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(senderAddress);
+        const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
     
+        if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
+            return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
+        }
+
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
         verifier.update(JSON.stringify(transactionData));

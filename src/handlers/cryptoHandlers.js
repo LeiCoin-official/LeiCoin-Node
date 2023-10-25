@@ -27,11 +27,13 @@ function base64DecodeToString(data) {
 }
 
 function encodePublicKeyToAddress(public_key_pem) {
-    return base64EncodeToString(public_key_pem.replace('-----BEGIN PUBLIC KEY-----\n', '').replace('\n-----END PUBLIC KEY-----\n', ''));
+    //return base64EncodeToString(public_key_pem.replace('-----BEGIN PUBLIC KEY-----\n', '').replace('\n-----END PUBLIC KEY-----\n', ''));
+    return base64EncodeToString(public_key_pem);
 }
 
 function decodeAddressToPublicKey(address) {
-    return '-----BEGIN PUBLIC KEY-----\n' + base64DecodeToString(address) + '\n-----END PUBLIC KEY-----\n';
+    //return '-----BEGIN PUBLIC KEY-----\n' + base64DecodeToString(address) + '\n-----END PUBLIC KEY-----\n';
+    return base64DecodeToString(address);
 }
 
 module.exports = {
