@@ -8,7 +8,7 @@ const events = new EventEmitter();
 
 const processRootDirectory = process.cwd();
 
-const mining_difficulty = 10;
+const mining_difficulty = 6;
 const mining_pow = 5;
 
 const miner_message = {};
