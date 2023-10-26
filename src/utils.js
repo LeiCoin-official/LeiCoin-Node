@@ -7,7 +7,9 @@ const { EventEmitter } = require("events");
 const events = new EventEmitter();
 
 const processRootDirectory = process.cwd();
-const mining_difficulty = 6;
+
+const mining_difficulty = 10;
+const mining_pow = 5;
 
 const miner_message = {};
 const server_message = {};
@@ -108,6 +110,7 @@ process.on("SIGTERM", gracefulShutdown);
 module.exports = {
     processRootDirectory,
     mining_difficulty,
+    mining_pow,
     miner_message,
     server_message,
     ws_client_message,

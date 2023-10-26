@@ -6,21 +6,8 @@ const data = require('./handlers/dataHandler');
 
 function isValidTransaction(transaction) {
 
-    // Function to check if the transaction arguments are valid
-    function areTransactionArgsValid(transaction) {
-        const { txid, senderAddress, publicKey, output, input, signature } = transaction;
-    
-        // Ensure that all required fields are present
-        if (!txid || !senderAddress || !publicKey || !output || !signature || !input) {
-            return false;
-        }
-    
-        return true;
-    }
-
-
     function isTransactionSignatureValid(transaction) {
-        const { signature, senderAddress, publicKey } = transaction;
+        const { signature, publicKey } = transaction;
     
         // Prepare transaction data for verification (exclude the signature)
         const transactionData = { ...transaction };
@@ -29,10 +16,6 @@ function isValidTransaction(transaction) {
     
         // decode the senderAddress
         const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
-    
-        if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
-            return false;
-        }
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
@@ -44,16 +27,24 @@ function isValidTransaction(transaction) {
     }
 
 
-	if (areTransactionArgsValid(transaction)) {
+    const { txid, senderAddress, publicKey, output, input, signature } = transaction;
+    
+    // Ensure that all required fields are present
+    if (!txid || !senderAddress || !publicKey || !output || !signature || !input) {
+        return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
+    }
 
-        if (isTransactionSignatureValid(transaction)) {
-            return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
-        }
-
+    if (!isTransactionSignatureValid(transaction)) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
+
+    const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
+    if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
+        return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
+    }
+
     
-    return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
+    return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
 }
 
 function isNewForkBlock() {
@@ -62,6 +53,10 @@ function isNewForkBlock() {
 
 function isValidBlock(block) {
     const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
+
+    if (!index || !previousHash || !transactions || !timestamp || !nonce || !coinbase || !hash) {
+        return false;
+    }
 
     let forktype = "none";
 
@@ -104,6 +99,7 @@ function isValidBlock(block) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
     }
 
+    //we have to make that better
     const existsBlock = data.existsBlock(hash, index);
     if (existsBlock.cb === "success" && !existsBlock.exists) {
         if (existsBlock.fork) {
@@ -122,6 +118,10 @@ function isValidBlock(block) {
     const hashPrefix = '0'.repeat(util.mining_difficulty);
     if (hash.substring(0, util.mining_difficulty) !== hashPrefix) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash is invalid.'};
+    }
+
+    if (coinbase.amount !== util.mining_pow) {
+        return {cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.'};
     }
   
     // Ensure that the block contains valid transactions (add your validation logic here)

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const data = require('../handlers/dataHandler'); // Import the data-handler module
 const config = require('../handlers/configHandler');
+const util = require('../utils');
 
 // Function to create a new block
 function createBlock() {
@@ -24,7 +25,7 @@ function createBlock() {
 		nonce: 0,
 		coinbase: {
 			minerAdress: config.miner.minerAddress,
-			amount: 50
+			amount: util.mining_pow
 		},
 		hash: '',
     };
