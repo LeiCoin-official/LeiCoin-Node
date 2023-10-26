@@ -75,7 +75,7 @@ function isNewForkBlock() {
 function isValidBlock(block) {
     const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
 
-    if (!index || !previousHash || !transactions || !timestamp || !nonce || !coinbase || !hash) {
+    if ((!index && index !== 0) || (!previousHash && index !== 0) || !transactions || !timestamp || !nonce || !coinbase || !hash) {
         return false;
     }
 
