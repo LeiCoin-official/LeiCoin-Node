@@ -43,6 +43,27 @@ function isValidTransaction(transaction) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
 
+    let utxo_input_amount = 0;
+    let utxo_output_amount = 0;
+
+    for (let input_utxo of input) {
+        let utxoData = data.readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
+        if (utxoData.cb !== "success") {
+            if (utxoData.cb === "none") {
+                return {cb: false, status: 400, message: 'Bad Request. Transaction includes UTXO that does not exists.'};
+            }
+            return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes UTXO that could not be readed.'};
+        }
+        utxo_input_amount += utxoData.amount;
+    }
+
+    for (let output_utxo of output) {
+        utxo_output_amount += output_utxo.amount;
+    }
+
+    if (utxo_input_amount < utxo_output_amount) {
+        return {cb: false, status: 400, message: 'Bad Request. Transaction output amount is higher than the input amount'};
+    }
     
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
 }
@@ -77,8 +98,6 @@ function isValidBlock(block) {
             if (previousBlock.cb !== "success") {
                 if (previousBlock.cb === "none") {
                     return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
-                } else if (previousBlock.cb === "error") {
-                    return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
                 }
                 return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
             }

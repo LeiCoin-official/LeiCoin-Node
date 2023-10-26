@@ -10,6 +10,7 @@ router.ws('/', (req, res, next) => {
 });
 
 router.use('/sendtransactions', require('./sendTransactions'));
+router.use('/getutxos', require('./getUTXOS'));
 //router.use('/sendblocks', require('./sendBlocks'));
 
 module.exports = router;

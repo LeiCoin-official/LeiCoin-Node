@@ -222,9 +222,9 @@ function readTransaction(txID) {
 }
 
 // Function to write a UTXO
-function addUTXOS(transactionData) {
-    // Iterate through the recipients in the output array
-    for (const output of transactionData.output) {
+function addUTXOS(transactionData, coinbase = false) {
+
+    function writeUTXO(output, txid) {
         const recipientAddress = output.recipientAddress;
 
         if (recipientAddress.length < 54) {
@@ -239,7 +239,7 @@ function addUTXOS(transactionData) {
         ensureFileExists(`${directoryPath}/${filePath}`, '{}');
 
         try {
-            // Read existing UTXOs from the recipient's file
+                // Read existing UTXOs from the recipient's file
             const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
             const existingData = fs.readFileSync(fullFilePath, 'utf8');
             const existingUTXOs = JSON.parse(existingData);
@@ -248,16 +248,27 @@ function addUTXOS(transactionData) {
 
             // Add UTXOs to the recipient's file
             existingUTXOs[recipientAddress].push({
-                txid: transactionData.txid,
+                txid: txid,
                 index: output.index,
                 amount: output.amount
             });
 
-            // Write the updated UTXOs back to the recipient's file
+                // Write the updated UTXOs back to the recipient's file
             fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
         } catch (err) {
             util.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
             return { cb: 'error' };
+        }
+    }
+
+    if (coinbase) {
+
+        writeUTXO(transactionData, transactionData.txid)
+
+    } else {
+        // Iterate through the recipients in the output array
+        for (const output of transactionData.output) {
+            writeUTXO(output, transactionData.txid)
         }
     }
 
