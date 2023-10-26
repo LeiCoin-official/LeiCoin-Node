@@ -265,21 +265,50 @@ function addUTXOS(transactionData) {
 }
 
 // Function to read a UTXO
-function readUTXOS(ownerAddress, txid = null, index = null) {
-    const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
+function readUTXOS(recipientAddress, txid = null, index = null) {
+    if (recipientAddress.length < 54) {
+        util.data_message.error(`Recipient address is not long enough for the specified format.`);
+        return { cb: 'error' };
+    }
+
+    const directoryPath = `/utxos/${recipientAddress.slice(50, 52)}`;
+    const filePath = `${recipientAddress.slice(52, 54)}.json`;
+
     try {
-        if (fs.existsSync(txFilePath)) {
-            const data = fs.readFileSync(txFilePath, 'utf8');
-            return {cb: 'success', data: JSON.parse(data)}
+        // Check if the UTXO file for the address exists
+        const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
+        if (fs.existsSync(fullFilePath)) {
+            const existingData = fs.readFileSync(fullFilePath, 'utf8');
+            const existingUTXOs = JSON.parse(existingData);
+
+            if (!existingUTXOs[recipientAddress]) {
+                return { cb: 'none'};
+            }
+
+            if (txid === null && index === null) {
+                return { cb: 'success', data: existingUTXOs[recipientAddress] };
+            }
+
+            if (txid && index !== null) {
+                const utxo = existingUTXOs[recipientAddress].find(
+                    (u) => u.txid === txid && u.index === index
+                );
+
+                if (utxo) {
+                    return { cb: 'success', data: utxo };
+                }
+            }
+
+            return { cb: 'none'};
         } else {
-            util.data_message.error(`Transaktion ${txID} was not found`);
-            return {cb: 'none'}
+            return { cb: 'none'};
         }
     } catch (err) {
-        util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
-        return {cb: 'error'}
+        util.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+        return { cb: 'error' };
     }
 }
+
 
 function existsUTXOS(transactionData) {
     const inputs = transactionData.input;
