@@ -232,8 +232,8 @@ function addUTXOS(transactionData) {
             return { cb: 'error' };
         }
 
-        const directoryPath = `/utxos/${recipientAddress.slice(50, 52)}`;
-        const filePath = `${recipientAddress.slice(52, 54)}.json`;
+        const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
+        const filePath = `${recipientAddress.slice(2, 4)}.json`;
 
         // Ensure the existence of the directory and file for the recipient
         ensureFileExists(`${directoryPath}/${filePath}`, '{}');
@@ -271,8 +271,8 @@ function readUTXOS(recipientAddress, txid = null, index = null) {
         return { cb: 'error' };
     }
 
-    const directoryPath = `/utxos/${recipientAddress.slice(50, 52)}`;
-    const filePath = `${recipientAddress.slice(52, 54)}.json`;
+    const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
+    const filePath = `${recipientAddress.slice(2, 4)}.json`;
 
     try {
         // Check if the UTXO file for the address exists
