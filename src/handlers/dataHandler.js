@@ -510,7 +510,6 @@ module.exports = {
     readBlock,
     addTransactionToMempool,
     removeTransactionFromMempool,
-    removeBlockFromMempool,
     writeTransaction,
     readTransaction,
     getLatestBlockInfo,
