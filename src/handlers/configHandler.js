@@ -22,13 +22,22 @@ function parseArgs() {
             const [argName, argValue] = arg.split('=');
 
             if (argName && mergedArgInfo[argName]) {
-                const { type, default: defaultValue, required } = mergedArgInfo[argName];
-                
-                argsObj[argName] =
-                    type === 'number' ? (argValue ? parseFloat(argValue) : defaultValue) : (argValue || defaultValue);
+                const { type, default: defaultValue } = mergedArgInfo[argName];
+
+                if (argValue !== undefined) {
+                    argsObj[argName] =
+                        type === 'number' ? parseFloat(argValue) : argValue;
+                }
             }
         } catch (error) {
             console.error(`Error parsing argument: ${arg}`);
+        }
+    }
+
+    // Now, for each required argument, if it's not in argsObj, set it to the default value
+    for (const argName in mergedArgInfo) {
+        if (mergedArgInfo[argName].required && argsObj[argName] === undefined) {
+            argsObj[argName] = mergedArgInfo[argName].default;
         }
     }
 
@@ -52,7 +61,7 @@ function loadNormalConfig() {
 
             // Check for --internal-port and extract the value
             let internalPort = processArgs['internal-port'];
-            if (internalPort !== null) {
+            if (internalPort !== null && internalPort !== undefined) {
                 configDataJSON.server.port = internalPort;
             }
 
