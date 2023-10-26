@@ -62,7 +62,7 @@ function isValidTransaction(transaction) {
     }
 
     if (utxo_input_amount < utxo_output_amount) {
-        return {cb: false, status: 400, message: 'Bad Request. Transaction output amount is higher than the input amount'};
+        return {cb: false, status: 400, message: 'Bad Request. Transaction output amount is higher than the input amount.'};
     }
     
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};

@@ -28,7 +28,7 @@ router.use('/', (req, res, next) => {
 
 	// Add the transaction to the mempool (replace with your blockchain logic)
 	data.addTransactionToMempool(transactionData);
-
+	return;
 });
 
 // Replace this function with your actual transaction validation logic
