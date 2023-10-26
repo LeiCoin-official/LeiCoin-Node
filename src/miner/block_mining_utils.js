@@ -48,17 +48,8 @@ function calculateBlockHash(block) {
     	.digest('hex');
 }
 
-// Function to mine a block with verified transactions from the Mempool
-function removeAddedTransactions(block) {
-
-  	for (let [transactionHash, transactionData] of Object.entries(block.transactions)) {
-    	data.removeTransactionFromMempool(transactionData);
-  	}
-}
-
 
 module.exports = {
 	createBlock,
-	calculateBlockHash,
-	removeAddedTransactions,
+	calculateBlockHash
 }

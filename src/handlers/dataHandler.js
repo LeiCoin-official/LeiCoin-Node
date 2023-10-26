@@ -3,7 +3,6 @@ const util = require('../utils.js');
 const path = require('path');
 
 let mempool = {
-    blocks: {},
     transactions: {}
 };
 
@@ -138,28 +137,6 @@ function readBlock(blockNumber) {
     }
 }
 
-
-// Function to add a block to the Mempool
-function addBlockToMempool(blockNumber, blockData) {
-    if (mempool.blocks[blockNumber]) {
-        util.data_message.error(`Block ${blockNumber} already exists in the Mempool.`);
-        return { cb: 'error' };
-    }
-  
-    mempool.blocks[blockNumber] = blockData;
-    return { cb: 'success' };
-}
-  
-  // Function to remove a block from the Mempool
-function removeBlockFromMempool(blockNumber) {
-    if (mempool.blocks[blockNumber]) {
-        delete mempool.blocks[blockNumber];
-        return { cb: 'success' };
-    }
-  
-    util.data_message.error(`Block ${blockNumber} not found in the Mempool.`);
-    return { cb: 'error' };
-}
   
   // Function to add a transaction to the Mempool
 function addTransactionToMempool(transaction) {
@@ -321,60 +298,88 @@ function readUTXOS(recipientAddress, txid = null, index = null) {
 }
 
 
-function existsUTXOS(transactionData) {
-    const inputs = transactionData.input;
+// function existsUTXOS(transactionData) {
+//     const inputs = transactionData.input;
     
-    for (const input of inputs) {
-        const address = input.address;
-        if (address.length < 54) {
-            util.data_message.error(`Address is not long enough for the specified format.`);
-            return { cb: 'error' };
-        }
+//     for (const input of inputs) {
+//         const address = input.address;
+//         if (address.length < 54) {
+//             util.data_message.error(`Address is not long enough for the specified format.`);
+//             return { cb: 'error' };
+//         }
 
-        const directoryPath = `/utxos/${address.slice(50, 52)}`;
-        const filePath = `${address.slice(52, 54)}.json`;
+//         const directoryPath = `/utxos/${address.slice(50, 52)}`;
+//         const filePath = `${address.slice(52, 54)}.json`;
 
-        try {
-            // Check if the UTXO file for the address exists
-            const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
-            if (fs.existsSync(fullFilePath)) {
-                const existingData = fs.readFileSync(fullFilePath, 'utf8');
-                const existingUTXOs = JSON.parse(existingData);
+//         try {
+//             // Check if the UTXO file for the address exists
+//             const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
+//             if (fs.existsSync(fullFilePath)) {
+//                 const existingData = fs.readFileSync(fullFilePath, 'utf8');
+//                 const existingUTXOs = JSON.parse(existingData);
 
-                // Check if the specified UTXO index exists
-                const indexExists = existingUTXOs.some(utxo => utxo.index === input.index);
+//                 // Check if the specified UTXO index exists
+//                 const indexExists = existingUTXOs.some(utxo => utxo.index === input.index);
 
-                if (!indexExists) {
-                    return { cb: 'success', exists: false };
-                }
-            } else {
-                return { cb: 'success', exists: false };
-            }
-        } catch (err) {
-            util.data_message.error(`Error checking UTXOs for address ${address}: ${err.message}`);
-            return { cb: 'error' };
-        }
+//                 if (!indexExists) {
+//                     return { cb: 'success', exists: false };
+//                 }
+//             } else {
+//                 return { cb: 'success', exists: false };
+//             }
+//         } catch (err) {
+//             util.data_message.error(`Error checking UTXOs for address ${address}: ${err.message}`);
+//             return { cb: 'error' };
+//         }
+//     }
+
+//     return { cb: 'success', exists: true };
+// }
+
+// Function to delete a UTXO
+function deleteUTXO(recipientAddress, txid, index) {
+    if (recipientAddress.length < 54) {
+        util.data_message.error(`Recipient address is not long enough for the specified format.`);
+        return { cb: 'error' };
     }
 
-    return { cb: 'success', exists: true };
-}
+    const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
+    const filePath = `${recipientAddress.slice(2, 4)}.json`;
 
-// Function to remove a UTXO
-function removeUTXO(transactionData) {
-    const txFilePath = getBlockchainDataFilePath(`/utxos/${txID}.json`);
     try {
-        if (fs.existsSync(txFilePath)) {
-            const data = fs.readFileSync(txFilePath, 'utf8');
-            return {cb: 'success', data: JSON.parse(data)}
-        } else {
-            util.data_message.error(`Transaktion ${txID} was not found`);
-            return {cb: 'none'}
+        // Check if the UTXO file for the address exists
+        const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
+        if (fs.existsSync(fullFilePath)) {
+            const existingData = fs.readFileSync(fullFilePath, 'utf8');
+            const existingUTXOs = JSON.parse(existingData);
+
+            if (!existingUTXOs[recipientAddress]) {
+                return { cb: 'none' };
+            }
+
+            // Find the UTXO to delete
+            const utxoIndex = existingUTXOs[recipientAddress].findIndex(
+                (u) => u.txid === txid && u.index === index
+            );
+
+            if (utxoIndex !== -1) {
+                // Remove the UTXO from the array
+                existingUTXOs[recipientAddress].splice(utxoIndex, 1);
+
+                // Update the UTXO file
+                fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2), 'utf8');
+
+                return { cb: 'success' };
+            }
         }
+
+        return { cb: 'none' };
     } catch (err) {
-        util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
-        return {cb: 'error'}
+        util.data_message.error(`Error deleting UTXO for recipient address ${recipientAddress}: ${err.message}`);
+        return { cb: 'error' };
     }
 }
+
 
 function getLatestBlockInfo() {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
@@ -490,12 +495,19 @@ function readBlockInForks(index, hash) {
     }
 }
 
+
+// Function to mine a block with verified transactions from the Mempool
+function removeAddedTransactionsFromMempool(block) {
+
+    for (let [transactionHash, transactionData] of Object.entries(block.transactions)) {
+        data.removeTransactionFromMempool(transactionData);
+    }
+}
+
 module.exports = {
     mempool,
     writeBlock,
     readBlock,
-    addBlockToMempool,
-    removeBlockFromMempool,
     addTransactionToMempool,
     removeTransactionFromMempool,
     removeBlockFromMempool,
@@ -510,6 +522,7 @@ module.exports = {
     createStorageIfNotExists,
     readBlockInForks,
     addUTXOS,
-    removeUTXO,
+    deleteUTXO,
     readUTXOS,
+    removeAddedTransactionsFromMempool
 }

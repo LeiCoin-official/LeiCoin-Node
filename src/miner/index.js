@@ -68,10 +68,20 @@ async function main() {
 
 function afterMiningLogic(blockResult) {
 	if (validation.isValidBlock(blockResult).cb) {
+		
 		data.writeBlock(blockResult);
 		data.updateLatestBlockInfo(blockResult.index, blockResult.hash);
-		blockMiningUtils.removeAddedTransactions(blockResult);
+		data.removeAddedTransactionsFromMempool(blockResult);
+
 		data.addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
+
+		for (let [transactionHash, transactionData] of Object.entries(blockResult.transactions)) {
+			for (let input of transactionData.input) {
+				data.deleteUTXO(transactionData.senderAddress, input.txid, input.index);
+			}
+			data.addUTXOS(transactionData, false);
+		}
+
 		util.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
 		util.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
