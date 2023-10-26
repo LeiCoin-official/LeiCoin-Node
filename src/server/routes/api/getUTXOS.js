@@ -2,8 +2,6 @@ const express = require('express');
 const data = require('../../../handlers/dataHandler');
 const router = express.Router();
 
-const data = require("../../../handlers/dataHandler");
-
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
 
