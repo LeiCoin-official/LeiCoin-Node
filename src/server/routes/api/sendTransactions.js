@@ -15,8 +15,6 @@ router.use('/', (req, res, next) => {
     }
 
 	const transactionData = req.body;
-	
-	console.log(transactionData);
 
 	// Validate the transaction (add your validation logic here)
 	const validationresult = validation.isValidTransaction(transactionData)
