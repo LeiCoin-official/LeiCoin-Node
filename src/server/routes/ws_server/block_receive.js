@@ -3,7 +3,7 @@ const util = require('../../../utils');
 const validation = require('../../../validation');
 
 module.exports = function (block) {
-	const blocksExist = existsBlock(hash, index);
+	const blocksExist = existsBlock(block.hash, block.index);
 	if (blocksExist.cb === "success" && !block.exists) {
 
 		if (validation.isValidBlock(block).cb) {
