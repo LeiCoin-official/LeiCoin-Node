@@ -54,11 +54,10 @@ function isValidTransaction(transaction) {
         }
         let utxoData = readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
         if (utxoData.cb !== "success") {
-            if (mempool.added_utxos[`${input_utxo.txid}_${input_utxo.index}`]) {
-                utxoData = mempool.added_utxos[utxoIndex];
+            if (utxoData.cb === "none") {
                 return {cb: false, status: 400, message: 'Bad Request. Transaction includes input UTXO that does not exists.'};
             }
-            //return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes input UTXO that could not be readed.'};
+            return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes input UTXO that could not be readed.'};
         }
         added_input_utxos.push(`${input_utxo.txid}_${input_utxo.index}`);
         utxo_input_amount += utxoData.amount;
