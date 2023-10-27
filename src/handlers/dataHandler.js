@@ -500,7 +500,7 @@ function readBlockInForks(index, hash) {
 function removeAddedTransactionsFromMempool(block) {
 
     for (let [transactionHash, transactionData] of Object.entries(block.transactions)) {
-        data.removeTransactionFromMempool(transactionData);
+        removeTransactionFromMempool(transactionData);
     }
 }
 
