@@ -21,11 +21,19 @@ function connectToPeer(peerServer) {
     });
 
     util.events.on("block_receive", function (data) {
-        wsclient.send(data);
+        try {
+            wsclient.send(data);
+        } catch (err) {
+            util.ws_client_message.error(`Error sending Block to ${peerServer}: ${err.message}`);
+        }
     });
 
     util.events.on("transaction_receive", function (data) {
-        wsclient.send(data);
+        try {
+            wsclient.send(data);
+        } catch (err) {
+            util.ws_client_message.error(`Error sending Transaction to ${peerServer}: ${err.message}`);
+        }
     });
 
     return wsclient;
