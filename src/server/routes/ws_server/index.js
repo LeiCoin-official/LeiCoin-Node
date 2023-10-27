@@ -4,9 +4,14 @@ const util = require('../../../utils');
 const block_receive_job = require('./block_receive');
 const transactions_receive_job = require('./transactions_receive');
 
+
+const nodeConnections = [];
+
 // WebSocket route for nodes
 router.ws('/', (ws, req) => {
     // Add the WebSocket connection to the nodeConnections array
+
+    nodeConnections.push(ws);
 
     // Listen for messages from clients connected to the node
     ws.on('message', (data) => {
