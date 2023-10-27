@@ -34,3 +34,7 @@ util.events.on("stop_server", function() {
     util.server_message.log(`Server stopped`);
     server.close();
 });
+
+util.ws_client_message("Starting WS-Client..");
+require("./ws_client");
+util.ws_client_message("WS-Client started");
