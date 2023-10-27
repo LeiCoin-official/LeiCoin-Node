@@ -2,7 +2,7 @@ const { Worker, isMainThread } = require('worker_threads');
 const blockMiningUtils = require('./block_mining_utils');
 const util = require('../utils');
 const config = require('../handlers/configHandler');
-const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXO} = require('../handlers/dataHandler');
+const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} = require('../handlers/dataHandler');
 const validation = require('../validation');
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
@@ -75,10 +75,8 @@ function afterMiningLogic(blockResult) {
 
 		addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
 
-		for (let [transactionHash, transactionData] of Object.entries(blockResult.transactions)) {
-			for (let input of transactionData.input) {
-				deleteUTXO(transactionData.senderAddress, input.txid, input.index);
-			}
+		for (const [transactionHash, transactionData] of Object.entries(blockResult.transactions)) {
+			deleteUTXOS(transactionData);
 			addUTXOS(transactionData, false);
 		}
 

@@ -145,8 +145,8 @@ function addTransactionToMempool(transaction) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
-        util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
-        return { cb: 'error' };
+        //util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+        return { cb: 'exists' };
     }
   
     mempool.transactions[transactionHash] = transaction;
@@ -162,26 +162,10 @@ function removeTransactionFromMempool(transaction) {
         return { cb: 'success' };
     }
   
-    util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
-    return { cb: 'error' };
+    //util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
+    return { cb: 'none' };
 }
 
-// Function to write a transaction
-function writeTransaction(txID, transactionData) {
-    const txFilePath = getBlockchainDataFilePath(`/transactions/${txID}.json`);
-    try {
-        if (!fs.existsSync(txFilePath)) {
-            fs.writeFileSync(txFilePath, JSON.stringify(transactionData, null, 2));
-            return {cb: "success"};
-        } else {
-            util.data_message.error(`Transaktion ${txID} already exists and cannot be overwritten.`);
-            return {cb: 'error'}
-        }
-    } catch (err) {
-        util.data_message.error(`Error writing transaction ${txID}: ${err.message}`);
-        return {cb: 'error'};
-    }
-}
 
 // Function to read a transaction
 function readTransaction(txID) {
@@ -293,46 +277,8 @@ function readUTXOS(recipientAddress, txid = null, index = null) {
 }
 
 
-// function existsUTXOS(transactionData) {
-//     const inputs = transactionData.input;
-    
-//     for (const input of inputs) {
-//         const address = input.address;
-//         if (address.length < 54) {
-//             util.data_message.error(`Address is not long enough for the specified format.`);
-//             return { cb: 'error' };
-//         }
-
-//         const directoryPath = `/utxos/${address.slice(50, 52)}`;
-//         const filePath = `${address.slice(52, 54)}.json`;
-
-//         try {
-//             // Check if the UTXO file for the address exists
-//             const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
-//             if (fs.existsSync(fullFilePath)) {
-//                 const existingData = fs.readFileSync(fullFilePath, 'utf8');
-//                 const existingUTXOs = JSON.parse(existingData);
-
-//                 // Check if the specified UTXO index exists
-//                 const indexExists = existingUTXOs.some(utxo => utxo.index === input.index);
-
-//                 if (!indexExists) {
-//                     return { cb: 'success', exists: false };
-//                 }
-//             } else {
-//                 return { cb: 'success', exists: false };
-//             }
-//         } catch (err) {
-//             util.data_message.error(`Error checking UTXOs for address ${address}: ${err.message}`);
-//             return { cb: 'error' };
-//         }
-//     }
-
-//     return { cb: 'success', exists: true };
-// }
-
 // Function to delete a UTXO
-function deleteUTXO(transactionData) {
+function deleteUTXOS(transactionData) {
 
     try {
 
@@ -384,8 +330,8 @@ function deleteUTXO(transactionData) {
 function addDeletedUTXOToMempool(utxo) {
 
     if (mempool.deleted_utxos.includes(utxo)) {
-        util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
-        return { cb: 'error' };
+        //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
+        return { cb: 'exists' };
     }
   
     mempool.deleted_utxos.push(utxo);
@@ -403,16 +349,16 @@ function removeDeletedUTXOFromMempool(utxo) {
         return { cb: 'success' };
     }
   
-    util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
-    return { cb: 'error' };
+    //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
+    return { cb: 'none' };
 }
 
 // Function to add a utxo to the list of added utxos of the Mempool
 function addAddedUTXOToMempool(utxo) {
 
     if (mempool.added_utxos.includes(utxo)) {
-        util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
-        return { cb: 'error' };
+        //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
+        return { cb: 'exists' };
     }
   
     mempool.added_utxos.push(utxo);
@@ -430,8 +376,8 @@ function removeAddedUTXOFromMempool(utxo) {
         return { cb: 'success' };
     }
   
-    util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
-    return { cb: 'error' };
+    //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
+    return { cb: 'none' };
 }
 
 
@@ -553,8 +499,14 @@ function readBlockInForks(index, hash) {
 // Function to mine a block with verified transactions from the Mempool
 function clearMempool(block) {
 
-    for (let [transactionHash, transactionData] of Object.entries(block.transactions)) {
+    for (const [transactionHash, transactionData] of Object.entries(block.transactions)) {
         removeTransactionFromMempool(transactionData);
+        for (const input of transactionData.input) {
+            removeDeletedUTXOFromMempool(input);
+        }
+        for (const output of transactionData.output) {
+            removeAddedUTXOFromMempool(output);
+        }
     }
 }
 
@@ -564,7 +516,6 @@ module.exports = {
     readBlock,
     addTransactionToMempool,
     removeTransactionFromMempool,
-    writeTransaction,
     readTransaction,
     getLatestBlockInfo,
     updateLatestBlockInfo,
@@ -575,7 +526,7 @@ module.exports = {
     createStorageIfNotExists,
     readBlockInForks,
     addUTXOS,
-    deleteUTXO,
+    deleteUTXOS,
     readUTXOS,
     addDeletedUTXOToMempool,
     removeDeletedUTXOFromMempool,
