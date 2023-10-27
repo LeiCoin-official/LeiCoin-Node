@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const util = require('../../../utils');
 const block_receive_job = require('./block_receive');
+const transactions_receive_job = require('./transactions_receive');
 
 // WebSocket route for nodes
 router.ws('/', (ws, req) => {
@@ -14,13 +15,17 @@ router.ws('/', (ws, req) => {
 
         // Relay the message to all other connected nodes (except the sender)
         if (decodedData.type === "block") {
-			block_receive_job(decodedData.block);
-            util.events.emit("block_receive", data);
+			const block_receive_job_result = block_receive_job(decodedData.block);
+            if (!block_receive_job_result.alreadyExists) {
+                util.events.emit("block_receive", data);
+            }
         }
 
 		if (decodedData.type === "transaction") {
-			block_receive_job(decodedData.transaction);
-            util.events.emit("transaction_receive", data);
+			const transactions_receive_job_result = transactions_receive_job(decodedData.transaction);
+            if (!transactions_receive_job_result.alreadyExists) {
+                util.events.emit("transaction_receive", data);
+            }
         }
 
     });
