@@ -11,6 +11,7 @@ const self_node_name = "node1";
 // Store WebSocket connections for nodes
 const nodeConnections = [];
 
+
 // Configuration for other servers (nodes)
 const otherServers = [
     { name: 'node2', port: 12211 },
