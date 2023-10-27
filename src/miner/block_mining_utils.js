@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { getLatestBlockInfo } = require('../handlers/dataHandler'); // Import the data-handler module
+const { getLatestBlockInfo, mempool } = require('../handlers/dataHandler'); // Import the data-handler module
 const config = require('../handlers/configHandler');
 const util = require('../utils');
 
@@ -20,7 +20,7 @@ function createBlock() {
     const newBlock = {
       	index: newIndex,
 		previousHash: previousHash,
-		transactions: data.mempool.transactions,
+		transactions: mempool.transactions,
 		timestamp: new Date().getTime(),
 		nonce: 0,
 		coinbase: {
