@@ -1,4 +1,4 @@
-const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} = require('../../../handlers/dataHandler');
+const { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } = require('../../../handlers/dataHandler');
 const util = require('../../../utils');
 const validation = require('../../../validation');
 

@@ -1,4 +1,4 @@
-const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} = require('../../../handlers/dataHandler');
+const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS, existsBlock } = require('../../../handlers/dataHandler');
 const util = require('../../../utils');
 const validation = require('../../../validation');
 
@@ -20,4 +20,9 @@ module.exports = function (block) {
 	} else {
 		util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 	}
+	const blocksExist = existsBlock(hash, index);
+	if (blocksExist.cb === "success") {
+		return { alreadyExists: blocksExist.exists};
+	}
+	return { alreadyExists: false};
 }
