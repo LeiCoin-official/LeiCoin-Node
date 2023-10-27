@@ -380,29 +380,57 @@ function deleteUTXO(transactionData) {
 }
 
 
-// Function to add a transaction to the Mempool
-function addUTXOToMempool(transaction) {
-    const transactionHash = transaction.txid;
-  
-    if (mempool.transactions[transactionHash]) {
-        util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+// Function to add a utxo to the list of deleted utxos of the Mempool
+function addDeletedUTXOToMempool(utxo) {
+
+    if (mempool.deleted_utxos.includes(utxo)) {
+        util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
         return { cb: 'error' };
     }
   
-    mempool.transactions[transactionHash] = transaction;
+    mempool.deleted_utxos.push(utxo);
     return { cb: 'success' };
 }
   
-  // Function to remove a transaction from the Mempool
-function removeUTXOFromMempool(transaction) {
-    const transactionHash = transaction.txid;
-  
-    if (mempool.transactions[transactionHash]) {
-        delete mempool.transactions[transactionHash];
+  // Function to remove a utxo from the list of deleted utxos of the Mempool
+function removeDeletedUTXOFromMempool(utxo) {
+
+    if (mempool.deleted_utxos.includes(utxo)) {
+        const utxoIndex = mempool.deleted_utxos.findIndex(
+            (u) => u.txid === input.txid && u.index === input.index
+        );
+        mempool.deleted_utxos.splice(utxoIndex, 1);
         return { cb: 'success' };
     }
   
-    util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
+    util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
+    return { cb: 'error' };
+}
+
+// Function to add a utxo to the list of added utxos of the Mempool
+function addAddedUTXOToMempool(utxo) {
+
+    if (mempool.added_utxos.includes(utxo)) {
+        util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
+        return { cb: 'error' };
+    }
+  
+    mempool.added_utxos.push(utxo);
+    return { cb: 'success' };
+}
+  
+  // Function to remove a utxo from the list of added utxo of the Mempool
+function removeAddedUTXOFromMempool(utxo) {
+
+    if (mempool.added_utxos.includes(utxo)) {
+        const utxoIndex = mempool.added_utxos.findIndex(
+            (u) => u.txid === input.txid && u.index === input.index
+        );
+        mempool.added_utxos.splice(utxoIndex, 1);
+        return { cb: 'success' };
+    }
+  
+    util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
     return { cb: 'error' };
 }
 
@@ -523,7 +551,7 @@ function readBlockInForks(index, hash) {
 
 
 // Function to mine a block with verified transactions from the Mempool
-function removeAddedTransactionsFromMempool(block) {
+function clearMempool(block) {
 
     for (let [transactionHash, transactionData] of Object.entries(block.transactions)) {
         removeTransactionFromMempool(transactionData);
@@ -549,5 +577,9 @@ module.exports = {
     addUTXOS,
     deleteUTXO,
     readUTXOS,
-    removeAddedTransactionsFromMempool
+    addDeletedUTXOToMempool,
+    removeDeletedUTXOFromMempool,
+    addAddedUTXOToMempool,
+    removeAddedUTXOFromMempool,
+    clearMempool
 }

@@ -3,7 +3,7 @@ const router = express.Router();
 
 const validation = require('../../../validation');
 
-const { writeBlock, updateLatestBlockInfo, removeAddedTransactionsFromMempool } = require("../../../handlers/dataHandler");
+const { writeBlock, updateLatestBlockInfo, clearMempool } = require("../../../handlers/dataHandler");
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -29,7 +29,7 @@ router.use('/', (req, res, next) => {
     // Add the transaction to the mempool (replace with your blockchain logic)
     writeBlock(blockData);
     updateLatestBlockInfo(blockData.index, blockData.hash);
-    removeAddedTransactionsFromMempool();
+    clearMempool();
 
 });
 
