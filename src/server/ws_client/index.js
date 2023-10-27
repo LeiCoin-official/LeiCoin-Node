@@ -10,8 +10,14 @@ function connectToPeer(peerServer) {
         console.log(`Connected to: ${peerServer}`);
     });
 
+    wsclient.on('error', (error) => {
+        console.error(`Error connecting to ${peerServer}: ${error.message}`);
+        //util.events.emit("ws_reconnect");
+    });
+
     wsclient.on('close', () => {
         console.log(`Connection to ${peerServer} closed. Retrying on the next block send...`);
+        //util.events.emit("ws_reconnect");
     });
 
     util.events.on("block_receive", function (data) {
