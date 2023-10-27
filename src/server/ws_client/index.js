@@ -1,4 +1,4 @@
-const WebSocket = require('WebSocket');
+const WebSocket = require('ws');
 const util = require('../../utils');
 const config = require('../../handlers/configHandler');
 
