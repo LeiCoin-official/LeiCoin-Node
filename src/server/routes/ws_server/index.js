@@ -22,6 +22,7 @@ router.ws('/', (ws, req) => {
         if (decodedData.type === "block") {
 			const block_receive_job_result = block_receive_job(decodedData.data);
             if (!block_receive_job_result.alreadyExists) {
+                util.events.emit("ws_reconnect");
                 util.events.emit("block_receive", data);
             }
         }
@@ -29,6 +30,7 @@ router.ws('/', (ws, req) => {
 		if (decodedData.type === "transaction") {
 			const transactions_receive_job_result = transactions_receive_job(decodedData.data);
             if (!transactions_receive_job_result.alreadyExists) {
+                util.events.emit("ws_reconnect");
                 util.events.emit("transaction_receive", data);
             }
         }

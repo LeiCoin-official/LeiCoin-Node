@@ -38,6 +38,7 @@ router.use('/', (req, res, next) => {
 		addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${output.index}`, output.amount);
 	}
 
+	util.events.emit("ws_reconnect");
 	util.events.emit("transaction_receive", JSON.stringify({type: "transaction", data: transactionData}));
 
 	return;

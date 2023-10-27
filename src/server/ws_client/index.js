@@ -21,12 +21,10 @@ function connectToPeer(peerServer) {
     });
 
     util.events.on("block_receive", function (data) {
-        util.events.emit("ws_reconnect");
         wsclient.send(data);
     });
 
     util.events.on("transaction_receive", function (data) {
-        util.events.emit("ws_reconnect");
         wsclient.send(data);
     });
 
