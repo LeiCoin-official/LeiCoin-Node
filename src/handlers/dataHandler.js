@@ -3,7 +3,9 @@ const util = require('../utils.js');
 const path = require('path');
 
 let mempool = {
-    transactions: {}
+    transactions: {},
+    deleted_utxos: [],
+    added_utxos: []
 };
 
 function createStorageIfNotExists() {
@@ -204,11 +206,6 @@ function addUTXOS(transactionData, coinbase = false) {
     function writeUTXO(output, txid) {
         const recipientAddress = output.recipientAddress;
 
-        if (recipientAddress.length < 54) {
-            util.data_message.error(`Recipient address is not long enough for the specified format.`);
-            return { cb: 'error' };
-        }
-
         const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
         const filePath = `${recipientAddress.slice(2, 4)}.json`;
 
@@ -254,10 +251,6 @@ function addUTXOS(transactionData, coinbase = false) {
 
 // Function to read a UTXO
 function readUTXOS(recipientAddress, txid = null, index = null) {
-    if (recipientAddress.length < 54) {
-        util.data_message.error(`Recipient address is not long enough for the specified format.`);
-        return { cb: 'error' };
-    }
 
     const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
     const filePath = `${recipientAddress.slice(2, 4)}.json`;

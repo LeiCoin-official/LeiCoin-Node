@@ -1,5 +1,5 @@
 const express = require('express');
-const data = require('../../../handlers/dataHandler');
+const { readUTXOS } = require('../../../handlers/dataHandler');
 const router = express.Router();
 
 // Route for receiving new transactions
@@ -23,7 +23,7 @@ router.use('/', (req, res, next) => {
     }
 
     // Validate the transaction (add your validation logic here)
-    const utxos_reading_result = data.readUTXOS(address, txid, index);
+    const utxos_reading_result = readUTXOS(address, txid, index);
 
     if (utxos_reading_result.cb !== 'success') {
         if (utxos_reading_result.cb === 'none') {

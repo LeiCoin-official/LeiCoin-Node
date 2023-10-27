@@ -1,12 +1,12 @@
 const crypto = require('crypto');
-const data = require('../handlers/dataHandler'); // Import the data-handler module
+const { getLatestBlockInfo } = require('../handlers/dataHandler'); // Import the data-handler module
 const config = require('../handlers/configHandler');
 const util = require('../utils');
 
 // Function to create a new block
 function createBlock() {
 
-	previousBlock = data.getLatestBlockInfo().data;
+	previousBlock = getLatestBlockInfo().data;
 
 	let newIndex;
 	let previousHash;

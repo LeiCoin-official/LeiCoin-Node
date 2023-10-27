@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const cryptoHandler = require('./handlers/cryptoHandlers');
 const util = require('./utils.js');
-const data = require('./handlers/dataHandler');
+const { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } = require('./handlers/dataHandler');
 
 
 function isValidTransaction(transaction) {
@@ -47,7 +47,7 @@ function isValidTransaction(transaction) {
     let utxo_output_amount = 0;
 
     for (let input_utxo of input) {
-        let utxoData = data.readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
+        let utxoData = readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
         if (utxoData.cb !== "success") {
             if (utxoData.cb === "none") {
                 return {cb: false, status: 400, message: 'Bad Request. Transaction includes UTXO that does not exists.'};
@@ -83,15 +83,15 @@ function isValidBlock(block) {
 
     if (index == 0) {
 
-        if (!data.isGenesisBlock()) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+        if (!isGenesisBlock()) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
 
     } else {
 
-        let previousBlock = data.readBlock(index - 1);
+        let previousBlock = readBlock(index - 1);
 
         if (previousBlock.cb !== "success") {
 
-            previousBlock = data.readBlockInForks(index - 1, previousHash);
+            previousBlock = readBlockInForks(index - 1, previousHash);
 
             forktype = "forkchild";
 
@@ -119,10 +119,10 @@ function isValidBlock(block) {
     }
 
     //we have to make that better
-    const existsBlock = data.existsBlock(hash, index);
-    if (existsBlock.cb === "success" && !existsBlock.exists) {
-        if (existsBlock.fork) {
-            const latestblockinfo = data.getLatestBlockInfo();
+    const blocksExist = existsBlock(hash, index);
+    if (blocksExist.cb === "success" && !blocksExist.exists) {
+        if (blocksExist.fork) {
+            const latestblockinfo = getLatestBlockInfo();
             if (latestblockinfo.cb === "success" && latestblockinfo.data.index === index) {
                 forktype = "newfork";
             } else {
