@@ -20,7 +20,7 @@ app.use(function(req, res, next) {
 
 app.use("/api", require('./routes/api'));
 
-app.use("/ws", require('./routes/ws'));
+app.use("/ws", require('./routes/ws_server'));
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

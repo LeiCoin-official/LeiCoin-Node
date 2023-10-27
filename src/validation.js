@@ -40,7 +40,13 @@ function isValidTransaction(transaction) {
 
     const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
     if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
-        return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
+        return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
+    }
+
+    const transactionWithoutHash = transaction;
+    delete transactionWithoutHash.txid;
+    if (crypto.createHash('sha256').update(JSON.stringify(transactionWithoutHash)).digest('hex') !== txid) {
+        return {cb: false, status: 400, message: "Bad Request. Transaction hash does not correspond to its data."};
     }
 
     let utxo_input_amount = 0;
