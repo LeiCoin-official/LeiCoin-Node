@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const cryptoHandler = require('./handlers/cryptoHandlers');
 const util = require('./utils.js');
-const { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } = require('./handlers/dataHandler');
+const { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo, mempool } = require('./handlers/dataHandler');
 
 
 function isValidTransaction(transaction) {
@@ -46,14 +46,21 @@ function isValidTransaction(transaction) {
     let utxo_input_amount = 0;
     let utxo_output_amount = 0;
 
+    let added_input_utxos = [];
+
     for (let input_utxo of input) {
+        if (added_input_utxos.includes(`${input_utxo.txid}_${input_utxo.index}`)) {
+            return {cb: false, status: 400, message: 'Bad Request. Transaction includes double spending UTXO inputs.'};
+        }
         let utxoData = readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
         if (utxoData.cb !== "success") {
-            if (utxoData.cb === "none") {
-                return {cb: false, status: 400, message: 'Bad Request. Transaction includes UTXO that does not exists.'};
+            if (mempool.added_utxos[`${input_utxo.txid}_${input_utxo.index}`]) {
+                utxoData = mempool.added_utxos[utxoIndex];
+                return {cb: false, status: 400, message: 'Bad Request. Transaction includes input UTXO that does not exists.'};
             }
-            return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes UTXO that could not be readed.'};
+            //return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes input UTXO that could not be readed.'};
         }
+        added_input_utxos.push(`${input_utxo.txid}_${input_utxo.index}`);
         utxo_input_amount += utxoData.amount;
     }
 
@@ -63,6 +70,10 @@ function isValidTransaction(transaction) {
 
     if (utxo_input_amount < utxo_output_amount) {
         return {cb: false, status: 400, message: 'Bad Request. Transaction output amount is higher than the input amount.'};
+    }
+
+    if (utxo_output_amount <= 0) {
+        return {cb: false, status: 400, message: 'Bad Request. Transaction output amount must be greater than zero.'};
     }
     
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
@@ -144,7 +155,7 @@ function isValidBlock(block) {
     }
   
     // Ensure that the block contains valid transactions (add your validation logic here)
-    for (let [transactionHash, transactionData] of Object.entries(transactions)) {
+    for (let [, transactionData] of Object.entries(transactions)) {
         const transactionsValid = isValidTransaction(transactionData);
         if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }

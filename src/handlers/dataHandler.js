@@ -4,8 +4,8 @@ const path = require('path');
 
 let mempool = {
     transactions: {},
-    deleted_utxos: [],
-    added_utxos: []
+    deleted_utxos: {},
+    added_utxos: {}
 };
 
 function createStorageIfNotExists() {
@@ -203,16 +203,14 @@ function addUTXOS(transactionData, coinbase = false) {
             const existingData = fs.readFileSync(fullFilePath, 'utf8');
             const existingUTXOs = JSON.parse(existingData);
 
-            if (!existingUTXOs[recipientAddress]) existingUTXOs[recipientAddress] = [];
+            if (!existingUTXOs[recipientAddress]) existingUTXOs[recipientAddress] = {};
 
             // Add UTXOs to the recipient's file
-            existingUTXOs[recipientAddress].push({
-                txid: txid,
-                index: output.index,
+            existingUTXOs[recipientAddress][`${txid}_${output.index}`] = {
                 amount: output.amount
-            });
+            };
 
-                // Write the updated UTXOs back to the recipient's file
+            // Write the updated UTXOs back to the recipient's file
             fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
         } catch (err) {
             util.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
@@ -235,7 +233,7 @@ function addUTXOS(transactionData, coinbase = false) {
 }
 
 // Function to read a UTXO
-function readUTXOS(recipientAddress, txid = null, index = null) {
+function readUTXOS(recipientAddress, txid = null, index = null, includeMempool = true) {
 
     try {
 
@@ -248,6 +246,19 @@ function readUTXOS(recipientAddress, txid = null, index = null) {
             const existingData = fs.readFileSync(fullFilePath, 'utf8');
             const existingUTXOs = JSON.parse(existingData);
 
+            if (includeMempool) {
+                if (mempool.deleted_utxos[recipientAddress]) {
+                    for (const deleted_utxo of mempool.deleted_utxos[recipientAddress]) {
+                        delete existingUTXOs[recipientAddress][deleted_utxo];
+                    }
+                }
+                if (mempool.added_utxos[recipientAddress]) {
+                    for (const [added_utxo, added_utxo_content] of Object.entries(mempool.added_utxos[recipientAddress])) {
+                        existingUTXOs[recipientAddress][added_utxo] = added_utxo_content;
+                    }
+                }
+            }
+
             if (!existingUTXOs[recipientAddress]) {
                 return { cb: 'none'};
             }
@@ -257,10 +268,8 @@ function readUTXOS(recipientAddress, txid = null, index = null) {
             }
 
             if (txid && index !== null) {
-                const utxo = existingUTXOs[recipientAddress].find(
-                    (u) => u.txid === txid && u.index === index
-                );
-
+                const utxo = existingUTXOs[recipientAddress][`${txid}_${index}`];
+            
                 if (utxo) {
                     return { cb: 'success', data: utxo };
                 }
@@ -300,14 +309,10 @@ function deleteUTXOS(transactionData) {
             for (const input of transactionData.input) {
 
                 // Find the UTXO to delete
-                const utxoIndex = existingUTXOs[senderAddress].findIndex(
-                    (u) => u.txid === input.txid && u.index === input.index
-                );
-
-                if (utxoIndex !== -1) {
-                    // Remove the UTXO from the array
-                    existingUTXOs[senderAddress].splice(utxoIndex, 1);
-
+                const utxoKey = `${input.txid}_${input.index}`;
+                if (existingUTXOs[senderAddress][utxoKey]) {
+                    // Remove the UTXO from the object
+                    delete existingUTXOs[senderAddress][utxoKey];
                 }
             }
 
@@ -327,25 +332,28 @@ function deleteUTXOS(transactionData) {
 
 
 // Function to add a utxo to the list of deleted utxos of the Mempool
-function addDeletedUTXOToMempool(utxo) {
+function addDeletedUTXOToMempool(senderAddress, utxo) {
 
-    if (mempool.deleted_utxos.includes(utxo)) {
+    mempool.deleted_utxos[senderAddress] = mempool.deleted_utxos[senderAddress] || [];
+
+    if (mempool.deleted_utxos[senderAddress].includes(utxo)) {
         //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
         return { cb: 'exists' };
     }
   
-    mempool.deleted_utxos.push(utxo);
+    mempool.deleted_utxos[senderAddress].push(utxo);
     return { cb: 'success' };
 }
   
   // Function to remove a utxo from the list of deleted utxos of the Mempool
-function removeDeletedUTXOFromMempool(utxo) {
+function removeDeletedUTXOFromMempool(senderAddress, utxo) {
 
-    if (mempool.deleted_utxos.includes(utxo)) {
-        const utxoIndex = mempool.deleted_utxos.findIndex(
-            (u) => u.txid === input.txid && u.index === input.index
-        );
-        mempool.deleted_utxos.splice(utxoIndex, 1);
+    if (mempool.deleted_utxos[senderAddress] && mempool.deleted_utxos[senderAddress].includes(utxo)) {
+        
+        mempool.deleted_utxos[senderAddress].splice(mempool.deleted_utxos.indexOf(utxo), 1);
+
+        if (mempool.deleted_utxos[senderAddress].length === 0) delete mempool.deleted_utxos[senderAddress];
+
         return { cb: 'success' };
     }
   
@@ -354,25 +362,27 @@ function removeDeletedUTXOFromMempool(utxo) {
 }
 
 // Function to add a utxo to the list of added utxos of the Mempool
-function addAddedUTXOToMempool(utxo) {
+function addAddedUTXOToMempool(recipientAddress, utxo, amount) {
 
-    if (mempool.added_utxos.includes(utxo)) {
+    mempool.added_utxos[recipientAddress] = mempool.added_utxos[recipientAddress] || {};
+
+    if (mempool.added_utxos[recipientAddress][utxo]) {
         //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
         return { cb: 'exists' };
     }
   
-    mempool.added_utxos.push(utxo);
+    mempool.added_utxos[recipientAddress][utxo] = {amount: amount};
     return { cb: 'success' };
 }
   
   // Function to remove a utxo from the list of added utxo of the Mempool
-function removeAddedUTXOFromMempool(utxo) {
+function removeAddedUTXOFromMempool(recipientAddress, utxo) {
 
-    if (mempool.added_utxos.includes(utxo)) {
-        const utxoIndex = mempool.added_utxos.findIndex(
-            (u) => u.txid === input.txid && u.index === input.index
-        );
-        mempool.added_utxos.splice(utxoIndex, 1);
+    if (mempool.added_utxos[recipientAddress] && mempool.added_utxos[recipientAddress][utxo]) {
+        delete mempool.added_utxos[recipientAddress][utxo];
+
+        if (Object.keys(mempool.added_utxos[recipientAddress]).length === 0) delete mempool.added_utxos[recipientAddress];
+
         return { cb: 'success' };
     }
   
@@ -499,13 +509,13 @@ function readBlockInForks(index, hash) {
 // Function to mine a block with verified transactions from the Mempool
 function clearMempool(block) {
 
-    for (const [transactionHash, transactionData] of Object.entries(block.transactions)) {
+    for (const [, transactionData] of Object.entries(block.transactions)) {
         removeTransactionFromMempool(transactionData);
         for (const input of transactionData.input) {
-            removeDeletedUTXOFromMempool(input);
+            removeDeletedUTXOFromMempool(transactionData.senderAddress, `${input.txid}_${input.index}`);
         }
         for (const output of transactionData.output) {
-            removeAddedUTXOFromMempool(output);
+            removeAddedUTXOFromMempool(output.recipientAddress, `${output.txid}_${output.index}`);
         }
     }
 }

@@ -75,7 +75,7 @@ function afterMiningLogic(blockResult) {
 
 		addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
 
-		for (const [transactionHash, transactionData] of Object.entries(blockResult.transactions)) {
+		for (const [, transactionData] of Object.entries(blockResult.transactions)) {
 			deleteUTXOS(transactionData);
 			addUTXOS(transactionData, false);
 		}
