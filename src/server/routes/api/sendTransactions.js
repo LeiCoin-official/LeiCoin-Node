@@ -3,7 +3,7 @@ const router = express.Router();
 
 const validation = require('../../../validation');
 
-const { addTransactionToMempool } = require("../../../handlers/dataHandler");
+const { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } = require("../../../handlers/dataHandler");
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -17,7 +17,7 @@ router.use('/', (req, res, next) => {
 	const transactionData = req.body;
 
 	// Validate the transaction (add your validation logic here)
-	const validationresult = validation.isValidTransaction(transactionData)
+	const validationresult = validation.isValidTransaction(transactionData);
 
 	res.status(validationresult.status)
 	res.json({message: validationresult.message});
@@ -28,6 +28,17 @@ router.use('/', (req, res, next) => {
 
 	// Add the transaction to the mempool (replace with your blockchain logic)
 	addTransactionToMempool(transactionData);
+
+	for (const input of transactionData.input) {
+		const removeAddedUTXOFromMempoolResult = removeAddedUTXOFromMempool(transactionData.senderAddress, `${input.txid}_${input.index}`);
+		if (removeAddedUTXOFromMempoolResult.cb !== "success") {
+			addDeletedUTXOToMempool(transactionData.senderAddress, `${input.txid}_${input.index}`);
+		}
+	}
+	for (const output of transactionData.output) {
+		addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${output.index}`, output.amount);
+	}
+
 	return;
 });
 
