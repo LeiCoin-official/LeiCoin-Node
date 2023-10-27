@@ -43,10 +43,12 @@ function isValidTransaction(transaction) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }
 
-    const transactionWithoutHash = transaction;
-    delete transactionWithoutHash.txid;
-    if (crypto.createHash('sha256').update(JSON.stringify(transactionWithoutHash)).digest('hex') !== txid) {
+    if (crypto.createHash('sha256').update(senderAddress + publicKey + JSON.stringify(input) + JSON.stringify(output) + signature).digest('hex') !== txid) {
         return {cb: false, status: 400, message: "Bad Request. Transaction hash does not correspond to its data."};
+    }
+
+    if (txid in mempool.transactions) {
+        return {cb: false, status: 400, message: 'Bad Request. Transaction aleady exists in Mempool'};
     }
 
     let utxo_input_amount = 0;
