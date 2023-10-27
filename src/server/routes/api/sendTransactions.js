@@ -38,7 +38,7 @@ router.use('/', (req, res, next) => {
 		addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${output.index}`, output.amount);
 	}
 
-	util.events.emit("transaction_receive", transactionData);
+	util.events.emit("transaction_receive", {type: "transaction", data: transactionData});
 
 	return;
 });

@@ -10,14 +10,16 @@ router.ws('/', (ws, req) => {
     // Listen for messages from clients connected to the node
     ws.on('message', (data) => {
 
+        decodedData = JSON.parse(data);
+
         // Relay the message to all other connected nodes (except the sender)
-        if (data.type === "block") {
-			block_receive_job(data.block);
+        if (decodedData.type === "block") {
+			block_receive_job(decodedData.block);
             util.events.emit("block_receive", data);
         }
 
-		if (data.type === "transaction") {
-			block_receive_job(data.transaction);
+		if (decodedData.type === "transaction") {
+			block_receive_job(decodedData.transaction);
             util.events.emit("transaction_receive", data);
         }
 
