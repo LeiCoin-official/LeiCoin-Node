@@ -80,7 +80,6 @@ function afterMiningLogic(blockResult) {
 			addUTXOS(transactionData, false);
 		}
 
-		util.events.emit("ws_reconnect");
 		util.events.emit('block_receive', JSON.stringify({type: "block", data: blockResult}));
 
 		util.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);

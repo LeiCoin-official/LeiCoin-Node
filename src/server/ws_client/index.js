@@ -21,6 +21,7 @@ function connectToPeer(peerServer) {
     });
 
     util.events.on("block_receive", function (data) {
+        util.events.emit("ws_reconnect");
         try {
             wsclient.send(data);
         } catch (err) {
@@ -29,6 +30,7 @@ function connectToPeer(peerServer) {
     });
 
     util.events.on("transaction_receive", function (data) {
+        util.events.emit("ws_reconnect");
         try {
             wsclient.send(data);
         } catch (err) {
