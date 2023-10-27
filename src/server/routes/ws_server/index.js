@@ -30,7 +30,7 @@ router.ws('/', (ws, req) => {
         if (index !== -1) {
             nodeConnections.splice(index, 1);
         }
-        console.log(`WebSocket connection to ${req.baseUrl} closed.`);
+        util.server_message.log(`WebSocket connection to ${req.baseUrl} closed.`);
     });
 });
 

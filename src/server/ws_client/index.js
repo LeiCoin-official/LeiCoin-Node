@@ -7,16 +7,16 @@ function connectToPeer(peerServer) {
     const wsclient = new WebSocket(`ws://${peerServer}/ws`);
 
     wsclient.on('open', () => {
-        console.log(`Connected to: ${peerServer}`);
+        util.ws_client_message.log(`Connected to: ${peerServer}`);
     });
 
     wsclient.on('error', (error) => {
-        console.error(`Error connecting to ${peerServer}: ${error.message}`);
+        util.ws_client_message.log(`Error connecting to ${peerServer}: ${error.message}`);
         //util.events.emit("ws_reconnect");
     });
 
     wsclient.on('close', () => {
-        console.log(`Connection to ${peerServer} closed. Retrying on the next block send...`);
+        util.ws_client_message.log(`Connection to ${peerServer} closed. Retrying on the next block send...`);
         //util.events.emit("ws_reconnect");
     });
 
@@ -40,7 +40,7 @@ config.peers.forEach((server) => {
     // Retry the connection on the next block send
     util.events.on("ws_reconnect", function () {
         if (wsclient.readyState !== WebSocket.OPEN) {
-            console.log(`Retrying connection to ${server}`);
+            util.ws_client_message.log(`Retrying connection to ${server}`);
             wsclient = connectToPeer(server);
         }
     });
