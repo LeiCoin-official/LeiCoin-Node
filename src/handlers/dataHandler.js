@@ -140,7 +140,7 @@ function readBlock(blockNumber) {
 }
 
   
-  // Function to add a transaction to the Mempool
+// Function to add a transaction to the Mempool
 function addTransactionToMempool(transaction) {
     const transactionHash = transaction.txid;
   
@@ -153,7 +153,7 @@ function addTransactionToMempool(transaction) {
     return { cb: 'success' };
 }
   
-  // Function to remove a transaction from the Mempool
+// Function to remove a transaction from the Mempool
 function removeTransactionFromMempool(transaction) {
     const transactionHash = transaction.txid;
   
@@ -204,16 +204,17 @@ function readTransaction(txID) {
 function addUTXOS(transactionData, coinbase = false) {
 
     function writeUTXO(output, txid) {
-        const recipientAddress = output.recipientAddress;
-
-        const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
-        const filePath = `${recipientAddress.slice(2, 4)}.json`;
-
-        // Ensure the existence of the directory and file for the recipient
-        ensureFileExists(`${directoryPath}/${filePath}`, '{}');
-
         try {
-                // Read existing UTXOs from the recipient's file
+
+            const recipientAddress = output.recipientAddress;
+
+            const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
+            const filePath = `${recipientAddress.slice(2, 4)}.json`;
+    
+            // Ensure the existence of the directory and file for the recipient
+            ensureFileExists(`${directoryPath}/${filePath}`, '{}');
+
+            // Read existing UTXOs from the recipient's file
             const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
             const existingData = fs.readFileSync(fullFilePath, 'utf8');
             const existingUTXOs = JSON.parse(existingData);
@@ -237,12 +238,12 @@ function addUTXOS(transactionData, coinbase = false) {
 
     if (coinbase) {
 
-        writeUTXO(transactionData, transactionData.txid)
+        writeUTXO(transactionData, transactionData.txid);
 
     } else {
         // Iterate through the recipients in the output array
         for (const output of transactionData.output) {
-            writeUTXO(output, transactionData.txid)
+            writeUTXO(output, transactionData.txid);
         }
     }
 
@@ -252,10 +253,11 @@ function addUTXOS(transactionData, coinbase = false) {
 // Function to read a UTXO
 function readUTXOS(recipientAddress, txid = null, index = null) {
 
-    const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
-    const filePath = `${recipientAddress.slice(2, 4)}.json`;
-
     try {
+
+        const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
+        const filePath = `${recipientAddress.slice(2, 4)}.json`;
+
         // Check if the UTXO file for the address exists
         const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
         if (fs.existsSync(fullFilePath)) {
@@ -330,40 +332,44 @@ function readUTXOS(recipientAddress, txid = null, index = null) {
 // }
 
 // Function to delete a UTXO
-function deleteUTXO(recipientAddress, txid, index) {
-    if (recipientAddress.length < 54) {
-        util.data_message.error(`Recipient address is not long enough for the specified format.`);
-        return { cb: 'error' };
-    }
-
-    const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
-    const filePath = `${recipientAddress.slice(2, 4)}.json`;
+function deleteUTXO(transactionData) {
 
     try {
+
+        const senderAddress = transactionData.senderAddress;
+
+        const directoryPath = `/utxos/${senderAddress.slice(0, 2)}`;
+        const filePath = `${senderAddress.slice(2, 4)}.json`;
+
         // Check if the UTXO file for the address exists
         const fullFilePath = getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
         if (fs.existsSync(fullFilePath)) {
             const existingData = fs.readFileSync(fullFilePath, 'utf8');
             const existingUTXOs = JSON.parse(existingData);
 
-            if (!existingUTXOs[recipientAddress]) {
+            if (!existingUTXOs[senderAddress]) {
                 return { cb: 'none' };
             }
 
-            // Find the UTXO to delete
-            const utxoIndex = existingUTXOs[recipientAddress].findIndex(
-                (u) => u.txid === txid && u.index === index
-            );
+            for (const input of transactionData.input) {
 
-            if (utxoIndex !== -1) {
-                // Remove the UTXO from the array
-                existingUTXOs[recipientAddress].splice(utxoIndex, 1);
+                // Find the UTXO to delete
+                const utxoIndex = existingUTXOs[senderAddress].findIndex(
+                    (u) => u.txid === input.txid && u.index === input.index
+                );
 
-                // Update the UTXO file
-                fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2), 'utf8');
+                if (utxoIndex !== -1) {
+                    // Remove the UTXO from the array
+                    existingUTXOs[senderAddress].splice(utxoIndex, 1);
 
-                return { cb: 'success' };
+                }
             }
+
+            // Update the UTXO file
+            fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2), 'utf8');
+
+            return { cb: 'success' };
+            
         }
 
         return { cb: 'none' };
@@ -371,6 +377,33 @@ function deleteUTXO(recipientAddress, txid, index) {
         util.data_message.error(`Error deleting UTXO for recipient address ${recipientAddress}: ${err.message}`);
         return { cb: 'error' };
     }
+}
+
+
+// Function to add a transaction to the Mempool
+function addUTXOToMempool(transaction) {
+    const transactionHash = transaction.txid;
+  
+    if (mempool.transactions[transactionHash]) {
+        util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+        return { cb: 'error' };
+    }
+  
+    mempool.transactions[transactionHash] = transaction;
+    return { cb: 'success' };
+}
+  
+  // Function to remove a transaction from the Mempool
+function removeUTXOFromMempool(transaction) {
+    const transactionHash = transaction.txid;
+  
+    if (mempool.transactions[transactionHash]) {
+        delete mempool.transactions[transactionHash];
+        return { cb: 'success' };
+    }
+  
+    util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
+    return { cb: 'error' };
 }
 
 
