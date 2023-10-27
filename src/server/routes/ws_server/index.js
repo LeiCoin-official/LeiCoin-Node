@@ -35,6 +35,11 @@ router.ws('/', (ws, req) => {
 
     });
 
+    wsclient.on('error', (error) => {
+        util.server_message.log(`WS Server Error: ${error.message}`);
+        //util.events.emit("ws_reconnect");
+    });
+
     // Handle WebSocket disconnections for nodes
     ws.on('close', () => {
         // Remove the WebSocket connection from the nodeConnections array

@@ -21,12 +21,12 @@ module.exports = function (block) {
 	
 			util.ws_client_message.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
 		} else {
-			util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.1`);
+			util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 		}
 
 		return { alreadyExists: false};
 	}
 
-	util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.2`);
+	util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 	return { alreadyExists: true};
 }
