@@ -1,42 +1,38 @@
 const express = require('express');
 const router = express.Router();
-const WebSocket = require('ws');
+const util = require('../../../utils');
+const block_receive_job = require('./block_receive');
 
-// Create a route that upgrades to WebSocket
+// WebSocket route for nodes
 router.ws('/', (ws, req) => {
-    // Handle WebSocket connections here
-  
-    // Listen for messages from the client
-    ws.on('message', (message) => {
-		console.log('Received:', message);
-	
-		// Send a response back to the client
-		ws.send('Hello, WebSocket client!');
+    // Add the WebSocket connection to the nodeConnections array
+
+    // Listen for messages from clients connected to the node
+    ws.on('message', (data) => {
+
+        // Relay the message to all other connected nodes (except the sender)
+        if (data.type === "block") {
+			block_receive_job(data.block);
+            util.events.emit("block_receive", data);
+        }
+
+		if (data.type === "transaction") {
+			block_receive_job(data.transaction);
+            util.events.emit("transaction_receive", data);
+        }
+
     });
-  
-    // Handle WebSocket disconnections
+
+    // Handle WebSocket disconnections for nodes
     ws.on('close', () => {
-      	console.log('WebSocket connection closed.');
-    });
-  
-    // Connect to other servers on server startup
-    util.peers.forEach((serverURL) => {
-		const wsclient = new WebSocket(serverURL);
-	
-		wsclient.on('open', () => {
-			console.log(`Connected to: ${serverURL}`);
-		});
-	
-		wsclient.on('message', (message) => {
-			console.log(`Received from ${serverURL}: ${message}`);
-		});
-	
-		wsclient.on('close', () => {
-			console.log(`Connection to ${serverURL} closed.`);
-		});
+        // Remove the WebSocket connection from the nodeConnections array
+        const index = nodeConnections.indexOf(ws);
+        if (index !== -1) {
+            nodeConnections.splice(index, 1);
+        }
+        console.log(`WebSocket connection to ${req.baseUrl} closed.`);
     });
 });
 
-//router.use('/sendtransactions', require('./sendTransactions'));
 
 module.exports = router;

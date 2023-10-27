@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-
 const validation = require('../../../validation');
-
 const { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } = require("../../../handlers/dataHandler");
+const util = require('../../../utils');
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -38,6 +37,8 @@ router.use('/', (req, res, next) => {
 	for (const output of transactionData.output) {
 		addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${output.index}`, output.amount);
 	}
+
+	util.events.emit("transaction_receive", transactionData);
 
 	return;
 });

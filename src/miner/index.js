@@ -80,6 +80,8 @@ function afterMiningLogic(blockResult) {
 			addUTXOS(transactionData, false);
 		}
 
+		util.events.emit('block_receive', blockResult);
+
 		util.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
 		util.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
