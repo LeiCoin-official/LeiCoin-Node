@@ -6,7 +6,6 @@ cd /home/container
 echo "Starting..."
 
 # Clone the GitHub repo to /home/container/tmp with the "docker" branch
-# Clone the GitHub repo to /home/container/tmp with the "docker" branch
 git clone --single-branch --branch main https://github.com/LeiCraft/LeiCoin-Node.git /home/container/gittmp
 
 # Check the exit code of the git clone command
@@ -14,8 +13,12 @@ clone_exit_code=$?
 
 # Check if the clone was successful
 if [ $clone_exit_code -eq 0 ]; then
-    # Copy all files to /home/container while excluding .git, .github, and files listed in .gitignore
-    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' --filter=':- .gitignore' /home/container/gittmp/ /home/container/
+    # Copy .gitignore to .dockerignore and add "-" before each ignore rule
+    cp /home/container/gittmp/.gitignore /home/container/gittmp/.dockerignore
+    sed -i 's/^/- /' /home/container/gittmp/.dockerignore
+
+    # Copy all files to /home/container while excluding .git, .github, and files listed in .dockerignore
+    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' --filter=':- /home/container/gittmp/.gitignore /home/container/gittmp/.dockerignore' /home/container/gittmp/ /home/container/
 
     echo "GitHub repository cloned and files copied successfully."
 else

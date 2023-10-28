@@ -1,4 +1,4 @@
 config/config.json
 config/.env
 config/peers.json
-blockchain_data
+blockchain_data/
