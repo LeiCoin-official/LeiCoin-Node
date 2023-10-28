@@ -29,7 +29,6 @@ function connectToPeer(peerServer) {
 }
 
 function reconnectToPeer(peerConnection) {
-    // Retry the connection on the next block or transaction send
     if (peerConnection.client.readyState !== WebSocket.OPEN) {
         peerConnection.client = connectToPeer(peerConnection.server);
         util.ws_client_message.log(`Retrying connection to ${peerConnection.server}`);
@@ -45,22 +44,34 @@ util.events.on("block_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
         reconnectToPeer(peerConnection);
         setTimeout(() => {
-            try {
-                peerConnection.client.send(data);
-            } catch (err) {
-                util.ws_client_message.error(`Error sending Block to ${peerConnection.server}: ${err.message}`);
+            if (peerConnection.client.readyState === WebSocket.OPEN) {
+                try {
+                    peerConnection.client.send(data);
+                    util.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+                } catch (err) {
+                    util.ws_client_message.error(`Error sending Block to ${peerConnection.server}: ${err.message}`);
+                }
+            } else {
+                util.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
             }
-        }, 5000);
+        }, 5000); // Wait for 5 seconds before sending data
     });
 });
 
 util.events.on("transaction_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
         reconnectToPeer(peerConnection);
-        try {
-            peerConnection.client.send(data);
-        } catch (err) {
-            util.ws_client_message.error(`Error sending Transaction to ${peerConnection.server}: ${err.message}`);
-        }
+        setTimeout(() => {
+            if (peerConnection.client.readyState === WebSocket.OPEN) {
+                try {
+                    peerConnection.client.send(data);
+                    util.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+                } catch (err) {
+                    util.ws_client_message.error(`Error sending Transaction to ${peerConnection.server}: ${err.message}`);
+                }
+            } else {
+                util.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+            }
+        }, 5000); // Wait for 5 seconds before sending data
     });
 });
