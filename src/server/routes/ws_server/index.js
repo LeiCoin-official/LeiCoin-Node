@@ -21,14 +21,14 @@ router.ws('/', (ws, req) => {
         // Relay the message to all other connected nodes (except the sender)
         if (decodedData.type === "block") {
 			const block_receive_job_result = block_receive_job(decodedData.data);
-            if (!block_receive_job_result.alreadyExists) {
+            if (block_receive_job_result.cb) {
                 util.events.emit("block_receive", data);
             }
         }
 
 		if (decodedData.type === "transaction") {
 			const transactions_receive_job_result = transactions_receive_job(decodedData.data);
-            if (!transactions_receive_job_result.alreadyExists) {
+            if (transactions_receive_job_result.cb) {
                 util.events.emit("transaction_receive", data);
             }
         }

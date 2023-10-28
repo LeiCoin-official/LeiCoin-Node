@@ -6,7 +6,9 @@ module.exports = function (transaction) {
 
     if (!(transaction.txid in mempool.transactions)) {
 
-        if (validation.isValidTransaction(transaction).cb) {
+        const validationresult = validation.isValidTransaction(transaction);
+
+        if (validationresult.cb) {
 
             // Add the transaction to the mempool (replace with your blockchain logic)
             addTransactionToMempool(transaction);
@@ -23,13 +25,13 @@ module.exports = function (transaction) {
     
             util.ws_client_message.success(`Received block with hash ${transaction.txid} has been validated. Adding to Blockchain.`);
         } else {
-            util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
+            util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
         }
 
-        return {alreadyExists: false};
+        return {cb: true, validationresult: validationresult };
     }
 
     util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
-	return { alreadyExists: true};
+	return { cb: false, validationresult: null };
 
 }
