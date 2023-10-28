@@ -15,17 +15,24 @@ clone_exit_code=$?
 if [ $clone_exit_code -eq 0 ]; then
     # Copy .gitignore to .dockerignore and add "-" before each ignore rule
     cp /home/container/gittmp/.gitignore /home/container/gittmp/.dockerignore
-    sed -i 's/^/- /' /home/container/gittmp/.dockerignore
+    sed -i '/^\s*#/!s/^\(.*\)$/ - \1/' /home/container/gittmp/.dockerignore
+
+    # Read .dockerignore and add exclusion rules to rsync command
+    while IFS= read -r line; do
+        if [[ ! $line =~ ^\s*# ]]; then
+            echo "--exclude='$line'" >> /home/container/gittmp/exclusion_rules
+        fi
+    done < /home/container/gittmp/.dockerignore
 
     # Copy all files to /home/container while excluding .git, .github, and files listed in .dockerignore
-    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' --filter=':- /home/container/gittmp/.gitignore /home/container/gittmp/.dockerignore' /home/container/gittmp/ /home/container/
+    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' --exclude-from=/home/container/gittmp/exclusion_rules /home/container/gittmp/ /home/container/
 
-    echo "GitHub repository cloned and files copied successfully."
+    echo "GitHub repository cloned, files copied successfully, and .dockerignore created."
 else
     echo "Failed to clone the GitHub repository."
 fi
 
-# Remove temporary directories
+# Remove temporary directories and exclusion rules file
 rm -rf /home/container/gittmp
 
 # Extract the value of --internal-port from STARTUP if it exists
