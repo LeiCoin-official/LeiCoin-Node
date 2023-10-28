@@ -20,7 +20,7 @@ function connectToPeer(peerServer) {
 
     wsclient.on('close', () => {
         util.ws_client_message.log(`Connection to ${peerServer} closed. Retrying on the next sending action...`);
-        reconnectToPeer(peerConnection);
+        //reconnectToPeer(peerConnection);
     });
 
     wsConnections.push(peerConnection);
