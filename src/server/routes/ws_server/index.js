@@ -18,6 +18,8 @@ router.ws('/', (ws, req) => {
 
         decodedData = JSON.parse(data);
 
+        util.server_message.loh(`Received ${decodedData}`);
+
         // Relay the message to all other connected nodes (except the sender)
         if (decodedData.type === "block") {
 			const block_receive_job_result = block_receive_job(decodedData.data);
