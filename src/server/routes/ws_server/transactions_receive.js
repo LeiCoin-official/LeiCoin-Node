@@ -23,7 +23,7 @@ module.exports = function (transaction) {
                 addAddedUTXOToMempool(output.recipientAddress, `${transaction.txid}_${output.index}`, output.amount);
             }
     
-            util.ws_client_message.success(`Received block with hash ${transaction.txid} has been validated. Adding to Blockchain.`);
+            util.ws_client_message.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Blockchain.`);
         } else {
             util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
         }

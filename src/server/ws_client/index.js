@@ -50,7 +50,7 @@ util.events.on("block_receive", function (data) {
             } catch (err) {
                 util.ws_client_message.error(`Error sending Block to ${peerConnection.server}: ${err.message}`);
             }
-        }, 1000);
+        }, 5000);
     });
 });
 
