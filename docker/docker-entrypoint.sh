@@ -13,17 +13,8 @@ clone_exit_code=$?
 
 # Check if the clone was successful
 if [ $clone_exit_code -eq 0 ]; then
-    # Read .gitignore and build exclusion command
-    EXCLUSION_COMMAND=""
-    while IFS= read -r line; do
-        # Exclude files and directories based on .gitignore rules
-        if [[ ! $line =~ ^\s*# && ! -z "$line" ]]; then
-            EXCLUSION_COMMAND="$EXCLUSION_COMMAND --exclude='$line'"
-        fi
-    done < /home/container/gittmp/.gitignore
-
     # Copy all files to /home/container while excluding .git, .github, and files listed in .gitignore
-    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' $EXCLUSION_COMMAND /home/container/gittmp/ /home/container/
+    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' --exclude-from=/home/container/gittmp/.gitignore /home/container/gittmp/ /home/container/
 
     echo "GitHub repository cloned and files copied successfully."
 else
@@ -31,7 +22,6 @@ else
 fi
 
 # Remove temporary directories
-
 rm -rf /home/container/gittmp
 
 # Extract the value of --internal-port from STARTUP if it exists
