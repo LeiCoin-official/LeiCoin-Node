@@ -4,7 +4,7 @@ const validation = require('../../../validation');
 
 module.exports = function (block) {
 	const blocksExist = existsBlock(block.hash, block.index);
-	if (blocksExist.cb === "success" && !block.exists) {
+	if (blocksExist.cb === "success" && !blocksExist.exists && !block.fork) {
 
 		const validationresult = validation.isValidBlock(block);
 
