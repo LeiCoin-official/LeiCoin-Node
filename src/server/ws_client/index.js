@@ -12,15 +12,18 @@ function connectToPeer(peerServer) {
 
     wsclient.on('open', () => {
         util.ws_client_message.log(`Connected to: ${peerServer}`);
+        peerConnection.isConnected = true; // Mark the connection as open
     });
 
     wsclient.on('error', (error) => {
         util.ws_client_message.error(`Error connecting to ${peerServer}: ${error.message}`);
+        peerConnection.isConnected = false; // Mark the connection as closed
     });
 
     wsclient.on('close', () => {
         util.ws_client_message.log(`Connection to ${peerServer} closed. Retrying on the next sending action...`);
-        //reconnectToPeer(peerConnection);
+        peerConnection.isConnected = false; // Mark the connection as closed
+        reconnectToPeer(peerConnection);
     });
 
     wsConnections.push(peerConnection);
@@ -29,10 +32,18 @@ function connectToPeer(peerServer) {
 }
 
 function reconnectToPeer(peerConnection) {
-    // Retry the connection on the next block or transaction send
     if (peerConnection.client.readyState !== WebSocket.OPEN) {
-        util.ws_client_message.log(`Retrying connection to ${peerConnection.server}`);
-        peerConnection.client = connectToPeer(peerConnection.server);
+        if (!peerConnection.isReconnecting) {
+            util.ws_client_message.log(`Retrying connection to ${peerConnection.server}`);
+            peerConnection.isReconnecting = true;
+
+            const interval = setInterval(() => {
+                if (peerConnection.isConnected) {
+                    clearInterval(interval); // Reconnection successful, clear the interval
+                    peerConnection.isReconnecting = false;
+                }
+            }, 1000); // Wait for 1 second before retrying
+        }
     }
 }
 
