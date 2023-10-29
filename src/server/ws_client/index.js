@@ -78,12 +78,13 @@ function sendBlock(peerConnection, data) {
     if (peerConnection.client.readyState === WebSocket.OPEN) {
         try {
             peerConnection.client.send(data);
-            util.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+            //util.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+            util.ws_client_message.log(`Block sent to ${peerConnection.server}`);
         } catch (err) {
             util.ws_client_message.error(`Error sending Block to ${peerConnection.server}: ${err.message}`);
         }
     } else {
-        util.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+        //util.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
     }
 }
 
@@ -91,11 +92,12 @@ function sendTransaction(peerConnection, data) {
     if (peerConnection.client.readyState === WebSocket.OPEN) {
         try {
             peerConnection.client.send(data);
-            util.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+            //util.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+            util.ws_client_message.log(`Transaction sent to ${peerConnection.server}`);
         } catch (err) {
             util.ws_client_message.error(`Error sending Transaction to ${peerConnection.server}: ${err.message}`);
         }
     } else {
-        util.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+        //util.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
     }
 }
