@@ -37,7 +37,7 @@ if (!fs.existsSync(logFilePathdir)) {
     data_message.log(`Directory ${logFilePathdir} was created because it was missing.`);
 }
 if (!fs.existsSync(logFilePath)) {
-    fs.writeFileSync(logFilePath, content, 'utf8');
+    fs.writeFileSync(logFilePath, "", 'utf8');
     data_message.log(`File ${logFilePath} was created because it was missing.`);
 }
 
