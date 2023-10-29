@@ -3,6 +3,7 @@ const chalk = require('chalk');
 const process = require('process');
 const ansiEscapes = require('ansi-escapes');
 const fs = require('fs');
+const path = require('path');
 //const { Writable } = require('stream');
 
 const { EventEmitter } = require("events");
