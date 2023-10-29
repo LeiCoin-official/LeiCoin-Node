@@ -2,6 +2,8 @@ const readline = require('readline');
 const chalk = require('chalk');
 const process = require('process');
 const ansiEscapes = require('ansi-escapes');
+const fs = require('fs');
+//const { Writable } = require('stream');
 
 const { EventEmitter } = require("events");
 const events = new EventEmitter();
@@ -11,6 +13,30 @@ const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
 const mining_pow = 5;
 
+
+// Function to get the current date and time as a formatted string
+function getCurrentTimestamp() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
+}
+
+// Generate a timestamp for the log file name
+const timestamp = getCurrentTimestamp();
+const logFilePath = `/logs/log-${timestamp}.log`;
+
+const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+logStream.on('error', (err) => {
+    console.error('Error writing to log file:', err);
+});
+
+
+const default_message = {};
 const miner_message = {};
 const server_message = {};
 const data_message = {};
@@ -28,6 +54,7 @@ const styles = {
 const messageTypes = ['log', 'success', 'error'];
 
 const messageConfigs = [
+    { object: default_message, prefix: '', color: '#ffffff' },
     { object: miner_message, prefix: 'Miner', color: '#00ffff' },
     { object: server_message, prefix: 'Server', color: '#c724b1' },
     { object: data_message, prefix: 'Data', color: '#1711df' },
@@ -57,6 +84,8 @@ function logToConsole(prefix, message, type = 'log') {
     console.log(outputMessage);
 
     rl.prompt();
+
+    logStream.write(outputMessage + '\n');
 }
 
 
@@ -71,26 +100,26 @@ for (const { object, prefix } of messageConfigs) {
 function handleCommand(command) {
     switch (command) {
         case 'help':
-            console.log('Available commands:');
-            console.log(' - help: Show available commands');
-            console.log(' - stop: Stops The Server and Miner');
+            default_message.log('Available commands:');
+            default_message.log(' - help: Show available commands');
+            default_message.log(' - stop: Stops The Server and Miner');
             break;
         case 'stop':
             gracefulShutdown();
             break;
         default:
-            console.log('Command not recognized. Type "help" for available commands.');
+            default_message.log('Command not recognized. Type "help" for available commands.');
             break;
     }
 }
 
 
 function gracefulShutdown() {
-    console.log('Shutting down...');
+    default_message.log('Shutting down...');
 
     events.emit("stop_server");
 
-    console.log('LeiCoin Node stopped.');
+    default_message.log('LeiCoin Node stopped.');
     process.exit(0);
   
 }
@@ -100,7 +129,7 @@ rl.on('line', (input) => {
     handleCommand(input.trim().toLowerCase());
     rl.prompt();
 }).on('close', () => {
-    //console.log('CLI closed.');
+    //default_message.log('CLI closed.');
     process.exit(0);
 });
 
