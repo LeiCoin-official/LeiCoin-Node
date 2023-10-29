@@ -25,10 +25,8 @@ function getBlockchainDataFilePath(subpath) {
 }
 
 // Function to ensure the existence of a directory
-function ensureDirectoryExists(directoryPath, fullDirectoryPath = null) {
-    if (fullDirectoryPath === null) {
-        fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
-    }
+function ensureDirectoryExists(directoryPath) {
+    const fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
     try {
         if (!fs.existsSync(fullDirectoryPath)) {
             fs.mkdirSync(fullDirectoryPath, { recursive: true });
@@ -40,10 +38,8 @@ function ensureDirectoryExists(directoryPath, fullDirectoryPath = null) {
 }
 
 // Function to ensure the existence of a file
-function ensureFileExists(filePath, content = '', fullFilePath = null) {
-    if (fullFilePath === null) {
-        fullFilePath = getBlockchainDataFilePath(filePath);
-    }
+function ensureFileExists(filePath, content = '') {
+    const fullFilePath = getBlockchainDataFilePath(filePath);
     try {
         const dir = path.dirname(fullFilePath);
         if (!fs.existsSync(dir)) {

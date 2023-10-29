@@ -6,7 +6,6 @@ const fs = require('fs');
 //const { Writable } = require('stream');
 
 const { EventEmitter } = require("events");
-const { ensureFileExists, ensureDirectoryExists } = require('./handlers/dataHandler');
 const events = new EventEmitter();
 
 const processRootDirectory = process.cwd();
@@ -31,7 +30,7 @@ function getCurrentTimestamp() {
 const timestamp = getCurrentTimestamp();
 const logFilePath = `/logs/log-${timestamp}.log`;
 
-ensureFileExists("", "", processRootDirectory + `/logs/log-${timestamp}.log`,);
+fs.writeFileSync(logFilePath, "", )
 
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 logStream.on('error', (err) => {
