@@ -31,7 +31,7 @@ function getCurrentTimestamp() {
 const timestamp = getCurrentTimestamp();
 const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
 
-const logFilePathdir = path.dirname(fullFilePath);
+const logFilePathdir = path.dirname(logFilePath);
 if (!fs.existsSync(logFilePathdir)) {
     fs.mkdirSync(logFilePathdir, { recursive: true });
     data_message.log(`Directory ${logFilePathdir} was created because it was missing.`);
