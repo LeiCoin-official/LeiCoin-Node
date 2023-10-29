@@ -31,7 +31,7 @@ module.exports = function (transaction) {
         return {cb: true, validationresult: validationresult };
     }
 
-    util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
+    //util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
 	return { cb: false, validationresult: null };
 
 }

@@ -29,6 +29,6 @@ module.exports = function (block) {
 		return { cb: true, validationresult: validationresult };
 	}
 
-	util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
+	//util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 	return { cb: false, validationresult: null} ;
 }

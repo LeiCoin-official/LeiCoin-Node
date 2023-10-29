@@ -18,7 +18,7 @@ router.ws('/', (ws, req) => {
 
         decodedData = JSON.parse(data);
 
-        util.server_message.log(`Received ${data}`);
+        //util.server_message.log(`Received ${data}`);
 
         // Relay the message to all other connected nodes (except the sender)
         if (decodedData.type === "block") {

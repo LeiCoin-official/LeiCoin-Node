@@ -8,7 +8,7 @@ const wsConnections = [];
 // Function to establish a WebSocket connection to a peer server
 function connectToPeer(peerServer) {
     const wsclient = new WebSocket(`ws://${peerServer}/ws`);
-    const peerConnection = { server: peerServer, client: wsclient };
+    //const peerConnection = { server: peerServer, client: wsclient };
 
     wsclient.on('open', () => {
         util.ws_client_message.log(`Connected to: ${peerServer}`);
@@ -23,7 +23,7 @@ function connectToPeer(peerServer) {
         //reconnectToPeer(peerConnection);
     });
 
-    wsConnections.push(peerConnection);
+    //wsConnections.push(peerConnection);
 
     return wsclient;
 }
@@ -32,23 +32,28 @@ function reconnectToPeer(peerConnection) {
     if (peerConnection.client.readyState !== WebSocket.OPEN) {
         peerConnection.client = connectToPeer(peerConnection.server);
         util.ws_client_message.log(`Retrying connection to ${peerConnection.server}`);
-        return true;
+        return { needed: true, connection: peerConnection };
     }
-    return false;
+    return { needed: false };
 }
 
 // Connect to other peer nodes and create peer-to-peer connections
 config.peers.forEach((server) => {
     let wsclient = connectToPeer(server);
+    wsConnections.push({
+        server: server,
+        client: wsclient
+    })
 });
 
 util.events.on("block_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
-        const reconnectNedeed = reconnectToPeer(peerConnection);
-        if (reconnectNedeed) {
+        const reconnect= reconnectToPeer(peerConnection);
+        if (reconnect.needed) {
+            peerConnection = reconnect.connection;
             setTimeout(() => {
                 sendBlock(peerConnection, data);
-            }, 5000); // Wait for 5 seconds before sending data
+            }, 2000); // Wait for 2 seconds before sending data
         } else {
             sendBlock(peerConnection, data);
         }
@@ -57,11 +62,12 @@ util.events.on("block_receive", function (data) {
 
 util.events.on("transaction_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
-        const reconnectNedeed = reconnectToPeer(peerConnection);
-            if (reconnectNedeed) {
+        const reconnect = reconnectToPeer(peerConnection);
+        if (reconnect.needed) {
+            peerConnection = reconnect.connection;
             setTimeout(() => {
                 sendTransaction(peerConnection, data);
-            }, 5000); // Wait for 5 seconds before sending data
+            }, 2000); // Wait for 2 seconds before sending data
         } else {
             sendTransaction(peerConnection, data);
         }
