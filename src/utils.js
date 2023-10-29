@@ -28,9 +28,17 @@ function getCurrentTimestamp() {
 
 // Generate a timestamp for the log file name
 const timestamp = getCurrentTimestamp();
-const logFilePath = `/logs/log-${timestamp}.log`;
+const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
 
-fs.writeFileSync(logFilePath, "", )
+const logFilePathdir = path.dirname(fullFilePath);
+if (!fs.existsSync(logFilePathdir)) {
+    fs.mkdirSync(logFilePathdir, { recursive: true });
+    data_message.log(`Directory ${logFilePathdir} was created because it was missing.`);
+}
+if (!fs.existsSync(logFilePath)) {
+    fs.writeFileSync(logFilePath, content, 'utf8');
+    data_message.log(`File ${logFilePath} was created because it was missing.`);
+}
 
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 logStream.on('error', (err) => {
