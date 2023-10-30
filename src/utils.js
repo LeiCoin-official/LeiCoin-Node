@@ -41,7 +41,7 @@ if (!fs.existsSync(logFilePath)) {
     console.log(`File ${logFilePath} was created because it was missing.`);
 }
 
-const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
 logStream.on('error', (err) => {
     console.error('Error writing to log file:', err);
 });
