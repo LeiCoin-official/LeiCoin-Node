@@ -15,38 +15,6 @@ const mining_difficulty = 6;
 const mining_pow = 5;
 
 
-// Function to get the current date and time as a formatted string
-function getCurrentTimestamp() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hour = String(now.getHours()).padStart(2, '0');
-    const minute = String(now.getMinutes()).padStart(2, '0');
-    const second = String(now.getSeconds()).padStart(2, '0');
-    return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
-}
-
-// Generate a timestamp for the log file name
-const timestamp = getCurrentTimestamp();
-const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
-
-const logFilePathdir = path.dirname(logFilePath);
-if (!fs.existsSync(logFilePathdir)) {
-    fs.mkdirSync(logFilePathdir, { recursive: true });
-    console.log(`Directory ${logFilePathdir} was created because it was missing.`);
-}
-if (!fs.existsSync(logFilePath)) {
-    fs.writeFileSync(logFilePath, "", 'utf8');
-    console.log(`File ${logFilePath} was created because it was missing.`);
-}
-
-const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
-logStream.on('error', (err) => {
-    console.error('Error writing to log file:', err);
-});
-
-
 const default_message = {};
 const miner_message = {};
 const server_message = {};
@@ -107,6 +75,37 @@ for (const { object, prefix } of messageConfigs) {
         };
     }
 }
+
+// Function to get the current date and time as a formatted string
+function getCurrentTimestamp() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
+}
+
+// Generate a timestamp for the log file name
+const timestamp = getCurrentTimestamp();
+const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
+
+const logFilePathdir = path.dirname(logFilePath);
+if (!fs.existsSync(logFilePathdir)) {
+    fs.mkdirSync(logFilePathdir, { recursive: true });
+    data_message.log(`Directory ${logFilePathdir} was created because it was missing.`);
+}
+if (!fs.existsSync(logFilePath)) {
+    fs.writeFileSync(logFilePath, "", 'utf8');
+    data_message.log(`File ${logFilePath} was created because it was missing.`);
+}
+
+const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
+logStream.on('error', (err) => {
+    console.error('Error writing to log file:', err);
+});
 
 function handleCommand(command) {
     switch (command) {
