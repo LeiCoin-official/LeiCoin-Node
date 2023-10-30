@@ -27,10 +27,11 @@ const styles = {
     reset: ctx.reset,
     success: ctx.green,
     error: ctx.red,
+    warn: ctx.yellow,
 };
 
 
-const messageTypes = ['log', 'success', 'error'];
+const messageTypes = ['log', 'success', 'error', 'warn'];
 
 const messageConfigs = [
     { object: default_message, prefix: 'Global', color: '#ffffff' },
@@ -95,12 +96,12 @@ const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
 const logFilePathdir = path.dirname(logFilePath);
 if (!fs.existsSync(logFilePathdir)) {
     fs.mkdirSync(logFilePathdir, { recursive: true });
-    data_message.log(`Directory ${logFilePathdir} was created because it was missing.`);
+    //logToConsole(`Directory ${logFilePathdir} was created because it was missing.`);
 }
 
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
 logStream.on('error', (err) => {
-    console.error('Error writing to log file:', err);
+    data_message.warn('Error writing to log file:', err);
 });
 
 function handleCommand(command) {
