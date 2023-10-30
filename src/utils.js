@@ -101,7 +101,7 @@ if (!fs.existsSync(logFilePathdir)) {
 
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
 logStream.on('error', (err) => {
-    data_message.warn('Error writing to log file:', err);
+    //data_message.warn('Error writing to log file:', err);
 });
 
 function handleCommand(command) {
