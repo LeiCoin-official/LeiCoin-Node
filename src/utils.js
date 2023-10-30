@@ -97,10 +97,6 @@ if (!fs.existsSync(logFilePathdir)) {
     fs.mkdirSync(logFilePathdir, { recursive: true });
     data_message.log(`Directory ${logFilePathdir} was created because it was missing.`);
 }
-// if (!fs.existsSync(logFilePath)) {
-//     fs.writeFileSync(logFilePath, "", 'utf8');
-//     data_message.log(`File ${logFilePath} was created because it was missing.`);
-// }
 
 const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
 logStream.on('error', (err) => {
