@@ -33,7 +33,7 @@ const styles = {
 const messageTypes = ['log', 'success', 'error'];
 
 const messageConfigs = [
-    { object: default_message, prefix: '', color: '#ffffff' },
+    { object: default_message, prefix: 'Global', color: '#ffffff' },
     { object: miner_message, prefix: 'Miner', color: '#00ffff' },
     { object: server_message, prefix: 'Server', color: '#c724b1' },
     { object: data_message, prefix: 'Data', color: '#1711df' },
