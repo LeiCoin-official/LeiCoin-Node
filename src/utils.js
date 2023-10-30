@@ -62,7 +62,7 @@ function logToConsole(prefix, message, type = 'log') {
     process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
     console.log(outputMessage);
 
-    logStream.write(message + '\n');
+    logStream.write(`[${prefix}] ${message}\n`);
 
     rl.prompt();
 }
