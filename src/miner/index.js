@@ -16,31 +16,31 @@ async function runInMiningParallel() {
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise((resolve) => {
-		const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { block, threadIndex: i } });
-		workerThreads.push(worker);
+			const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { block, threadIndex: i } });
+			workerThreads.push(worker);
 
-		worker.on('message', (data) => {
-			util.miner_message.log(`Miner mined block with hash ${data.hash}. Waiting for verification`);
-			results[i] = data;
-			resolve(data);
-		});
+			worker.on('message', (data) => {
+				util.miner_message.log(`Miner mined block with hash ${data.hash}. Waiting for verification`);
+				results[i] = data;
+				resolve(data);
+			});
 
-		worker.on('error', (error) => {
-			// Handle worker errors if needed.
-			util.miner_message.error('Mining Worker Error:', error);
-			resolve(null);
-		});
+			worker.on('error', (error) => {
+				// Handle worker errors if needed.
+				util.miner_message.error('Mining Worker Error:', error);
+				resolve(null);
+			});
 
-		worker.on('exit', (code) => {
-			// if (code !== 0) {
-			//   console.error(`Mining Worker ${i} exited with code ${code}`);
-			//   resolve(null);
-			// }
-			resolve(null);
-		});
+			worker.on('exit', (code) => {
+				// if (code !== 0) {
+				//   console.error(`Mining Worker ${i} exited with code ${code}`);
+				//   resolve(null);
+				// }
+				resolve(null);
+			});
 		})
 	);
-
+	
 	const blockResult = await Promise.race(promises);
 
 	// Terminate all worker threads.

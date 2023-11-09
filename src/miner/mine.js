@@ -12,6 +12,8 @@ function mineBlock(block) {
 
     if (block.hash.substring(0, util.mining_difficulty) === '0'.repeat(util.mining_difficulty)) {
       return block;
+
+      
     }
   }
 }
