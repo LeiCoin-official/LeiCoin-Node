@@ -6,7 +6,7 @@ const util = require('../utils');
 // Function to create a new block
 function createBlock() {
 
-	previousBlock = getLatestBlockInfo().data;
+	previousBlock = getLatestBlockInfo().data.main.latestBlockInfo;
 
 	let newIndex;
 	let previousHash;

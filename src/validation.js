@@ -99,7 +99,9 @@ function isValidBlock(block) {
 
     let forktype = "none";
 
-    if (index == 0) {
+    let forkchain = null;
+
+    if (index === 0) {
 
         if (!isGenesisBlock()) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
 
@@ -121,6 +123,8 @@ function isValidBlock(block) {
             }
         }
 
+        //we need to implement logic for fork childs here
+
         // Confirm that the block's index is greater than the previous block's index by one
         if (index !== previousBlock.data.index + 1) {
             return {cb: false, status: 400, message: 'Bad Request. Block index does not correspond to the previous blocks minus one.'};
@@ -140,7 +144,7 @@ function isValidBlock(block) {
     const blocksExist = existsBlock(hash, index);
     if (blocksExist.cb === "success" && !blocksExist.exists) {
         if (blocksExist.fork) {
-            const latestblockinfo = getLatestBlockInfo();
+            
             if (latestblockinfo.cb === "success" && latestblockinfo.data.index === index) {
                 forktype = "newfork";
             } else {
@@ -150,6 +154,27 @@ function isValidBlock(block) {
     } else {
         return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
     }
+
+    const latestblockinfoFileData = getLatestBlockInfo();
+
+    if (latestblockinfoFileData.cb === "success") {
+        let previousBlockInfoExists = false;
+        for (const [forkName, latestANDPreviousForkBlockInfo] of Object.entries(latestblockinfoFileData.data)) {
+            const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
+            const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
+            if (latestBlockInfo.hash === hash) {
+                return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
+            } else if ((latestBlockInfo.hash === previousHash) && ((latestBlockInfo.index + 1) === index)) {
+                
+            } else if ((previousBlockInfo.hash === previousHash) && ((previousBlockInfo.index + 1) === index)) {
+                
+            }
+        }
+        if (!previousBlockInfoExists) {
+            return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};   
+        }
+    }
+
 
     // Verify that the hash of the block meets the mining difficulty criteria
     const hashPrefix = '0'.repeat(util.mining_difficulty);
@@ -162,7 +187,7 @@ function isValidBlock(block) {
     }
   
     // Ensure that the block contains valid transactions (add your validation logic here)
-    for (let [, transactionData] of Object.entries(transactions)) {
+    for (const [, transactionData] of Object.entries(transactions)) {
         const transactionsValid = isValidTransaction(transactionData);
         if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }

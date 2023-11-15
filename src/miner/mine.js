@@ -6,26 +6,27 @@ const { block, threadIndex } = workerData;
 
 // Function to mine a block with custom logic
 function mineBlock(block) {
-  while (true) {
-    block.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
-    block.hash = blockMiningUtils.calculateBlockHash(block);
+	let stopMining = false;
 
-    if (block.hash.substring(0, util.mining_difficulty) === '0'.repeat(util.mining_difficulty)) {
-      return block;
+	// Listen for messages from the parent thread
+	parentPort.on('message', (message) => {
+		if (message === 'stopMining') {
+			console.log(`Thread ${threadIndex} received stop signal. Stopping mining.`);
+			stopMining = true;
+		}
+		// Add more logic to handle other messages from the parent thread if needed
+	});
 
-      
-    }
-  }
+	while (!stopMining) {
+		block.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
+		block.hash = blockMiningUtils.calculateBlockHash(block);
+
+		if (block.hash.substring(0, util.mining_difficulty) === '0'.repeat(util.mining_difficulty)) {
+			parentPort.postMessage({ result: block, threadIndex });
+			return;
+		}
+	}
 }
 
-//console.log(`Thread ${threadIndex} is mining a block`);
+console.log(`Thread ${threadIndex} is mining a block`);
 mineBlock(block);
-
-// Check if the mined block is valid
-// if (blockMiningUtils.isValidBlock(minedBlock)) {
-//   parentPort.postMessage(`Thread ${threadIndex} mined a valid block with hash: ${minedBlock.hash}`);
-// } else {
-//   parentPort.postMessage(null); // Indicate that this thread did not find a valid block
-// }
-
-parentPort.postMessage(block);

@@ -402,14 +402,18 @@ function getLatestBlockInfo() {
     }
 }
 
-function updateLatestBlockInfo(index, hash) {
+function updateLatestBlockInfo(fork = "main", previousBlockInfo, latestBlockInfo) {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
     try {
-        const data = {
-            hash: hash,
-            index: index,
-        }
-        fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(data), {encoding:'utf8',flag:'w'});
+
+        const latestBlockInfoFileData = getLatestBlockInfo().data;
+
+        latestBlockInfo[fork] = {
+            "previousBlockInfo": previousBlockInfo,
+            "latestBlockInfo": previousBlockInfo
+        };
+
+        fs.writeFileSync(latestBlockInfoFilePath, latestBlockInfoFileData, {encoding:'utf8',flag:'w'});
         return {cb: 'success'};
     } catch (err) {
         util.data_message.error(`Error writing latest block info: ${err.message}`);
@@ -420,7 +424,7 @@ function updateLatestBlockInfo(index, hash) {
 // Define the function to check if a block with a specific hash and index exists.
 function existsBlock(blockHash, blockIndex) {
     try {
-        const latestBlockInfoFilePath = getBlockchainDataFilePath('/indexes/blocks.json');
+        const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/blocks.json`);
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         const blockArray = JSON.parse(data);
     
@@ -446,6 +450,7 @@ function existsBlock(blockHash, blockIndex) {
         return { cb: 'error' };
     }
 }
+
 
 function isGenesisBlock() {
     const blocksDirectory = '/blocks';
@@ -520,27 +525,36 @@ function clearMempool(block) {
     }
 }
 
+
+
 module.exports = {
     mempool,
-    writeBlock,
-    readBlock,
-    addTransactionToMempool,
-    removeTransactionFromMempool,
-    readTransaction,
-    getLatestBlockInfo,
-    updateLatestBlockInfo,
-    existsBlock,
-    isGenesisBlock,
-    ensureDirectoryExists,
-    ensureFileExists,
-    createStorageIfNotExists,
-    readBlockInForks,
-    addUTXOS,
-    deleteUTXOS,
-    readUTXOS,
     addDeletedUTXOToMempool,
     removeDeletedUTXOFromMempool,
     addAddedUTXOToMempool,
     removeAddedUTXOFromMempool,
-    clearMempool
+    clearMempool,
+
+    writeBlock,
+    readBlock,
+
+    readBlockInForks,
+
+    addTransactionToMempool,
+    removeTransactionFromMempool,
+    readTransaction,
+    
+    getLatestBlockInfo,
+    updateLatestBlockInfo,
+
+    existsBlock,
+    isGenesisBlock,
+
+    ensureDirectoryExists,
+    ensureFileExists,
+    createStorageIfNotExists,
+
+    addUTXOS,
+    deleteUTXOS,
+    readUTXOS
 }
