@@ -453,27 +453,56 @@ function existsBlock(blockHash, blockIndex) {
 
 
 function isGenesisBlock() {
-    const blocksDirectory = '/blocks';
-    const latestBlockInfoFile = '/indexes/latestblockinfo.json';
-    const blocksIndexFile = '/indexes/blocks.json';
+    //const blocksDirectory = '/blocks';
+    //const latestBlockInfoFile = '/indexes/latestblockinfo.json';
+    //const blocksIndexFile = '/indexes/blocks.json';
   
     try {
-        const blocksExist = isDirectoryNotEmpty(blocksDirectory);
-        const latestBlockInfoExists = fs.existsSync(latestBlockInfoFile);
-        const blocksIndexFileExists = fs.existsSync(blocksIndexFile);
+        //const blocksExist = isDirectoryNotEmpty(blocksDirectory);
+        //const latestBlockInfoExists = fs.existsSync(latestBlockInfoFile);
+        //const blocksIndexFileExists = fs.existsSync(blocksIndexFile);
     
-        const isLatestBlockInfoEmpty = isFileNotEmpty(latestBlockInfoFile);
-        const isBlocksIndexEmpty = isFileNotEmpty(blocksIndexFile);
+        //const isLatestBlockInfoEmpty = isFileNotEmpty(latestBlockInfoFile, "{}");
+        //const isBlocksIndexEmpty = isFileNotEmpty(blocksIndexFile, "[]");
+
+        const latestblockinfoFileData = getLatestBlockInfo();
+
+        if (latestblockinfoFileData.cb === "success") {
+            const latestANDPreviousForkBlockInfo = latestblockinfoFileData.data.main
+            if ((latestANDPreviousForkBlockInfo !== null) && (latestANDPreviousForkBlockInfo !== undefined)) {
+
+                const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo || null;
+                const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo || null;
+
+                if ((previousBlockInfo !== null) && (previousBlockInfo !== undefined)) {
+                    if (typeof(previousBlockInfo) === "object") {
+                        if (((previousBlockInfo.index !== null) && (previousBlockInfo.index !== undefined)) && ((previousBlockInfo.hash !== null) && (previousBlockInfo.hash !== undefined))) {
+                            return { isGenesisBlock: false, isForkOFGenesisBlock: false };
+                        }
+                    }
+                } else if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
+                    if (typeof(latestBlockInfo) === "object") {
+                        if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
+                            return { isGenesisBlock: true, isForkOFGenesisBlock: true };
+                        }
+                    }
+                }
+
+            }
+        }
     
         // Check if all conditions are true
-        if (blocksExist || latestBlockInfoExists || blocksIndexFileExists || isLatestBlockInfoEmpty || isBlocksIndexEmpty) {
+        //if (blocksExist || latestBlockInfoExists || blocksIndexFileExists || isLatestBlockInfoEmpty || isBlocksIndexEmpty) {
+        /*if (previousBlockInfoExists) {
+            //return {cb: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain'};   
             return false;
         } else {
             return true;
-        }
+        }*/
+        return { isGenesisBlock: true, isForkOFGenesisBlock: false };
     } catch (err) {
         util.data_message.error(`Error checking for existing blocks: ${err.message}`);
-        return false;
+        return { isGenesisBlock: false, isForkOFGenesisBlock: false };
     }
 }
 

@@ -98,81 +98,47 @@ function isValidBlock(block) {
     }
 
     let forktype = "none";
-
-    let forkchain = null;
+    let forkchain = "none";
+    let forkparent = "none"
 
     if (index === 0) {
 
-        if (!isGenesisBlock()) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+        const isGenesisBlockResult = isGenesisBlock();
+
+        if (!isGenesisBlockResult.isGenesisBlock) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
 
     } else {
 
-        let previousBlock = readBlock(index - 1);
+        const latestblockinfoFileData = getLatestBlockInfo();
 
-        if (previousBlock.cb !== "success") {
-
-            previousBlock = readBlockInForks(index - 1, previousHash);
-
-            forktype = "forkchild";
-
-            if (previousBlock.cb !== "success") {
-                if (previousBlock.cb === "none") {
-                    return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+        if (latestblockinfoFileData.cb === "success") {
+            let previousBlockInfoExists = false;
+            for (const [forkName, latestANDPreviousForkBlockInfo] of Object.entries(latestblockinfoFileData.data)) {
+                const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
+                const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
+                if (latestBlockInfo.hash === hash) {
+                    return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
+                } else if ((latestBlockInfo.hash === previousHash) && ((latestBlockInfo.index + 1) === index)) {
+                    forkchain = forkName;
+                    forktype = "child";
+                    forkparent = forkName;
+                    previousBlockInfoExists = true;
+                } else if ((previousBlockInfo.hash === previousHash) && ((previousBlockInfo.index + 1) === index)) {
+                    forkchain = hash;
+                    forktype = "newfork";
+                    forkparent = forkName;
+                    previousBlockInfoExists = true;
                 }
-                return {cb: false, status: 500, message: 'Internal Server Error. Previous Block could not be readed.'};
+            }
+            if (!previousBlockInfoExists) {
+                return {cb: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain'};   
             }
         }
 
-        //we need to implement logic for fork childs here
-
-        // Confirm that the block's index is greater than the previous block's index by one
-        if (index !== previousBlock.data.index + 1) {
-            return {cb: false, status: 400, message: 'Bad Request. Block index does not correspond to the previous blocks minus one.'};
-        }
-    
-        // Validate that the previous hash in the new block matches the hash of the previous block
-        if (previousHash !== previousBlock.data.hash) {
-            return {cb: false, status: 400, message: 'Bad Request. Previous Block hash is not the same as the previous block hash'};
-        }
     }
     
     if (crypto.createHash('sha256').update( index + previousHash + JSON.stringify(transactions) + timestamp + nonce + JSON.stringify(coinbase)).digest('hex') !== hash) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
-    }
-
-    //we have to make that better
-    const blocksExist = existsBlock(hash, index);
-    if (blocksExist.cb === "success" && !blocksExist.exists) {
-        if (blocksExist.fork) {
-            
-            if (latestblockinfo.cb === "success" && latestblockinfo.data.index === index) {
-                forktype = "newfork";
-            } else {
-                return {cb: false, status: 400, message: 'Bad Request. Forks for older Blocks are not allowed.'};
-            }
-        }
-    } else {
-        return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
-    }
-
-    const latestblockinfoFileData = getLatestBlockInfo();
-
-    if (latestblockinfoFileData.cb === "success") {
-        let previousBlockInfoExists = false;
-        for (const [forkName, latestANDPreviousForkBlockInfo] of Object.entries(latestblockinfoFileData.data)) {
-            const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
-            const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
-            if (latestBlockInfo.hash === hash) {
-                return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
-            } else if ((latestBlockInfo.hash === previousHash) && ((latestBlockInfo.index + 1) === index)) {
-                
-            } else if ((previousBlockInfo.hash === previousHash) && ((previousBlockInfo.index + 1) === index)) {
-                
-            }
-        }
-        if (!previousBlockInfoExists) {
-            return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};   
-        }
     }
 
 
@@ -191,7 +157,7 @@ function isValidBlock(block) {
         const transactionsValid = isValidTransaction(transactionData);
         if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }
-    return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forktype: forktype};
+    return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forkchain: forkchain, forktype: forktype, forkparent: forkparent};
 }
   
 module.exports = {
