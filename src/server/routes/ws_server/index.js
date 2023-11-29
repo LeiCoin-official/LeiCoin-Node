@@ -35,6 +35,10 @@ router.ws('/', (ws, req) => {
             }
         }
 
+        if (decodedData.type === "update_request") {
+			
+        }
+
     });
 
     wsclient.on('error', (error) => {

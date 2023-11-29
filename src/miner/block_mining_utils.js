@@ -22,6 +22,7 @@ function createBlock() {
 		previousHash: previousHash,
 		transactions: mempool.transactions,
 		timestamp: new Date().getTime(),
+		
 		nonce: 0,
 		coinbase: {
 			minerAddress: config.miner.minerAddress,

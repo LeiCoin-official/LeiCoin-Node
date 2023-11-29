@@ -35,6 +35,6 @@ util.events.on("stop_server", function() {
     server.close();
 });
 
-util.ws_client_message.log("Starting WS-Client..");
+util.ws_client_message.log("Starting WS-Client ...");
 require("./ws_client");
 util.ws_client_message.log("WS-Client started");
