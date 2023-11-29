@@ -11,7 +11,11 @@ module.exports = function (block) {
 		if (validationresult.cb) {
 
 			writeBlock(block);
-			updateLatestBlockInfo(block.index, block.hash);
+			updateLatestBlockInfo(
+				validationresult.forkchain,
+				{hash: block.previousHash, index: block.index -1 },
+				{hash: block.hash, index: block.index}
+			);
 			clearMempool(block);
 	
 			addUTXOS({txid: block.hash, index: 0, recipientAddress: block.coinbase.minerAddress, amount: block.coinbase.amount}, true);

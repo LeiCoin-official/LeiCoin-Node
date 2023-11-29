@@ -86,9 +86,6 @@ function isValidTransaction(transaction) {
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
 }
 
-function isNewForkBlock() {
-    
-}
 
 function isValidBlock(block) {
     const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
@@ -106,6 +103,15 @@ function isValidBlock(block) {
         const isGenesisBlockResult = isGenesisBlock();
 
         if (!isGenesisBlockResult.isGenesisBlock) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+
+        forkchain = "main";
+        forktype = "child";
+        forkparent = "main";
+
+        if (isGenesisBlockResult.isForkOFGenesisBlock) {
+            forkchain = hash;
+            forktype = "newfork";
+        } 
 
     } else {
 
