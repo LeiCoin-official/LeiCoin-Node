@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const util = require('../../utils');
+const util = require('../../utils').default;
 const config = require('../../handlers/configHandler');
 
 // An array to store WebSocket connections

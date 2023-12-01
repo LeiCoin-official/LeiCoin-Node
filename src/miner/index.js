@@ -1,6 +1,6 @@
 const { Worker, isMainThread } = require('worker_threads');
 const blockMiningUtils = require('./block_mining_utils');
-const util = require('../utils');
+const util = require('../utils').default;
 const config = require('../handlers/configHandler');
 const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} = require('../handlers/dataHandler');
 const validation = require('../validation');

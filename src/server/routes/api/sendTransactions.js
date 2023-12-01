@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const validation = require('../../../validation');
 const { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } = require("../../../handlers/dataHandler");
-const util = require('../../../utils');
+const util = require('../../../utils').default;
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {

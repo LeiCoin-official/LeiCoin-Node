@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const util = require('../../../utils');
+const util = require('../../../utils').default;
 const block_receive_job = require('./block_receive');
 const transactions_receive_job = require('./transactions_receive');
 

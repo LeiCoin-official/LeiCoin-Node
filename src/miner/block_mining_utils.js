@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { getLatestBlockInfo, mempool } = require('../handlers/dataHandler'); // Import the data-handler module
 const config = require('../handlers/configHandler');
-const util = require('../utils');
+const util = require('../utils').default;
 
 // Function to create a new block
 function createBlock() {

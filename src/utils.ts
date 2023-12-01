@@ -1,15 +1,15 @@
-const readline = require('readline');
-const chalk = require('chalk');
-const process = require('process');
-const ansiEscapes = require('ansi-escapes');
-const fs = require('fs');
-const path = require('path');
+import { createInterface } from 'readline';
+import { Instance } from 'chalk';
+import { cwd, stdin, stdout, exit, on } from 'process';
+import { eraseLines, cursorTo } from 'ansi-escapes';
+import { existsSync, mkdirSync, createWriteStream } from 'fs';
+import { dirname } from 'path';
 //const { Writable } = require('stream');
 
-const { EventEmitter } = require("events");
+import { EventEmitter } from "events";
 const events = new EventEmitter();
 
-const processRootDirectory = process.cwd();
+const processRootDirectory = cwd();
 
 const mining_difficulty = 6;
 const mining_pow = 5;
@@ -21,7 +21,7 @@ const server_message = {};
 const data_message = {};
 const ws_client_message = {};
 
-const ctx = new chalk.Instance({level: 3});
+const ctx = new Instance({level: 3});
 
 const styles = {
     reset: ctx.reset,
@@ -41,9 +41,9 @@ const messageConfigs = [
     { object: ws_client_message, prefix: 'WS Client', color: '#f47fff' },
 ];
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+const rl = createInterface({
+    input: stdin,
+    output: stdout,
     terminal: true,
 });
 
@@ -59,8 +59,8 @@ function logToConsole(prefix, message, type = 'log') {
     const outputMessage = generateLogMessage(prefix, message, color, type);
 
     // Clear the current line and move the cursor to the beginning
-    process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
-    process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
+    stdout.write(eraseLines(1)); // Clear the current line
+    stdout.write(cursorTo(0)); // Move the cursor to the beginning
     console.log(outputMessage);
 
     logStream.write(`[${prefix}] ${message}\n`);
@@ -93,13 +93,13 @@ function getCurrentTimestamp() {
 const timestamp = getCurrentTimestamp();
 const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
 
-const logFilePathdir = path.dirname(logFilePath);
-if (!fs.existsSync(logFilePathdir)) {
-    fs.mkdirSync(logFilePathdir, { recursive: true });
+const logFilePathdir = dirname(logFilePath);
+if (!existsSync(logFilePathdir)) {
+    mkdirSync(logFilePathdir, { recursive: true });
     //logToConsole(`Directory ${logFilePathdir} was created because it was missing.`);
 }
 
-const logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
+const logStream = createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
 logStream.on('error', (err) => {
     //data_message.warn('Error writing to log file:', err);
 });
@@ -127,7 +127,7 @@ function gracefulShutdown() {
     events.emit("stop_server");
 
     default_message.log('LeiCoin Node stopped.');
-    process.exit(0);
+    exit(0);
   
 }
   
@@ -137,13 +137,13 @@ rl.on('line', (input) => {
     rl.prompt();
 }).on('close', () => {
     //default_message.log('CLI closed.');
-    process.exit(0);
+    exit(0);
 });
 
-process.on("SIGINT", gracefulShutdown);
-process.on("SIGTERM", gracefulShutdown);
+on("SIGINT", gracefulShutdown);
+on("SIGTERM", gracefulShutdown);
 
-module.exports = {
+export {
     processRootDirectory,
     mining_difficulty,
     mining_pow,

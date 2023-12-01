@@ -3,7 +3,7 @@ const expressWS = require('express-ws');
 const bodyParser = require('body-parser');
 const config = require('../handlers/configHandler');
 const cors = require('cors');
-const util = require('../utils');
+const util = require('../utils').default;
 
 const app = express();
 

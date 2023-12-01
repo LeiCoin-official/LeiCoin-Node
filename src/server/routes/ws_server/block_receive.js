@@ -1,5 +1,5 @@
 const { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS, existsBlock } = require('../../../handlers/dataHandler');
-const util = require('../../../utils');
+const util = require('../../../utils').default;
 const validation = require('../../../validation');
 
 module.exports = function (block) {

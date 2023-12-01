@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
-const util = require('../utils');
+const util = require('../utils').default;
 const dotenv = require('dotenv');
 
 

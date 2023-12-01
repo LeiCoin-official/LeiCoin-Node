@@ -1,7 +1,7 @@
 
 
 
-const util = require('./src/utils');
+const util = require('./src/utils').default;
 const { createStorageIfNotExists } = require('./src/handlers/dataHandler');
 
 createStorageIfNotExists();

@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const cryptoHandler = require('./handlers/cryptoHandlers');
-const util = require('./utils.js');
+const util = require('./utils.js').default;
 const { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo, mempool } = require('./handlers/dataHandler');
 
 
@@ -143,7 +143,7 @@ function isValidBlock(block) {
 
     }
     
-    if (crypto.createHash('sha256').update( index + previousHash + JSON.stringify(transactions) + timestamp + nonce + JSON.stringify(coinbase)).digest('hex') !== hash) {
+    if (crypto.createHash('sha256').update( index + previousHash + timestamp + nonce + JSON.stringify(transactions) + JSON.stringify(coinbase)).digest('hex') !== hash) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
     }
 

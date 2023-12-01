@@ -1,6 +1,6 @@
-const fs = require('fs');
-const util = require('../utils.js');
-const path = require('path');
+import fs from 'fs';
+import * as util from '../utils';
+import path from 'path';
 
 let mempool = {
     transactions: {},
@@ -20,25 +20,25 @@ function createStorageIfNotExists() {
 }
 
 
-function getBlockchainDataFilePath(subpath) {
+function getBlockchainDataFilePath(subpath: string) {
     return path.join(util.processRootDirectory, '/blockchain_data' + subpath);
 }
 
 // Function to ensure the existence of a directory
-function ensureDirectoryExists(directoryPath) {
+function ensureDirectoryExists(directoryPath: string) {
     const fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
     try {
         if (!fs.existsSync(fullDirectoryPath)) {
             fs.mkdirSync(fullDirectoryPath, { recursive: true });
             util.data_message.log(`Directory ${directoryPath} was created because it was missing.`);
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
     }
 }
 
 // Function to ensure the existence of a file
-function ensureFileExists(filePath, content = '') {
+function ensureFileExists(filePath: string, content = '') {
     const fullFilePath = getBlockchainDataFilePath(filePath);
     try {
         const dir = path.dirname(fullFilePath);
@@ -50,19 +50,19 @@ function ensureFileExists(filePath, content = '') {
             fs.writeFileSync(fullFilePath, content, 'utf8');
             util.data_message.log(`File ${filePath} was created because it was missing.`);
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
     }
 }
 
 // Function to check if a file is empty or contains an empty JSON object or array
-function isFileNotEmpty(filePath, jsonFormat = '[]') {
+function isFileNotEmpty(filePath: any, jsonFormat = '[]') {
     try {
         const content = fs.readFileSync(getBlockchainDataFilePath(filePath), 'utf8');
         let jsonData;
         try {
             jsonData = JSON.parse(content);
-        } catch (err) {
+        } catch (err: any) {
             jsonData = JSON.parse(jsonFormat);
             ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
         }
@@ -73,7 +73,7 @@ function isFileNotEmpty(filePath, jsonFormat = '[]') {
             return Object.keys(jsonData).length > 0;
         }
         return false;
-    } catch (err) {
+    } catch (err: any) {
         const jsonData = JSON.parse(jsonFormat);
         ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
         return true;
@@ -81,19 +81,19 @@ function isFileNotEmpty(filePath, jsonFormat = '[]') {
 }
 
 // Function to check if a directory is empty
-function isDirectoryNotEmpty(directoryPath) {
+function isDirectoryNotEmpty(directoryPath: any) {
     try {
         const fullDirectoryPath = getBlockchainDataFilePath(directoryPath);
         const files = fs.readdirSync(fullDirectoryPath);
         return files.length > 0;
-    } catch (err) {
+    } catch (err: any) {
         ensureDirectoryExists(directoryPath);
     }
 }
 
 
 // Function to write a block
-function writeBlock(blockData) {
+function writeBlock(blockData: { index: any; hash: any; }) {
     const blockNumber = blockData.index;
     const blockHash = blockData.hash;
     const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
@@ -116,14 +116,14 @@ function writeBlock(blockData) {
             util.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
             return { cb: 'error' };
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
         return { cb: 'error' };
     }
 }
 
 // Function to read a block
-function readBlock(blockNumber) {
+function readBlock(blockNumber: any) {
     const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
     try {
         if (fs.existsSync(blockFilePath)) {
@@ -133,15 +133,15 @@ function readBlock(blockNumber) {
             util.data_message.error(`Block ${blockNumber} was not found.`);
             return {cb: 'none'};
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error reading block ${blockNumber}: ${err.message}.`);
         return {cb: 'error'}
     }
 }
 
-  
+/*  
 // Function to add a transaction to the Mempool
-function addTransactionToMempool(transaction) {
+function addTransactionToMempool(transaction: { txid: any; }) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
@@ -154,7 +154,7 @@ function addTransactionToMempool(transaction) {
 }
   
 // Function to remove a transaction from the Mempool
-function removeTransactionFromMempool(transaction) {
+function removeTransactionFromMempool(transaction: { txid: any; }) {
     const transactionHash = transaction.txid;
   
     if (mempool.transactions[transactionHash]) {
@@ -165,10 +165,11 @@ function removeTransactionFromMempool(transaction) {
     //util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
     return { cb: 'none' };
 }
+*/
 
 
 // Function to read a transaction
-function readTransaction(txID) {
+function readTransaction(txID: any) {
     const txFilePath = getBlockchainDataFilePath(`/transactions/${txID}.json`);
     try {
         if (fs.existsSync(txFilePath)) {
@@ -178,16 +179,16 @@ function readTransaction(txID) {
             util.data_message.error(`Transaktion ${txID} was not found`);
             return {cb: 'none'}
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
         return {cb: 'error'};
     }
 }
 
 // Function to write a UTXO
-function addUTXOS(transactionData, coinbase = false) {
+function addUTXOS(transactionData: { txid: any; output: any; }, coinbase = false) {
 
-    function writeUTXO(output, txid) {
+    function writeUTXO(output: { recipientAddress: any; index: any; amount: any; }, txid: any) {
         try {
 
             const recipientAddress = output.recipientAddress;
@@ -212,7 +213,7 @@ function addUTXOS(transactionData, coinbase = false) {
 
             // Write the updated UTXOs back to the recipient's file
             fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
-        } catch (err) {
+        } catch (err: any) {
             util.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
             return { cb: 'error' };
         }
@@ -233,7 +234,7 @@ function addUTXOS(transactionData, coinbase = false) {
 }
 
 // Function to read a UTXO
-function readUTXOS(recipientAddress, txid = null, index = null, includeMempool = true) {
+function readUTXOS(recipientAddress: string | any[], txid = null, index = null, includeMempool = true) {
 
     try {
 
@@ -279,7 +280,7 @@ function readUTXOS(recipientAddress, txid = null, index = null, includeMempool =
         } else {
             return { cb: 'none'};
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
         return { cb: 'error' };
     }
@@ -287,7 +288,7 @@ function readUTXOS(recipientAddress, txid = null, index = null, includeMempool =
 
 
 // Function to delete a UTXO
-function deleteUTXOS(transactionData) {
+function deleteUTXOS(transactionData: { senderAddress: any; input: any; }) {
 
     try {
 
@@ -324,15 +325,15 @@ function deleteUTXOS(transactionData) {
         }
 
         return { cb: 'none' };
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error deleting UTXO for recipient address ${recipientAddress}: ${err.message}`);
         return { cb: 'error' };
     }
 }
 
-
+/*
 // Function to add a utxo to the list of deleted utxos of the Mempool
-function addDeletedUTXOToMempool(senderAddress, utxo) {
+function addDeletedUTXOToMempool(senderAddress: string | number, utxo: any) {
 
     mempool.deleted_utxos[senderAddress] = mempool.deleted_utxos[senderAddress] || [];
 
@@ -346,7 +347,7 @@ function addDeletedUTXOToMempool(senderAddress, utxo) {
 }
   
   // Function to remove a utxo from the list of deleted utxos of the Mempool
-function removeDeletedUTXOFromMempool(senderAddress, utxo) {
+function removeDeletedUTXOFromMempool(senderAddress: string | number, utxo: string) {
 
     if (mempool.deleted_utxos[senderAddress] && mempool.deleted_utxos[senderAddress].includes(utxo)) {
         
@@ -362,7 +363,7 @@ function removeDeletedUTXOFromMempool(senderAddress, utxo) {
 }
 
 // Function to add a utxo to the list of added utxos of the Mempool
-function addAddedUTXOToMempool(recipientAddress, utxo, amount) {
+function addAddedUTXOToMempool(recipientAddress: string | number, utxo: string | number, amount: any) {
 
     mempool.added_utxos[recipientAddress] = mempool.added_utxos[recipientAddress] || {};
 
@@ -376,7 +377,7 @@ function addAddedUTXOToMempool(recipientAddress, utxo, amount) {
 }
   
   // Function to remove a utxo from the list of added utxo of the Mempool
-function removeAddedUTXOFromMempool(recipientAddress, utxo) {
+function removeAddedUTXOFromMempool(recipientAddress: string | number, utxo: string) {
 
     if (mempool.added_utxos[recipientAddress] && mempool.added_utxos[recipientAddress][utxo]) {
         delete mempool.added_utxos[recipientAddress][utxo];
@@ -389,20 +390,20 @@ function removeAddedUTXOFromMempool(recipientAddress, utxo) {
     //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
     return { cb: 'none' };
 }
-
+*/
 
 function getLatestBlockInfo() {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
     try {
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         return {cb: 'success', data: JSON.parse(data)}
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error reading latest block info: ${err.message}`);
         return {cb: 'error'}
     }
 }
 
-function updateLatestBlockInfo(fork = "main", previousBlockInfo, latestBlockInfo) {
+function updateLatestBlockInfo(fork = "main", previousBlockInfo: any, latestBlockInfo: { [x: string]: { previousBlockInfo: any; latestBlockInfo: any; }; }) {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
     try {
 
@@ -415,28 +416,28 @@ function updateLatestBlockInfo(fork = "main", previousBlockInfo, latestBlockInfo
 
         fs.writeFileSync(latestBlockInfoFilePath, latestBlockInfoFileData, {encoding:'utf8',flag:'w'});
         return {cb: 'success'};
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error writing latest block info: ${err.message}`);
         return {cb: 'error'};
     }
 }
 
 // Define the function to check if a block with a specific hash and index exists.
-function existsBlock(blockHash, blockIndex) {
+function existsBlock(blockHash: String, blockIndex: Number) {
     try {
         const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/blocks.json`);
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         const blockArray = JSON.parse(data);
     
         // Check if an object with the specified index and hash exists in the array.
-        const block = blockArray.find(block => block.index === blockIndex && block.hash === blockHash);
+        const block: {index: Number, hash: String} = blockArray.find((block: { index: Number; hash: String; }) => block.index === blockIndex && block.hash === blockHash);
 
         if (block) {
             // The block with the specified index and hash exists in the main chain
             return { cb: 'success', exists: true};
         } else {
             // Check if there's a block with the specified index and a different hash in the provided JSON data
-            const forkedBlock = blockArray.find(block => block.index === blockIndex && block.hash !== blockHash);
+            const forkedBlock = blockArray.find((block: { index: Number; hash: String; }) => block.index === blockIndex && block.hash !== blockHash);
             if (forkedBlock) {
                 // The block with the same index but a different hash exists in the provided data
                 return { cb: 'success', exists: false, fork: true };
@@ -445,7 +446,7 @@ function existsBlock(blockHash, blockIndex) {
             // The block with the specified index and hash does not exist
             return { cb: 'success', exists: false, fork: false };
         }
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error reading latest block info: ${err.message}`);
         return { cb: 'error' };
     }
@@ -500,13 +501,13 @@ function isGenesisBlock() {
             return true;
         }*/
         return { isGenesisBlock: true, isForkOFGenesisBlock: false };
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error checking for existing blocks: ${err.message}`);
         return { isGenesisBlock: false, isForkOFGenesisBlock: false };
     }
 }
 
-function readBlockInForks(index, hash) {
+function readBlockInForks(index: Number, hash: String) {
 
     const forksDirectory = getBlockchainDataFilePath('/forks/');
 
@@ -533,15 +534,15 @@ function readBlockInForks(index, hash) {
     
         // Block not found in any fork
         return {cb: "none"};
-    } catch (err) {
+    } catch (err: any) {
         util.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
         return {cb: "error"};
     }
 }
 
-
+/*
 // Function to mine a block with verified transactions from the Mempool
-function clearMempool(block) {
+function clearMempool(block: any) {
 
     for (const [, transactionData] of Object.entries(block.transactions)) {
         removeTransactionFromMempool(transactionData);
@@ -553,10 +554,10 @@ function clearMempool(block) {
         }
     }
 }
+*/
 
 
-
-module.exports = {
+export {
     mempool,
     addDeletedUTXOToMempool,
     removeDeletedUTXOFromMempool,

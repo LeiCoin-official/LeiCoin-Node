@@ -1,5 +1,5 @@
 const { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool, mempool } = require('../../../handlers/dataHandler');
-const util = require('../../../utils');
+const util = require('../../../utils').default;
 const validation = require('../../../validation');
 
 module.exports = function (transaction) {

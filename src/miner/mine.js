@@ -28,5 +28,5 @@ function mineBlock(block) {
 	}
 }
 
-console.log(`Thread ${threadIndex} is mining a block`);
+util.miner_message.log(`Thread ${threadIndex} is mining a block`);
 mineBlock(block);
