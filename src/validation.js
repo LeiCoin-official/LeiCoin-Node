@@ -15,7 +15,7 @@ function isValidTransaction(transaction) {
         delete transactionData.txid;
     
         // decode the senderAddress
-        const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
+        const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
@@ -38,7 +38,7 @@ function isValidTransaction(transaction) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
 
-    const publicKeyPEM = cryptoHandler.decodeAddressToPublicKey(publicKey);
+    const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
     if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }

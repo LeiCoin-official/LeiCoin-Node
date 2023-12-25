@@ -26,14 +26,14 @@ function base64DecodeToString(data) {
     return Buffer.from(data, 'base64').toString();
 }
 
-function encodePublicKeyToAddress(public_key_pem) {
+function encodePublicKeyToEncodedPublicKey(public_key_pem) {
     //return base64EncodeToString(public_key_pem.replace('-----BEGIN PUBLIC KEY-----\n', '').replace('\n-----END PUBLIC KEY-----\n', ''));
     return base64EncodeToString(public_key_pem);
 }
 
-function decodeAddressToPublicKey(address) {
+function decodeEncodedPublicKeyToPublicKey(encoded_public_key) {
     //return '-----BEGIN PUBLIC KEY-----\n' + base64DecodeToString(address) + '\n-----END PUBLIC KEY-----\n';
-    return base64DecodeToString(address);
+    return base64DecodeToString(encoded_public_key);
 }
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
     base64EncodeToString,
     base64DecodeToString,
     base64EncodeToBuffer,
-    encodePublicKeyToAddress,
-    decodeAddressToPublicKey
+    encodePublicKeyToEncodedPublicKey,
+    decodeEncodedPublicKeyToPublicKey
 }
 
