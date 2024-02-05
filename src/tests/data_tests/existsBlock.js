@@ -1,6 +1,6 @@
-const fs = require('fs');
-//const util = require('../utils.js');
-const path = require('path');
+import fs from 'fs';
+//import util from '../utils.js';
+import path from 'path';
 
 function getBlockchainDataFilePath(subpath) {
     return path.join('../blockchain_data' + subpath);

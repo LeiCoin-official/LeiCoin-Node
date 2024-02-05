@@ -89,19 +89,22 @@ export default class Block {
         );
     }
 
+    public static createCopy(block: Block) {
+        return Block.initFromJSON(block);
+    }
 
     public calculateBlockHash() {
-        return crypto
-          .createHash('sha256')
-          .update(
+        this.hash = crypto
+            .createHash('sha256')
+            .update(
                 this.index.toString() +
                 this.previousHash +
                 this.timestamp +
                 this.nonce +
                 JSON.stringify(this.transactions) +
                 JSON.stringify(this.coinbase)
-          )
-          .digest('hex');
+            )
+            .digest('hex');
     }
 
 }

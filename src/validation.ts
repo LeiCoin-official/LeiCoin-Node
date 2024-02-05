@@ -1,12 +1,13 @@
-const crypto = require('crypto');
-const cryptoHandler = require('./handlers/cryptoHandlers');
+import crypto from 'crypto';
+import { decodeEncodedPublicKeyToPublicKey, base64EncodeToBuffer } from './handlers/cryptoHandlers';
 
-const { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo, mempool } = require('./handlers/dataHandler');
+import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo, mempool } from './handlers/dataHandler';
+import Transaction from './objects/transaction';
 
 
-function isValidTransaction(transaction) {
+function isValidTransaction(transaction: Transaction) {
 
-    function isTransactionSignatureValid(transaction) {
+    function isTransactionSignatureValid(transaction: Transaction) {
         const { signature, publicKey } = transaction;
     
         // Prepare transaction data for verification (exclude the signature)
@@ -15,12 +16,12 @@ function isValidTransaction(transaction) {
         delete transactionData.txid;
     
         // decode the senderAddress
-        const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
+        const publicKeyPEM = decodeEncodedPublicKeyToPublicKey(publicKey);
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
         verifier.update(JSON.stringify(transactionData));
-        const signatureBuffer = cryptoHandler.base64EncodeToBuffer(signature);
+        const signatureBuffer = base64EncodeToBuffer(signature);
         const isVerified = verifier.verify(publicKeyPEM, signatureBuffer);
     
         return isVerified;
@@ -38,7 +39,7 @@ function isValidTransaction(transaction) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
 
-    const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
+    const publicKeyPEM = decodeEncodedPublicKeyToPublicKey(publicKey);
     if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }

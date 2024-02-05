@@ -1,9 +1,9 @@
-const express = require('express');
-const expressWs = require('express-ws');
-const WebSocket = require('ws');
+import express from 'express';
+import expressWs from 'express-ws';
+import WebSocket from 'ws';
 const app = express();
 const expressWsInstance = expressWs(app);
-const { EventEmitter } = require("events");
+import { EventEmitter } from "events";
 const events = new EventEmitter();
 
 const self_node_name = "node2";

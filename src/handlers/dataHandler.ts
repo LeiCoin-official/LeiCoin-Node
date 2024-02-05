@@ -1,12 +1,6 @@
 import fs from 'fs';
-import * as util from '../utils';
+import { data_message } from '../utils';
 import path from 'path';
-
-let mempool = {
-    transactions: {} as {[key: string]: any},
-    deleted_utxos: {} as {[key: string]: any},
-    added_utxos: {} as {[key: string]: any}
-};
 
 function createStorageIfNotExists() {
     ensureDirectoryExists('/blocks');
@@ -30,10 +24,10 @@ function ensureDirectoryExists(directoryPath: string) {
     try {
         if (!fs.existsSync(fullDirectoryPath)) {
             fs.mkdirSync(fullDirectoryPath, { recursive: true });
-            util.data_message.log(`Directory ${directoryPath} was created because it was missing.`);
+            data_message.log(`Directory ${directoryPath} was created because it was missing.`);
         }
     } catch (err: any) {
-        util.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
+        data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
     }
 }
 
@@ -44,14 +38,14 @@ function ensureFileExists(filePath: string, content = '') {
         const dir = path.dirname(fullFilePath);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
-            util.data_message.log(`Directory ${dir} was created because it was missing.`);
+            data_message.log(`Directory ${dir} was created because it was missing.`);
         }
         if (!fs.existsSync(fullFilePath)) {
             fs.writeFileSync(fullFilePath, content, 'utf8');
-            util.data_message.log(`File ${filePath} was created because it was missing.`);
+            data_message.log(`File ${filePath} was created because it was missing.`);
         }
     } catch (err: any) {
-        util.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
+        data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
     }
 }
 
@@ -113,11 +107,11 @@ function writeBlock(blockData: { index: any; hash: any; }) {
 
             return { cb: 'success' };
         } else {
-            util.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
+            data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
             return { cb: 'error' };
         }
     } catch (err: any) {
-        util.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
+        data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
         return { cb: 'error' };
     }
 }
@@ -130,42 +124,14 @@ function readBlock(blockNumber: any) {
             const data = fs.readFileSync(blockFilePath, 'utf8');
             return {cb: "success", data: JSON.parse(data)};
         } else {
-            util.data_message.error(`Block ${blockNumber} was not found.`);
+            data_message.error(`Block ${blockNumber} was not found.`);
             return {cb: 'none'};
         }
     } catch (err: any) {
-        util.data_message.error(`Error reading block ${blockNumber}: ${err.message}.`);
+        data_message.error(`Error reading block ${blockNumber}: ${err.message}.`);
         return {cb: 'error'}
     }
 }
-
-/*  
-// Function to add a transaction to the Mempool
-function addTransactionToMempool(transaction: { txid: any; }) {
-    const transactionHash = transaction.txid;
-  
-    if (mempool.transactions[transactionHash]) {
-        //util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
-        return { cb: 'exists' };
-    }
-  
-    mempool.transactions[transactionHash] = transaction;
-    return { cb: 'success' };
-}
-  
-// Function to remove a transaction from the Mempool
-function removeTransactionFromMempool(transaction: { txid: any; }) {
-    const transactionHash = transaction.txid;
-  
-    if (mempool.transactions[transactionHash]) {
-        delete mempool.transactions[transactionHash];
-        return { cb: 'success' };
-    }
-  
-    //util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
-    return { cb: 'none' };
-}
-*/
 
 
 // Function to read a transaction
@@ -176,11 +142,11 @@ function readTransaction(txID: any) {
             const data = fs.readFileSync(txFilePath, 'utf8');
             return {cb: 'success', data: JSON.parse(data)}
         } else {
-            util.data_message.error(`Transaktion ${txID} was not found`);
+            data_message.error(`Transaktion ${txID} was not found`);
             return {cb: 'none'}
         }
     } catch (err: any) {
-        util.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
+        data_message.error(`Error reading transaction ${txID}: ${err.message}`);
         return {cb: 'error'};
     }
 }
@@ -213,7 +179,7 @@ function addUTXOS(transactionData: { txid: any; output?: any; recipientAddress?:
             // Write the updated UTXOs back to the recipient's file
             fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
         } catch (err: any) {
-            util.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+            data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
             return { cb: 'error' };
         }
     }
@@ -285,7 +251,7 @@ function readUTXOS(recipientAddress: string, txid = null, index = null, includeM
             return { cb: 'none'};
         }
     } catch (err: any) {
-        util.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+        data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
         return { cb: 'error' };
     }
 }
@@ -330,71 +296,11 @@ function deleteUTXOS(transactionData: { senderAddress: any; input: any; }) {
 
         return { cb: 'none' };
     } catch (err: any) {
-        util.data_message.error(`Error deleting UTXO: ${err.message}`);
+        data_message.error(`Error deleting UTXO: ${err.message}`);
         return { cb: 'error' };
     }
 }
 
-/*
-// Function to add a utxo to the list of deleted utxos of the Mempool
-function addDeletedUTXOToMempool(senderAddress: string | number, utxo: any) {
-
-    mempool.deleted_utxos[senderAddress] = mempool.deleted_utxos[senderAddress] || [];
-
-    if (mempool.deleted_utxos[senderAddress].includes(utxo)) {
-        //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
-        return { cb: 'exists' };
-    }
-  
-    mempool.deleted_utxos[senderAddress].push(utxo);
-    return { cb: 'success' };
-}
-  
-  // Function to remove a utxo from the list of deleted utxos of the Mempool
-function removeDeletedUTXOFromMempool(senderAddress: string | number, utxo: string) {
-
-    if (mempool.deleted_utxos[senderAddress] && mempool.deleted_utxos[senderAddress].includes(utxo)) {
-        
-        mempool.deleted_utxos[senderAddress].splice(mempool.deleted_utxos.indexOf(utxo), 1);
-
-        if (mempool.deleted_utxos[senderAddress].length === 0) delete mempool.deleted_utxos[senderAddress];
-
-        return { cb: 'success' };
-    }
-  
-    //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
-    return { cb: 'none' };
-}
-
-// Function to add a utxo to the list of added utxos of the Mempool
-function addAddedUTXOToMempool(recipientAddress: string | number, utxo: string | number, amount: any) {
-
-    mempool.added_utxos[recipientAddress] = mempool.added_utxos[recipientAddress] || {};
-
-    if (mempool.added_utxos[recipientAddress][utxo]) {
-        //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
-        return { cb: 'exists' };
-    }
-  
-    mempool.added_utxos[recipientAddress][utxo] = {amount: amount};
-    return { cb: 'success' };
-}
-  
-  // Function to remove a utxo from the list of added utxo of the Mempool
-function removeAddedUTXOFromMempool(recipientAddress: string | number, utxo: string) {
-
-    if (mempool.added_utxos[recipientAddress] && mempool.added_utxos[recipientAddress][utxo]) {
-        delete mempool.added_utxos[recipientAddress][utxo];
-
-        if (Object.keys(mempool.added_utxos[recipientAddress]).length === 0) delete mempool.added_utxos[recipientAddress];
-
-        return { cb: 'success' };
-    }
-  
-    //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
-    return { cb: 'none' };
-}
-*/
 
 function getLatestBlockInfo() {
     const latestBlockInfoFilePath = getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
@@ -402,7 +308,7 @@ function getLatestBlockInfo() {
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         return {cb: 'success', data: JSON.parse(data)}
     } catch (err: any) {
-        util.data_message.error(`Error reading latest block info: ${err.message}`);
+        data_message.error(`Error reading latest block info: ${err.message}`);
         return {cb: 'error'}
     }
 }
@@ -421,7 +327,7 @@ function updateLatestBlockInfo(fork = "main", previousBlockInfo: any, latestBloc
         fs.writeFileSync(latestBlockInfoFilePath, latestBlockInfoFileData, {encoding:'utf8',flag:'w'});
         return {cb: 'success'};
     } catch (err: any) {
-        util.data_message.error(`Error writing latest block info: ${err.message}`);
+        data_message.error(`Error writing latest block info: ${err.message}`);
         return {cb: 'error'};
     }
 }
@@ -451,7 +357,7 @@ function existsBlock(blockHash: String, blockIndex: Number) {
             return { cb: 'success', exists: false, fork: false };
         }
     } catch (err: any) {
-        util.data_message.error(`Error reading latest block info: ${err.message}`);
+        data_message.error(`Error reading latest block info: ${err.message}`);
         return { cb: 'error' };
     }
 }
@@ -506,7 +412,7 @@ function isGenesisBlock() {
         }*/
         return { isGenesisBlock: true, isForkOFGenesisBlock: false };
     } catch (err: any) {
-        util.data_message.error(`Error checking for existing blocks: ${err.message}`);
+        data_message.error(`Error checking for existing blocks: ${err.message}`);
         return { isGenesisBlock: false, isForkOFGenesisBlock: false };
     }
 }
@@ -539,43 +445,19 @@ function readBlockInForks(index: Number, hash: String) {
         // Block not found in any fork
         return {cb: "none"};
     } catch (err: any) {
-        util.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
+        data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
         return {cb: "error"};
     }
 }
 
-/*
-// Function to mine a block with verified transactions from the Mempool
-function clearMempool(block: any) {
-
-    for (const [, transactionData] of Object.entries(block.transactions)) {
-        removeTransactionFromMempool(transactionData);
-        for (const input of transactionData.input) {
-            removeDeletedUTXOFromMempool(transactionData.senderAddress, `${input.txid}_${input.index}`);
-        }
-        for (const output of transactionData.output) {
-            removeAddedUTXOFromMempool(output.recipientAddress, `${output.txid}_${output.index}`);
-        }
-    }
-}
-*/
-
 
 export {
-    mempool,
-    addDeletedUTXOToMempool,
-    removeDeletedUTXOFromMempool,
-    addAddedUTXOToMempool,
-    removeAddedUTXOFromMempool,
-    clearMempool,
 
     writeBlock,
     readBlock,
 
     readBlockInForks,
 
-    addTransactionToMempool,
-    removeTransactionFromMempool,
     readTransaction,
     
     getLatestBlockInfo,
