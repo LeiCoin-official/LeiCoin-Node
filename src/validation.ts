@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const cryptoHandler = require('./handlers/cryptoHandlers');
-const util = require('./utils.js').default;
+
 const { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo, mempool } = require('./handlers/dataHandler');
 
 
@@ -75,8 +75,8 @@ function isValidTransaction(transaction) {
         utxo_output_amount += output_utxo.amount;
     }
 
-    if (utxo_input_amount < utxo_output_amount) {
-        return {cb: false, status: 400, message: 'Bad Request. Transaction output amount is higher than the input amount.'};
+    if (utxo_input_amount !== utxo_output_amount) {
+        return {cb: false, status: 400, message: 'Bad Request. Transaction output amount does not correspond to the input amount.'};
     }
 
     if (utxo_output_amount <= 0) {

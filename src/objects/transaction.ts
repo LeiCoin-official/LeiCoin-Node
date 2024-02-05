@@ -1,18 +1,22 @@
-class Transaction {
+export interface TXInput {
+    utxoid: string;
+}
+
+export interface TXOutput {
+    recipientAddress: string;
+    amount: number;
+}
+
+export class Transaction {
 
     public txid: string;
     public senderAddress: string;
     public publicKey: string;
-    public output: Array<
-        {
-            recipientAddress: string,
-
-        }
-    >;
-    public input: Array<>;
+    public input: TXInput[];
+    public output: TXOutput[];
     public signature: string;
 
-    constructor(txid: string, senderAddress: string, publicKey: string, output, input, signature: string) {
+    constructor(txid: string, senderAddress: string, publicKey: string, input: TXInput[], output: TXOutput[], signature: string) {
         this.txid = txid;
         this.senderAddress = senderAddress;
         this.publicKey = publicKey;

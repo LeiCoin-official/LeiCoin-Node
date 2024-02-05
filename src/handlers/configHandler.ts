@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const process = require('process');
-const util = require('../utils').default;
+import process from "process";
+const util = require('../utils');
 const dotenv = require('dotenv');
 
 
@@ -141,4 +141,4 @@ function loadConfig() {
 
 let config = loadConfig();
 
-module.exports = config;
+export default config
