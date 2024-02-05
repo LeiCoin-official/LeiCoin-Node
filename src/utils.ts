@@ -1,7 +1,7 @@
 import { createInterface } from 'readline';
-import { Instance } from 'chalk';
+import { Chalk, ChalkInstance } from 'chalk';
 import { cwd, stdin, stdout, exit, on } from 'process';
-import { eraseLines, cursorTo } from 'ansi-escapes';
+import ansiEscapes from 'ansi-escapes';
 import { existsSync, mkdirSync, createWriteStream } from 'fs';
 import { dirname } from 'path';
 //const { Writable } = require('stream');
@@ -14,16 +14,20 @@ const processRootDirectory = cwd();
 const mining_difficulty = 6;
 const mining_pow = 5;
 
+interface LogMessageObject {
+    [key: string]: (message: string) => void;
+}
 
-const default_message = {};
-const miner_message = {};
-const server_message = {};
-const data_message = {};
-const ws_client_message = {};
 
-const ctx = new Instance({level: 3});
+const default_message: LogMessageObject = {};
+const miner_message: LogMessageObject = {};
+const server_message: LogMessageObject = {};
+const data_message: LogMessageObject = {};
+const ws_client_message: LogMessageObject = {};
 
-const styles = {
+const ctx = new Chalk({level: 3});
+
+const message_styles: { [key: string]: ChalkInstance } = {
     reset: ctx.reset,
     success: ctx.green,
     error: ctx.red,
@@ -33,7 +37,7 @@ const styles = {
 
 const messageTypes = ['log', 'success', 'error', 'warn'];
 
-const messageConfigs = [
+const messageConfigs: { object: { [key: string]: (message: string) => void }, prefix: string, color: string }[] = [
     { object: default_message, prefix: 'Global', color: '#ffffff' },
     { object: miner_message, prefix: 'Miner', color: '#00ffff' },
     { object: server_message, prefix: 'Server', color: '#c724b1' },
@@ -47,20 +51,26 @@ const rl = createInterface({
     terminal: true,
 });
 
-function generateLogMessage(prefix, message, color, type = 'log') {
+function generateLogMessage(prefix: string, message: string, color: string, type = 'log') {
     const colorizedPrefix = ctx.hex(color).visible(`[${prefix}]`);
-    const styleFunction = styles[type] || styles.reset;
+    const styleFunction = message_styles[type] || message_styles.reset;
     const styledMessage = styleFunction(message);
     return `${colorizedPrefix} ${styledMessage}`;
 }
 
-function logToConsole(prefix, message, type = 'log') {
-    const color = messageConfigs.find((config) => config.prefix === prefix).color;
+function logToConsole(prefix: string, message: string, type = 'log') {
+    const config = messageConfigs.find((config) => config.prefix === prefix);
+    let color;
+    if (!config) {
+        return;
+    }
+    color = config.color;
+
     const outputMessage = generateLogMessage(prefix, message, color, type);
 
     // Clear the current line and move the cursor to the beginning
-    stdout.write(eraseLines(1)); // Clear the current line
-    stdout.write(cursorTo(0)); // Move the cursor to the beginning
+    stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
+    stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
     console.log(outputMessage);
 
     logStream.write(`[${prefix}] ${message}\n`);
@@ -71,7 +81,7 @@ function logToConsole(prefix, message, type = 'log') {
 
 for (const { object, prefix } of messageConfigs) {
     for (const type of messageTypes) {
-        object[type] = (message) => {
+        object[type] = (message: string) => {
             logToConsole(prefix, message, type);
         };
     }
@@ -104,7 +114,7 @@ logStream.on('error', (err) => {
     //data_message.warn('Error writing to log file:', err);
 });
 
-function handleCommand(command) {
+function handleCommand(command: string) {
     switch (command) {
         case 'help':
             default_message.log('Available commands:');

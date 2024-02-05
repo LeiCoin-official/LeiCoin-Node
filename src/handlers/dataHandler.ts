@@ -3,9 +3,9 @@ import * as util from '../utils';
 import path from 'path';
 
 let mempool = {
-    transactions: {},
-    deleted_utxos: {},
-    added_utxos: {}
+    transactions: {} as {[key: string]: any},
+    deleted_utxos: {} as {[key: string]: any},
+    added_utxos: {} as {[key: string]: any}
 };
 
 function createStorageIfNotExists() {
@@ -186,12 +186,11 @@ function readTransaction(txID: any) {
 }
 
 // Function to write a UTXO
-function addUTXOS(transactionData: { txid: any; output: any; }, coinbase = false) {
+function addUTXOS(transactionData: { txid: any; output?: any; recipientAddress?: any; index?: any; amount?: any; }, coinbase = false) {
 
-    function writeUTXO(output: { recipientAddress: any; index: any; amount: any; }, txid: any) {
+    function writeUTXO(output: {recipientAddress: any; index: any; amount: any; }, txid: any) {
+        const recipientAddress = output.recipientAddress;
         try {
-
-            const recipientAddress = output.recipientAddress;
 
             const directoryPath = `/utxos/${recipientAddress.slice(0, 2)}`;
             const filePath = `${recipientAddress.slice(2, 4)}.json`;
@@ -221,7 +220,12 @@ function addUTXOS(transactionData: { txid: any; output: any; }, coinbase = false
 
     if (coinbase) {
 
-        writeUTXO(transactionData, transactionData.txid);
+        const coinbaseData = {
+            recipientAddress: transactionData.recipientAddress,
+            index: transactionData.index,
+            amount: transactionData.amount
+        };
+        writeUTXO(coinbaseData, transactionData.txid);
 
     } else {
         // Iterate through the recipients in the output array
@@ -234,7 +238,7 @@ function addUTXOS(transactionData: { txid: any; output: any; }, coinbase = false
 }
 
 // Function to read a UTXO
-function readUTXOS(recipientAddress: string | any[], txid = null, index = null, includeMempool = true) {
+function readUTXOS(recipientAddress: string, txid = null, index = null, includeMempool = true) {
 
     try {
 
@@ -326,7 +330,7 @@ function deleteUTXOS(transactionData: { senderAddress: any; input: any; }) {
 
         return { cb: 'none' };
     } catch (err: any) {
-        util.data_message.error(`Error deleting UTXO for recipient address ${recipientAddress}: ${err.message}`);
+        util.data_message.error(`Error deleting UTXO: ${err.message}`);
         return { cb: 'error' };
     }
 }
