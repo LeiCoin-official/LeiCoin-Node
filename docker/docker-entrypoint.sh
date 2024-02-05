@@ -24,6 +24,10 @@ fi
 # Remove temporary directories
 rm -rf /home/container/gittmp
 
+# Install Node Packges
+
+npm i
+
 # Extract the value of --internal-port from STARTUP if it exists
 
 if [ -n "$STARTUP" ] && [[ "$STARTUP" == "start"* ]]; then
