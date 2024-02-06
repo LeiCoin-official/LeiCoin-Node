@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
 
-async function sha256(data) {
+async function sha256(data: string) {
     // encode as UTF-8
     const msgBuffer = new TextEncoder().encode(data);
   
@@ -16,29 +16,27 @@ async function sha256(data) {
     return hashHex;
 }
 
-function base64EncodeToString(data) {
+function base64EncodeToString(data: string) {
     return Buffer.from(data).toString('base64');
 }
 
-function base64EncodeToBuffer(data) {
+function base64EncodeToBuffer(data: string) {
     return Buffer.from(data, 'base64');
 }
 
-function base64DecodeToString(data) {
+function base64DecodeToString(data: string) {
     return Buffer.from(data, 'base64').toString();
 }
 
-function encodePublicKeyToEncodedPublicKey(public_key_pem) {
-    //return base64EncodeToString(public_key_pem.replace('-----BEGIN PUBLIC KEY-----\n', '').replace('\n-----END PUBLIC KEY-----\n', ''));
+function encodePublicKeyToEncodedPublicKey(public_key_pem: string) {
     return base64EncodeToString(public_key_pem);
 }
 
-function decodeEncodedPublicKeyToPublicKey(encoded_public_key) {
-    //return '-----BEGIN PUBLIC KEY-----\n' + base64DecodeToString(address) + '\n-----END PUBLIC KEY-----\n';
+function decodeEncodedPublicKeyToPublicKey(encoded_public_key: string) {
     return base64DecodeToString(encoded_public_key);
 }
 
-export {
+export default {
     sha256,
     base64EncodeToString,
     base64DecodeToString,

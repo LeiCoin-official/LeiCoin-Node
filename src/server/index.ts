@@ -3,7 +3,7 @@ import expressWS from 'express-ws';
 import bodyParser from 'body-parser';
 import config from '../handlers/configHandler';
 import cors from 'cors';
-import util from '../utils'.default;
+import util from '../utils';
 
 const app = express();
 

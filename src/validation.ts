@@ -1,8 +1,8 @@
 import crypto from 'crypto';
-import { decodeEncodedPublicKeyToPublicKey, base64EncodeToBuffer } from './handlers/cryptoHandlers';
-
-import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo, mempool } from './handlers/dataHandler';
+import cryptoHandler from './handlers/cryptoHandlers';
+import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } from './handlers/dataHandler';
 import Transaction from './objects/transaction';
+import mempool from './objects/mempool';
 
 
 function isValidTransaction(transaction: Transaction) {
@@ -16,12 +16,12 @@ function isValidTransaction(transaction: Transaction) {
         delete transactionData.txid;
     
         // decode the senderAddress
-        const publicKeyPEM = decodeEncodedPublicKeyToPublicKey(publicKey);
+        const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
         verifier.update(JSON.stringify(transactionData));
-        const signatureBuffer = base64EncodeToBuffer(signature);
+        const signatureBuffer = cryptoHandler.base64EncodeToBuffer(signature);
         const isVerified = verifier.verify(publicKeyPEM, signatureBuffer);
     
         return isVerified;

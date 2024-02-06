@@ -153,7 +153,7 @@ rl.on('line', (input) => {
 on("SIGINT", gracefulShutdown);
 on("SIGTERM", gracefulShutdown);
 
-export {
+export default {
     processRootDirectory,
     mining_difficulty,
     mining_pow,

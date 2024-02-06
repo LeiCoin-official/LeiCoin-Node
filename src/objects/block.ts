@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { getLatestBlockInfo } from '../handlers/dataHandler'; // Import the data-handler module
 import config from '../handlers/configHandler';
-import * as util from '../utils';
+import util from '../utils';
 import Transaction from './transaction';
 import mempool from './mempool';
 
