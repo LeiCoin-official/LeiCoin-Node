@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import validation from '../../../validation';
 import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } from "../../../handlers/dataHandler";
-import util from '../../../utils';
+import utils from '../../../utils';
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -38,7 +38,7 @@ router.use('/', (req, res, next) => {
 		addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${output.index}`, output.amount);
 	}
 
-	util.events.emit("transaction_receive", JSON.stringify({type: "transaction", data: transactionData}));
+	utils.events.emit("transaction_receive", JSON.stringify({type: "transaction", data: transactionData}));
 
 	return;
 });

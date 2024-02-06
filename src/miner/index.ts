@@ -1,6 +1,6 @@
 import { Worker, isMainThread } from "worker_threads";
 import Block from "../objects/block";
-import util from '../utils'.default;
+import utils from '../utils'.default;
 import config from '../handlers/configHandler';
 import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} from '../handlers/dataHandler';
 import validation from '../validation';
@@ -13,18 +13,18 @@ async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Blo
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise<Block | null>((resolve) => {
-			const worker = new Worker(util.processRootDirectory + '/src/miner/mine.js', { workerData: { threadIndex: i } });
+			const worker = new Worker(utils.processRootDirectory + '/src/miner/mine.js', { workerData: { threadIndex: i } });
 			workerThreads.push(worker);
 
 			worker.on('message', (data) => {
-				util.miner_message.log(`Miner mined block with hash ${data.hash}. Waiting for verification`);
+				utils.miner_message.log(`Miner mined block with hash ${data.hash}. Waiting for verification`);
 				results[i] = data;
 				resolve(data);
 			});
 
 			worker.on('error', (error) => {
 				// Handle worker errors if needed.
-				util.miner_message.error('Mining Worker Error:', error);
+				utils.miner_message.error('Mining Worker Error:', error);
 				resolve(null);
 			});
 
@@ -77,11 +77,11 @@ function afterMiningLogic(blockResult: Block) {
 			addUTXOS(transactionData, false);
 		}
 
-		util.events.emit('block_receive', JSON.stringify({type: "block", data: blockResult}));
+		utils.events.emit('block_receive', JSON.stringify({type: "block", data: blockResult}));
 
-		util.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
+		utils.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
-		util.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
+		utils.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
 	}
 }
 

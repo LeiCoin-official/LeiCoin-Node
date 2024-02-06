@@ -1,3 +1,5 @@
+import utils from "../utils";
+
 export interface TXInput {
     utxoid: string;
 }
@@ -7,7 +9,18 @@ export interface TXOutput {
     amount: number;
 }
 
-export class Transaction {
+export interface TransactionLike {
+
+    txid: string;
+    senderAddress: string;
+    publicKey: string;
+    input: TXInput[];
+    output: TXOutput[];
+    signature: string;
+
+}
+
+export class Transaction implements TransactionLike {
 
     public txid: string;
     public senderAddress: string;
@@ -24,6 +37,11 @@ export class Transaction {
         this.input = input;
         this.signature = signature;
     }
+
+    public static initFromJSON(preset: TransactionLike) {
+        return utils.createInstanceFromJSON(Transaction, preset);
+    }
+
 }
 
 export default Transaction;

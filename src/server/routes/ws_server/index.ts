@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import util from '../../../utils'.default;
+import utils from '../../../utils'.default;
 import block_receive_job from './block_receive';
 import transactions_receive_job from './transactions_receive';
 
@@ -18,20 +18,20 @@ router.ws('/', (ws, req) => {
 
         decodedData = JSON.parse(data);
 
-        //util.server_message.log(`Received ${data}`);
+        //utils.server_message.log(`Received ${data}`);
 
         // Relay the message to all other connected nodes (except the sender)
         if (decodedData.type === "block") {
 			const block_receive_job_result = block_receive_job(decodedData.data);
             if (block_receive_job_result.cb) {
-                util.events.emit("block_receive", data);
+                utils.events.emit("block_receive", data);
             }
         }
 
 		if (decodedData.type === "transaction") {
 			const transactions_receive_job_result = transactions_receive_job(decodedData.data);
             if (transactions_receive_job_result.cb) {
-                util.events.emit("transaction_receive", data);
+                utils.events.emit("transaction_receive", data);
             }
         }
 
@@ -42,8 +42,8 @@ router.ws('/', (ws, req) => {
     });
 
     wsclient.on('error', (error) => {
-        util.server_message.log(`WS Server Error: ${error.message}`);
-        //util.events.emit("ws_reconnect");
+        utils.server_message.log(`WS Server Error: ${error.message}`);
+        //utils.events.emit("ws_reconnect");
     });
 
     // Handle WebSocket disconnections for nodes
@@ -53,7 +53,7 @@ router.ws('/', (ws, req) => {
         if (index !== -1) {
             nodeConnections.splice(index, 1);
         }
-        util.server_message.log(`WebSocket connection to ${req.baseUrl} closed.`);
+        utils.server_message.log(`WebSocket connection to ${req.baseUrl} closed.`);
     });
 });
 

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { data_message } from '../utils';
+import utils from '../utils';
 import path from 'path';
 
 function createStorageIfNotExists() {
@@ -15,7 +15,7 @@ function createStorageIfNotExists() {
 
 
 function getBlockchainDataFilePath(subpath: string) {
-    return path.join(util.processRootDirectory, '/blockchain_data' + subpath);
+    return path.join(utils.processRootDirectory, '/blockchain_data' + subpath);
 }
 
 // Function to ensure the existence of a directory
@@ -24,10 +24,10 @@ function ensureDirectoryExists(directoryPath: string) {
     try {
         if (!fs.existsSync(fullDirectoryPath)) {
             fs.mkdirSync(fullDirectoryPath, { recursive: true });
-            data_message.log(`Directory ${directoryPath} was created because it was missing.`);
+            utils.data_message.log(`Directory ${directoryPath} was created because it was missing.`);
         }
     } catch (err: any) {
-        data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
+        utils.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
     }
 }
 
@@ -38,14 +38,14 @@ function ensureFileExists(filePath: string, content = '') {
         const dir = path.dirname(fullFilePath);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
-            data_message.log(`Directory ${dir} was created because it was missing.`);
+            utils.data_message.log(`Directory ${dir} was created because it was missing.`);
         }
         if (!fs.existsSync(fullFilePath)) {
             fs.writeFileSync(fullFilePath, content, 'utf8');
-            data_message.log(`File ${filePath} was created because it was missing.`);
+            utils.data_message.log(`File ${filePath} was created because it was missing.`);
         }
     } catch (err: any) {
-        data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
+        utils.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
     }
 }
 
@@ -85,55 +85,6 @@ function isDirectoryNotEmpty(directoryPath: any) {
     }
 }
 
-
-// Function to write a block
-function writeBlock(blockData: { index: any; hash: any; }) {
-    const blockNumber = blockData.index;
-    const blockHash = blockData.hash;
-    const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
-    const blocksListFilePath = getBlockchainDataFilePath('/indexes/blocks.json');
-
-    try {
-        // Check if the block file already exists.
-        if (!fs.existsSync(blockFilePath)) {
-            // Write the block data to the block file.
-            fs.writeFileSync(blockFilePath, JSON.stringify(blockData), { encoding: 'utf8', flag: 'w' });
-
-            // Update the list of blocks.
-            const blocksListData = fs.readFileSync(blocksListFilePath, 'utf8');
-            const blocksList = JSON.parse(blocksListData);
-            blocksList.push({ hash: blockHash, index: blockNumber });
-            fs.writeFileSync(blocksListFilePath, JSON.stringify(blocksList), { encoding: 'utf8', flag: 'w' });
-
-            return { cb: 'success' };
-        } else {
-            data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
-            return { cb: 'error' };
-        }
-    } catch (err: any) {
-        data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
-        return { cb: 'error' };
-    }
-}
-
-// Function to read a block
-function readBlock(blockNumber: any) {
-    const blockFilePath = getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
-    try {
-        if (fs.existsSync(blockFilePath)) {
-            const data = fs.readFileSync(blockFilePath, 'utf8');
-            return {cb: "success", data: JSON.parse(data)};
-        } else {
-            data_message.error(`Block ${blockNumber} was not found.`);
-            return {cb: 'none'};
-        }
-    } catch (err: any) {
-        data_message.error(`Error reading block ${blockNumber}: ${err.message}.`);
-        return {cb: 'error'}
-    }
-}
-
-
 // Function to read a transaction
 function readTransaction(txID: any) {
     const txFilePath = getBlockchainDataFilePath(`/transactions/${txID}.json`);
@@ -142,11 +93,11 @@ function readTransaction(txID: any) {
             const data = fs.readFileSync(txFilePath, 'utf8');
             return {cb: 'success', data: JSON.parse(data)}
         } else {
-            data_message.error(`Transaktion ${txID} was not found`);
+            utils.data_message.error(`Transaktion ${txID} was not found`);
             return {cb: 'none'}
         }
     } catch (err: any) {
-        data_message.error(`Error reading transaction ${txID}: ${err.message}`);
+        utils.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
         return {cb: 'error'};
     }
 }
@@ -179,7 +130,7 @@ function addUTXOS(transactionData: { txid: any; output?: any; recipientAddress?:
             // Write the updated UTXOs back to the recipient's file
             fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
         } catch (err: any) {
-            data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+            utils.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
             return { cb: 'error' };
         }
     }
@@ -251,7 +202,7 @@ function readUTXOS(recipientAddress: string, txid = null, index = null, includeM
             return { cb: 'none'};
         }
     } catch (err: any) {
-        data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+        utils.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
         return { cb: 'error' };
     }
 }
@@ -296,7 +247,7 @@ function deleteUTXOS(transactionData: { senderAddress: any; input: any; }) {
 
         return { cb: 'none' };
     } catch (err: any) {
-        data_message.error(`Error deleting UTXO: ${err.message}`);
+        utils.data_message.error(`Error deleting UTXO: ${err.message}`);
         return { cb: 'error' };
     }
 }
@@ -308,7 +259,7 @@ function getLatestBlockInfo() {
         const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
         return {cb: 'success', data: JSON.parse(data)}
     } catch (err: any) {
-        data_message.error(`Error reading latest block info: ${err.message}`);
+        utils.data_message.error(`Error reading latest block info: ${err.message}`);
         return {cb: 'error'}
     }
 }
@@ -327,7 +278,7 @@ function updateLatestBlockInfo(fork = "main", previousBlockInfo: any, latestBloc
         fs.writeFileSync(latestBlockInfoFilePath, latestBlockInfoFileData, {encoding:'utf8',flag:'w'});
         return {cb: 'success'};
     } catch (err: any) {
-        data_message.error(`Error writing latest block info: ${err.message}`);
+        utils.data_message.error(`Error writing latest block info: ${err.message}`);
         return {cb: 'error'};
     }
 }
@@ -357,63 +308,8 @@ function existsBlock(blockHash: String, blockIndex: Number) {
             return { cb: 'success', exists: false, fork: false };
         }
     } catch (err: any) {
-        data_message.error(`Error reading latest block info: ${err.message}`);
+        utils.data_message.error(`Error reading latest block info: ${err.message}`);
         return { cb: 'error' };
-    }
-}
-
-
-function isGenesisBlock() {
-    //const blocksDirectory = '/blocks';
-    //const latestBlockInfoFile = '/indexes/latestblockinfo.json';
-    //const blocksIndexFile = '/indexes/blocks.json';
-  
-    try {
-        //const blocksExist = isDirectoryNotEmpty(blocksDirectory);
-        //const latestBlockInfoExists = fs.existsSync(latestBlockInfoFile);
-        //const blocksIndexFileExists = fs.existsSync(blocksIndexFile);
-    
-        //const isLatestBlockInfoEmpty = isFileNotEmpty(latestBlockInfoFile, "{}");
-        //const isBlocksIndexEmpty = isFileNotEmpty(blocksIndexFile, "[]");
-
-        const latestblockinfoFileData = getLatestBlockInfo();
-
-        if (latestblockinfoFileData.cb === "success") {
-            const latestANDPreviousForkBlockInfo = latestblockinfoFileData.data.main
-            if ((latestANDPreviousForkBlockInfo !== null) && (latestANDPreviousForkBlockInfo !== undefined)) {
-
-                const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo || null;
-                const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo || null;
-
-                if ((previousBlockInfo !== null) && (previousBlockInfo !== undefined)) {
-                    if (typeof(previousBlockInfo) === "object") {
-                        if (((previousBlockInfo.index !== null) && (previousBlockInfo.index !== undefined)) && ((previousBlockInfo.hash !== null) && (previousBlockInfo.hash !== undefined))) {
-                            return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                        }
-                    }
-                } else if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
-                    if (typeof(latestBlockInfo) === "object") {
-                        if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
-                            return { isGenesisBlock: true, isForkOFGenesisBlock: true };
-                        }
-                    }
-                }
-
-            }
-        }
-    
-        // Check if all conditions are true
-        //if (blocksExist || latestBlockInfoExists || blocksIndexFileExists || isLatestBlockInfoEmpty || isBlocksIndexEmpty) {
-        /*if (previousBlockInfoExists) {
-            //return {cb: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain'};   
-            return false;
-        } else {
-            return true;
-        }*/
-        return { isGenesisBlock: true, isForkOFGenesisBlock: false };
-    } catch (err: any) {
-        data_message.error(`Error checking for existing blocks: ${err.message}`);
-        return { isGenesisBlock: false, isForkOFGenesisBlock: false };
     }
 }
 
@@ -445,16 +341,13 @@ function readBlockInForks(index: Number, hash: String) {
         // Block not found in any fork
         return {cb: "none"};
     } catch (err: any) {
-        data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
+        utils.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
         return {cb: "error"};
     }
 }
 
 
-export {
-
-    writeBlock,
-    readBlock,
+export default {
 
     readBlockInForks,
 
@@ -464,7 +357,6 @@ export {
     updateLatestBlockInfo,
 
     existsBlock,
-    isGenesisBlock,
 
     ensureDirectoryExists,
     ensureFileExists,
@@ -472,5 +364,7 @@ export {
 
     addUTXOS,
     deleteUTXOS,
-    readUTXOS
+    readUTXOS,
+
+    getBlockchainDataFilePath
 }

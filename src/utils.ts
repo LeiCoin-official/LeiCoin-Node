@@ -153,6 +153,31 @@ rl.on('line', (input) => {
 on("SIGINT", gracefulShutdown);
 on("SIGTERM", gracefulShutdown);
 
+
+// Define a generic interface representing the class structure
+interface Constructable<T> {
+    new (...args: any[]): T;
+}
+  
+// Define a function to create an instance of a class from a JSON object
+function createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
+    // Retrieve the constructor of the class
+    const constructor = cls as any;
+  
+    // Retrieve the parameter names of the constructor
+    const paramNames = constructor.toString().match(/\(([^)]+)\)/)?.[1].split(',').map((param: string) => param.trim()) || [];
+  
+    // Create an array of arguments for the constructor
+    const args = paramNames.map((paramName: string) => json[paramName]);
+  
+    // Instantiate the class with the arguments
+    const instance = Reflect.construct(cls, args);
+  
+    // Return the instance
+    return instance;
+}
+    
+
 export default {
     processRootDirectory,
     mining_difficulty,
@@ -162,4 +187,5 @@ export default {
     ws_client_message,
     data_message,
     events,
+    createInstanceFromJSON
 };

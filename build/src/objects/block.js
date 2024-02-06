@@ -27,7 +27,7 @@ export default class Block {
             previousHash = previousBlock.hash;
         return new Block(newIndex, '', previousHash, new Date().getTime(), 0, mempool.transactions, {
             minerAddress: config.miner.minerAddress,
-            amount: util.mining_pow
+            amount: utils.mining_pow
         });
     }
     static initFromJSON(blockPreset) {

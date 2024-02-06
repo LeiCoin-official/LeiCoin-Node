@@ -1,5 +1,5 @@
 import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool, mempool } from '../../../handlers/dataHandler';
-import util from '../../../utils'.default;
+import utils from '../../../utils'.default;
 import validation from '../../../validation';
 
 module.exports = function (transaction) {
@@ -23,15 +23,15 @@ module.exports = function (transaction) {
                 addAddedUTXOToMempool(output.recipientAddress, `${transaction.txid}_${output.index}`, output.amount);
             }
     
-            util.ws_client_message.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
+            utils.ws_client_message.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
         } else {
-            util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
+            utils.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
         }
 
         return {cb: true, validationresult: validationresult };
     }
 
-    //util.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
+    //utils.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
 	return { cb: false, validationresult: null };
 
 }

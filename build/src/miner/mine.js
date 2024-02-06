@@ -19,7 +19,7 @@ function mineBlock() {
     while (!stopMining) {
         block.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
         block.calculateBlockHash();
-        if (block.hash.substring(0, util.mining_difficulty) === '0'.repeat(util.mining_difficulty)) {
+        if (block.hash.substring(0, utils.mining_difficulty) === '0'.repeat(utils.mining_difficulty)) {
             parentPort.postMessage({ result: block, threadIndex });
             return;
         }

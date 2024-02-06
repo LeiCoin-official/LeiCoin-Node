@@ -25,7 +25,7 @@ class Mempool {
     addDeletedUTXOToMempool(senderAddress, utxoid, utxo_data) {
         mempool.deleted_utxos[senderAddress] = mempool.deleted_utxos[senderAddress] || [];
         if (mempool.deleted_utxos[senderAddress][utxoid]) {
-            //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
+            //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
             return { cb: 'exists' };
         }
         mempool.deleted_utxos[senderAddress][utxoid] = utxo_data;
@@ -39,14 +39,14 @@ class Mempool {
                 delete mempool.deleted_utxos[senderAddress];
             return { cb: 'success' };
         }
-        //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
+        //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
         return { cb: 'none' };
     }
     // Function to add a utxo to the list of added utxos of the Mempool
     addAddedUTXOToMempool(recipientAddress, utxoid, utxo_data) {
         mempool.added_utxos[recipientAddress] = mempool.added_utxos[recipientAddress] || {};
         if (mempool.added_utxos[recipientAddress][utxoid]) {
-            //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
+            //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
             return { cb: 'exists' };
         }
         mempool.added_utxos[recipientAddress][utxoid] = utxo_data;
@@ -60,14 +60,14 @@ class Mempool {
                 delete mempool.added_utxos[recipientAddress];
             return { cb: 'success' };
         }
-        //util.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
+        //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
         return { cb: 'none' };
     }
     // Function to add a transaction to the Mempool
     addTransactionToMempool(transaction) {
         const txid = transaction.txid;
         if (mempool.transactions[txid]) {
-            //util.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+            //utils.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
             return { cb: 'exists' };
         }
         mempool.transactions[txid] = transaction;
@@ -79,7 +79,7 @@ class Mempool {
             delete mempool.transactions[txid];
             return { cb: 'success' };
         }
-        //util.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
+        //utils.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
         return { cb: 'none' };
     }
 }

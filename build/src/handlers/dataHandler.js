@@ -11,7 +11,7 @@ function createStorageIfNotExists() {
     ensureFileExists('/indexes/transactions.json', '[]');
 }
 function getBlockchainDataFilePath(subpath) {
-    return path.join(util.processRootDirectory, '/blockchain_data' + subpath);
+    return path.join(utils.processRootDirectory, '/blockchain_data' + subpath);
 }
 // Function to ensure the existence of a directory
 function ensureDirectoryExists(directoryPath) {

@@ -3,6 +3,7 @@ import cryptoHandler from './handlers/cryptoHandlers';
 import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } from './handlers/dataHandler';
 import Transaction from './objects/transaction';
 import mempool from './objects/mempool';
+import Block from './objects/block';
 
 
 function isValidTransaction(transaction: Transaction) {
@@ -39,7 +40,7 @@ function isValidTransaction(transaction: Transaction) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
 
-    const publicKeyPEM = decodeEncodedPublicKeyToPublicKey(publicKey);
+    const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
     if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }
@@ -87,8 +88,7 @@ function isValidTransaction(transaction: Transaction) {
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
 }
 
-
-function isValidBlock(block) {
+function isValidBlock(block: Block) {
     const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
 
     if ((!index && index !== 0) || (!previousHash && index !== 0) || !transactions || !timestamp || !nonce || !coinbase || !hash) {
@@ -150,12 +150,12 @@ function isValidBlock(block) {
 
 
     // Verify that the hash of the block meets the mining difficulty criteria
-    const hashPrefix = '0'.repeat(util.mining_difficulty);
-    if (hash.substring(0, util.mining_difficulty) !== hashPrefix) {
+    const hashPrefix = '0'.repeat(utils.mining_difficulty);
+    if (hash.substring(0, utils.mining_difficulty) !== hashPrefix) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash is invalid.'};
     }
 
-    if (coinbase.amount !== util.mining_pow) {
+    if (coinbase.amount !== utils.mining_pow) {
         return {cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.'};
     }
   

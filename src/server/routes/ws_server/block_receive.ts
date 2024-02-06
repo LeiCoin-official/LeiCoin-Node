@@ -1,5 +1,5 @@
 import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS, existsBlock } from '../../../handlers/dataHandler';
-import util from '../../../utils'.default;
+import utils from '../../../utils'.default;
 import validation from '../../../validation';
 
 module.exports = function (block) {
@@ -25,14 +25,14 @@ module.exports = function (block) {
 				addUTXOS(transactionData, false);
 			}
 	
-			util.server_message.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
+			utils.server_message.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
 		} else {
-			util.server_message.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
+			utils.server_message.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
 		}
 
 		return { cb: true, validationresult: validationresult };
 	}
 
-	//util.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
+	//utils.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 	return { cb: false, validationresult: null} ;
 }

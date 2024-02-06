@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import process from "process";
-import util from '../utils';
+import utils from '../utils';
 import dotenv from 'dotenv';
 
 
@@ -51,8 +51,8 @@ const processArgs = parseArgs();
 // Function to load the configuration file or a default if it doesn't exist
 function loadNormalConfig() {
     // Define the paths for the configuration files
-    const configFilePath = path.join(util.processRootDirectory, '/config/config.json');
-    const defaultConfigFilePath = path.join(util.processRootDirectory, '/config/sample.config.json');
+    const configFilePath = path.join(utils.processRootDirectory, '/config/config.json');
+    const defaultConfigFilePath = path.join(utils.processRootDirectory, '/config/sample.config.json');
 
     try {
         // Check if the configuration file exists
@@ -75,14 +75,14 @@ function loadNormalConfig() {
             return loadConfig();
         }
     } catch (error) {
-        util.data_message.error('Error loading config configuration:', error);
+        utils.data_message.error('Error loading config configuration:', error);
         process.exit(1);
     }
 }
 
 function loadKnownNodesConfig() {
-    const configFilePath = path.join(util.processRootDirectory, '/config/peers.json');
-    const defaultConfigFilePath = path.join(util.processRootDirectory, '/config/sample.peers.json');
+    const configFilePath = path.join(utils.processRootDirectory, '/config/peers.json');
+    const defaultConfigFilePath = path.join(utils.processRootDirectory, '/config/sample.peers.json');
 
     try {
         // Check if the configuration file exists
@@ -99,14 +99,14 @@ function loadKnownNodesConfig() {
             return loadKnownNodesConfig();
         }
     } catch (error) {
-        util.data_message.error('Error loading peers configuration:', error);
+        utils.data_message.error('Error loading peers configuration:', error);
         process.exit(1);
     }
 }
 
 function loadENVConfig() {
-    const envFilePath = path.join(util.processRootDirectory, '/config/.env');
-    const defaultENVFilePath = path.join(util.processRootDirectory, '/config/sample.env');
+    const envFilePath = path.join(utils.processRootDirectory, '/config/.env');
+    const defaultENVFilePath = path.join(utils.processRootDirectory, '/config/sample.env');
 
     try {
         // Check if the configuration file exists
@@ -128,7 +128,7 @@ function loadENVConfig() {
             return loadENVConfig();
         }
     } catch (error) {
-        util.data_message.error('Error loading .env configuration:', error);
+        utils.data_message.error('Error loading .env configuration:', error);
         process.exit(1);
     }
 }

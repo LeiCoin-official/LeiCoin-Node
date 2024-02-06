@@ -117,11 +117,11 @@ function isValidBlock(block) {
         return { cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.' };
     }
     // Verify that the hash of the block meets the mining difficulty criteria
-    const hashPrefix = '0'.repeat(util.mining_difficulty);
-    if (hash.substring(0, util.mining_difficulty) !== hashPrefix) {
+    const hashPrefix = '0'.repeat(utils.mining_difficulty);
+    if (hash.substring(0, utils.mining_difficulty) !== hashPrefix) {
         return { cb: false, status: 400, message: 'Bad Request. Block hash is invalid.' };
     }
-    if (coinbase.amount !== util.mining_pow) {
+    if (coinbase.amount !== utils.mining_pow) {
         return { cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.' };
     }
     // Ensure that the block contains valid transactions (add your validation logic here)

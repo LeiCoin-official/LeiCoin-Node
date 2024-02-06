@@ -3,7 +3,7 @@ import expressWS from 'express-ws';
 import bodyParser from 'body-parser';
 import config from '../handlers/configHandler';
 import cors from 'cors';
-import util from '../utils';
+import utils from '../utils';
 
 const app = express();
 
@@ -27,14 +27,14 @@ app.get('/', (req, res) => {
 });
 
 const server = app.listen(config.server.port, () => {
-    util.server_message.log(`Server listening on port ${config.server.port}`);
+    utils.server_message.log(`Server listening on port ${config.server.port}`);
 });
 
-util.events.on("stop_server", function() {
-    util.server_message.log(`Server stopped`);
+utils.events.on("stop_server", function() {
+    utils.server_message.log(`Server stopped`);
     server.close();
 });
 
-util.ws_client_message.log("Starting WS-Client ...");
+utils.ws_client_message.log("Starting WS-Client ...");
 require("./ws_client");
-util.ws_client_message.log("WS-Client started");
+utils.ws_client_message.log("WS-Client started");
