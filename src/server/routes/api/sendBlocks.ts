@@ -1,9 +1,8 @@
-import express from 'express';
+import express from "express";
+import validation from "../../../validation.js";
+import dataHandler from "../../../handlers/dataHandler.js";
+
 const router = express.Router();
-
-import validation from '../../../validation';
-
-import { writeBlock, updateLatestBlockInfo, clearMempool } from "../../../handlers/dataHandler";
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -33,6 +32,5 @@ router.use('/', (req, res, next) => {
 
 });
 
-// Replace this function with your actual transaction validation logic
-
-module.exports = router;
+const sendBlocks = router;
+export default sendBlocks;

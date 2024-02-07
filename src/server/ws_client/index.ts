@@ -1,6 +1,6 @@
-import WebSocket from 'ws';
-import utils from '../../utils'.default;
-import config from '../../handlers/configHandler';
+import WebSocket from "ws";
+import utils from "../../utils.js";
+import config from "../../handlers/configHandler.js";
 
 // An array to store WebSocket connections
 const wsConnections = [];

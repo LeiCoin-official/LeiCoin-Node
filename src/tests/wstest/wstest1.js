@@ -1,6 +1,6 @@
-import express from 'express';
-import expressWs from 'express-ws';
-import WebSocket from 'ws';
+import express from "express";
+import expressWs from "express-ws";
+import WebSocket from "ws";
 const app = express();
 const expressWsInstance = expressWs(app);
 import { EventEmitter } from "events";

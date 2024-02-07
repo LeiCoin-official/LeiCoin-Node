@@ -1,10 +1,10 @@
-import * as util from './src/utils';
-import { createStorageIfNotExists } from './src/handlers/dataHandler';
+import utils from "./src/utils.js";
+import dataHandler from "./src/handlers/dataHandler.js";
 
-createStorageIfNotExists();
+dataHandler.createStorageIfNotExists();
 
 utils.server_message.log("Starting LeiCoin-Node Server ...");
-require("./src/server");
+import "./src/server/index.js";
 utils.server_message.log("LeiCoin-Node Server started");
 
 // utils.ws_client_message.log("Starting LeiCoin-Node WS ...");
@@ -12,6 +12,6 @@ utils.server_message.log("LeiCoin-Node Server started");
 // utils.ws_client_message.log("LeiCoin-Node WS Client started");
 
 utils.miner_message.log("Starting LeiCoin-Node Miner ...");
-require("./src/miner");
+import "./src/miner/index.js";
 utils.miner_message.log("LeiCoin-Node Miner started");   
 

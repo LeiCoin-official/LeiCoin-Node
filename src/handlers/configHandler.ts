@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 import process from "process";
-import utils from '../utils';
-import dotenv from 'dotenv';
+import utils from "../utils.js";
+import dotenv from "dotenv";
 
 
 function parseArgs() {
@@ -39,7 +39,7 @@ function parseArgs() {
     // Now, for each required argument, if it's not in argsObj, set it to the default value
     for (const argName in mergedArgInfo) {
         if (mergedArgInfo[argName].required && argsObj[argName] === undefined) {
-            argsObj[argName] = mergedArgInfo[argName].default;
+            argsObj[argName] = mergedArgInfo[argName];
         }
     }
 

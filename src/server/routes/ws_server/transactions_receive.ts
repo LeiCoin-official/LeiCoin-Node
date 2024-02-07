@@ -1,6 +1,6 @@
-import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool, mempool } from '../../../handlers/dataHandler';
-import utils from '../../../utils'.default;
-import validation from '../../../validation';
+import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool, mempool } from "../../../handlers/dataHandler.js";
+import utils from "../../../utils.js";
+import validation from "../../../validation.js";
 
 module.exports = function (transaction) {
 

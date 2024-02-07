@@ -1,6 +1,6 @@
-import Block from "../objects/block";
-import { parentPort, workerData } from 'worker_threads';
-import { miner_message } from "../utils";
+import Block from "../objects/block.js";
+import { parentPort, workerData } from "worker_threads";
+import { miner_message } from "../utils.js";
 
 const { threadIndex } = workerData;
 

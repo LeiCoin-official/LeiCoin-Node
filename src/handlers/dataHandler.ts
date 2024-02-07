@@ -1,6 +1,6 @@
-import fs from 'fs';
-import utils from '../utils';
-import path from 'path';
+import fs from "fs";
+import utils from "../utils.js";
+import path from "path";
 
 function createStorageIfNotExists() {
     ensureDirectoryExists('/blocks');

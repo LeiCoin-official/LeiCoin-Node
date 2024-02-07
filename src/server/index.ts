@@ -1,9 +1,12 @@
-import express from 'express';
-import expressWS from 'express-ws';
-import bodyParser from 'body-parser';
-import config from '../handlers/configHandler';
-import cors from 'cors';
-import utils from '../utils';
+import express from "express";
+import expressWS from "express-ws";
+import bodyParser from "body-parser";
+import config from "../handlers/configHandler.js";
+import cors from "cors";
+import utils from "../utils.js";
+
+import api_router from "./routes/api/index.js";
+import ws_server_router from "./routes/ws_server/index.js";
 
 const app = express();
 
@@ -18,9 +21,9 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use("/api", require('./routes/api'));
+app.use("/api", api_router);
 
-app.use("/ws", require('./routes/ws_server'));
+app.use("/ws", ws_server_router);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

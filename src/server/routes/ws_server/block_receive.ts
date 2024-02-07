@@ -1,8 +1,8 @@
-import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS, existsBlock } from '../../../handlers/dataHandler';
-import utils from '../../../utils'.default;
-import validation from '../../../validation';
+import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS, existsBlock } from "../../../handlers/dataHandler.js";
+import utils from "../../../utils.js";
+import validation from "../../../validation.js";
 
-module.exports = function (block) {
+export default function (block) {
 	const blocksExist = existsBlock(block.hash, block.index);
 	if (blocksExist.cb === "success" && !blocksExist.exists && !blocksExist.fork) {
 

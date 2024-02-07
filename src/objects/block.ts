@@ -1,10 +1,10 @@
-import crypto from 'crypto';
-import dataHandler from '../handlers/dataHandler'; // Import the data-handler module
-import config from '../handlers/configHandler';
-import utils from '../utils';
-import { Transaction, TransactionLike } from './transaction';
-import mempool from './mempool';
-import fs from 'fs';
+import crypto from "crypto";
+import dataHandler from "../handlers/dataHandler.js"; // Import the data-handler module
+import config from "../handlers/configHandler.js";
+import utils from "../utils.js";
+import { Transaction, TransactionLike } from "./transaction.js";
+import mempool from "./mempool.js";
+import fs from "fs";
 
 export interface Coinbase {
     minerAddress: string;

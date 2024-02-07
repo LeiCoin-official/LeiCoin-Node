@@ -1,9 +1,9 @@
 import { Worker, isMainThread } from "worker_threads";
-import Block from "../objects/block";
-import utils from '../utils'.default;
-import config from '../handlers/configHandler';
-import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} from '../handlers/dataHandler';
-import validation from '../validation';
+import Block from "../objects/block.js";
+import utils from "../utils.js";
+import config from "../handlers/configHandler.js";
+import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} from "../handlers/dataHandler.js";
+import validation from "../validation.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 

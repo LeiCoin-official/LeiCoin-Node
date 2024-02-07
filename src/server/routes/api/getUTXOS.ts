@@ -1,5 +1,5 @@
-import express from 'express';
-import { readUTXOS } from '../../../handlers/dataHandler';
+import express from "express";
+import { readUTXOS } from "../../../handlers/dataHandler.js";
 const router = express.Router();
 
 // Route for receiving new transactions
@@ -44,8 +44,5 @@ router.use('/', (req, res, next) => {
     return;
 });
 
-
-
-// Replace this function with your actual transaction validation logic
-
-module.exports = router;
+const getUTXOS = router;
+export default getUTXOS;

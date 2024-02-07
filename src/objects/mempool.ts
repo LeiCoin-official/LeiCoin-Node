@@ -1,6 +1,6 @@
-import {AddedUTXO, DeletedUTXO, UTXO} from "./utxo";
-import Transaction from "./transaction";
-import Block from "./block";    
+import {AddedUTXO, DeletedUTXO, UTXO} from "./utxo.js";
+import Transaction from "./transaction.js";
+import Block from "./block.js";    
 
 class Mempool {
 

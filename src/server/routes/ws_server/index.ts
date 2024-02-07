@@ -1,8 +1,9 @@
-import express from 'express';
+import express from "express";
+import utils from "../../../utils.js";
+import block_receive_job from "./block_receive.js";
+import transactions_receive_job from "./transactions_receive.js";
+
 const router = express.Router();
-import utils from '../../../utils'.default;
-import block_receive_job from './block_receive';
-import transactions_receive_job from './transactions_receive';
 
 
 const nodeConnections = [];

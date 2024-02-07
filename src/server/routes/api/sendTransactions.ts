@@ -1,8 +1,8 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
-import validation from '../../../validation';
-import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } from "../../../handlers/dataHandler";
-import utils from '../../../utils';
+import validation from "../../../validation.js";
+import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool } from "../../../handlers/dataHandler.js";
+import utils from "../../../utils.js";
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -43,6 +43,5 @@ router.use('/', (req, res, next) => {
 	return;
 });
 
-// Replace this function with your actual transaction validation logic
-
-module.exports = router;
+const sendTransactions = router;
+export default sendTransactions;

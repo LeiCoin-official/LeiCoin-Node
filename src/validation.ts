@@ -1,9 +1,9 @@
-import crypto from 'crypto';
-import cryptoHandler from './handlers/cryptoHandlers';
-import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } from './handlers/dataHandler';
-import Transaction from './objects/transaction';
-import mempool from './objects/mempool';
-import Block from './objects/block';
+import crypto from "crypto";
+import cryptoHandler from "./handlers/cryptoHandlers.js";
+import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } from "./handlers/dataHandler.js";
+import Transaction from "./objects/transaction.js";
+import mempool from "./objects/mempool.js";
+import Block from "./objects/block.js";
 
 
 function isValidTransaction(transaction: Transaction) {
@@ -167,7 +167,7 @@ function isValidBlock(block: Block) {
     return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forkchain: forkchain, forktype: forktype, forkparent: forkparent};
 }
   
-module.exports = {
+export default {
     isValidTransaction,
     isValidBlock
 }

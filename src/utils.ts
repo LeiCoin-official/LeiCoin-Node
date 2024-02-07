@@ -1,10 +1,10 @@
-import { createInterface } from 'readline';
-import { Chalk, ChalkInstance } from 'chalk';
-import { cwd, stdin, stdout, exit, on } from 'process';
-import ansiEscapes from 'ansi-escapes';
-import { existsSync, mkdirSync, createWriteStream } from 'fs';
-import { dirname } from 'path';
-//import { Writable } from 'stream';
+import { createInterface } from "readline";
+import { Chalk, ChalkInstance } from "chalk";
+import { cwd, stdin, stdout, exit, on } from "process";
+import ansiEscapes from "ansi-escapes";
+import { existsSync, mkdirSync, createWriteStream } from "fs";
+import { dirname } from "path";
+//import { Writable } from "stream";
 
 import { EventEmitter } from "events";
 const events = new EventEmitter();
