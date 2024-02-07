@@ -1,7 +1,5 @@
 import utils from "./src/utils.js";
-import dataHandler from "./src/handlers/dataHandler.js";
-
-dataHandler.createStorageIfNotExists();
+import "./src/handlers/storage/blockchain.js";
 
 utils.server_message.log("Starting LeiCoin-Node Server ...");
 import "./src/server/index.js";

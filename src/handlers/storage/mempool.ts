@@ -1,6 +1,6 @@
-import {AddedUTXO, DeletedUTXO, UTXO} from "./utxo.js";
-import Transaction from "./transaction.js";
-import Block from "./block.js";    
+import {AddedUTXO, DeletedUTXO, UTXO} from "../../objects/utxo.js";
+import Transaction from "../../objects/transaction.js";
+import Block from "../../objects/block.js";    
 
 class Mempool {
 
@@ -32,7 +32,6 @@ class Mempool {
       if (!Mempool.instance) {
         Mempool.instance = new Mempool();
       }
-  
       return Mempool.instance;
     }
 
@@ -52,26 +51,26 @@ class Mempool {
         // Function to add a utxo to the list of deleted utxos of the Mempool
     public addDeletedUTXOToMempool(senderAddress: string, utxoid: string, utxo_data: DeletedUTXO) {
 
-        mempool.deleted_utxos[senderAddress] = mempool.deleted_utxos[senderAddress] || [];
+        this.deleted_utxos[senderAddress] = this.deleted_utxos[senderAddress] || [];
 
-        if (mempool.deleted_utxos[senderAddress][utxoid]) {
+        if (this.deleted_utxos[senderAddress][utxoid]) {
             //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
             return { cb: 'exists' };
         }
     
-        mempool.deleted_utxos[senderAddress][utxoid] = utxo_data;
+        this.deleted_utxos[senderAddress][utxoid] = utxo_data;
         return { cb: 'success' };
     }
     
     // Function to remove a utxo from the list of deleted utxos of the Mempool
     public removeDeletedUTXOFromMempool(senderAddress: string, utxoid: string) {
 
-        if (mempool.deleted_utxos[senderAddress] && mempool.deleted_utxos[senderAddress][utxoid]) {
+        if (this.deleted_utxos[senderAddress] && this.deleted_utxos[senderAddress][utxoid]) {
             
-            delete mempool.deleted_utxos[senderAddress][utxoid];
+            delete this.deleted_utxos[senderAddress][utxoid];
 
-            if (mempool.deleted_utxos[senderAddress].length === 0)
-                delete mempool.deleted_utxos[senderAddress];
+            if (this.deleted_utxos[senderAddress].length === 0)
+                delete this.deleted_utxos[senderAddress];
 
             return { cb: 'success' };
         }
@@ -83,26 +82,26 @@ class Mempool {
     // Function to add a utxo to the list of added utxos of the Mempool
     public addAddedUTXOToMempool(recipientAddress: string, utxoid: string, utxo_data: AddedUTXO) {
 
-        mempool.added_utxos[recipientAddress] = mempool.added_utxos[recipientAddress] || {};
+        this.added_utxos[recipientAddress] = this.added_utxos[recipientAddress] || {};
 
-        if (mempool.added_utxos[recipientAddress][utxoid]) {
+        if (this.added_utxos[recipientAddress][utxoid]) {
             //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
             return { cb: 'exists' };
         }
     
-        mempool.added_utxos[recipientAddress][utxoid] = utxo_data;
+        this.added_utxos[recipientAddress][utxoid] = utxo_data;
         return { cb: 'success' };
     }
     
     // Function to remove a utxo from the list of added utxo of the Mempool
     public removeAddedUTXOFromMempool(recipientAddress: string, utxoid: string) {
 
-        if (mempool.added_utxos[recipientAddress] && mempool.added_utxos[recipientAddress][utxoid]) {
+        if (this.added_utxos[recipientAddress] && this.added_utxos[recipientAddress][utxoid]) {
 
-            delete mempool.added_utxos[recipientAddress][utxoid];
+            delete this.added_utxos[recipientAddress][utxoid];
 
-            if (Object.keys(mempool.added_utxos[recipientAddress]).length === 0)
-                delete mempool.added_utxos[recipientAddress];
+            if (Object.keys(this.added_utxos[recipientAddress]).length === 0)
+                delete this.added_utxos[recipientAddress];
 
             return { cb: 'success' };
         }
@@ -115,20 +114,20 @@ class Mempool {
     public addTransactionToMempool(transaction: Transaction) {
         const txid = transaction.txid;
     
-        if (mempool.transactions[txid]) {
+        if (this.transactions[txid]) {
             //utils.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
             return { cb: 'exists' };
         }
     
-        mempool.transactions[txid] = transaction;
+        this.transactions[txid] = transaction;
         return { cb: 'success' };
     }
     
     // Function to remove a transaction from the Mempool
     public removeTransactionFromMempool(txid: string) {
     
-        if (mempool.transactions[txid]) {
-            delete mempool.transactions[txid];
+        if (this.transactions[txid]) {
+            delete this.transactions[txid];
             return { cb: 'success' };
         }
     
@@ -139,5 +138,4 @@ class Mempool {
 
 }
 
-const mempool = Mempool.getInstance();
-export default mempool;
+export default Mempool.getInstance();

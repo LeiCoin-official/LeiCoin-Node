@@ -2,7 +2,7 @@ import crypto from "crypto";
 import cryptoHandler from "./handlers/cryptoHandlers.js";
 import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } from "./handlers/dataHandler.js";
 import Transaction from "./objects/transaction.js";
-import mempool from "./objects/mempool.js";
+import mempool from "./handlers/storage/mempool.js";
 import Block from "./objects/block.js";
 
 

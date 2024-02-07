@@ -3,7 +3,7 @@ import dataHandler from "../handlers/dataHandler.js"; // Import the data-handler
 import config from "../handlers/configHandler.js";
 import utils from "../utils.js";
 import { Transaction, TransactionLike } from "./transaction.js";
-import mempool from "./mempool.js";
+import mempool from "../handlers/storage/mempool.js";
 import fs from "fs";
 
 export interface Coinbase {
@@ -112,93 +112,6 @@ export class Block implements BlockLike {
             )
             .digest('hex');
     }
-
-    public static isGenesisBlock() {
-    
-        try {
-    
-            const latestblockinfoFileData = getLatestBlockInfo();
-    
-            if (latestblockinfoFileData.cb === "success") {
-                const latestANDPreviousForkBlockInfo = latestblockinfoFileData.data.main
-                if ((latestANDPreviousForkBlockInfo !== null) && (latestANDPreviousForkBlockInfo !== undefined)) {
-    
-                    const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo || null;
-                    const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo || null;
-    
-                    if ((previousBlockInfo !== null) && (previousBlockInfo !== undefined)) {
-                        if (typeof(previousBlockInfo) === "object") {
-                            if (((previousBlockInfo.index !== null) && (previousBlockInfo.index !== undefined)) && ((previousBlockInfo.hash !== null) && (previousBlockInfo.hash !== undefined))) {
-                                return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                            }
-                        }
-                    } else if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
-                        if (typeof(latestBlockInfo) === "object") {
-                            if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
-                                return { isGenesisBlock: true, isForkOFGenesisBlock: true };
-                            }
-                        }
-                    }
-    
-                }
-            }
-        
-            return { isGenesisBlock: true, isForkOFGenesisBlock: false };
-        } catch (err: any) {
-            utils.data_message.error(`Error checking for existing blocks: ${err.message}`);
-            return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-        }
-    }
-
-    
-    // Function to write a block
-    public writeBlock() {
-        const blockNumber = this.index;
-        const blockHash = this.hash;
-        const blockFilePath = dataHandler.getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
-        const blocksListFilePath = dataHandler.getBlockchainDataFilePath('/indexes/blocks.json');
-
-        try {
-            // Check if the block file already exists.
-            if (!fs.existsSync(blockFilePath)) {
-                // Write the block data to the block file.
-                fs.writeFileSync(blockFilePath, JSON.stringify(this), { encoding: 'utf8', flag: 'w' });
-
-                // Update the list of blocks.
-                const blocksListData = fs.readFileSync(blocksListFilePath, 'utf8');
-                const blocksList = JSON.parse(blocksListData);
-                blocksList.push({ hash: blockHash, index: blockNumber });
-                fs.writeFileSync(blocksListFilePath, JSON.stringify(blocksList), { encoding: 'utf8', flag: 'w' });
-
-                return { cb: 'success' };
-            } else {
-                utils.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
-                return { cb: 'error' };
-            }
-        } catch (err: any) {
-            utils.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
-            return { cb: 'error' };
-        }
-    }
-
-    // Function to read a block
-    public static readBlock(blockIndex: number) {
-        const blockFilePath = dataHandler.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`);
-        try {
-            if (fs.existsSync(blockFilePath)) {
-                const data = fs.readFileSync(blockFilePath, 'utf8');
-                return {cb: "success", block: Block.initFromJSON(JSON.parse(data))};
-            } else {
-                utils.data_message.error(`Block ${blockIndex} was not found.`);
-                return {cb: 'none'};
-            }
-        } catch (err: any) {
-            utils.data_message.error(`Error reading block ${blockIndex}: ${err.message}.`);
-            return {cb: 'error'};
-        }
-    }
-
-
 
 }
 

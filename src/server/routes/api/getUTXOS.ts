@@ -1,5 +1,5 @@
 import express from "express";
-import { readUTXOS } from "../../../handlers/dataHandler.js";
+import  from "../../../handlers/dataHandler.js";
 const router = express.Router();
 
 // Route for receiving new transactions
@@ -44,5 +44,5 @@ router.use('/', (req, res, next) => {
     return;
 });
 
-const getUTXOS = router;
-export default getUTXOS;
+const getUTXOS_route = router;
+export default getUTXOS_route;

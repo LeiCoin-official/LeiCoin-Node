@@ -2,54 +2,61 @@ import WebSocket from "ws";
 import utils from "../../utils.js";
 import config from "../../handlers/configHandler.js";
 
+interface WebSocketClientConnection {
+    host: string;
+    client: WebSocket | null;
+    initialized: boolean;
+}
+
 // An array to store WebSocket connections
-const wsConnections = [];
+const wsConnections: WebSocketClientConnection[] = [];
 
 // Function to establish a WebSocket connection to a peer server
-function connectToPeer(peerServer) {
-    const wsclient = new WebSocket(`ws://${peerServer}/ws`);
+function connectToPeer(peerConnection: WebSocketClientConnection) {
+    const wsclient = new WebSocket(`ws://${peerConnection.host}/ws`);
     //const peerConnection = { server: peerServer, client: wsclient };
 
     wsclient.on('open', () => {
-        utils.ws_client_message.log(`Connected to: ${peerServer}`);
+        utils.ws_client_message.log(`Connected to: ${peerConnection.host}`);
+        peerConnection.initialized = true;
     });
 
     wsclient.on('error', (error) => {
-        utils.ws_client_message.error(`Error connecting to ${peerServer}: ${error.message}`);
+        utils.ws_client_message.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
     });
 
     wsclient.on('close', () => {
-        utils.ws_client_message.log(`Connection to ${peerServer} closed. Retrying on the next sending action...`);
-        //reconnectToPeer(peerConnection);
+        utils.ws_client_message.log(`Connection to ${peerConnection.host} closed. Retrying on the next sending action...`);
+        peerConnection.initialized = false;
     });
 
-    //wsConnections.push(peerConnection);
-
-    return wsclient;
+    peerConnection.client = wsclient;
+    return peerConnection;
 }
 
-function reconnectToPeer(peerConnection) {
-    if (peerConnection.client.readyState !== WebSocket.OPEN) {
-        peerConnection.client = connectToPeer(peerConnection.server);
-        utils.ws_client_message.log(`Retrying connection to ${peerConnection.server}`);
+function reconnectToPeer(peerConnection: WebSocketClientConnection) {
+    if (!peerConnection.client || peerConnection.client.readyState !== WebSocket.OPEN) {
+        peerConnection = connectToPeer(peerConnection);
+        utils.ws_client_message.log(`Retrying connection to ${peerConnection.host}`);
         return { needed: true, connection: peerConnection };
     }
     return { needed: false };
 }
 
 // Connect to other peer nodes and create peer-to-peer connections
-config.peers.forEach((server) => {
-    let wsclient = connectToPeer(server);
-    wsConnections.push({
-        server: server,
-        client: wsclient
-    })
+config.peers.forEach((host: string) => {
+    const peerConnection = connectToPeer({
+        host: host,
+        client: null,
+        initialized: false,
+    });
+    wsConnections.push(peerConnection);
 });
 
 utils.events.on("block_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
-        const reconnect= reconnectToPeer(peerConnection);
-        if (reconnect.needed) {
+        const reconnect = reconnectToPeer(peerConnection);
+        if (reconnect.needed && reconnect.connection) {
             peerConnection = reconnect.connection;
             setTimeout(() => {
                 sendBlock(peerConnection, data);
@@ -63,7 +70,7 @@ utils.events.on("block_receive", function (data) {
 utils.events.on("transaction_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
         const reconnect = reconnectToPeer(peerConnection);
-        if (reconnect.needed) {
+        if (reconnect.needed && reconnect.connection) {
             peerConnection = reconnect.connection;
             setTimeout(() => {
                 sendTransaction(peerConnection, data);
@@ -74,28 +81,28 @@ utils.events.on("transaction_receive", function (data) {
     });
 });
 
-function sendBlock(peerConnection, data) {
-    if (peerConnection.client.readyState === WebSocket.OPEN) {
+function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
+    if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
             peerConnection.client.send(data);
             //utils.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            utils.ws_client_message.log(`Block sent to ${peerConnection.server}`);
-        } catch (err) {
-            utils.ws_client_message.error(`Error sending Block to ${peerConnection.server}: ${err.message}`);
+            utils.ws_client_message.log(`Block sent to ${peerConnection.host}`);
+        } catch (err: any) {
+            utils.ws_client_message.error(`Error sending Block to ${peerConnection.host}: ${err.message}`);
         }
     } else {
         //utils.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
     }
 }
 
-function sendTransaction(peerConnection, data) {
-    if (peerConnection.client.readyState === WebSocket.OPEN) {
+function sendTransaction(peerConnection: WebSocketClientConnection, data: any) {
+    if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
             peerConnection.client.send(data);
             //utils.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            utils.ws_client_message.log(`Transaction sent to ${peerConnection.server}`);
-        } catch (err) {
-            utils.ws_client_message.error(`Error sending Transaction to ${peerConnection.server}: ${err.message}`);
+            utils.ws_client_message.log(`Transaction sent to ${peerConnection.host}`);
+        } catch (err: any) {
+            utils.ws_client_message.error(`Error sending Transaction to ${peerConnection.host}: ${err.message}`);
         }
     } else {
         //utils.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);

@@ -58,5 +58,3 @@ router.ws('/', (ws, req) => {
     });
 });
 
-
-module.exports = router;

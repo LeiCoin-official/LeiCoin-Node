@@ -131,13 +131,13 @@ function handleCommand(command: string) {
 }
 
 
-function gracefulShutdown() {
+function gracefulShutdown(exitCode: number = 0) {
     default_message.log('Shutting down...');
 
     events.emit("stop_server");
 
     default_message.log('LeiCoin Node stopped.');
-    exit(0);
+    exit(exitCode);
   
 }
   
@@ -187,5 +187,6 @@ export default {
     ws_client_message,
     data_message,
     events,
-    createInstanceFromJSON
+    createInstanceFromJSON,
+    gracefulShutdown
 };

@@ -4,7 +4,6 @@ import process from "process";
 import utils from "../utils.js";
 import dotenv from "dotenv";
 
-
 function parseArgs() {
     // Define default argument information with default values, types, and required flags
     const defaultArgInfo : {
@@ -49,7 +48,7 @@ function parseArgs() {
 const processArgs = parseArgs();
 
 // Function to load the configuration file or a default if it doesn't exist
-function loadNormalConfig() {
+function loadNormalConfig(): Record<string, unknown> {
     // Define the paths for the configuration files
     const configFilePath = path.join(utils.processRootDirectory, '/config/config.json');
     const defaultConfigFilePath = path.join(utils.processRootDirectory, '/config/sample.config.json');
@@ -72,12 +71,13 @@ function loadNormalConfig() {
             // If it doesn't exist, read and parse the default configuration
             const defaultConfigData = fs.readFileSync(defaultConfigFilePath, 'utf-8');
             fs.writeFileSync(configFilePath, defaultConfigData);
-            return loadConfig();
+            return loadNormalConfig();
         }
     } catch (error) {
         utils.data_message.error('Error loading config configuration:', error);
-        process.exit(1);
+        utils.gracefulShutdown(1);
     }
+    return {};
 }
 
 function loadKnownNodesConfig() {
@@ -98,9 +98,9 @@ function loadKnownNodesConfig() {
             fs.writeFileSync(configFilePath, defaultConfigData);
             return loadKnownNodesConfig();
         }
-    } catch (error) {
-        utils.data_message.error('Error loading peers configuration:', error);
-        process.exit(1);
+    } catch (error: any) {
+        utils.data_message.error(`Error loading peers configuration: ${error.message}`);
+        utils.gracefulShutdown(1);
     }
 }
 
@@ -127,20 +127,22 @@ function loadENVConfig() {
             fs.writeFileSync(envFilePath, defaultENVData);
             return loadENVConfig();
         }
-    } catch (error) {
-        utils.data_message.error('Error loading .env configuration:', error);
-        process.exit(1);
+    } catch (error: any) {
+        utils.data_message.error(`Error loading .env configuration: ${error.message}`);
+        utils.gracefulShutdown(1);
     }
 }
 
 function loadConfig() {
-    const config = { ...loadNormalConfig(), ...loadENVConfig() };
-
-    config.peers = loadKnownNodesConfig();
+    const config = {
+        ...loadNormalConfig(),
+        ...loadENVConfig(),
+        peers: loadKnownNodesConfig()
+    };
 
     return config;
 }
 
 let config = loadConfig();
 
-export default config
+export default config;

@@ -1,6 +1,6 @@
 import express from "express";
-import getU
-import sendTransactions from "./sendTransactions.js";
+import getUTXOS_router from "./getUTXOS.js";
+import sendTransactions_router from "./sendTransactions.js";
 
 const router = express.Router();
 
@@ -12,8 +12,9 @@ router.use('/', (ws, res, next) => {
 
 });
 
-router.use('/sendtransactions', sendBlocks);
-router.use('/getutxos', );
+router.use('/sendtransactions', sendTransactions_router);
+router.use('/getutxos', getUTXOS_router);
 //router.use('/sendblocks', require('./sendBlocks'));
 
-export default router;
+const api_router = router;
+export default api_router;

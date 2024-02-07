@@ -43,5 +43,5 @@ router.use('/', (req, res, next) => {
 	return;
 });
 
-const sendTransactions = router;
-export default sendTransactions;
+const sendTransactions_route = router;
+export default sendTransactions_route;

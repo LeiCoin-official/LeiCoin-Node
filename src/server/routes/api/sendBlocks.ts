@@ -32,5 +32,5 @@ router.use('/', (req, res, next) => {
 
 });
 
-const sendBlocks = router;
-export default sendBlocks;
+const sendBlocks_route = router;
+export default sendBlocks_route;
