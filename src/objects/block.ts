@@ -1,10 +1,9 @@
 import crypto from "crypto";
-import dataHandler from "../handlers/dataHandler.js"; // Import the data-handler module
 import config from "../handlers/configHandler.js";
 import utils from "../utils.js";
 import { Transaction, TransactionLike } from "./transaction.js";
 import mempool from "../handlers/storage/mempool.js";
-import fs from "fs";
+import blockchain from "../handlers/storage/blockchain.js";
 
 export interface Coinbase {
     minerAddress: string;
@@ -53,7 +52,7 @@ export class Block implements BlockLike {
 
     public static createNewBlock() {
         
-        const previousBlock = getLatestBlockInfo().data.main.latestBlockInfo;
+        const previousBlock = blockchain.getLatestBlockInfo().data.main.latestBlockInfo;
     
         let newIndex;
         let previousHash;
@@ -99,7 +98,7 @@ export class Block implements BlockLike {
         return Block.initFromJSON(block);
     }
 
-    public calculateBlockHash() {
+    public calculateHash() {
         this.hash = crypto
             .createHash('sha256')
             .update(

@@ -2,8 +2,8 @@ import { Worker, isMainThread } from "worker_threads";
 import Block from "../objects/block.js";
 import utils from "../utils.js";
 import config from "../handlers/configHandler.js";
-import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS} from "../handlers/dataHandler.js";
 import validation from "../validation.js";
+import blockchain from "../handlers/storage/blockchain.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
@@ -66,15 +66,15 @@ async function main() {
 function afterMiningLogic(blockResult: Block) {
 	if (validation.isValidBlock(blockResult).cb) {
 
-		writeBlock(blockResult);
-		updateLatestBlockInfo(blockResult.index, blockResult.hash);
-		clearMempool(blockResult);
+		blockchain.addBlock(blockResult);
+		blockchain.updateLatestBlockInfo(blockResult.index, blockResult.hash);
+		blockchain.clearMempool(blockResult);
 
-		addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
+		blockchain.addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
 
 		for (const [, transactionData] of Object.entries(blockResult.transactions)) {
-			deleteUTXOS(transactionData);
-			addUTXOS(transactionData, false);
+			blockchain.deleteUTXOS(transactionData);
+			blockchain.addUTXOS(transactionData, false);
 		}
 
 		utils.events.emit('block_receive', JSON.stringify({type: "block", data: blockResult}));

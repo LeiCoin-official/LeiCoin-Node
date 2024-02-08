@@ -1,6 +1,6 @@
 import Block from "../objects/block.js";
 import { parentPort, workerData } from "worker_threads";
-import { miner_message } from "../utils.js";
+import utils from "../utils.js";
 
 const { threadIndex } = workerData;
 
@@ -24,7 +24,7 @@ function mineBlock() {
 
 	while (!stopMining) {
 		block.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
-		block.calculateBlockHash();
+		block.calculateHash();
 
 		if (block.hash.substring(0, utils.mining_difficulty) === '0'.repeat(utils.mining_difficulty)) {
 			parentPort.postMessage({ result: block, threadIndex });
@@ -33,5 +33,5 @@ function mineBlock() {
 	}
 }
 
-miner_message.log(`Thread ${threadIndex} is mining a block`);
+utils.miner_message.log(`Thread ${threadIndex} is mining a block`);
 mineBlock();

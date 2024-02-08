@@ -1,6 +1,6 @@
 import { createInterface } from "readline";
 import { Chalk, ChalkInstance } from "chalk";
-import { cwd, stdin, stdout, exit, on } from "process";
+import process from "process";
 import ansiEscapes from "ansi-escapes";
 import { existsSync, mkdirSync, createWriteStream } from "fs";
 import { dirname } from "path";
@@ -9,7 +9,7 @@ import { dirname } from "path";
 import { EventEmitter } from "events";
 const events = new EventEmitter();
 
-const processRootDirectory = cwd();
+const processRootDirectory = process.cwd();
 
 const mining_difficulty = 6;
 const mining_pow = 5;
@@ -46,8 +46,8 @@ const messageConfigs: { object: { [key: string]: (message: string) => void }, pr
 ];
 
 const rl = createInterface({
-    input: stdin,
-    output: stdout,
+    input: process.stdin,
+    output: process.stdout,
     terminal: true,
 });
 
@@ -69,8 +69,8 @@ function logToConsole(prefix: string, message: string, type = 'log') {
     const outputMessage = generateLogMessage(prefix, message, color, type);
 
     // Clear the current line and move the cursor to the beginning
-    stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
-    stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
+    process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
+    process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
     console.log(outputMessage);
 
     logStream.write(`[${prefix}] ${message}\n`);
@@ -137,7 +137,7 @@ function gracefulShutdown(exitCode: number = 0) {
     events.emit("stop_server");
 
     default_message.log('LeiCoin Node stopped.');
-    exit(exitCode);
+    process.exit(exitCode);
   
 }
   
@@ -147,11 +147,10 @@ rl.on('line', (input) => {
     rl.prompt();
 }).on('close', () => {
     //default_message.log('CLI closed.');
-    exit(0);
 });
 
-on("SIGINT", gracefulShutdown);
-on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
 
 
 // Define a generic interface representing the class structure
