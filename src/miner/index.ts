@@ -49,7 +49,7 @@ async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Blo
 	return { results, blockResult };
 }
 
-async function main() {
+async function initMiner() {
 
 	while (true) {
 		const { results, blockResult } = await runInMiningParallel();
@@ -87,5 +87,5 @@ function afterMiningLogic(blockResult: Block) {
 }
 
 if (isMainThread && config.miner.active) {
-  	main();
+  	initMiner();
 }
