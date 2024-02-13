@@ -57,10 +57,10 @@ export class Block implements BlockLike {
         let newIndex;
         let previousHash;
     
-        if (previousBlock === undefined || (typeof(previousBlock.index) !== 'number')) newIndex = 0;
+        if (!previousBlock || (typeof(previousBlock.index) !== 'number')) newIndex = 0;
         else newIndex = previousBlock.index + 1;
     
-        if (previousBlock === undefined || (typeof(previousBlock.hash) !== 'string')) previousHash = '';
+        if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = '';
         else previousHash = previousBlock.hash;
     
         return new Block(
