@@ -1,10 +1,11 @@
 import crypto from "crypto";
 import cryptoHandler from "./handlers/cryptoHandlers.js";
-import Transaction, { TXInput, TXOutput, TransactionLike } from "./objects/transaction.js";
+import Transaction, { TransactionLike } from "./objects/transaction.js";
 import mempool from "./handlers/storage/mempool.js";
 import Block, { BlockLike } from "./objects/block.js";
 import blockchain from "./handlers/storage/blockchain.js";
 import { Callbacks } from "./utils/callbacks.js";
+import utils from "./utils.js";
 
 
 function isValidTransaction(transaction: TransactionLike) {
@@ -55,21 +56,21 @@ function isValidTransaction(transaction: TransactionLike) {
     let utxo_input_amount = 0;
     let utxo_output_amount = 0;
 
-    let added_input_utxos = [];
+    let added_input_utxos: string[] = [];
 
     for (let input_utxo of input) {
-        if (added_input_utxos.includes(`${input_utxo.txid}_${input_utxo.index}`)) {
+        if (added_input_utxos.includes(input_utxo.utxoid)) {
             return {cb: false, status: 400, message: 'Bad Request. Transaction includes double spending UTXO inputs.'};
         }
-        let utxoData = readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
+        let utxoData = blockchain.getUTXOS(senderAddress, input_utxo.utxoid);
         if (utxoData.cb !== Callbacks.SUCCESS) {
             if (utxoData.cb === Callbacks.NONE) {
                 return {cb: false, status: 400, message: 'Bad Request. Transaction includes input UTXO that does not exists.'};
             }
             return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes input UTXO that could not be readed.'};
         }
-        added_input_utxos.push(`${input_utxo.txid}_${input_utxo.index}`);
-        utxo_input_amount += utxoData.amount;
+        added_input_utxos.push(input_utxo.utxoid);
+        utxo_input_amount += utxoData.data.amount;
     }
 
     for (let output_utxo of output) {
@@ -94,9 +95,9 @@ function isValidBlock(block: BlockLike) {
         return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
     }
 
-    let forktype = Callbacks.NONE;
-    let forkchain = Callbacks.NONE;
-    let forkparent = Callbacks.NONE
+    let forktype = "none";
+    let forkchain = "none";
+    let forkparent = "none"
 
     if (index === 0) {
 

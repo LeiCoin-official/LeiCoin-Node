@@ -173,7 +173,7 @@ class Blockchain {
     }
     
     // Function to read a UTXO
-    public getUTXOS(recipientAddress: string, txid: string | null = null, index: string | null = null, includeMempool = true) {
+    public getUTXOS(recipientAddress: string, utxoid: string | null = null, includeMempool = true) {
     
         try {
     
@@ -203,12 +203,12 @@ class Blockchain {
                     return { cb: Callbacks.NONE};
                 }
     
-                if (txid === null && index === null) {
+                if (utxoid === null) {
                     return { cb: Callbacks.SUCCESS, data: existingUTXOs[recipientAddress] };
                 }
     
-                if (txid && index !== null) {
-                    const utxo = existingUTXOs[recipientAddress][`${txid}_${index}`];
+                if (utxoid !== null) {
+                    const utxo = existingUTXOs[recipientAddress][utxoid];
                 
                     if (utxo) {
                         return { cb: Callbacks.SUCCESS, data: utxo };

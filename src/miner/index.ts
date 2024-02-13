@@ -4,6 +4,7 @@ import utils from "../utils.js";
 import config from "../handlers/configHandler.js";
 import validation from "../validation.js";
 import blockchain from "../handlers/storage/blockchain.js";
+import mempool from "../handlers/storage/mempool.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
@@ -67,8 +68,8 @@ function afterMiningLogic(blockResult: Block) {
 	if (validation.isValidBlock(blockResult).cb) {
 
 		blockchain.addBlock(blockResult);
-		blockchain.updateLatestBlockInfo(blockResult.index, blockResult.hash);
-		blockchain.clearMempool(blockResult);
+		blockchain.updateLatestBlockInfo("main", blockResult, blockResult);
+		mempool.clearMempoolbyBlock(blockResult);
 
 		blockchain.addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
 

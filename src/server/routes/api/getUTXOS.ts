@@ -13,8 +13,7 @@ router.use('/', (req, res, next) => {
     }
 
     const address = req.query.address?.toString();
-    const txid = req.query.txid?.toString() || null; // Set to null if not provided
-    const index = req.query.index?.toString() || null; // Set to null if not provided
+    const utxoid = req.query.utxoid?.toString() || null; // Set to null if not provided
 
     // Check if the address is provided
     if (!address) {
@@ -24,12 +23,12 @@ router.use('/', (req, res, next) => {
     }
 
     // Validate the transaction (add your validation logic here)
-    const utxos_reading_result = blockchain.getUTXOS(address, txid, index);
+    const utxos_reading_result = blockchain.getUTXOS(address, utxoid);
 
     if (utxos_reading_result.cb !== Callbacks.SUCCESS) {
         if (utxos_reading_result.cb === Callbacks.NONE) {
             res.status(400);
-            if (!txid && !index) {
+            if (!utxoid) {
                 res.json({ message: 'Bad Request. Address does not have UTXOs.' });
                 return;
             }
