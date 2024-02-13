@@ -1,28 +1,31 @@
-import { writeBlock, updateLatestBlockInfo, clearMempool, addUTXOS, deleteUTXOS, existsBlock } from "../../../handlers/dataHandler.js";
+import blockchain from "../../../handlers/storage/blockchain.js";
+import mempool from "../../../handlers/storage/mempool.js";
+import Block from "../../../objects/block.js";
 import utils from "../../../utils.js";
+import { Callbacks } from "../../../utils/callbacks.js";
 import validation from "../../../validation.js";
 
-export default function (block) {
-	const blocksExist = existsBlock(block.hash, block.index);
-	if (blocksExist.cb === "success" && !blocksExist.exists && !blocksExist.fork) {
+export default function (block: Block) {
+	const blocksExist = blockchain.existsBlock(block.hash, block.index);
+	if (blocksExist.cb === Callbacks.SUCCESS && !blocksExist.exists && !blocksExist.fork) {
 
 		const validationresult = validation.isValidBlock(block);
 
 		if (validationresult.cb) {
 
-			writeBlock(block);
-			updateLatestBlockInfo(
+			blockchain.addBlock(block);
+			blockchain.updateLatestBlockInfo(
 				validationresult.forkchain,
 				{hash: block.previousHash, index: block.index -1 },
 				{hash: block.hash, index: block.index}
 			);
-			clearMempool(block);
+			mempool.clearMempoolbyBlock(block);
 	
-			addUTXOS({txid: block.hash, index: 0, recipientAddress: block.coinbase.minerAddress, amount: block.coinbase.amount}, true);
+			blockchain.addUTXOS({txid: block.hash, index: 0, recipientAddress: block.coinbase.minerAddress, amount: block.coinbase.amount}, true);
 	
 			for (const [, transactionData] of Object.entries(block.transactions)) {
-				deleteUTXOS(transactionData);
-				addUTXOS(transactionData, false);
+				blockchain.deleteUTXOS(transactionData);
+				blockchain.addUTXOS(transactionData, false);
 			}
 	
 			utils.server_message.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);

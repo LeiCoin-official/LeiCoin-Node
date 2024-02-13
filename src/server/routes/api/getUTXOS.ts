@@ -1,5 +1,6 @@
 import express from "express";
-import  from "../../../handlers/dataHandler.js";
+import blockchain from "../../../handlers/storage/blockchain";
+import { Callbacks } from "../../../utils/callbacks";
 const router = express.Router();
 
 // Route for receiving new transactions
@@ -11,9 +12,9 @@ router.use('/', (req, res, next) => {
         return;
     }
 
-    const address = req.query.address;
-    const txid = req.query.txid || null; // Set to null if not provided
-    const index = req.query.index || null; // Set to null if not provided
+    const address = req.query.address?.toString();
+    const txid = req.query.txid?.toString() || null; // Set to null if not provided
+    const index = req.query.index?.toString() || null; // Set to null if not provided
 
     // Check if the address is provided
     if (!address) {
@@ -23,10 +24,10 @@ router.use('/', (req, res, next) => {
     }
 
     // Validate the transaction (add your validation logic here)
-    const utxos_reading_result = readUTXOS(address, txid, index);
+    const utxos_reading_result = blockchain.getUTXOS(address, txid, index);
 
-    if (utxos_reading_result.cb !== 'success') {
-        if (utxos_reading_result.cb === 'none') {
+    if (utxos_reading_result.cb !== Callbacks.SUCCESS) {
+        if (utxos_reading_result.cb === Callbacks.NONE) {
             res.status(400);
             if (!txid && !index) {
                 res.json({ message: 'Bad Request. Address does not have UTXOs.' });

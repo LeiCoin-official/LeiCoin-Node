@@ -175,7 +175,7 @@ function createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
     // Return the instance
     return instance;
 }
-    
+
 
 export default {
     processRootDirectory,

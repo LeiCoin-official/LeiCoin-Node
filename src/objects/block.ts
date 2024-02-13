@@ -4,6 +4,7 @@ import utils from "../utils.js";
 import { Transaction, TransactionLike } from "./transaction.js";
 import mempool from "../handlers/storage/mempool.js";
 import blockchain from "../handlers/storage/blockchain.js";
+import cryptoHandlers from "../handlers/cryptoHandlers.js";
 
 export interface Coinbase {
     minerAddress: string;
@@ -16,7 +17,7 @@ export interface BlockLike {
     previousHash: string;
     timestamp: number;
     nonce: number;
-    transactions: {[txid: string]: TransactionLike};
+    transactions: Transaction[];
     coinbase: Coinbase;
 }
 
@@ -27,7 +28,7 @@ export class Block implements BlockLike {
     public previousHash: string;
     public timestamp: number;
     public nonce: number;
-    public transactions: {[txid: string]: Transaction};
+    public transactions: Transaction[];
     public coinbase: Coinbase;
 
     constructor(
@@ -36,7 +37,7 @@ export class Block implements BlockLike {
         previousHash: string,
         timestamp: number,
         nonce: number,
-        transactions: {[txid: string]: Transaction},
+        transactions: Transaction[],
         coinbase: Coinbase
     ) {
 
@@ -69,7 +70,7 @@ export class Block implements BlockLike {
             previousHash,
             new Date().getTime(),
             0,
-            mempool.transactions,
+            Object.values(mempool.transactions),
             {
                 minerAddress: config.miner.minerAddress,
                 amount: utils.mining_pow
@@ -78,17 +79,16 @@ export class Block implements BlockLike {
 
     }
 
-
     public static initFromJSON(preset: BlockLike) {
 
-        for (const [txid, transaction] of Object.entries(preset.transactions)) {
+        for (const [index, transaction] of preset.transactions.entries()) {
             let newtransaction: Transaction;
             if (!(transaction instanceof Transaction)) {
                 newtransaction = Transaction.initFromJSON(transaction);
             } else {
                 newtransaction = transaction;
             }
-            preset.transactions[txid] = newtransaction;
+            preset.transactions[index] = newtransaction;
         }
 
         return utils.createInstanceFromJSON(Block, preset);
@@ -98,17 +98,10 @@ export class Block implements BlockLike {
         return Block.initFromJSON(block);
     }
 
-    public calculateHash() {
+    public calculateHash(modifyedBlock: {[key: string]: any}) {
         this.hash = crypto
             .createHash('sha256')
-            .update(
-                this.index.toString() +
-                this.previousHash +
-                this.timestamp +
-                this.nonce +
-                JSON.stringify(this.transactions) +
-                JSON.stringify(this.coinbase)
-            )
+            .update(JSON.stringify(modifyedBlock))
             .digest('hex');
     }
 

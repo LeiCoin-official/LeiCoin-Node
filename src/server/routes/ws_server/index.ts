@@ -2,11 +2,11 @@ import express from "express";
 import utils from "../../../utils.js";
 import block_receive_job from "./block_receive.js";
 import transactions_receive_job from "./transactions_receive.js";
+import WebSocket from "ws";
 
 const router = express.Router();
 
-
-const nodeConnections = [];
+const nodeConnections: WebSocket[] = [];
 
 // WebSocket route for nodes
 router.ws('/', (ws, req) => {
@@ -17,7 +17,7 @@ router.ws('/', (ws, req) => {
     // Listen for messages from clients connected to the node
     ws.on('message', (data) => {
 
-        decodedData = JSON.parse(data);
+        const decodedData = JSON.parse(data.toString());
 
         //utils.server_message.log(`Received ${data}`);
 
@@ -42,7 +42,7 @@ router.ws('/', (ws, req) => {
 
     });
 
-    wsclient.on('error', (error) => {
+    ws.on('error', (error) => {
         utils.server_message.log(`WS Server Error: ${error.message}`);
         //utils.events.emit("ws_reconnect");
     });
@@ -58,3 +58,5 @@ router.ws('/', (ws, req) => {
     });
 });
 
+const ws_server_router = router;
+export default ws_server_router;

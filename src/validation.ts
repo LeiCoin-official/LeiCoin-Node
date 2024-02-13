@@ -1,27 +1,26 @@
 import crypto from "crypto";
 import cryptoHandler from "./handlers/cryptoHandlers.js";
-import { readUTXOS, isGenesisBlock, readBlock, readBlockInForks, existsBlock, getLatestBlockInfo } from "./handlers/dataHandler.js";
-import Transaction from "./objects/transaction.js";
+import Transaction, { TXInput, TXOutput, TransactionLike } from "./objects/transaction.js";
 import mempool from "./handlers/storage/mempool.js";
-import Block from "./objects/block.js";
+import Block, { BlockLike } from "./objects/block.js";
+import blockchain from "./handlers/storage/blockchain.js";
+import { Callbacks } from "./utils/callbacks.js";
 
 
-function isValidTransaction(transaction: Transaction) {
+function isValidTransaction(transaction: TransactionLike) {
 
-    function isTransactionSignatureValid(transaction: Transaction) {
+    function isTransactionSignatureValid(transaction: TransactionLike) {
         const { signature, publicKey } = transaction;
     
         // Prepare transaction data for verification (exclude the signature)
-        const transactionData = { ...transaction };
-        delete transactionData.signature;
-        delete transactionData.txid;
+        const modifyedTransactionData = cryptoHandler.getPreparedObjectForHashing(transaction, ["txid", "signature"])
     
         // decode the senderAddress
         const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
-        verifier.update(JSON.stringify(transactionData));
+        verifier.update(JSON.stringify(modifyedTransactionData));
         const signatureBuffer = cryptoHandler.base64EncodeToBuffer(signature);
         const isVerified = verifier.verify(publicKeyPEM, signatureBuffer);
     
@@ -45,7 +44,7 @@ function isValidTransaction(transaction: Transaction) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }
 
-    if (crypto.createHash('sha256').update(senderAddress + publicKey + JSON.stringify(input) + JSON.stringify(output) + signature).digest('hex') !== txid) {
+    if (crypto.createHash('sha256').update(JSON.stringify(cryptoHandler.getPreparedObjectForHashing(transaction, ["txid"]))).digest('hex') !== txid) {
         return {cb: false, status: 400, message: "Bad Request. Transaction hash does not correspond to its data."};
     }
 
@@ -63,8 +62,8 @@ function isValidTransaction(transaction: Transaction) {
             return {cb: false, status: 400, message: 'Bad Request. Transaction includes double spending UTXO inputs.'};
         }
         let utxoData = readUTXOS(senderAddress, input_utxo.txid, input_utxo.index);
-        if (utxoData.cb !== "success") {
-            if (utxoData.cb === "none") {
+        if (utxoData.cb !== Callbacks.SUCCESS) {
+            if (utxoData.cb === Callbacks.NONE) {
                 return {cb: false, status: 400, message: 'Bad Request. Transaction includes input UTXO that does not exists.'};
             }
             return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes input UTXO that could not be readed.'};
@@ -88,20 +87,20 @@ function isValidTransaction(transaction: Transaction) {
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
 }
 
-function isValidBlock(block: Block) {
+function isValidBlock(block: BlockLike) {
     const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
 
     if ((!index && index !== 0) || (!previousHash && index !== 0) || !transactions || !timestamp || !nonce || !coinbase || !hash) {
-        return false;
+        return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
     }
 
-    let forktype = "none";
-    let forkchain = "none";
-    let forkparent = "none"
+    let forktype = Callbacks.NONE;
+    let forkchain = Callbacks.NONE;
+    let forkparent = Callbacks.NONE
 
     if (index === 0) {
 
-        const isGenesisBlockResult = isGenesisBlock();
+        const isGenesisBlockResult = blockchain.isGenesisBlock();
 
         if (!isGenesisBlockResult.isGenesisBlock) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
 
@@ -116,9 +115,9 @@ function isValidBlock(block: Block) {
 
     } else {
 
-        const latestblockinfoFileData = getLatestBlockInfo();
+        const latestblockinfoFileData = blockchain.getLatestBlockInfo();
 
-        if (latestblockinfoFileData.cb === "success") {
+        if (latestblockinfoFileData.cb === Callbacks.SUCCESS) {
             let previousBlockInfoExists = false;
             for (const [forkName, latestANDPreviousForkBlockInfo] of Object.entries(latestblockinfoFileData.data)) {
                 const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
@@ -144,7 +143,7 @@ function isValidBlock(block: Block) {
 
     }
     
-    if (crypto.createHash('sha256').update( index + previousHash + timestamp + nonce + JSON.stringify(transactions) + JSON.stringify(coinbase)).digest('hex') !== hash) {
+    if (crypto.createHash('sha256').update(JSON.stringify(cryptoHandler.getPreparedObjectForHashing(block, ["hash"]))).digest('hex') !== hash) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
     }
 

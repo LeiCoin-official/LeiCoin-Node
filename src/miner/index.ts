@@ -24,7 +24,7 @@ async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Blo
 
 			worker.on('error', (error) => {
 				// Handle worker errors if needed.
-				utils.miner_message.error('Mining Worker Error:', error);
+				utils.miner_message.error(`Mining Worker Error: ${error}`);
 				resolve(null);
 			});
 

@@ -1,6 +1,7 @@
 import express from "express";
 import validation from "../../../validation.js";
-import dataHandler from "../../../handlers/dataHandler.js";
+import blockchain from "../../../handlers/storage/blockchain.js";
+import mempool from "../../../handlers/storage/mempool.js";
 
 const router = express.Router();
 
@@ -26,9 +27,9 @@ router.use('/', (req, res, next) => {
 	}
 
     // Add the transaction to the mempool (replace with your blockchain logic)
-    writeBlock(blockData);
-    updateLatestBlockInfo(blockData.index, blockData.hash);
-    clearMempool();
+    blockchain.addBlock(blockData);
+    //blockchain.updateLatestBlockInfo(blockData.index, blockData.hash);
+    mempool.clearMempoolbyBlock(blockData);
 
 });
 

@@ -18,28 +18,28 @@ function existsBlock(blockHash, blockIndex) {
 
         if (block) {
             // The block with the specified index and hash exists in the main chain
-            return { cb: 'success', exists: true};
+            return { cb: Callbacks.SUCCESS, exists: true};
         } else {
             // Check if there's a block with the specified index and a different hash in the provided JSON data
             const forkedBlock = blockArray.find(block => block.index === blockIndex && block.hash !== blockHash);
             if (forkedBlock) {
                 // The block with the same index but a different hash exists in the provided data
-                return { cb: 'success', exists: false, fork: true };
+                return { cb: Callbacks.SUCCESS, exists: false, fork: true };
             }
             
             // The block with the specified index and hash does not exist
-            return { cb: 'success', exists: false, fork: false };
+            return { cb: Callbacks.SUCCESS, exists: false, fork: false };
         }
     } catch (err) {
         console.error(`Error reading latest block info: ${err.message}`);
-        return { cb: 'error' };
+        return { cb: Callbacks.ERROR };
     }
 }
 
 let blocksExist = existsBlock("123456", 14);
 console.log(blocksExist);
 
-if (blocksExist.cb === "success" && !blocksExist.exists && !blocksExist.fork) {
+if (blocksExist.cb === Callbacks.SUCCESS && !blocksExist.exists && !blocksExist.fork) {
     console.log(true);
 } else {
     console.log(false);

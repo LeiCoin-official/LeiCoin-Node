@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 import mempool from "./mempool.js";
 import Block from "../../objects/block.js";
+import { Callbacks } from "../../utils/callbacks.js";
+import { LatestBlockInfo } from "./fileDataStructures.js";
 
 class Blockchain {
 
@@ -107,14 +109,14 @@ class Blockchain {
         try {
             if (fs.existsSync(txFilePath)) {
                 const data = fs.readFileSync(txFilePath, 'utf8');
-                return {cb: 'success', data: JSON.parse(data)}
+                return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
             } else {
                 utils.data_message.error(`Transaktion ${txID} was not found`);
-                return {cb: 'none'}
+                return {cb: Callbacks.NONE}
             }
         } catch (err: any) {
             utils.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
-            return {cb: 'error'};
+            return {cb: Callbacks.ERROR};
         }
     }
     
@@ -147,7 +149,7 @@ class Blockchain {
                 fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
             } catch (err: any) {
                 utils.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
-                return { cb: 'error' };
+                return { cb: Callbacks.ERROR };
             }
         }
     
@@ -167,11 +169,11 @@ class Blockchain {
             }
         }
     
-        return { cb: 'success' };
+        return { cb: Callbacks.SUCCESS };
     }
     
     // Function to read a UTXO
-    public getUTXOS(recipientAddress: string, txid = null, index = null, includeMempool = true) {
+    public getUTXOS(recipientAddress: string, txid: string | null = null, index: string | null = null, includeMempool = true) {
     
         try {
     
@@ -198,34 +200,34 @@ class Blockchain {
                 }
     
                 if (!existingUTXOs[recipientAddress]) {
-                    return { cb: 'none'};
+                    return { cb: Callbacks.NONE};
                 }
     
                 if (txid === null && index === null) {
-                    return { cb: 'success', data: existingUTXOs[recipientAddress] };
+                    return { cb: Callbacks.SUCCESS, data: existingUTXOs[recipientAddress] };
                 }
     
                 if (txid && index !== null) {
                     const utxo = existingUTXOs[recipientAddress][`${txid}_${index}`];
                 
                     if (utxo) {
-                        return { cb: 'success', data: utxo };
+                        return { cb: Callbacks.SUCCESS, data: utxo };
                     }
                 }
     
-                return { cb: 'none'};
+                return { cb: Callbacks.NONE};
             } else {
-                return { cb: 'none'};
+                return { cb: Callbacks.NONE};
             }
         } catch (err: any) {
             utils.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
-            return { cb: 'error' };
+            return { cb: Callbacks.ERROR };
         }
     }
     
     
     // Function to delete a UTXO
-    public deleteUTXOS(this: any, transactionData: { senderAddress: any; input: any; }) {
+    public deleteUTXOS(transactionData: { senderAddress: any; input: any; }) {
     
         try {
     
@@ -241,7 +243,7 @@ class Blockchain {
                 const existingUTXOs = JSON.parse(existingData);
     
                 if (!existingUTXOs[senderAddress]) {
-                    return { cb: 'none' };
+                    return { cb: Callbacks.NONE };
                 }
     
                 for (const input of transactionData.input) {
@@ -257,50 +259,50 @@ class Blockchain {
                 // Update the UTXO file
                 fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2), 'utf8');
     
-                return { cb: 'success' };
+                return { cb: Callbacks.SUCCESS };
                 
             }
     
-            return { cb: 'none' };
+            return { cb: Callbacks.NONE };
         } catch (err: any) {
             utils.data_message.error(`Error deleting UTXO: ${err.message}`);
-            return { cb: 'error' };
+            return { cb: Callbacks.ERROR };
         }
     }
     
     
-    public getLatestBlockInfo(this: any) {
+    public getLatestBlockInfo(): {cb: Callbacks, data: LatestBlockInfo} {
         const latestBlockInfoFilePath = this.getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
         try {
             const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
-            return {cb: 'success', data: JSON.parse(data)}
+            return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
         } catch (err: any) {
             utils.data_message.error(`Error reading latest block info: ${err.message}`);
-            return {cb: 'error'}
+            return {cb: Callbacks.ERROR, data: {}}
         }
     }
     
-    public updateLatestBlockInfo(this: any, fork = "main", previousBlockInfo: any, latestBlockInfo: { [x: string]: { previousBlockInfo: any; latestBlockInfo: any; }; }) {
+    public updateLatestBlockInfo(fork = "main", previousBlockInfo: { index: number, hash: string }, latestBlockInfo: { index: number, hash: string }) {
         const latestBlockInfoFilePath = this.getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
         try {
     
             const latestBlockInfoFileData = this.getLatestBlockInfo().data;
     
-            latestBlockInfo[fork] = {
+            latestBlockInfoFileData[fork] = {
                 "previousBlockInfo": previousBlockInfo,
-                "latestBlockInfo": previousBlockInfo
+                "latestBlockInfo": latestBlockInfo
             };
     
-            fs.writeFileSync(latestBlockInfoFilePath, latestBlockInfoFileData, {encoding:'utf8',flag:'w'});
-            return {cb: 'success'};
+            fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(latestBlockInfoFileData), {encoding:'utf8',flag:'w'});
+            return {cb: Callbacks.SUCCESS};
         } catch (err: any) {
             utils.data_message.error(`Error writing latest block info: ${err.message}`);
-            return {cb: 'error'};
+            return {cb: Callbacks.ERROR};
         }
     }
     
     // Define the function to check if a block with a specific hash and index exists.
-    public existsBlock(this: any, blockHash: String, blockIndex: Number) {
+    public existsBlock(blockHash: String, blockIndex: Number) {
         try {
             const latestBlockInfoFilePath = this.getBlockchainDataFilePath(`/indexes/blocks.json`);
             const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
@@ -311,25 +313,25 @@ class Blockchain {
     
             if (block) {
                 // The block with the specified index and hash exists in the main chain
-                return { cb: 'success', exists: true};
+                return { cb: Callbacks.SUCCESS, exists: true};
             } else {
                 // Check if there's a block with the specified index and a different hash in the provided JSON data
                 const forkedBlock = blockArray.find((block: { index: Number; hash: String; }) => block.index === blockIndex && block.hash !== blockHash);
                 if (forkedBlock) {
                     // The block with the same index but a different hash exists in the provided data
-                    return { cb: 'success', exists: false, fork: true };
+                    return { cb: Callbacks.SUCCESS, exists: false, fork: true };
                 }
                 
                 // The block with the specified index and hash does not exist
-                return { cb: 'success', exists: false, fork: false };
+                return { cb: Callbacks.SUCCESS, exists: false, fork: false };
             }
         } catch (err: any) {
             utils.data_message.error(`Error reading latest block info: ${err.message}`);
-            return { cb: 'error' };
+            return { cb: Callbacks.ERROR };
         }
     }
     
-    public getBlockInForks(this: any, index: Number, hash: String) {
+    public getBlockInForks(index: Number, hash: String) {
     
         const forksDirectory = this.getBlockchainDataFilePath('/forks/');
     
@@ -348,17 +350,17 @@ class Blockchain {
             
                         if (blockData.hash === hash) {
                             // Found a block with matching index and hash
-                            return {cb: "success", data: blockData};
+                            return {cb: Callbacks.SUCCESS, data: blockData};
                         }
                     }
                 }
             }
         
             // Block not found in any fork
-            return {cb: "none"};
+            return {cb: Callbacks.NONE};
         } catch (err: any) {
             utils.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
-            return {cb: "error"};
+            return {cb: Callbacks.ERROR};
         }
     }
         
@@ -369,8 +371,8 @@ class Blockchain {
     
             const latestblockinfoFileData = this.getLatestBlockInfo();
     
-            if (latestblockinfoFileData.cb === "success") {
-                const latestANDPreviousForkBlockInfo = latestblockinfoFileData.data.main
+            if (latestblockinfoFileData.cb === Callbacks.SUCCESS) {
+                const latestANDPreviousForkBlockInfo = latestblockinfoFileData.data.main || {};
                 if ((latestANDPreviousForkBlockInfo !== null) && (latestANDPreviousForkBlockInfo !== undefined)) {
     
                     const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo || null;
@@ -420,14 +422,14 @@ class Blockchain {
                 blocksList.push({ hash: blockHash, index: blockNumber });
                 fs.writeFileSync(blocksListFilePath, JSON.stringify(blocksList), { encoding: 'utf8', flag: 'w' });
 
-                return { cb: 'success' };
+                return { cb: Callbacks.SUCCESS };
             } else {
                 utils.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
-                return { cb: 'error' };
+                return { cb: Callbacks.ERROR };
             }
         } catch (err: any) {
             utils.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
-            return { cb: 'error' };
+            return { cb: Callbacks.ERROR };
         }
     }
 
@@ -437,14 +439,14 @@ class Blockchain {
         try {
             if (fs.existsSync(blockFilePath)) {
                 const data = fs.readFileSync(blockFilePath, 'utf8');
-                return {cb: "success", block: Block.initFromJSON(JSON.parse(data))};
+                return {cb: Callbacks.SUCCESS, block: Block.initFromJSON(JSON.parse(data))};
             } else {
                 utils.data_message.error(`Block ${blockIndex} was not found.`);
-                return {cb: 'none'};
+                return {cb: Callbacks.NONE};
             }
         } catch (err: any) {
             utils.data_message.error(`Error reading block ${blockIndex}: ${err.message}.`);
-            return {cb: 'error'};
+            return {cb: Callbacks.ERROR};
         }
     }
 }

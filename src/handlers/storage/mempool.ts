@@ -1,6 +1,7 @@
 import {AddedUTXO, DeletedUTXO, UTXO} from "../../objects/utxo.js";
 import Transaction from "../../objects/transaction.js";
-import Block from "../../objects/block.js";    
+import Block from "../../objects/block.js";
+import { Callbacks } from "../../utils/callbacks.js";
 
 class Mempool {
 
@@ -59,7 +60,7 @@ class Mempool {
         }
     
         this.deleted_utxos[senderAddress][utxoid] = utxo_data;
-        return { cb: 'success' };
+        return { cb: Callbacks.SUCCESS };
     }
     
     // Function to remove a utxo from the list of deleted utxos of the Mempool
@@ -72,11 +73,11 @@ class Mempool {
             if (this.deleted_utxos[senderAddress].length === 0)
                 delete this.deleted_utxos[senderAddress];
 
-            return { cb: 'success' };
+            return { cb: Callbacks.SUCCESS };
         }
     
         //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
-        return { cb: 'none' };
+        return { cb: Callbacks.NONE };
     }
 
     // Function to add a utxo to the list of added utxos of the Mempool
@@ -90,7 +91,7 @@ class Mempool {
         }
     
         this.added_utxos[recipientAddress][utxoid] = utxo_data;
-        return { cb: 'success' };
+        return { cb: Callbacks.SUCCESS };
     }
     
     // Function to remove a utxo from the list of added utxo of the Mempool
@@ -103,11 +104,11 @@ class Mempool {
             if (Object.keys(this.added_utxos[recipientAddress]).length === 0)
                 delete this.added_utxos[recipientAddress];
 
-            return { cb: 'success' };
+            return { cb: Callbacks.SUCCESS };
         }
     
         //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
-        return { cb: 'none' };
+        return { cb: Callbacks.NONE };
     }
 
     // Function to add a transaction to the Mempool
@@ -120,7 +121,7 @@ class Mempool {
         }
     
         this.transactions[txid] = transaction;
-        return { cb: 'success' };
+        return { cb: Callbacks.SUCCESS };
     }
     
     // Function to remove a transaction from the Mempool
@@ -128,11 +129,11 @@ class Mempool {
     
         if (this.transactions[txid]) {
             delete this.transactions[txid];
-            return { cb: 'success' };
+            return { cb: Callbacks.SUCCESS };
         }
     
         //utils.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
-        return { cb: 'none' };
+        return { cb: Callbacks.NONE };
     }
     
 

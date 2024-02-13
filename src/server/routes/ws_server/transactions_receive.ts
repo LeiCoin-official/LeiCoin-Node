@@ -1,8 +1,11 @@
-import { addTransactionToMempool, addDeletedUTXOToMempool, addAddedUTXOToMempool, removeAddedUTXOFromMempool, mempool } from "../../../handlers/dataHandler.js";
+import mempool from "../../../handlers/storage/mempool.js";
+import Transaction from "../../../objects/transaction.js";
+import { AddedUTXO, DeletedUTXO } from "../../../objects/utxo.js";
 import utils from "../../../utils.js";
+import { Callbacks } from "../../../utils/callbacks.js";
 import validation from "../../../validation.js";
 
-module.exports = function (transaction) {
+export default function (transaction: Transaction) {
 
     if (!(transaction.txid in mempool.transactions)) {
 
@@ -11,16 +14,16 @@ module.exports = function (transaction) {
         if (validationresult.cb) {
 
             // Add the transaction to the mempool (replace with your blockchain logic)
-            addTransactionToMempool(transaction);
+            mempool.addTransactionToMempool(transaction);
     
             for (const input of transaction.input) {
-                const removeAddedUTXOFromMempoolResult = removeAddedUTXOFromMempool(transaction.senderAddress, `${input.txid}_${input.index}`);
-                if (removeAddedUTXOFromMempoolResult.cb !== "success") {
-                    addDeletedUTXOToMempool(transaction.senderAddress, `${input.txid}_${input.index}`);
+                const removeAddedUTXOFromMempoolResult = mempool.removeAddedUTXOFromMempool(transaction.senderAddress, input.utxoid);
+                if (removeAddedUTXOFromMempoolResult.cb === Callbacks.NONE) {
+                    mempool.addDeletedUTXOToMempool(transaction.senderAddress, input.utxoid, DeletedUTXO.initFromTXInput(input));
                 }
             }
-            for (const output of transaction.output) {
-                addAddedUTXOToMempool(output.recipientAddress, `${transaction.txid}_${output.index}`, output.amount);
+            for (const [index, output] of transaction.output.entries()) {
+                mempool.addAddedUTXOToMempool(output.recipientAddress, `${transaction.txid}_${index}`, AddedUTXO.initFromTXOutput(output));
             }
     
             utils.ws_client_message.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);

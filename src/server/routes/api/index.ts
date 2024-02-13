@@ -5,7 +5,7 @@ import sendTransactions_router from "./sendTransactions.js";
 const router = express.Router();
 
 // Route for api
-router.use('/', (ws, res, next) => {
+router.use('/', (req, res, next) => {
 
     res.status(200);
 	res.json({ message: "Online" });
