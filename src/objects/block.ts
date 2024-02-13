@@ -4,7 +4,6 @@ import utils from "../utils.js";
 import { Transaction, TransactionLike } from "./transaction.js";
 import mempool from "../handlers/storage/mempool.js";
 import blockchain from "../handlers/storage/blockchain.js";
-import cryptoHandlers from "../handlers/cryptoHandlers.js";
 
 export interface Coinbase {
     minerAddress: string;

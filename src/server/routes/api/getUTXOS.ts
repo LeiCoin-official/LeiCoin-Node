@@ -1,6 +1,6 @@
 import express from "express";
-import blockchain from "../../../handlers/storage/blockchain";
-import { Callbacks } from "../../../utils/callbacks";
+import blockchain from "../../../handlers/storage/blockchain.js";
+import { Callbacks } from "../../../utils/callbacks.js";
 const router = express.Router();
 
 // Route for receiving new transactions

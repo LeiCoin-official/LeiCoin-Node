@@ -1,4 +1,4 @@
-import { TXInput, TXOutput } from "./transaction";
+import { TXInput, TXOutput } from "./transaction.js";
 
 export class DeletedUTXO {
 
