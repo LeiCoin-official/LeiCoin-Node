@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import utils from "../../utils.js";
 import config from "../../handlers/configHandler.js";
 
-interface WebSocketClientConnection {
+export interface WebSocketClientConnection {
     host: string;
     client: WebSocket | null;
     initialized: boolean;
@@ -13,20 +13,20 @@ const wsConnections: WebSocketClientConnection[] = [];
 
 // Function to establish a WebSocket connection to a peer server
 function connectToPeer(peerConnection: WebSocketClientConnection) {
-    const wsclient = new WebSocket(`ws://${peerConnection.host}/ws`);
+    const wsclient = new WebSocket(`ws://${peerConnection.host}/`);
     //const peerConnection = { server: peerServer, client: wsclient };
 
     wsclient.on('open', () => {
-        utils.ws_client_message.log(`Connected to: ${peerConnection.host}`);
+        utils.leicoin_net_message.client.log(`Connected to: ${peerConnection.host}`);
         peerConnection.initialized = true;
     });
 
     wsclient.on('error', (error) => {
-        utils.ws_client_message.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
+        utils.leicoin_net_message.client.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
     });
 
     wsclient.on('close', () => {
-        utils.ws_client_message.log(`Connection to ${peerConnection.host} closed. Retrying on the next sending action...`);
+        utils.leicoin_net_message.client.log(`Connection to ${peerConnection.host} closed. Retrying on the next sending action...`);
         peerConnection.initialized = false;
     });
 
@@ -37,21 +37,11 @@ function connectToPeer(peerConnection: WebSocketClientConnection) {
 function reconnectToPeer(peerConnection: WebSocketClientConnection) {
     if (!peerConnection.client || peerConnection.client.readyState !== WebSocket.OPEN) {
         peerConnection = connectToPeer(peerConnection);
-        utils.ws_client_message.log(`Retrying connection to ${peerConnection.host}`);
+        utils.leicoin_net_message.client.log(`Retrying connection to ${peerConnection.host}`);
         return { needed: true, connection: peerConnection };
     }
     return { needed: false };
 }
-
-// Connect to other peer nodes and create peer-to-peer connections
-config.peers.forEach((host: string) => {
-    const peerConnection = connectToPeer({
-        host: host,
-        client: null,
-        initialized: false,
-    });
-    wsConnections.push(peerConnection);
-});
 
 utils.events.on("block_receive", function (data) {
     wsConnections.forEach((peerConnection) => {
@@ -84,11 +74,11 @@ utils.events.on("transaction_receive", function (data) {
 function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
     if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
-            peerConnection.client.send(data);
+            peerConnection.client.emit("block", data);
             //utils.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            utils.ws_client_message.log(`Block sent to ${peerConnection.host}`);
+            utils.leicoin_net_message.client.log(`Block sent to ${peerConnection.host}`);
         } catch (err: any) {
-            utils.ws_client_message.error(`Error sending Block to ${peerConnection.host}: ${err.message}`);
+            utils.leicoin_net_message.client.error(`Error sending Block to ${peerConnection.host}: ${err.message}`);
         }
     } else {
         //utils.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
@@ -98,13 +88,27 @@ function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
 function sendTransaction(peerConnection: WebSocketClientConnection, data: any) {
     if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
-            peerConnection.client.send(data);
+            peerConnection.client.emit("transaction", data);
             //utils.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            utils.ws_client_message.log(`Transaction sent to ${peerConnection.host}`);
+            utils.leicoin_net_message.client.log(`Transaction sent to ${peerConnection.host}`);
         } catch (err: any) {
-            utils.ws_client_message.error(`Error sending Transaction to ${peerConnection.host}: ${err.message}`);
+            utils.leicoin_net_message.client.error(`Error sending Transaction to ${peerConnection.host}: ${err.message}`);
         }
     } else {
         //utils.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
     }
+}
+
+export default function initLeiCoinNetClient() {
+    // Connect to other peer nodes and create peer-to-peer connections
+    config.peers.forEach((host: string) => {
+        const peerConnection = connectToPeer({
+            host: host,
+            client: null,
+            initialized: false,
+        });
+        wsConnections.push(peerConnection);
+    });
+
+    return wsConnections;
 }

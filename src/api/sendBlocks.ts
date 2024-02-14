@@ -1,7 +1,7 @@
 import express from "express";
-import validation from "../../../validation.js";
-import blockchain from "../../../handlers/storage/blockchain.js";
-import mempool from "../../../handlers/storage/mempool.js";
+import validation from "../validation.js";
+import blockchain from "../handlers/storage/blockchain.js";
+import mempool from "../handlers/storage/mempool.js";
 
 const router = express.Router();
 

@@ -1,9 +1,9 @@
-import blockchain from "../../../handlers/storage/blockchain.js";
-import mempool from "../../../handlers/storage/mempool.js";
-import Block from "../../../objects/block.js";
-import utils from "../../../utils.js";
-import { Callbacks } from "../../../utils/callbacks.js";
-import validation from "../../../validation.js";
+import blockchain from "../../handlers/storage/blockchain.js";
+import mempool from "../../handlers/storage/mempool.js";
+import Block from "../../objects/block.js";
+import utils from "../../utils.js";
+import { Callbacks } from "../../utils/callbacks.js";
+import validation from "../../validation.js";
 
 export default function (block: Block) {
 	const blocksExist = blockchain.existsBlock(block.hash, block.index);
@@ -28,9 +28,9 @@ export default function (block: Block) {
 				blockchain.addUTXOS(transactionData, false);
 			}
 	
-			utils.server_message.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
+			utils.leicoin_net_message.server.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
 		} else {
-			utils.server_message.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
+			utils.leicoin_net_message.server.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
 		}
 
 		return { cb: true, validationresult: validationresult };

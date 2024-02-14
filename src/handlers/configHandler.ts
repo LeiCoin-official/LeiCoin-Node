@@ -5,9 +5,15 @@ import utils from "../utils.js";
 import dotenv from "dotenv";
 
 interface DefaultConfigInterface {
-    server: {
-        port: number
+    api: {
+        active: boolean;
+        host: string;
+        port: number;
     };
+    leicoin_net: {
+        host: string;
+        port: number;
+    },
     miner: {
         active: boolean,
         number_of_threads: number,
@@ -186,5 +192,5 @@ class Config {
     }
 
 }
-
-export default new Config().getConfig();
+const config = new Config().getConfig();
+export default config;

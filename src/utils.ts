@@ -14,16 +14,35 @@ const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
 const mining_pow = 5;
 
-interface LogMessageObject {
-    [key: string]: (message: string) => void;
+class LogMessage {
+    private readonly prefix: string;
+    private readonly color: string;
+    constructor(prefix: string, color: string) {
+        this.prefix = prefix;
+        this.color = color;
+    }
+    private _log(message: string, type: string) {
+        logToConsole(this.prefix, this.color, message, type);
+    }
+    public log(message: string) {this._log(message, "log");}
+    public success(message: string) {this._log(message, "success");}
+    public error(message: string) {this._log(message, "error");}
+    public warn(message: string) {this._log(message, "warn");}
 }
 
+class LeiCoinNetLogMessage extends LogMessage {
+    public readonly server: LogMessage = new LogMessage('LeiCoinNet-Server', '#f47fff');
+    public readonly client: LogMessage = new LogMessage('LeiCoinNet-Client', '#f47fff');
+    constructor(prefix: string, color: string) {
+        super(prefix, color);
+    }
+}
 
-const default_message: LogMessageObject = {};
-const miner_message: LogMessageObject = {};
-const server_message: LogMessageObject = {};
-const data_message: LogMessageObject = {};
-const ws_client_message: LogMessageObject = {};
+const default_message = new LogMessage('Global', '#ffffff');
+const miner_message = new LogMessage('Miner', '#00ffff');
+const api_message = new LogMessage('API', '#c724b1');
+const data_message = new LogMessage('Data', '#1711df');
+const leicoin_net_message = new LeiCoinNetLogMessage('LeiCoinNet', '#f47fff')
 
 const ctx = new Chalk({level: 3});
 
@@ -34,57 +53,33 @@ const message_styles: { [key: string]: ChalkInstance } = {
     warn: ctx.yellow,
 };
 
-
-const messageTypes = ['log', 'success', 'error', 'warn'];
-
-const messageConfigs: { object: { [key: string]: (message: string) => void }, prefix: string, color: string }[] = [
-    { object: default_message, prefix: 'Global', color: '#ffffff' },
-    { object: miner_message, prefix: 'Miner', color: '#00ffff' },
-    { object: server_message, prefix: 'Server', color: '#c724b1' },
-    { object: data_message, prefix: 'Data', color: '#1711df' },
-    { object: ws_client_message, prefix: 'WS Client', color: '#f47fff' },
-];
-
 const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
     terminal: true,
 });
 
-function generateLogMessage(prefix: string, message: string, color: string, type = 'log') {
-    const colorizedPrefix = ctx.hex(color).visible(`[${prefix}]`);
-    const styleFunction = message_styles[type] || message_styles.reset;
-    const styledMessage = styleFunction(message);
-    return `${colorizedPrefix} ${styledMessage}`;
-}
-
-function logToConsole(prefix: string, message: string, type = 'log') {
-    const config = messageConfigs.find((config) => config.prefix === prefix);
-    let color;
-    if (!config) {
-        return;
+function logToConsole(prefix: string, color: string, message: string, type = 'log') {
+    
+    function generateStyledMessage(prefix: string, color: string, message: string, type = 'log') {
+        const colorizedPrefix = ctx.hex(color).visible(`[${prefix}]`);
+        const styleFunction = message_styles[type] || message_styles.reset;
+        const styledMessage = styleFunction(message);
+        return `${colorizedPrefix} ${styledMessage}`;
     }
-    color = config.color;
 
-    const outputMessage = generateLogMessage(prefix, message, color, type);
+    const styledMessage = generateStyledMessage(prefix, color, message, type);
+
+    const currentLine = rl.line;
 
     // Clear the current line and move the cursor to the beginning
     process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
     process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
-    console.log(outputMessage);
+    console.log(styledMessage);
 
     logStream.write(`[${prefix}] ${message}\n`);
 
     rl.prompt();
-}
-
-
-for (const { object, prefix } of messageConfigs) {
-    for (const type of messageTypes) {
-        object[type] = (message: string) => {
-            logToConsole(prefix, message, type);
-        };
-    }
 }
 
 // Function to get the current date and time as a formatted string
@@ -182,8 +177,8 @@ export default {
     mining_difficulty,
     mining_pow,
     miner_message,
-    server_message,
-    ws_client_message,
+    api_message,
+    leicoin_net_message,
     data_message,
     events,
     createInstanceFromJSON,

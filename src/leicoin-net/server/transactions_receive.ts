@@ -1,9 +1,9 @@
-import mempool from "../../../handlers/storage/mempool.js";
-import Transaction from "../../../objects/transaction.js";
-import { AddedUTXO, DeletedUTXO } from "../../../objects/utxo.js";
-import utils from "../../../utils.js";
-import { Callbacks } from "../../../utils/callbacks.js";
-import validation from "../../../validation.js";
+import mempool from "../../handlers/storage/mempool.js";
+import Transaction from "../../objects/transaction.js";
+import { AddedUTXO, DeletedUTXO } from "../../objects/utxo.js";
+import utils from "../../utils.js";
+import { Callbacks } from "../../utils/callbacks.js";
+import validation from "../../validation.js";
 
 export default function (transaction: Transaction) {
 
@@ -26,9 +26,9 @@ export default function (transaction: Transaction) {
                 mempool.addAddedUTXOToMempool(output.recipientAddress, `${transaction.txid}_${index}`, AddedUTXO.initFromTXOutput(output));
             }
     
-            utils.ws_client_message.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
+            utils.leicoin_net_message.server.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
         } else {
-            utils.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
+            utils.leicoin_net_message.server.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
         }
 
         return {cb: true, validationresult: validationresult };

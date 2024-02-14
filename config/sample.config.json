@@ -1,5 +1,11 @@
 {
-    "server": {
+    "api": {
+        "active": false,
+        "host": "0.0.0.0",
+        "port": 12200
+    },
+    "leicoin_net": {
+        "host": "0.0.0.0",
         "port": 12200
     },
     "miner": {

@@ -1,4 +1,4 @@
-import { Worker, isMainThread } from "worker_threads";
+import { Worker } from "worker_threads";
 import Block from "../objects/block.js";
 import utils from "../utils.js";
 import config from "../handlers/configHandler.js";
@@ -8,9 +8,9 @@ import mempool from "../handlers/storage/mempool.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
-async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Block | null }> {
+async function runInMiningParallel(): Promise<Block | null> {
 	const workerThreads: Worker[] = [];
-	let results = new Array(numberOfThreads).fill(null);
+	//let results = new Array(numberOfThreads).fill(null);
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise<Block | null>((resolve) => {
@@ -18,14 +18,21 @@ async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Blo
 			workerThreads.push(worker);
 
 			worker.on('message', (data) => {
-				utils.miner_message.log(`Miner mined block with hash ${data.hash}. Waiting for verification`);
-				results[i] = data;
-				resolve(data);
+				switch (data.type) {
+					case "done":
+						utils.miner_message.log(`Mined block with hash ${data.block.hash}. Waiting for verification`);
+						//results[i] = data;
+						resolve(data.block);
+						break;
+					case "message":
+						utils.miner_message.log(data.message);
+						break;
+				}
 			});
 
 			worker.on('error', (error) => {
 				// Handle worker errors if needed.
-				utils.miner_message.error(`Mining Worker Error: ${error}`);
+				utils.miner_message.error(`Worker Error: ${error}`);
 				resolve(null);
 			});
 
@@ -38,6 +45,8 @@ async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Blo
 			});
 		})
 	);
+
+	utils.miner_message.log(`Started mining new Block with ${numberOfThreads} Threads`);
 	
 	const blockResult = await Promise.race<Block | null>(promises);
 
@@ -46,22 +55,8 @@ async function runInMiningParallel(): Promise<{ results: any[]; blockResult: Blo
 		worker.terminate();
 	}
 
-	return { results, blockResult };
-}
-
-async function initMiner() {
-
-	while (true) {
-		const { results, blockResult } = await runInMiningParallel();
-
-		if (blockResult !== null) {
-			const winnerIndex = results.findIndex((result) => result === blockResult);
-			afterMiningLogic(blockResult);
-		}
-
-		// Sleep for a while before starting the next iteration.
-		await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust the delay as needed.
-	}
+	//return { results, blockResult };
+	return blockResult;
 }
 
 function afterMiningLogic(blockResult: Block) {
@@ -78,7 +73,7 @@ function afterMiningLogic(blockResult: Block) {
 			blockchain.addUTXOS(transactionData, false);
 		}
 
-		utils.events.emit('block_receive', JSON.stringify({type: "block", data: blockResult}));
+		utils.events.emit('block_receive', blockResult);
 
 		utils.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
@@ -86,6 +81,24 @@ function afterMiningLogic(blockResult: Block) {
 	}
 }
 
-if (isMainThread && config.miner.active) {
-  	initMiner();
+async function runMinerCycle() {
+
+	while (true) {
+		//const { results, blockResult } = await runInMiningParallel();
+		const blockResult = await runInMiningParallel();
+
+		if (blockResult !== null) {
+			afterMiningLogic(blockResult);
+		}
+
+		// Sleep for a while before starting the next iteration.
+		await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust the delay as needed.
+	}
+}
+
+export default async function initMinerIfActive() {
+	if (config.miner.active) {
+		runMinerCycle();
+		utils.miner_message.log("Miner started");   
+	}
 }
