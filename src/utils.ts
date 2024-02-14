@@ -70,7 +70,7 @@ function logToConsole(prefix: string, color: string, message: string, type = 'lo
 
     const styledMessage = generateStyledMessage(prefix, color, message, type);
 
-    const currentLine = rl.line;
+    const currentPromptInput = rl.line;
 
     // Clear the current line and move the cursor to the beginning
     process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
@@ -79,6 +79,7 @@ function logToConsole(prefix: string, color: string, message: string, type = 'lo
 
     logStream.write(`[${prefix}] ${message}\n`);
 
+    rl.setPrompt("> " + currentPromptInput);
     rl.prompt();
 }
 
