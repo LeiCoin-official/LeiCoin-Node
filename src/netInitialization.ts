@@ -16,7 +16,7 @@ export default async function initNetConnections() {
     if (config.api.active) {
         web_server = http.createServer(initAPI())
 
-        web_server.listen(config.server.port, config.api.host, () => {
+        web_server.listen(config.api.port, config.api.host, () => {
             utils.api_message.log(`API listening on ${config.api.host}:${config.api.port}`);
         });
         utils.api_message.log("API started");
@@ -31,6 +31,11 @@ export default async function initNetConnections() {
         leiCoinNetServer = initLeiCoinNetServer({ server: web_server });
     else
         leiCoinNetServer = initLeiCoinNetServer({ port: config.leicoin_net.port, host: config.leicoin_net.host });
+
+    // Listen for 'listening' event to indicate successful server start
+    leiCoinNetServer.on('listening', () => {
+        utils.leicoin_net_message.server.log(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
+    });
 
     utils.leicoin_net_message.server.log("LeiCoinNet-Server started");
 

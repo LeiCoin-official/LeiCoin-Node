@@ -63,6 +63,7 @@ class Config {
             [key: string]: {default: string | number, type: string, required: boolean}
         } = {
             'internal-port': { default: 12200, type: 'number', required: false },
+            'internal-host': { default: "0.0.0.0", type: 'number', required: false }
             //'optional-arg': { type: 'string', required: false }, // This one is optional
         };
     
@@ -109,13 +110,13 @@ class Config {
             if (fs.existsSync(configFilePath)) {
                 // If it exists, read and parse the configuration
                 const configData = fs.readFileSync(configFilePath, 'utf-8');
-                let configDataJSON = JSON.parse(configData);
+                let configDataJSON: DefaultConfigInterface = JSON.parse(configData);
 
-                // Check for --internal-port and extract the value
-                let internalPort = processArgs['internal-port'];
-                if (internalPort !== null && internalPort !== undefined) {
-                    configDataJSON.server.port = internalPort;
-                }
+                // Check for internal-port and extract the value
+                if (processArgs['internal-port'])
+                    configDataJSON.leicoin_net.port = processArgs['internal-port'];
+                if (processArgs['internal-host'])
+                    configDataJSON.leicoin_net.host = processArgs['internal-host'];
 
                 return configDataJSON;
             } else {

@@ -7,9 +7,9 @@ const nodeConnections: WebSocket[] = [];
 
 export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
 
-    const socket_server = new WebSocketServer(options);
+    const websocket_server = new WebSocketServer(options);
 
-    socket_server.on('connection', (ws, req) => {
+    websocket_server.on('connection', (ws, req) => {
 
         nodeConnections.push(ws);
 
@@ -45,6 +45,6 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
         
     });
 
-    return socket_server;
+    return websocket_server;
 
 }
