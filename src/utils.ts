@@ -75,12 +75,13 @@ function logToConsole(prefix: string, color: string, message: string, type = 'lo
     // Clear the current line and move the cursor to the beginning
     process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
     process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
-    console.log(styledMessage);
 
+    console.log(styledMessage);
     logStream.write(`[${prefix}] ${message}\n`);
 
-    rl.setPrompt("> " + currentPromptInput);
     rl.prompt();
+    rl.write(null, { ctrl: true, name: 'e' });
+
 }
 
 // Function to get the current date and time as a formatted string
