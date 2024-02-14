@@ -135,7 +135,7 @@ function gracefulShutdown(exitCode: number = 0) {
 
     default_message.log('LeiCoin Node stopped.');
     process.exit(exitCode);
-  
+
 }
   
 
