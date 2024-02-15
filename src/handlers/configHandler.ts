@@ -34,7 +34,16 @@ class Config {
 
     private config: ConfigInterface;
 
-    constructor() {
+    private static instance: Config | null = null;
+
+    public static getInstance(): Config {
+        if (!Config.instance) {
+            Config.instance = new Config();
+        }
+        return Config.instance;
+    }
+
+    private constructor() {
 
         const processArgs = this.parseArgs();
         const defaultConfig = this.loadDefaultConfig(processArgs);
@@ -193,5 +202,5 @@ class Config {
     }
 
 }
-const config = new Config().getConfig();
+const config = Config.getInstance().getConfig();
 export default config;

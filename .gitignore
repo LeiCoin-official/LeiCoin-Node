@@ -4,5 +4,5 @@ config/peers.json
 blockchain_data/
 logs/
 node_modules/
-.vscode
+.vscode/
 build/
