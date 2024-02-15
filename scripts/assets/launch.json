@@ -4,7 +4,17 @@
             "type": "node-terminal",
             "name": "CASLB",
             "request": "launch",
-            "command": "npm run build",
+            "command": "npm run caslb",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node-terminal",
+            "name": "SLB",
+            "request": "launch",
+            "command": "npm run slb",
             "cwd": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"
@@ -16,16 +26,6 @@
             "request": "launch",
             "command": "npm run build",
             "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "node-terminal",
-            "name": "SLB",
-            "request": "launch",
-            "command": "npm run build",
-            "cwd": "${workspaceFolder}",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
         },
         {
             "type": "node-terminal",
