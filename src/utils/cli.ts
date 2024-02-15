@@ -89,7 +89,6 @@ export class CLI {
             //default_message.log('CLI closed.');
         });
     }
-    
 
     private logToConsole(prefix: string, color: string, message: string, type = 'log') {
     
@@ -106,7 +105,6 @@ export class CLI {
     
         this.rl.prompt();
         this.rl.write(null, { ctrl: true, name: 'e' });
-    
     }
 
     private handleCommand(command: string) {
@@ -125,6 +123,23 @@ export class CLI {
         }
     }
 
+    public async close() {
+        return new Promise((resolve, reject) => {
+            this.rl.setPrompt("");
+            this.rl.prompt();
+            this.rl.close();
+            this.logStream.on('finish', () => {
+              this.logStream.close();
+              resolve(null);
+            });
+        
+            this.logStream.on('error', (error) => {
+              reject(error);
+            });
+            this.logStream.end();
+        });
+    }
+ 
 }
 
 const cli = CLI.getInstance();

@@ -48,12 +48,17 @@ class Utils {
 
 
     public async gracefulShutdown(exitCode: number = 0) {
-        if (!this.cli)
+        try {
+            if (!this.cli)
             this.cli = (await import("./cli.js")).default;
-        this.cli.default_message.log('Shutting down...');
-        this.events.emit("stop_server");
-        this.cli.default_message.log('LeiCoin Node stopped.');
-        process.exit(exitCode);
+            this.cli.default_message.log('Shutting down...');
+            this.events.emit("stop_server");
+            this.cli.default_message.log('LeiCoin-Node stopped.');
+            await this.cli.close();
+            process.exit(exitCode);
+        } catch {
+            process.exit(1);
+        }
     }
     
     // Define a function to create an instance of a class from a JSON object
