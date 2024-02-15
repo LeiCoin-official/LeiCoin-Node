@@ -1,0 +1,41 @@
+{
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "CASLB",
+            "request": "launch",
+            "command": "npm run build",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node-terminal",
+            "name": "Build",
+            "request": "launch",
+            "command": "npm run build",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "node-terminal",
+            "name": "SLB",
+            "request": "launch",
+            "command": "npm run build",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node-terminal",
+            "name": "Start",
+            "request": "launch",
+            "command": "npm run start",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        }
+    ]
+}

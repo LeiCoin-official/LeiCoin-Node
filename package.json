@@ -5,6 +5,7 @@
 	"exports": "./index.ts",
 	"type": "module",
 	"scripts": {
+		"setup-dev-env": "node scripts/setup-dev-env.mjs",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"caslb": "npx tsc && cd build && node index.js",
 		"slb": "cd build && node index.js",
