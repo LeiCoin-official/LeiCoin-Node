@@ -70,8 +70,6 @@ function logToConsole(prefix: string, color: string, message: string, type = 'lo
 
     const styledMessage = generateStyledMessage(prefix, color, message, type);
 
-    const currentPromptInput = rl.line;
-
     // Clear the current line and move the cursor to the beginning
     process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
     process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
