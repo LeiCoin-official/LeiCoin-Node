@@ -14,6 +14,21 @@ const processRootDirectory = process.cwd();
 const mining_difficulty = 6;
 const mining_pow = 5;
 
+// Generate a timestamp for the log file name
+const timestamp = getCurrentTimestamp();
+const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
+
+const logFilePathdir = dirname(logFilePath);
+if (!existsSync(logFilePathdir)) {
+    mkdirSync(logFilePathdir, { recursive: true });
+    //logToConsole(`Directory ${logFilePathdir} was created because it was missing.`);
+}
+
+const logStream = createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
+logStream.on('error', (err) => {
+    console.error(`[System] Error writing to log: ${err.message}`);
+});
+
 class LogMessage {
     private readonly prefix: string;
     private readonly color: string;
@@ -93,21 +108,6 @@ function getCurrentTimestamp() {
     const second = String(now.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
 }
-
-// Generate a timestamp for the log file name
-const timestamp = getCurrentTimestamp();
-const logFilePath = processRootDirectory + `/logs/log-${timestamp}.log`;
-
-const logFilePathdir = dirname(logFilePath);
-if (!existsSync(logFilePathdir)) {
-    mkdirSync(logFilePathdir, { recursive: true });
-    //logToConsole(`Directory ${logFilePathdir} was created because it was missing.`);
-}
-
-const logStream = createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
-logStream.on('error', (err) => {
-    //data_message.warn('Error writing to log file:', err);
-});
 
 function handleCommand(command: string) {
     switch (command) {
