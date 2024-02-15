@@ -1,6 +1,6 @@
 import process from "process";
 import { EventEmitter } from "events";
-import cli from "./cli.js";
+import type { CLI } from "./cli.js";
 
 // Define a generic interface representing the class structure
 interface Constructable<T> {
@@ -18,6 +18,8 @@ class Utils {
         }
         return Utils.instance;
     }
+
+    private cli: CLI | null = null;
 
     public readonly events = new EventEmitter();
 
@@ -45,10 +47,12 @@ class Utils {
     }
 
 
-    public gracefulShutdown(exitCode: number = 0) {
-        cli.default_message.log('Shutting down...');
+    public async gracefulShutdown(exitCode: number = 0) {
+        if (!this.cli)
+            this.cli = (await import("./cli.js")).default;
+        this.cli.default_message.log('Shutting down...');
         this.events.emit("stop_server");
-        cli.default_message.log('LeiCoin Node stopped.');
+        this.cli.default_message.log('LeiCoin Node stopped.');
         process.exit(exitCode);
     }
     

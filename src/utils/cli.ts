@@ -6,7 +6,7 @@ import fs from "fs";
 import { dirname } from "path";
 import utils from "./utils.js";
 
-class CLI {
+export class CLI {
 
     private static instance: CLI | null = null;
 
