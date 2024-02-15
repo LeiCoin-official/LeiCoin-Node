@@ -5,6 +5,7 @@ import initLeiCoinNetClient, { WebSocketClientConnection } from "./leicoin-net/c
 import initLeiCoinNetServer from "./leicoin-net/server/index.js";
 import http from "http";
 import WebSocket from "ws";
+import cli from "./utils/cli.js";
 
 export default async function initNetConnections() {
     
@@ -17,9 +18,9 @@ export default async function initNetConnections() {
         web_server = http.createServer(initAPI())
 
         web_server.listen(config.api.port, config.api.host, () => {
-            utils.api_message.log(`API listening on ${config.api.host}:${config.api.port}`);
+            cli.api_message.log(`API listening on ${config.api.host}:${config.api.port}`);
         });
-        utils.api_message.log("API started");
+        cli.api_message.log("API started");
     }
 
     // Initialize LeiCoinNet-Server
@@ -34,14 +35,14 @@ export default async function initNetConnections() {
 
     // Listen for 'listening' event to indicate successful server start
     leiCoinNetServer.on('listening', () => {
-        utils.leicoin_net_message.server.log(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
+        cli.leicoin_net_message.server.log(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
     });
 
-    utils.leicoin_net_message.server.log("LeiCoinNet-Server started");
+    cli.leicoin_net_message.server.log("LeiCoinNet-Server started");
 
     // Initialize LeiCoinNet-Client
     leiCoinNetClient = initLeiCoinNetClient();
-    utils.leicoin_net_message.client.log("LeiCoinNet-Client started");
+    cli.leicoin_net_message.client.log("LeiCoinNet-Client started");
 
     // handle shutdown
     utils.events.once("stop_server", function() {
@@ -49,18 +50,18 @@ export default async function initNetConnections() {
         // API shutdown
         if (web_server) {
             web_server.close();
-            utils.api_message.log(`API stopped`);
+            cli.api_message.log(`API stopped`);
         }
 
         // LeiCoinNet-Server shutdown
         leiCoinNetServer.close();
-        utils.leicoin_net_message.server.log(`LeiCoinNet-Server stopped`);
+        cli.leicoin_net_message.server.log(`LeiCoinNet-Server stopped`);
 
         // LeiCoinNet-Server shutdown
         leiCoinNetClient.forEach(connection => {
             connection.client?.close();
         });
-        utils.leicoin_net_message.client.log(`LeiCoinNet-Client stopped`);
+        cli.leicoin_net_message.client.log(`LeiCoinNet-Client stopped`);
     });
 
 }

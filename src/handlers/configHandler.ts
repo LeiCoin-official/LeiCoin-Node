@@ -3,6 +3,7 @@ import path from "path";
 import process from "process";
 import utils from "../utils.js";
 import dotenv from "dotenv";
+import cli from "../utils/cli.js";
 
 interface DefaultConfigInterface {
     api: {
@@ -138,7 +139,7 @@ class Config {
 
             }
         } catch (error: any) {
-            utils.data_message.error(`Error loading config configuration: ${error}`);
+            cli.data_message.error(`Error loading config configuration: ${error}`);
             return null;
         }
         
@@ -165,7 +166,7 @@ class Config {
                 return null;
             }
         } catch (error: any) {
-            utils.data_message.error(`Error loading peers configuration: ${error.message}`);
+            cli.data_message.error(`Error loading peers configuration: ${error.message}`);
             return null;
         }
     }
@@ -196,7 +197,7 @@ class Config {
                 return null
             }
         } catch (error: any) {
-            utils.data_message.error(`Error loading .env configuration: ${error.message}`);
+            cli.data_message.error(`Error loading .env configuration: ${error.message}`);
             return null;
         }
     }

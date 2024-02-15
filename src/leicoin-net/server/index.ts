@@ -1,4 +1,5 @@
 import utils from "../../utils.js";
+import cli from "../../utils/cli.js";
 import block_receive_job from "./block_receive.js";
 import transactions_receive_job from "./transactions_receive.js";
 import WebSocket, { WebSocketServer } from "ws";
@@ -29,7 +30,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
         });
 
         ws.on('error', (error) => {
-            utils.leicoin_net_message.server.log(`WS Server Error: ${error.message}`);
+            cli.leicoin_net_message.server.log(`WS Server Error: ${error.message}`);
             //utils.events.emit("ws_reconnect");
         });
 
@@ -40,7 +41,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
             if (index !== -1) {
                 nodeConnections.splice(index, 1);
             }
-            utils.leicoin_net_message.server.log(`WebSocket connection to ${req.url} closed.`);
+            cli.leicoin_net_message.server.log(`WebSocket connection to ${req.url} closed.`);
         });
         
     });

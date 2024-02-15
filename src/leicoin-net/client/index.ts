@@ -1,6 +1,7 @@
 import WebSocket from "ws";
 import utils from "../../utils.js";
 import config from "../../handlers/configHandler.js";
+import cli from "../../utils/cli.js";
 
 export interface WebSocketClientConnection {
     host: string;
@@ -17,16 +18,16 @@ function connectToPeer(peerConnection: WebSocketClientConnection) {
     //const peerConnection = { server: peerServer, client: wsclient };
 
     wsclient.on('open', () => {
-        utils.leicoin_net_message.client.log(`Connected to: ${peerConnection.host}`);
+        cli.leicoin_net_message.client.log(`Connected to: ${peerConnection.host}`);
         peerConnection.initialized = true;
     });
 
     wsclient.on('error', (error) => {
-        utils.leicoin_net_message.client.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
+        cli.leicoin_net_message.client.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
     });
 
     wsclient.on('close', () => {
-        utils.leicoin_net_message.client.log(`Connection to ${peerConnection.host} closed. Retrying on the next sending action...`);
+        cli.leicoin_net_message.client.log(`Connection to ${peerConnection.host} closed. Retrying on the next sending action...`);
         peerConnection.initialized = false;
     });
 
@@ -37,7 +38,7 @@ function connectToPeer(peerConnection: WebSocketClientConnection) {
 function reconnectToPeer(peerConnection: WebSocketClientConnection) {
     if (!peerConnection.client || peerConnection.client.readyState !== WebSocket.OPEN) {
         peerConnection = connectToPeer(peerConnection);
-        utils.leicoin_net_message.client.log(`Retrying connection to ${peerConnection.host}`);
+        cli.leicoin_net_message.client.log(`Retrying connection to ${peerConnection.host}`);
         return { needed: true, connection: peerConnection };
     }
     return { needed: false };
@@ -75,13 +76,13 @@ function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
     if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
             peerConnection.client.emit("block", data);
-            //utils.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            utils.leicoin_net_message.client.log(`Block sent to ${peerConnection.host}`);
+            //cli.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+            cli.leicoin_net_message.client.log(`Block sent to ${peerConnection.host}`);
         } catch (err: any) {
-            utils.leicoin_net_message.client.error(`Error sending Block to ${peerConnection.host}: ${err.message}`);
+            cli.leicoin_net_message.client.error(`Error sending Block to ${peerConnection.host}: ${err.message}`);
         }
     } else {
-        //utils.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+        //cli.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
     }
 }
 
@@ -89,13 +90,13 @@ function sendTransaction(peerConnection: WebSocketClientConnection, data: any) {
     if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
             peerConnection.client.emit("transaction", data);
-            //utils.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            utils.leicoin_net_message.client.log(`Transaction sent to ${peerConnection.host}`);
+            //cli.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
+            cli.leicoin_net_message.client.log(`Transaction sent to ${peerConnection.host}`);
         } catch (err: any) {
-            utils.leicoin_net_message.client.error(`Error sending Transaction to ${peerConnection.host}: ${err.message}`);
+            cli.leicoin_net_message.client.error(`Error sending Transaction to ${peerConnection.host}: ${err.message}`);
         }
     } else {
-        //utils.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+        //cli.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
     }
 }
 

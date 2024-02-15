@@ -3,6 +3,7 @@ import mempool from "../../handlers/storage/mempool.js";
 import Block from "../../objects/block.js";
 import utils from "../../utils.js";
 import { Callbacks } from "../../utils/callbacks.js";
+import cli from "../../utils/cli.js";
 import validation from "../../validation.js";
 
 export default function (block: Block) {
@@ -28,14 +29,14 @@ export default function (block: Block) {
 				blockchain.addUTXOS(transactionData, false);
 			}
 	
-			utils.leicoin_net_message.server.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
+			cli.leicoin_net_message.server.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
 		} else {
-			utils.leicoin_net_message.server.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
+			cli.leicoin_net_message.server.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
 		}
 
 		return { cb: true, validationresult: validationresult };
 	}
 
-	//utils.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
+	//cli.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 	return { cb: false, validationresult: null} ;
 }

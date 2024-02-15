@@ -5,6 +5,7 @@ import mempool from "./mempool.js";
 import Block from "../../objects/block.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import { LatestBlockInfo } from "./fileDataStructures.js";
+import cli from "../../utils/cli.js";
 
 class Blockchain {
 
@@ -42,10 +43,10 @@ class Blockchain {
         try {
             if (!fs.existsSync(fullDirectoryPath)) {
                 fs.mkdirSync(fullDirectoryPath, { recursive: true });
-                utils.data_message.log(`Directory ${directoryPath} was created because it was missing.`);
+                cli.data_message.log(`Directory ${directoryPath} was created because it was missing.`);
             }
         } catch (err: any) {
-            utils.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
+            cli.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
         }
     }
     
@@ -56,14 +57,14 @@ class Blockchain {
             const dir = path.dirname(fullFilePath);
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
-                utils.data_message.log(`Directory ${dir} was created because it was missing.`);
+                cli.data_message.log(`Directory ${dir} was created because it was missing.`);
             }
             if (!fs.existsSync(fullFilePath)) {
                 fs.writeFileSync(fullFilePath, content, 'utf8');
-                utils.data_message.log(`File ${filePath} was created because it was missing.`);
+                cli.data_message.log(`File ${filePath} was created because it was missing.`);
             }
         } catch (err: any) {
-            utils.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
+            cli.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
         }
     }
     
@@ -111,11 +112,11 @@ class Blockchain {
                 const data = fs.readFileSync(txFilePath, 'utf8');
                 return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
             } else {
-                utils.data_message.error(`Transaktion ${txID} was not found`);
+                cli.data_message.error(`Transaktion ${txID} was not found`);
                 return {cb: Callbacks.NONE}
             }
         } catch (err: any) {
-            utils.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
+            cli.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
     }
@@ -148,7 +149,7 @@ class Blockchain {
                 // Write the updated UTXOs back to the recipient's file
                 fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
             } catch (err: any) {
-                utils.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+                cli.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
                 return { cb: Callbacks.ERROR };
             }
         }
@@ -220,7 +221,7 @@ class Blockchain {
                 return { cb: Callbacks.NONE};
             }
         } catch (err: any) {
-            utils.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+            cli.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
             return { cb: Callbacks.ERROR };
         }
     }
@@ -265,7 +266,7 @@ class Blockchain {
     
             return { cb: Callbacks.NONE };
         } catch (err: any) {
-            utils.data_message.error(`Error deleting UTXO: ${err.message}`);
+            cli.data_message.error(`Error deleting UTXO: ${err.message}`);
             return { cb: Callbacks.ERROR };
         }
     }
@@ -277,7 +278,7 @@ class Blockchain {
             const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
             return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
         } catch (err: any) {
-            utils.data_message.error(`Error reading latest block info: ${err.message}`);
+            cli.data_message.error(`Error reading latest block info: ${err.message}`);
             return {cb: Callbacks.ERROR, data: {}}
         }
     }
@@ -296,7 +297,7 @@ class Blockchain {
             fs.writeFileSync(latestBlockInfoFilePath, JSON.stringify(latestBlockInfoFileData), {encoding:'utf8',flag:'w'});
             return {cb: Callbacks.SUCCESS};
         } catch (err: any) {
-            utils.data_message.error(`Error writing latest block info: ${err.message}`);
+            cli.data_message.error(`Error writing latest block info: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
     }
@@ -326,7 +327,7 @@ class Blockchain {
                 return { cb: Callbacks.SUCCESS, exists: false, fork: false };
             }
         } catch (err: any) {
-            utils.data_message.error(`Error reading latest block info: ${err.message}`);
+            cli.data_message.error(`Error reading latest block info: ${err.message}`);
             return { cb: Callbacks.ERROR };
         }
     }
@@ -359,7 +360,7 @@ class Blockchain {
             // Block not found in any fork
             return {cb: Callbacks.NONE};
         } catch (err: any) {
-            utils.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
+            cli.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
     }
@@ -397,7 +398,7 @@ class Blockchain {
         
             return { isGenesisBlock: true, isForkOFGenesisBlock: false };
         } catch (err: any) {
-            utils.data_message.error(`Error checking for existing blocks: ${err.message}`);
+            cli.data_message.error(`Error checking for existing blocks: ${err.message}`);
             return { isGenesisBlock: false, isForkOFGenesisBlock: false };
         }
     }
@@ -424,11 +425,11 @@ class Blockchain {
 
                 return { cb: Callbacks.SUCCESS };
             } else {
-                utils.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
+                cli.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
                 return { cb: Callbacks.ERROR };
             }
         } catch (err: any) {
-            utils.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
+            cli.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
             return { cb: Callbacks.ERROR };
         }
     }
@@ -441,11 +442,11 @@ class Blockchain {
                 const data = fs.readFileSync(blockFilePath, 'utf8');
                 return {cb: Callbacks.SUCCESS, block: Block.initFromJSON(JSON.parse(data))};
             } else {
-                utils.data_message.error(`Block ${blockIndex} was not found.`);
+                cli.data_message.error(`Block ${blockIndex} was not found.`);
                 return {cb: Callbacks.NONE};
             }
         } catch (err: any) {
-            utils.data_message.error(`Error reading block ${blockIndex}: ${err.message}.`);
+            cli.data_message.error(`Error reading block ${blockIndex}: ${err.message}.`);
             return {cb: Callbacks.ERROR};
         }
     }

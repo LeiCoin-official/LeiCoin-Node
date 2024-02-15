@@ -5,6 +5,7 @@ import config from "../handlers/configHandler.js";
 import validation from "../validation.js";
 import blockchain from "../handlers/storage/blockchain.js";
 import mempool from "../handlers/storage/mempool.js";
+import cli from "../utils/cli.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
@@ -20,19 +21,19 @@ async function runInMiningParallel(): Promise<Block | null> {
 			worker.on('message', (data) => {
 				switch (data.type) {
 					case "done":
-						utils.miner_message.log(`Mined block with hash ${data.block.hash}. Waiting for verification`);
+						cli.miner_message.log(`Mined block with hash ${data.block.hash}. Waiting for verification`);
 						//results[i] = data;
 						resolve(data.block);
 						break;
 					case "message":
-						utils.miner_message.log(data.message);
+						cli.miner_message.log(data.message);
 						break;
 				}
 			});
 
 			worker.on('error', (error) => {
 				// Handle worker errors if needed.
-				utils.miner_message.error(`Worker Error: ${error}`);
+				cli.miner_message.error(`Worker Error: ${error}`);
 				resolve(null);
 			});
 
@@ -46,7 +47,7 @@ async function runInMiningParallel(): Promise<Block | null> {
 		})
 	);
 
-	utils.miner_message.log(`Started mining new Block with ${numberOfThreads} Threads`);
+	cli.miner_message.log(`Started mining new Block with ${numberOfThreads} Threads`);
 	
 	const blockResult = await Promise.race<Block | null>(promises);
 
@@ -75,9 +76,9 @@ function afterMiningLogic(blockResult: Block) {
 
 		utils.events.emit('block_receive', blockResult);
 
-		utils.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
+		cli.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
-		utils.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
+		cli.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
 	}
 }
 
@@ -99,6 +100,6 @@ async function runMinerCycle() {
 export default async function initMinerIfActive() {
 	if (config.miner.active) {
 		runMinerCycle();
-		utils.miner_message.log("Miner started");   
+		cli.miner_message.log("Miner started");   
 	}
 }

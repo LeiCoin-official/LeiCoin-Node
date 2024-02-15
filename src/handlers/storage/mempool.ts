@@ -55,7 +55,7 @@ class Mempool {
         this.deleted_utxos[senderAddress] = this.deleted_utxos[senderAddress] || [];
 
         if (this.deleted_utxos[senderAddress][utxoid]) {
-            //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
+            //cli.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of deleted utxos in the Mempool.`);
             return { cb: 'exists' };
         }
     
@@ -76,7 +76,7 @@ class Mempool {
             return { cb: Callbacks.SUCCESS };
         }
     
-        //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
+        //cli.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of deleted utxos in the Mempool.`);
         return { cb: Callbacks.NONE };
     }
 
@@ -86,7 +86,7 @@ class Mempool {
         this.added_utxos[recipientAddress] = this.added_utxos[recipientAddress] || {};
 
         if (this.added_utxos[recipientAddress][utxoid]) {
-            //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
+            //cli.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} already exists in the list of added utxos in the Mempool.`);
             return { cb: 'exists' };
         }
     
@@ -107,7 +107,7 @@ class Mempool {
             return { cb: Callbacks.SUCCESS };
         }
     
-        //utils.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
+        //cli.data_message.error(`UTXO with TxID: ${utxo.txid}, Index: ${utxo.index} not found in the list of added utxos in the Mempool.`);
         return { cb: Callbacks.NONE };
     }
 
@@ -116,7 +116,7 @@ class Mempool {
         const txid = transaction.txid;
     
         if (this.transactions[txid]) {
-            //utils.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+            //cli.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
             return { cb: 'exists' };
         }
     
@@ -132,7 +132,7 @@ class Mempool {
             return { cb: Callbacks.SUCCESS };
         }
     
-        //utils.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
+        //cli.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
         return { cb: Callbacks.NONE };
     }
     

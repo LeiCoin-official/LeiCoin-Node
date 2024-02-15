@@ -3,6 +3,7 @@ import Transaction from "../../objects/transaction.js";
 import { AddedUTXO, DeletedUTXO } from "../../objects/utxo.js";
 import utils from "../../utils.js";
 import { Callbacks } from "../../utils/callbacks.js";
+import cli from "../../utils/cli.js";
 import validation from "../../validation.js";
 
 export default function (transaction: Transaction) {
@@ -26,15 +27,15 @@ export default function (transaction: Transaction) {
                 mempool.addAddedUTXOToMempool(output.recipientAddress, `${transaction.txid}_${index}`, AddedUTXO.initFromTXOutput(output));
             }
     
-            utils.leicoin_net_message.server.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
+            cli.leicoin_net_message.server.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
         } else {
-            utils.leicoin_net_message.server.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
+            cli.leicoin_net_message.server.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
         }
 
         return {cb: true, validationresult: validationresult };
     }
 
-    //utils.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
+    //cli.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
 	return { cb: false, validationresult: null };
 
 }
