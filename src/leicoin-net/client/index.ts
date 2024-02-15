@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import utils from "../../utils.js";
+import utils from "../../utils/utils.js";
 import config from "../../handlers/configHandler.js";
 import cli from "../../utils/cli.js";
 

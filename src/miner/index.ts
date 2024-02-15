@@ -1,6 +1,6 @@
 import { Worker } from "worker_threads";
 import Block from "../objects/block.js";
-import utils from "../utils.js";
+import utils from "../utils/utils.js";
 import config from "../handlers/configHandler.js";
 import validation from "../validation.js";
 import blockchain from "../handlers/storage/blockchain.js";

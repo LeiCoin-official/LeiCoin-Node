@@ -1,5 +1,5 @@
 import config from "./handlers/configHandler.js";
-import utils from "./utils.js";
+import utils from "./utils/utils.js";
 import initAPI from "./api/index.js";
 import initLeiCoinNetClient, { WebSocketClientConnection } from "./leicoin-net/client/index.js";
 import initLeiCoinNetServer from "./leicoin-net/server/index.js";

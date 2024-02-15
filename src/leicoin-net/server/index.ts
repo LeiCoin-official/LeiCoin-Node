@@ -1,4 +1,4 @@
-import utils from "../../utils.js";
+import utils from "../../utils/utils.js";
 import cli from "../../utils/cli.js";
 import block_receive_job from "./block_receive.js";
 import transactions_receive_job from "./transactions_receive.js";

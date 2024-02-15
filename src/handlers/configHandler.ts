@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import process from "process";
-import utils from "../utils.js";
+import utils from "../utils/utils.js";
 import dotenv from "dotenv";
 import cli from "../utils/cli.js";
 

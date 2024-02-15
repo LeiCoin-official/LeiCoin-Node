@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import config from "../handlers/configHandler.js";
-import utils from "../utils.js";
+import utils from "../utils/utils.js";
 import { Transaction, TransactionLike } from "./transaction.js";
 import mempool from "../handlers/storage/mempool.js";
 import blockchain from "../handlers/storage/blockchain.js";

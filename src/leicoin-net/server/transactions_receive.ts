@@ -1,7 +1,7 @@
 import mempool from "../../handlers/storage/mempool.js";
 import Transaction from "../../objects/transaction.js";
 import { AddedUTXO, DeletedUTXO } from "../../objects/utxo.js";
-import utils from "../../utils.js";
+import utils from "../../utils/utils.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import cli from "../../utils/cli.js";
 import validation from "../../validation.js";

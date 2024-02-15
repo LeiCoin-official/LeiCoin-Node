@@ -1,4 +1,4 @@
-import utils from "../utils.js";
+import utils from "../utils/utils.js";
 
 // export interface TXInputLike {
 export interface TXInput {

@@ -1,6 +1,6 @@
 import process from "process";
 import { EventEmitter } from "events";
-import cli from "./utils/cli";
+import cli from "./cli";
 
 // Define a generic interface representing the class structure
 interface Constructable<T> {

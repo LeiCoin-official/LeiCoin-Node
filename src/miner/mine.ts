@@ -1,6 +1,6 @@
 import Block from "../objects/block.js";
 import { parentPort, workerData } from "worker_threads";
-import utils from "../utils.js";
+import utils from "../utils/utils.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 
 // Function to mine a block with custom logic
