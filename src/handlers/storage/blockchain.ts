@@ -9,7 +9,7 @@ import cli from "../../utils/cli.js";
 
 class Blockchain {
 
-    private static instance: Blockchain | null = null;
+    private static instance: Blockchain;
   
     private constructor() {
         this.createStorageIfNotExists();

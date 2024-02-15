@@ -19,7 +19,7 @@ class Mempool {
         }
     };
 
-    private static instance: Mempool | null = null;
+    private static instance: Mempool;
   
     private constructor() {
 

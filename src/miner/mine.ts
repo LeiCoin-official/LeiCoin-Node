@@ -1,13 +1,11 @@
-import Block from "../objects/block.js";
 import { parentPort, workerData } from "worker_threads";
-import utils from "../utils/utils.js";
-import cryptoHandlers from "../handlers/cryptoHandlers.js";
+import crypto from "crypto";
 
 // Function to mine a block with custom logic
 function mineBlock() {
 
-	const block = Block.createNewBlock();
-	const modifyedBlock = cryptoHandlers.getPreparedObjectForHashing(block, ["hash"]);
+	const block = workerData.block;
+	const modifyedBlock = workerData.modifyedBlock;
 
 	let stopMining = false;
 
@@ -18,11 +16,18 @@ function mineBlock() {
 		stopMining = true;
 	});
 
+	function calculateHash() {
+		block.hash = crypto
+			.createHash('sha256')
+			.update(JSON.stringify(modifyedBlock))
+			.digest('hex');
+	}	
+
 	while (!stopMining) {
 		block.nonce = modifyedBlock.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
-		block.calculateHash(modifyedBlock);
+		calculateHash();
 
-		if (block.hash.substring(0, utils.mining_difficulty) === '0'.repeat(utils.mining_difficulty)) {
+		if (block.hash.substring(0, workerData.mining_difficulty) === '0'.repeat(workerData.mining_difficulty)) {
 			parentPort.postMessage({"type": "done", block: block});
 			return;
 		}

@@ -10,7 +10,7 @@ interface Constructable<T> {
 
 class Utils {
 
-    private static instance: Utils | null = null;
+    private static instance: Utils;
 
     public static getInstance(): Utils {
         if (!Utils.instance) {

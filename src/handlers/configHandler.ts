@@ -35,7 +35,7 @@ class Config {
 
     private config: ConfigInterface;
 
-    private static instance: Config | null = null;
+    private static instance: Config;
 
     public static getInstance(): Config {
         if (!Config.instance) {

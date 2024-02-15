@@ -8,7 +8,7 @@ import utils from "./utils.js";
 
 export class CLI {
 
-    private static instance: CLI | null = null;
+    private static instance: CLI;
 
     public static getInstance(): CLI {
         if (!CLI.instance) {
@@ -78,6 +78,8 @@ export class CLI {
         this.logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
         this.logStream.on('error', (err) => {
             console.error(`[System] Error writing to log: ${err.message}`);
+            this.rl.prompt();
+            this.rl.write(null, { ctrl: true, name: 'e' });
         });
 
         this.rl.on('line', (input) => {

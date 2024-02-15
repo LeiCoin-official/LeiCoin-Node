@@ -6,23 +6,29 @@ import validation from "../validation.js";
 import blockchain from "../handlers/storage/blockchain.js";
 import mempool from "../handlers/storage/mempool.js";
 import cli from "../utils/cli.js";
+import cryptoHandlers from "../handlers/cryptoHandlers.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
 async function runInMiningParallel(): Promise<Block | null> {
 	const workerThreads: Worker[] = [];
-	//let results = new Array(numberOfThreads).fill(null);
+
+	const blockTemplate = Block.createNewBlock();
+	const workerData = {
+		block: blockTemplate,
+		mining_difficulty: utils.mining_difficulty,
+		modifyedBlock: cryptoHandlers.getPreparedObjectForHashing(blockTemplate, ["hash"])
+	}
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise<Block | null>((resolve) => {
-			const worker = new Worker(utils.processRootDirectory + '/src/miner/mine.js', { workerData: { threadIndex: i } });
+			const worker = new Worker(utils.processRootDirectory + '/src/miner/mine.js', { workerData });
 			workerThreads.push(worker);
 
 			worker.on('message', (data) => {
 				switch (data.type) {
 					case "done":
 						cli.miner_message.log(`Mined block with hash ${data.block.hash}. Waiting for verification`);
-						//results[i] = data;
 						resolve(data.block);
 						break;
 					case "message":
@@ -56,7 +62,6 @@ async function runInMiningParallel(): Promise<Block | null> {
 		worker.terminate();
 	}
 
-	//return { results, blockResult };
 	return blockResult;
 }
 
@@ -85,7 +90,7 @@ function afterMiningLogic(blockResult: Block) {
 async function runMinerCycle() {
 
 	while (true) {
-		//const { results, blockResult } = await runInMiningParallel();
+
 		const blockResult = await runInMiningParallel();
 
 		if (blockResult !== null) {
