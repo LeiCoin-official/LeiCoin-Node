@@ -1,14 +1,12 @@
 import blockchain from "../../handlers/storage/blockchain.js";
 import mempool from "../../handlers/storage/mempool.js";
 import Block from "../../objects/block.js";
-import utils from "../../utils/utils.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import cli from "../../utils/cli.js";
 import validation from "../../validation.js";
 
 export default function (block: Block) {
-	const blocksExist = blockchain.existsBlock(block.hash, block.index);
-	if (blocksExist.cb === Callbacks.SUCCESS && !blocksExist.exists && !blocksExist.fork) {
+	//if (blocksExist.cb === Callbacks.SUCCESS && !blocksExist.exists && !blocksExist.fork) {
 
 		const validationresult = validation.isValidBlock(block);
 
@@ -35,7 +33,7 @@ export default function (block: Block) {
 		}
 
 		return { cb: true, validationresult: validationresult };
-	}
+	//}
 
 	//cli.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
 	return { cb: false, validationresult: null} ;

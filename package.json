@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"setup-dev-env": "node scripts/setup-dev-env.mjs",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "npx jest",
 		"caslb": "npx tsc && cd build && node index.js",
 		"slb": "cd build && node index.js",
 		"dev": "npx ts-node --esm index.ts",
@@ -31,13 +31,16 @@
 		"cors": "^2.8.5",
 		"dotenv": "^16.3.1",
 		"express": "^4.18.2",
+		"ts-jest": "^29.1.2",
 		"ws": "^8.14.2"
 	},
 	"devDependencies": {
 		"@types/ansi-escapes": "^4.0.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.21",
+		"@types/jest": "^29.5.12",
 		"@types/node": "^20.10.1",
+		"jest": "^29.7.0",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.3.3"
 	}

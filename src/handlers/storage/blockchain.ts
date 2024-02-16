@@ -1,7 +1,7 @@
 import utils from "../../utils/utils.js";
 import fs from "fs";
 import path from "path";
-import mempool from "./mempool.js";
+import mempool, { MempoolWithUnconfirmedUTXOS } from "./mempool.js";
 import Block from "../../objects/block.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import { LatestBlockInfo } from "./fileDataStructures.js";
@@ -174,7 +174,7 @@ class Blockchain {
     }
     
     // Function to read a UTXO
-    public getUTXOS(recipientAddress: string, utxoid: string | null = null, includeMempool = true) {
+    public getUTXOS(recipientAddress: string, utxoid: string | null = null) {
     
         try {
     
@@ -187,7 +187,7 @@ class Blockchain {
                 const existingData = fs.readFileSync(fullFilePath, 'utf8');
                 const existingUTXOs = JSON.parse(existingData);
     
-                if (includeMempool) {
+                if (mempool instanceof MempoolWithUnconfirmedUTXOS) {
                     if (mempool.deleted_utxos[recipientAddress]) {
                         for (const [utxoid, ] of Object.entries(mempool.deleted_utxos[recipientAddress])) {
                             delete existingUTXOs[recipientAddress][utxoid];
@@ -299,36 +299,6 @@ class Blockchain {
         } catch (err: any) {
             cli.data_message.error(`Error writing latest block info: ${err.message}`);
             return {cb: Callbacks.ERROR};
-        }
-    }
-    
-    // Define the function to check if a block with a specific hash and index exists.
-    public existsBlock(blockHash: String, blockIndex: Number) {
-        try {
-            const latestBlockInfoFilePath = this.getBlockchainDataFilePath(`/indexes/blocks.json`);
-            const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
-            const blockArray = JSON.parse(data);
-        
-            // Check if an object with the specified index and hash exists in the array.
-            const block: {index: Number, hash: String} = blockArray.find((block: { index: Number; hash: String; }) => block.index === blockIndex && block.hash === blockHash);
-    
-            if (block) {
-                // The block with the specified index and hash exists in the main chain
-                return { cb: Callbacks.SUCCESS, exists: true};
-            } else {
-                // Check if there's a block with the specified index and a different hash in the provided JSON data
-                const forkedBlock = blockArray.find((block: { index: Number; hash: String; }) => block.index === blockIndex && block.hash !== blockHash);
-                if (forkedBlock) {
-                    // The block with the same index but a different hash exists in the provided data
-                    return { cb: Callbacks.SUCCESS, exists: false, fork: true };
-                }
-                
-                // The block with the specified index and hash does not exist
-                return { cb: Callbacks.SUCCESS, exists: false, fork: false };
-            }
-        } catch (err: any) {
-            cli.data_message.error(`Error reading latest block info: ${err.message}`);
-            return { cb: Callbacks.ERROR };
         }
     }
     

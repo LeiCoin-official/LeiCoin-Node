@@ -81,5 +81,4 @@ class Utils {
 
 }
 
-const utils = Utils.getInstance();
-export default utils;
+export default Utils.getInstance();

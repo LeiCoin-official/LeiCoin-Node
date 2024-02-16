@@ -15,6 +15,9 @@ interface DefaultConfigInterface {
         host: string;
         port: number;
     },
+    mempool: {
+        allowUnconfirmedUTXOS: boolean;
+    },
     miner: {
         active: boolean,
         number_of_threads: number,
@@ -23,11 +26,11 @@ interface DefaultConfigInterface {
 }
 
 interface ENVConfigInterface {
-    [key: string]: any
+    [key: string]: any;
 }
 
 interface ConfigInterface extends DefaultConfigInterface, ENVConfigInterface {
-    peers: [string]
+    peers: [string];
 }
   
 

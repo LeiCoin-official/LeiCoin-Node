@@ -142,5 +142,4 @@ export class CLI {
  
 }
 
-const cli = CLI.getInstance();
-export default cli;
+export default CLI.getInstance();

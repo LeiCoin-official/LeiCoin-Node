@@ -2,12 +2,66 @@ import {AddedUTXO, DeletedUTXO, UTXO} from "../../objects/utxo.js";
 import Transaction from "../../objects/transaction.js";
 import Block from "../../objects/block.js";
 import { Callbacks } from "../../utils/callbacks.js";
+import config from "../configHandler.js";
 
 class Mempool {
 
     public transactions: {
         [txid: string]: Transaction
     };                                                                                                                                                                                                              
+
+    private static instance: Mempool;
+  
+    public constructor() {
+        this.transactions = {};
+    }
+    
+    public static getInstance(): Mempool {
+      if (!Mempool.instance) {
+        Mempool.instance = new Mempool();
+      }
+      return Mempool.instance;
+    }
+
+    public clearMempoolbyBlock(block: Block) {
+
+        for (const [txid, ] of Object.entries(block.transactions)) {
+            this.removeTransactionFromMempool(txid);
+        }
+
+    }
+
+
+    // Function to add a transaction to the Mempool
+    public addTransactionToMempool(transaction: Transaction) {
+        const txid = transaction.txid;
+    
+        if (this.transactions[txid]) {
+            //cli.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
+            return { cb: 'exists' };
+        }
+    
+        this.transactions[txid] = transaction;
+        return { cb: Callbacks.SUCCESS };
+    }
+    
+    // Function to remove a transaction from the Mempool
+    public removeTransactionFromMempool(txid: string) {
+    
+        if (this.transactions[txid]) {
+            delete this.transactions[txid];
+            return { cb: Callbacks.SUCCESS };
+        }
+    
+        //cli.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
+        return { cb: Callbacks.NONE };
+    }
+    
+
+}
+
+export class MempoolWithUnconfirmedUTXOS extends Mempool {
+                                                                                                                                                                                                              
     public deleted_utxos: {
         [senderAddress: string]: {
             [utxoid: string]: DeletedUTXO
@@ -19,21 +73,21 @@ class Mempool {
         }
     };
 
-    private static instance: Mempool;
+    private static instanceUnconfirmedUTXOS: MempoolWithUnconfirmedUTXOS;
   
     private constructor() {
 
-        this.transactions = {};
+        super();
         this.deleted_utxos = {};
         this.added_utxos = {};
 
     }
     
-    public static getInstance(): Mempool {
-      if (!Mempool.instance) {
-        Mempool.instance = new Mempool();
-      }
-      return Mempool.instance;
+    public static getInstance(): MempoolWithUnconfirmedUTXOS {
+        if (!MempoolWithUnconfirmedUTXOS.instanceUnconfirmedUTXOS) {
+            MempoolWithUnconfirmedUTXOS.instanceUnconfirmedUTXOS = new MempoolWithUnconfirmedUTXOS();
+        }
+        return MempoolWithUnconfirmedUTXOS.instanceUnconfirmedUTXOS;
     }
 
     public clearMempoolbyBlock(block: Block) {
@@ -47,6 +101,7 @@ class Mempool {
                 this.removeAddedUTXOFromMempool(output.recipientAddress, `${txid}_${index}`);
             }
         }
+
     }
 
         // Function to add a utxo to the list of deleted utxos of the Mempool
@@ -111,32 +166,15 @@ class Mempool {
         return { cb: Callbacks.NONE };
     }
 
-    // Function to add a transaction to the Mempool
-    public addTransactionToMempool(transaction: Transaction) {
-        const txid = transaction.txid;
-    
-        if (this.transactions[txid]) {
-            //cli.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
-            return { cb: 'exists' };
-        }
-    
-        this.transactions[txid] = transaction;
-        return { cb: Callbacks.SUCCESS };
-    }
-    
-    // Function to remove a transaction from the Mempool
-    public removeTransactionFromMempool(txid: string) {
-    
-        if (this.transactions[txid]) {
-            delete this.transactions[txid];
-            return { cb: Callbacks.SUCCESS };
-        }
-    
-        //cli.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
-        return { cb: Callbacks.NONE };
-    }
-    
-
 }
 
-export default Mempool.getInstance();
+
+let mempool: Mempool;
+
+if (config.mempool.allowUnconfirmedUTXOS) {
+    mempool = MempoolWithUnconfirmedUTXOS.getInstance();
+} else {
+    mempool = Mempool.getInstance();
+}
+
+export default mempool;

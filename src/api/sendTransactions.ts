@@ -3,7 +3,7 @@ const router = express.Router();
 import validation from "../validation.js";
 import utils from "../utils/utils.js";
 import { AddedUTXO, DeletedUTXO } from "../objects/utxo.js";
-import mempool from "../handlers/storage/mempool.js";
+import mempool, { MempoolWithUnconfirmedUTXOS } from "../handlers/storage/mempool.js";
 import { Callbacks } from "../utils/callbacks.js";
 
 // Route for receiving new transactions
@@ -30,16 +30,17 @@ router.use('/', (req, res, next) => {
 	// Add the transaction to the mempool (replace with your blockchain logic)
 	mempool.addTransactionToMempool(transactionData);
 
-	for (const input of transactionData.input) {
-		const removeAddedUTXOFromMempoolResult = mempool.removeAddedUTXOFromMempool(transactionData.senderAddress, input.utxoid);
-		if (removeAddedUTXOFromMempoolResult.cb !== Callbacks.SUCCESS) {
-			mempool.addDeletedUTXOToMempool(transactionData.senderAddress, input.utxoid, DeletedUTXO.initFromTXInput(input));
+	if (mempool instanceof MempoolWithUnconfirmedUTXOS) {
+		for (const input of transactionData.input) {
+			const removeAddedUTXOFromMempoolResult = mempool.removeAddedUTXOFromMempool(transactionData.senderAddress, input.utxoid);
+			if (removeAddedUTXOFromMempoolResult.cb !== Callbacks.SUCCESS) {
+				mempool.addDeletedUTXOToMempool(transactionData.senderAddress, input.utxoid, DeletedUTXO.initFromTXInput(input));
+			}
+		}
+		for (const [index, output] of transactionData.output.entries()) {
+			mempool.addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${index}`, AddedUTXO.initFromTXOutput(output));
 		}
 	}
-	for (const [index, output] of transactionData.output.entries()) {
-		mempool.addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${index}`, AddedUTXO.initFromTXOutput(output));
-	}
-
 	utils.events.emit("transaction_receive", transactionData);
 
 	return;

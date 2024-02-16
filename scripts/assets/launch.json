@@ -2,6 +2,16 @@
     "configurations": [
         {
             "type": "node-terminal",
+            "name": "Test",
+            "request": "launch",
+            "command": "npm run test",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node-terminal",
             "name": "CASLB",
             "request": "launch",
             "command": "npm run caslb",

@@ -22,7 +22,7 @@ async function runInMiningParallel(): Promise<Block | null> {
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise<Block | null>((resolve) => {
-			const worker = new Worker(utils.processRootDirectory + '/src/miner/mine.js', { workerData });
+			const worker = new Worker(utils.processRootDirectory + "/src/miner/mine.js", { workerData });
 			workerThreads.push(worker);
 
 			worker.on('message', (data) => {
