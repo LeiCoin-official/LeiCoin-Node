@@ -3,10 +3,13 @@ import mempool from "../../handlers/storage/mempool.js";
 import Block from "../../objects/block.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import cli from "../../utils/cli.js";
+import utils from "../../utils/utils.js";
 import validation from "../../validation.js";
 
-export default function (block: Block) {
+export default function (data: any) {
 	//if (blocksExist.cb === Callbacks.SUCCESS && !blocksExist.exists && !blocksExist.fork) {
+
+		const block = utils.createInstanceFromJSON(Block, data);
 
 		const validationresult = validation.isValidBlock(block);
 
@@ -15,8 +18,7 @@ export default function (block: Block) {
 			blockchain.addBlock(block);
 			blockchain.updateLatestBlockInfo(
 				validationresult.forkchain,
-				{hash: block.previousHash, index: block.index -1 },
-				{hash: block.hash, index: block.index}
+				{ hash: block.previousHash, index: block.index -1 }
 			);
 			mempool.clearMempoolbyBlock(block);
 	
@@ -36,5 +38,5 @@ export default function (block: Block) {
 	//}
 
 	//cli.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
-	return { cb: false, validationresult: null} ;
+	return { cb: false, validationresult: null };
 }

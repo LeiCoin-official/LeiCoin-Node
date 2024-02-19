@@ -69,7 +69,7 @@ function afterMiningLogic(blockResult: Block) {
 	if (validation.isValidBlock(blockResult).cb) {
 
 		blockchain.addBlock(blockResult);
-		blockchain.updateLatestBlockInfo("main", blockResult, blockResult);
+		blockchain.updateLatestBlockInfo("main", blockResult);
 		mempool.clearMempoolbyBlock(blockResult);
 
 		blockchain.addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);

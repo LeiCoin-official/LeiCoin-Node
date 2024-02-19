@@ -3,9 +3,12 @@ import Transaction from "../../objects/transaction.js";
 import { AddedUTXO, DeletedUTXO } from "../../objects/utxo.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import cli from "../../utils/cli.js";
+import utils from "../../utils/utils.js";
 import validation from "../../validation.js";
 
-export default function (transaction: Transaction) {
+export default function (data: Transaction) {
+
+    const transaction = utils.createInstanceFromJSON(Transaction, data);
 
     if (!(transaction.txid in mempool.transactions)) {
 
