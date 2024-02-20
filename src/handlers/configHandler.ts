@@ -93,17 +93,15 @@ class Config {
     
                 if (argName && mergedArgInfo[argName]) {
                     const { type, default: defaultValue } = mergedArgInfo[argName];
-
-                    cli.data_message.log(argName);
     
                     if (argValue !== undefined) {
                         if (type === 'number') {
                             argsObj[argName] = parseFloat(argValue);
                         } else if (type === 'string') {
                             argsObj[argName] = argValue;
-                        } else if (type === 'boolean') {
-                            argsObj[argName] = true;
                         }
+                    } else if (type === 'boolean') {
+                        argsObj[argName] = true;
                     }
                 }
             } catch (error) {
