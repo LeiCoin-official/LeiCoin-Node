@@ -96,9 +96,9 @@ class Config {
     
                     if (argValue !== undefined) {
                         if (type === 'number') {
-                            argsObj[argName] = argValue;
-                        } else if (type === 'string') {
                             argsObj[argName] = parseFloat(argValue);
+                        } else if (type === 'string') {
+                            argsObj[argName] = argValue;
                         } else if (type === 'boolean') {
                             argsObj[argName] = true;
                         }
