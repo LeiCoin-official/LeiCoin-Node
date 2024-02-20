@@ -378,10 +378,8 @@ class Blockchain {
     
     // Function to write a block
     public addBlock(block: Block) {
-        const blockNumber = block.index;
-        const blockHash = block.hash;
-        const blockFilePath = this.getBlockchainDataFilePath(`/blocks/${blockNumber}.json`);
-        const blocksListFilePath = this.getBlockchainDataFilePath('/indexes/blocks.json');
+        const blockIndex = block.index;
+        const blockFilePath = this.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`);
 
         try {
             // Check if the block file already exists.
@@ -389,19 +387,13 @@ class Blockchain {
                 // Write the block data to the block file.
                 fs.writeFileSync(blockFilePath, JSON.stringify(block), { encoding: 'utf8', flag: 'w' });
 
-                // Update the list of blocks.
-                const blocksListData = fs.readFileSync(blocksListFilePath, 'utf8');
-                const blocksList = JSON.parse(blocksListData);
-                blocksList.push({ hash: blockHash, index: blockNumber });
-                fs.writeFileSync(blocksListFilePath, JSON.stringify(blocksList), { encoding: 'utf8', flag: 'w' });
-
                 return { cb: Callbacks.SUCCESS };
             } else {
-                cli.data_message.error(`Block ${blockNumber} already exists and cannot be overwritten.`);
+                cli.data_message.error(`Block ${blockIndex} already exists and cannot be overwritten.`);
                 return { cb: Callbacks.ERROR };
             }
         } catch (err: any) {
-            cli.data_message.error(`Error writing block ${blockNumber}: ${err.message}.`);
+            cli.data_message.error(`Error writing block ${blockIndex}: ${err.message}.`);
             return { cb: Callbacks.ERROR };
         }
     }
