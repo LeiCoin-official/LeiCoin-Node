@@ -86,7 +86,9 @@ class Config {
         const mergedArgInfo = defaultArgInfo;
     
         const argsObj: {[arg: string]: any} = {};
-    
+        
+        cli.data_message.log(JSON.stringify(process.argv));
+
         for (const arg of process.argv.slice(2)) {
             try {
                 const [argName, argValue] = arg.split('=');
