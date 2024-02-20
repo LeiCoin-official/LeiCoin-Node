@@ -53,11 +53,11 @@ class Utils {
             this.cli = (await import("./cli.js")).default;
             this.cli.default_message.log('Shutting down...');
             this.events.emit("stop_server");
-            const a = setTimeout(async() => {
+            setTimeout(async() => {
                 this.cli?.default_message.log('LeiCoin-Node stopped.');
                 await this.cli?.close();
+                process.exit(exitCode);
             }, 1000);
-            process.exit(exitCode);
         } catch {
             process.exit(1);
         }
