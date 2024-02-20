@@ -6,7 +6,7 @@ import cli from "../../utils/cli.js";
 import utils from "../../utils/utils.js";
 import validation from "../../validation.js";
 
-export default function (data: Transaction) {
+export default function (data: any) {
 
     const transaction = utils.createInstanceFromJSON(Transaction, data);
 

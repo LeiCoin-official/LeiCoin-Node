@@ -75,7 +75,7 @@ utils.events.on("transaction_receive", function (data) {
 function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
     if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
-            peerConnection.client.emit("block", data);
+            peerConnection.client.send(data);
             //cli.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
             cli.leicoin_net_message.client.log(`Block sent to ${peerConnection.host}`);
         } catch (err: any) {
@@ -89,7 +89,7 @@ function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
 function sendTransaction(peerConnection: WebSocketClientConnection, data: any) {
     if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
         try {
-            peerConnection.client.emit("transaction", data);
+            peerConnection.client.send(data);
             //cli.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
             cli.leicoin_net_message.client.log(`Transaction sent to ${peerConnection.host}`);
         } catch (err: any) {

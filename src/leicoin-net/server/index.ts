@@ -3,6 +3,7 @@ import cli from "../../utils/cli.js";
 import block_receive_job from "./block_receive.js";
 import transactions_receive_job from "./transactions_receive.js";
 import WebSocket, { WebSocketServer } from "ws";
+import { LeiCoinNetDataPackage, LeiCoinNetDataPackageInterface } from "../../objects/leicoinnet.js";
 
 const nodeConnections: WebSocket[] = [];
 
@@ -17,17 +18,28 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
         cli.leicoin_net_message.server.log(`${req.headers.host} established as connection to this Server.`);
 
         // Listen for messages from clients connected to the node
-        ws.on('block', (blockData) => {
-            const block_receive_job_result = block_receive_job(blockData);
-            if (block_receive_job_result.cb) {
-                utils.events.emit("block_receive", blockData);
-            }
-        });
+        ws.on('message', (rawdata) => {
 
-        ws.on('transaction', (transactionData) => {
-            const transactions_receive_job_result = transactions_receive_job(transactionData);
-            if (transactions_receive_job_result.cb) {
-                utils.events.emit("transaction_receive", transactionData);
+            const data = LeiCoinNetDataPackage.extract(rawdata.toString());
+            
+            switch (data.type) {
+
+                case 'block':
+                    const block_receive_job_result = block_receive_job(data.content);
+                    if (block_receive_job_result.cb) {
+                        utils.events.emit("block_receive", rawdata.toString());
+                    }
+                    break;
+                case "transaction":
+                    const transactions_receive_job_result = transactions_receive_job(data.content);
+                    if (transactions_receive_job_result.cb) {
+                        utils.events.emit("transaction_receive", rawdata.toString());
+                    }
+                    break;
+                case "message":
+                    break;
+                default:
+                    break;
             }
         });
 

@@ -11,7 +11,7 @@ export default async function initNetConnections() {
     
     let web_server: http.Server | null = null;
     let leiCoinNetServer: WebSocket.Server;
-    let leiCoinNetClient: WebSocketClientConnection[];
+    //let leiCoinNetClient: WebSocketClientConnection[];
 
     // Initialize API
     if (config.api.active) {
@@ -41,7 +41,8 @@ export default async function initNetConnections() {
     cli.leicoin_net_message.server.log("LeiCoinNet-Server started");
 
     // Initialize LeiCoinNet-Client
-    leiCoinNetClient = initLeiCoinNetClient();
+    //leiCoinNetClient = initLeiCoinNetClient();
+    initLeiCoinNetClient();
     cli.leicoin_net_message.client.log("LeiCoinNet-Client started");
 
     // handle shutdown

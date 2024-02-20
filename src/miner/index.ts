@@ -7,6 +7,7 @@ import blockchain from "../handlers/storage/blockchain.js";
 import mempool from "../handlers/storage/mempool.js";
 import cli from "../utils/cli.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
+import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
@@ -81,7 +82,7 @@ function afterMiningLogic(blockResult: Block) {
 			blockchain.addUTXOS(transactionData, false);
 		}
 
-		utils.events.emit('block_receive', blockResult);
+		utils.events.emit("block_receive", LeiCoinNetDataPackage.create("block", blockResult));
 
 		cli.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {

@@ -5,6 +5,7 @@ import utils from "../utils/utils.js";
 import { AddedUTXO, DeletedUTXO } from "../objects/utxo.js";
 import mempool, { MempoolWithUnconfirmedUTXOS } from "../handlers/storage/mempool.js";
 import { Callbacks } from "../utils/callbacks.js";
+import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
 
 // Route for receiving new transactions
 router.use('/', (req, res, next) => {
@@ -41,7 +42,7 @@ router.use('/', (req, res, next) => {
 			mempool.addAddedUTXOToMempool(output.recipientAddress, `${transactionData.txid}_${index}`, AddedUTXO.initFromTXOutput(output));
 		}
 	}
-	utils.events.emit("transaction_receive", transactionData);
+	utils.events.emit("transaction_receive", LeiCoinNetDataPackage.create("transaction", transactionData));
 
 	return;
 });
