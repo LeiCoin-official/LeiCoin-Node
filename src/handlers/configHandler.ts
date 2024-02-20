@@ -86,8 +86,6 @@ class Config {
         const mergedArgInfo = defaultArgInfo;
     
         const argsObj: {[arg: string]: any} = {};
-        
-        cli.data_message.log(JSON.stringify(process.argv));
 
         for (const arg of process.argv.slice(2)) {
             try {
@@ -95,6 +93,8 @@ class Config {
     
                 if (argName && mergedArgInfo[argName]) {
                     const { type, default: defaultValue } = mergedArgInfo[argName];
+
+                    cli.data_message.log(argName);
     
                     if (argValue !== undefined) {
                         if (type === 'number') {
@@ -117,8 +117,6 @@ class Config {
                 argsObj[argName] = mergedArgInfo[argName];
             }
         }
-        
-        cli.data_message.log(JSON.stringify(argsObj));
 
         return argsObj;
     }
