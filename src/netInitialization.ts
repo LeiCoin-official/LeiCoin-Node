@@ -59,7 +59,7 @@ export default async function initNetConnections() {
 
         // LeiCoinNet-Server shutdown
         leiCoinNetClient.forEach(connection => {
-            connection.client?.close();
+            connection.client?.close(1000);
         });
         cli.leicoin_net_message.client.log(`LeiCoinNet-Client stopped`);
     });

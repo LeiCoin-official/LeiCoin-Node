@@ -115,7 +115,9 @@ class Config {
                 argsObj[argName] = mergedArgInfo[argName];
             }
         }
-    
+        
+        cli.data_message.log(JSON.stringify(argsObj));
+
         return argsObj;
     }
 
