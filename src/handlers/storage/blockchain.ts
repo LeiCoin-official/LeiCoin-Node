@@ -28,7 +28,7 @@ class Blockchain {
         this.ensureDirectoryExists('/indexes');
         this.ensureDirectoryExists('/forks');
     
-        this.ensureFileExists('/indexes/latestblockinfo.json', '{}');
+        this.ensureFileExists('/indexes/latestblockinfo.json', '{"main": {"previousBlockInfo": {}, "latestBlockInfo": {}}}');
         this.ensureFileExists('/indexes/transactions.json', '[]');
     }
     
