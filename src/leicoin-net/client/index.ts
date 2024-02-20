@@ -26,8 +26,8 @@ function connectToPeer(peerConnection: WebSocketClientConnection) {
         cli.leicoin_net_message.client.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
     });
 
-    wsclient.on('close', () => {
-        cli.leicoin_net_message.client.log(`Connection to ${peerConnection.host} closed. Retrying on the next sending action...`);
+    wsclient.on('close', (code) => {
+        cli.leicoin_net_message.client.log(`Connection to ${peerConnection.host} closed. Exit-Code: ${code}`);
         peerConnection.initialized = false;
     });
 
