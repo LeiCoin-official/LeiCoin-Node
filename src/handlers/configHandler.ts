@@ -138,7 +138,7 @@ class Config {
                 if (processArgs['internal-host'])
                     configDataJSON.leicoin_net.host = processArgs['internal-host'];
                 if (processArgs['--experimental'])
-                    configDataJSON.leicoin_net.host = processArgs['internal-host'];
+                    configDataJSON.experimental = processArgs['--experimental'];
 
                 return configDataJSON;
             } else {
