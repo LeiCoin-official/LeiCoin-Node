@@ -10,6 +10,8 @@ import cryptoHandlers from "../handlers/cryptoHandlers.js";
 
 const numberOfThreads = config.miner.number_of_threads; // Adjust this to the number of threads you need.
 
+const minerWorkerPath = utils.processRootDirectory + (config.experimental ? "/build" : "") + "/src/miner/mine.js";
+
 async function runInMiningParallel(): Promise<Block | null> {
 	const workerThreads: Worker[] = [];
 
@@ -22,7 +24,7 @@ async function runInMiningParallel(): Promise<Block | null> {
 
 	const promises = Array.from({ length: numberOfThreads }, (_, i) =>
 		new Promise<Block | null>((resolve) => {
-			const worker = new Worker(utils.processRootDirectory + "/src/miner/mine.js", { workerData });
+			const worker = new Worker(minerWorkerPath, { workerData });
 			workerThreads.push(worker);
 
 			worker.on('message', (data) => {

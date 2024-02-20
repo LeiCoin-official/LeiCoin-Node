@@ -52,9 +52,8 @@ npm i
 if [[ "$run_experimental" == "true" ]]; then
 
     npm run build
-
-    cd build
-
+    
+    node ./build/index.js $args
+else
+    node index.js $args
 fi
-
-node index.js $args

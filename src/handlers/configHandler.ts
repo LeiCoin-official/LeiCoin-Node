@@ -14,15 +14,16 @@ interface DefaultConfigInterface {
     leicoin_net: {
         host: string;
         port: number;
-    },
+    };
     mempool: {
         allowUnconfirmedUTXOS: boolean;
-    },
+    };
     miner: {
-        active: boolean,
-        number_of_threads: number,
+        active: boolean;
+        number_of_threads: number;
         minerAddress: string
-    }
+    };
+    experimental: boolean
 }
 
 interface ENVConfigInterface {
@@ -73,10 +74,11 @@ class Config {
     private parseArgs() {
         // Define default argument information with default values, types, and required flags
         const defaultArgInfo : {
-            [key: string]: {default: string | number, type: string, required: boolean}
+            [key: string]: {default: string | number | boolean, type: string, required: boolean}
         } = {
             'internal-port': { default: 12200, type: 'number', required: false },
-            'internal-host': { default: "0.0.0.0", type: 'number', required: false }
+            'internal-host': { default: "0.0.0.0", type: 'string', required: false },
+            '--experimental': { default: false, type: 'boolean', required: false }
             //'optional-arg': { type: 'string', required: false }, // This one is optional
         };
     
@@ -93,8 +95,13 @@ class Config {
                     const { type, default: defaultValue } = mergedArgInfo[argName];
     
                     if (argValue !== undefined) {
-                        argsObj[argName] =
-                            type === 'number' ? parseFloat(argValue) : argValue;
+                        if (type === 'number') {
+                            argsObj[argName] = argValue;
+                        } else if (type === 'string') {
+                            argsObj[argName] = parseFloat(argValue);
+                        } else if (type === 'boolean') {
+                            argsObj[argName] = true;
+                        }
                     }
                 }
             } catch (error) {
@@ -129,6 +136,8 @@ class Config {
                 if (processArgs['internal-port'])
                     configDataJSON.leicoin_net.port = processArgs['internal-port'];
                 if (processArgs['internal-host'])
+                    configDataJSON.leicoin_net.host = processArgs['internal-host'];
+                if (processArgs['--experimental'])
                     configDataJSON.leicoin_net.host = processArgs['internal-host'];
 
                 return configDataJSON;
