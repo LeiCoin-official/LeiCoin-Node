@@ -100,16 +100,24 @@ function sendTransaction(peerConnection: WebSocketClientConnection, data: any) {
     }
 }
 
-export default function initLeiCoinNetClient() {
+export function initLeiCoinNetClient() {
     // Connect to other peer nodes and create peer-to-peer connections
     config.peers.forEach((host: string) => {
         const peerConnection = connectToPeer({
             host: host,
             client: null,
             initialized: false,
-        });
+        }); 
         wsConnections.push(peerConnection);
     });
 
     return wsConnections;
+}
+
+export function shutdownLeiCoinNetClient() {
+    wsConnections.forEach(connection => {
+        if (connection.initialized) {
+            connection.client?.close(1000);
+        }
+    });
 }
