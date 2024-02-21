@@ -3,7 +3,7 @@ import cli from "../../utils/cli.js";
 import block_receive_job from "./block_receive.js";
 import transactions_receive_job from "./transactions_receive.js";
 import WebSocket, { WebSocketServer } from "ws";
-import { LeiCoinNetDataPackage, LeiCoinNetDataPackageInterface } from "../../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage } from "../../objects/leicoinnet.js";
 
 const nodeConnections: WebSocket[] = [];
 
@@ -23,7 +23,6 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
             const data = LeiCoinNetDataPackage.extract(rawdata.toString());
             
             switch (data.type) {
-
                 case 'block':
                     const block_receive_job_result = block_receive_job(data.content);
                     if (block_receive_job_result.cb) {

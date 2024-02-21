@@ -7,7 +7,6 @@ import utils from "../../utils/utils.js";
 import validation from "../../validation.js";
 
 export default function (data: any) {
-	//if (blocksExist.cb === Callbacks.SUCCESS && !blocksExist.exists && !blocksExist.fork) {
 
 		const block = utils.createInstanceFromJSON(Block, data);
 
@@ -34,9 +33,8 @@ export default function (data: any) {
 			cli.leicoin_net_message.server.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
 		}
 
-		return { cb: true, validationresult: validationresult };
-	//}
+		return validationresult;
 
 	//cli.ws_client_message.error(`Received block with hash ${block.hash} is invalid.`);
-	return { cb: false, validationresult: null };
+	//return { cb: false, validationresult: null };
 }
