@@ -339,7 +339,7 @@ class Blockchain {
         
 
 
-    public isGenesisBlock() {
+    public isValidGenesisBlock(hash: string) {
         try {
     
             const latestblockinfoFileData = this.getLatestBlockInfo();
@@ -360,7 +360,9 @@ class Blockchain {
                     } else if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
                         if (typeof(latestBlockInfo) === "object") {
                             if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
-                                return { isGenesisBlock: true, isForkOFGenesisBlock: true };
+                                if (latestBlockInfo.hash !== hash)
+                                    return { isGenesisBlock: true, isForkOFGenesisBlock: true };
+                                return { isGenesisBlock: false, isForkOFGenesisBlock: false };
                             }
                         }
                     }

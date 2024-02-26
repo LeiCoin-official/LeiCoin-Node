@@ -101,15 +101,15 @@ function isValidBlock(block: BlockLike) {
 
     if (index === 0) {
 
-        const isGenesisBlockResult = blockchain.isGenesisBlock();
+        const isGenesisBlockResult = blockchain.isValidGenesisBlock();
 
-        if (!isGenesisBlockResult.isGenesisBlock) return {cb: false, status: 400, message: 'Bad Request. Previous Block does not exists.'};
+        if (!isGenesisBlockResult.isGenesisBlock) return {cb: false, status: 400, message: 'Bad Request. Block is not a valid Genesis Block.'};
 
         forkchain = "main";
         forktype = "child";
         forkparent = "main";
 
-        if (isGenesisBlockResult.isForkOFGenesisBlock) {
+        if (isGenesisBlockResult.isForkOFGenesisBlock && ) {
             forkchain = hash;
             forktype = "newfork";
         } 
