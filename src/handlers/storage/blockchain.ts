@@ -360,6 +360,7 @@ class Blockchain {
                     } else if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
                         if (typeof(latestBlockInfo) === "object") {
                             if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
+                                cli.data_message.log(`DEBUG: latestBlockInfo.hash: ${latestBlockInfo.hash} hash: ${hash}`);
                                 if (latestBlockInfo.hash !== hash)
                                     return { isGenesisBlock: true, isForkOFGenesisBlock: true };
                                 return { isGenesisBlock: false, isForkOFGenesisBlock: false };
@@ -416,6 +417,11 @@ class Blockchain {
             return {cb: Callbacks.ERROR};
         }
     }
+
+    public checkSimpleBlockExisting() {
+
+    }
+
 }
 
 export default Blockchain.getInstance();
