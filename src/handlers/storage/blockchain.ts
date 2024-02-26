@@ -357,7 +357,8 @@ class Blockchain {
                                 return { isGenesisBlock: false, isForkOFGenesisBlock: false };
                             }
                         }
-                    } else if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
+                    }
+                    if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
                         if (typeof(latestBlockInfo) === "object") {
                             if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
                                 cli.data_message.log(`DEBUG: latestBlockInfo.hash: ${latestBlockInfo.hash} hash: ${hash}`);

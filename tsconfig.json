@@ -109,5 +109,9 @@
   "exclude": [
     "tests/**/*",
     "jest.config.cjs"
-  ]
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "explicit"
+  }
 }
