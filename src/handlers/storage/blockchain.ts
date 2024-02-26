@@ -425,12 +425,14 @@ class Blockchain {
             if (hash && index) {
                 const blockFilePath = this.getBlockchainDataFilePath(`/blocks/${index}.json`);
                 if (fs.existsSync(blockFilePath)) {
+                    cli.data_message.log("true");
                     return {cb: true};
                 }
             }
         } catch (err: any) {
             cli.data_message.error(`Error checking Block existing: ${err.message}.`);
         }
+        cli.data_message.log("false");
         return { cb: false };
     }
 
