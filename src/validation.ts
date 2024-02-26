@@ -6,6 +6,7 @@ import Block, { BlockLike } from "./objects/block.js";
 import blockchain from "./handlers/storage/blockchain.js";
 import { Callbacks } from "./utils/callbacks.js";
 import utils from "./utils/utils.js";
+import cli from "./utils/cli.js";
 
 
 function isValidTransaction(transaction: TransactionLike) {
@@ -112,7 +113,9 @@ function isValidBlock(block: BlockLike) {
         if (isGenesisBlockResult.isForkOFGenesisBlock) {
             forkchain = hash;
             forktype = "newfork";
-        } 
+        }
+
+        cli.data_message.log(`DEBUG: Result: `)
 
     } else {
 
