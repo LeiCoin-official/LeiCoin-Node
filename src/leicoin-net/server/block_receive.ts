@@ -17,7 +17,7 @@ export default function (data: any) {
 			blockchain.addBlock(block);
 			blockchain.updateLatestBlockInfo(
 				validationresult.forkchain,
-				{ hash: block.previousHash, index: block.index -1 }
+				block
 			);
 			mempool.clearMempoolbyBlock(block);
 	
