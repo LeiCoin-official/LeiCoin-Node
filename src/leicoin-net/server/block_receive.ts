@@ -9,7 +9,7 @@ export default function (data: any) {
 
 	const block = utils.createInstanceFromJSON(Block, data);
 
-	if (!blockchain.simpleCheckBlockExisting(block.index, block.hash)) {
+	if (!blockchain.simpleCheckBlockExisting(block.index, block.hash).cb) {
 
 		const validationresult = validation.isValidBlock(block);
 
