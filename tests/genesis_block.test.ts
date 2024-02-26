@@ -1,4 +1,4 @@
-import blockchain from "../build/src/handlers/storage/blockchain.js";
+import blockchain from "../src/handlers/storage/blockchain.js";
 
 describe('testing index file', () => {
   test('empty string should result in zero', () => {
