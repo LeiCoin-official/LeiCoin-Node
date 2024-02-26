@@ -419,8 +419,18 @@ class Blockchain {
         }
     }
 
-    public checkSimpleBlockExisting() {
-
+    public simpleCheckBlockExisting(index: number, hash: string) {
+        try {
+            if (hash && index) {
+                const blockFilePath = this.getBlockchainDataFilePath(`/blocks/${index}.json`);
+                if (fs.existsSync(blockFilePath)) {
+                    return {cb: true};
+                }
+            }
+        } catch (err: any) {
+            cli.data_message.error(`Error checking Block existing: ${err.message}.`);
+        }
+        return { cb: false };
     }
 
 }
