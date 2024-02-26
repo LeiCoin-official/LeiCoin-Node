@@ -115,8 +115,6 @@ function isValidBlock(block: BlockLike) {
             forktype = "newfork";
         }
 
-        cli.data_message.log(`DEBUG: Result: ${JSON.stringify(isGenesisBlockResult)}`)
-
     } else {
 
         const latestblockinfoFileData = blockchain.getLatestBlockInfo();

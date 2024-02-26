@@ -420,6 +420,7 @@ class Blockchain {
     }
 
     public simpleCheckBlockExisting(index: number, hash: string) {
+        cli.data_message.log(index + ", " + hash);
         try {
             if (hash && index) {
                 const blockFilePath = this.getBlockchainDataFilePath(`/blocks/${index}.json`);
