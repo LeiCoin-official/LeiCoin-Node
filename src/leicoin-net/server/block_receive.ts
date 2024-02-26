@@ -37,4 +37,6 @@ export default function (data: any) {
 		return validationresult;
 	}
 
+	return {cb: false};
+
 }
