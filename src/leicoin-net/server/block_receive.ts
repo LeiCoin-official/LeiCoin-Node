@@ -25,6 +25,7 @@ export default function (data: any) {
 				block,
 				validationresult.forkparent
 			);
+			
 			mempool.clearMempoolbyBlock(block);
 	
 			for (const transactionData of block.transactions) {
