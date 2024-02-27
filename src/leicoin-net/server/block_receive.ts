@@ -9,24 +9,27 @@ export default function (data: any) {
 
 	const block = utils.createInstanceFromJSON(Block, data);
 
-	if (!blockchain.simpleCheckBlockExisting(block.index, block.hash).cb) {
+	if (!blockchain.checkNewBlockExisting(block.index, block.hash).cb) {
 
 		const validationresult = validation.isValidBlock(block);
 
 		if (validationresult.cb) {
 
-			blockchain.addBlock(block);
+			if (validationresult.forktype = "newfork") {
+				blockchain.createFork(validationresult.forkchain);
+			}
+
+			blockchain.addBlock(block, validationresult.forkchain);
 			blockchain.updateLatestBlockInfo(
 				validationresult.forkchain,
-				block
+				block,
+				validationresult.forkparent
 			);
 			mempool.clearMempoolbyBlock(block);
 	
-			blockchain.addUTXOS({txid: block.hash, index: 0, recipientAddress: block.coinbase.minerAddress, amount: block.coinbase.amount}, true);
-	
-			for (const [, transactionData] of Object.entries(block.transactions)) {
+			for (const transactionData of block.transactions) {
 				blockchain.deleteUTXOS(transactionData);
-				blockchain.addUTXOS(transactionData, false);
+				blockchain.addUTXOS(transactionData);
 			}
 	
 			cli.leicoin_net_message.server.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);

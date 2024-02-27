@@ -25,8 +25,8 @@ class Mempool {
 
     public clearMempoolbyBlock(block: Block) {
 
-        for (const [txid, ] of Object.entries(block.transactions)) {
-            this.removeTransactionFromMempool(txid);
+        for (const transactionData of block.transactions) {
+            this.removeTransactionFromMempool(transactionData.txid);
         }
 
     }
@@ -92,13 +92,13 @@ export class MempoolWithUnconfirmedUTXOS extends Mempool {
 
     public clearMempoolbyBlock(block: Block) {
 
-        for (const [txid, transactionData] of Object.entries(block.transactions)) {
+        for (const transactionData of block.transactions) {
             this.removeTransactionFromMempool(transactionData.txid);
             for (const input of transactionData.input) {
                 this.removeDeletedUTXOFromMempool(transactionData.senderAddress, input.utxoid);
             }
             for (const [index, output] of transactionData.output.entries()) {
-                this.removeAddedUTXOFromMempool(output.recipientAddress, `${txid}_${index}`);
+                this.removeAddedUTXOFromMempool(output.recipientAddress, `${transactionData.txid}_${index}`);
             }
         }
 

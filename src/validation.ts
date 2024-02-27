@@ -1,13 +1,26 @@
 import crypto from "crypto";
 import cryptoHandler from "./handlers/cryptoHandlers.js";
-import Transaction, { TransactionLike } from "./objects/transaction.js";
+import { TransactionLike } from "./objects/transaction.js";
 import mempool from "./handlers/storage/mempool.js";
-import Block, { BlockLike } from "./objects/block.js";
+import { BlockLike } from "./objects/block.js";
 import blockchain from "./handlers/storage/blockchain.js";
 import { Callbacks } from "./utils/callbacks.js";
 import utils from "./utils/utils.js";
-import cli from "./utils/cli.js";
 
+interface BlockValidationInvalidResult {
+    cb: false;
+    status: 400 | 500;
+    message: string;
+}
+
+interface BlockValidationValidResult {
+    cb: true;
+    status: 200;
+    message: string;
+    forkchain: string;
+    forktype: "child" | "newfork";
+    forkparent: string;
+}
 
 function isValidTransaction(transaction: TransactionLike) {
 
@@ -41,8 +54,12 @@ function isValidTransaction(transaction: TransactionLike) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
 
+    if (!senderAddress.startsWith("lc1-")) {
+        return {cb: false, status: 400, message: "Bad Request. SenderAddress is not a LeiCoin Address."};
+    }
+
     const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
-    if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress) {
+    if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress.slice(4)) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }
 
@@ -75,6 +92,11 @@ function isValidTransaction(transaction: TransactionLike) {
     }
 
     for (let output_utxo of output) {
+
+        if (!output_utxo.recipientAddress.startsWith("lc1-")) {
+            return {cb: false, status: 400, message: "Bad Request. RecipientAddress of some Output is not a LeiCoin Address."};
+        }
+
         utxo_output_amount += output_utxo.amount;
     }
 
@@ -89,26 +111,53 @@ function isValidTransaction(transaction: TransactionLike) {
     return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
 }
 
-function isValidBlock(block: BlockLike) {
-    const { index, previousHash, transactions, timestamp, nonce, coinbase, hash } = block;
+function isValidCoinbaseTransaction(coinbaseTransaction: TransactionLike): {
+    cb: true;
+} | {
+    cb: false;
+    status: 400;
+    message: string;
+} {
 
-    if ((!index && index !== 0) || (!previousHash && index !== 0) || !transactions || !timestamp || !nonce || !coinbase || !hash) {
+    const { txid, senderAddress, publicKey, output, input, signature, coinbase } = coinbaseTransaction;
+
+    if (!txid || !senderAddress || !publicKey || !output || !signature || !input || !coinbase) {
+        return {cb: false, status: 400, message: "Bad Request. Invalid Coinbase arguments."};
+    }
+
+    if (crypto.createHash('sha256').update(JSON.stringify(cryptoHandler.getPreparedObjectForHashing(coinbaseTransaction, ["txid", "coinbase"]))).digest('hex') !== txid) {
+        return {cb: false, status: 400, message: "Bad Request. Coinbase hash does not correspond to its data."};
+    }
+
+    if (![senderAddress, publicKey, input[0].utxoid, signature].every(value => value === "coinbase")) {
+        return {cb: false, status: 400, message: 'Bad Request. Coinbase Data is invalid.'};
+    }
+
+    if (output[0].amount !== utils.mining_pow) {
+        return {cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.'};
+    }
+
+    return {cb: true};
+
+}
+
+function isValidBlock(block: BlockLike): BlockValidationInvalidResult | BlockValidationValidResult {
+    const { index, previousHash, transactions, timestamp, nonce, hash } = block;
+
+    if ((!index && index !== 0) || (!previousHash && index !== 0) || !transactions || !timestamp || !nonce || !hash) {
         return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
     }
 
-    let forktype = "none";
-    let forkchain = "none";
-    let forkparent = "none"
+    let forkchain = "main";
+    let forktype: "child" | "newfork" = "child";
+    let forkparent = "main"
 
     if (index === 0) {
 
         const isGenesisBlockResult = blockchain.isValidGenesisBlock(hash);
 
-        if (!isGenesisBlockResult.isGenesisBlock) return {cb: false, status: 400, message: 'Bad Request. Block is not a valid Genesis Block.'};
-
-        forkchain = "main";
-        forktype = "child";
-        forkparent = "main";
+        if (!isGenesisBlockResult.isGenesisBlock)
+            return {cb: false, status: 400, message: 'Bad Request. Block is not a valid Genesis Block.'};
 
         if (isGenesisBlockResult.isForkOFGenesisBlock) {
             forkchain = hash;
@@ -141,6 +190,8 @@ function isValidBlock(block: BlockLike) {
             if (!previousBlockInfoExists) {
                 return {cb: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain'};   
             }
+        } else {
+            return {cb: false, status: 500, message: 'Internal Server Error. LatestBlockInfoData could not be readed.'};
         }
 
     }
@@ -156,12 +207,14 @@ function isValidBlock(block: BlockLike) {
         return {cb: false, status: 400, message: 'Bad Request. Block hash is invalid.'};
     }
 
-    if (coinbase.amount !== utils.mining_pow) {
-        return {cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.'};
+    const isValidCoinbaseTransactionResult = isValidCoinbaseTransaction(transactions[0])
+
+    if (!isValidCoinbaseTransactionResult.cb) {
+        return isValidCoinbaseTransactionResult;
     }
   
     // Ensure that the block contains valid transactions (add your validation logic here)
-    for (const [, transactionData] of Object.entries(transactions)) {
+    for (const transactionData of transactions) {
         const transactionsValid = isValidTransaction(transactionData);
         if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
     }

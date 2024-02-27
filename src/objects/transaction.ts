@@ -19,6 +19,7 @@ export interface TransactionLike {
     input: TXInput[];
     output: TXOutput[];
     signature: string;
+    coinbase?: boolean;
 
 }
 
@@ -56,14 +57,18 @@ export class Transaction implements TransactionLike {
     public input: TXInput[];
     public output: TXOutput[];
     public signature: string;
+    public coinbase?: boolean;
 
-    constructor(txid: string, senderAddress: string, publicKey: string, input: TXInput[], output: TXOutput[], signature: string) {
+    constructor(txid: string, senderAddress: string, publicKey: string, input: TXInput[], output: TXOutput[], signature: string, coinbase?: boolean) {
         this.txid = txid;
         this.senderAddress = senderAddress;
         this.publicKey = publicKey;
         this.output = output;
         this.input = input;
         this.signature = signature;
+        if (coinbase) {
+            this.coinbase = coinbase;
+        }
     }
 
     public static initFromJSON(preset: TransactionLike) {

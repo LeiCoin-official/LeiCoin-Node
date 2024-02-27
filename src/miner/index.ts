@@ -75,11 +75,9 @@ function afterMiningLogic(blockResult: Block) {
 		blockchain.updateLatestBlockInfo("main", blockResult);
 		mempool.clearMempoolbyBlock(blockResult);
 
-		blockchain.addUTXOS({txid: blockResult.hash, index: 0, recipientAddress: blockResult.coinbase.minerAddress, amount: blockResult.coinbase.amount}, true);
-
 		for (const [, transactionData] of Object.entries(blockResult.transactions)) {
 			blockchain.deleteUTXOS(transactionData);
-			blockchain.addUTXOS(transactionData, false);
+			blockchain.addUTXOS(transactionData);
 		}
 
 		utils.events.emit("block_receive", LeiCoinNetDataPackage.create("block", blockResult));
