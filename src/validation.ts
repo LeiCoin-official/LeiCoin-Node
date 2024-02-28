@@ -54,12 +54,12 @@ function isValidTransaction(transaction: TransactionLike) {
         return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
     }
 
-    if (!senderAddress.startsWith("lc1-")) {
+    if (!senderAddress.startsWith("lc0x")) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress is not a LeiCoin Address."};
     }
 
     const publicKeyPEM = cryptoHandler.decodeEncodedPublicKeyToPublicKey(publicKey);
-    if (crypto.createHash('sha256').update(publicKeyPEM).digest('hex') !== senderAddress.slice(4)) {
+    if (("lc0x" + crypto.createHash('sha256').update(publicKeyPEM).digest('hex').slice(0, 38)) !== senderAddress) {
         return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
     }
 
@@ -88,12 +88,13 @@ function isValidTransaction(transaction: TransactionLike) {
             return {cb: false, status: 500, message: 'Internal Server Error. Transaction includes input UTXO that could not be readed.'};
         }
         added_input_utxos.push(input_utxo.utxoid);
-        utxo_input_amount += utxoData.data.amount;
+        if (typeof(utxoData.data?.amount) == "number")
+            utxo_input_amount += utxoData.data.amount;
     }
 
     for (let output_utxo of output) {
 
-        if (!output_utxo.recipientAddress.startsWith("lc1-")) {
+        if (!output_utxo.recipientAddress.startsWith("lc0x")) {
             return {cb: false, status: 400, message: "Bad Request. RecipientAddress of some Output is not a LeiCoin Address."};
         }
 
@@ -150,7 +151,7 @@ function isValidBlock(block: BlockLike): BlockValidationInvalidResult | BlockVal
 
     let forkchain = "main";
     let forktype: "child" | "newfork" = "child";
-    let forkparent = "main"
+    let forkparent = "main";
 
     if (index === 0) {
 
@@ -212,12 +213,14 @@ function isValidBlock(block: BlockLike): BlockValidationInvalidResult | BlockVal
     if (!isValidCoinbaseTransactionResult.cb) {
         return isValidCoinbaseTransactionResult;
     }
-  
-    // Ensure that the block contains valid transactions (add your validation logic here)
-    for (const transactionData of transactions) {
-        const transactionsValid = isValidTransaction(transactionData);
-        if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
+    
+    if (forkchain === "main" || forktype === "newfork") {
+        for (const transactionData of transactions) {
+            const transactionsValid = isValidTransaction(transactionData);
+            if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
+        }
     }
+    // Ensure that the block contains valid transactions
     return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forkchain: forkchain, forktype: forktype, forkparent: forkparent};
 }
   

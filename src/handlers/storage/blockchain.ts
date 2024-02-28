@@ -4,7 +4,7 @@ import path from "path";
 import mempool, { MempoolWithUnconfirmedUTXOS } from "./mempool.js";
 import Block from "../../objects/block.js";
 import { Callbacks } from "../../utils/callbacks.js";
-import { LatestBlockInfo } from "./fileDataStructures.js";
+import { LatestBlockInfo, UTXOFileData } from "./fileDataStructures.js";
 import cli from "../../utils/cli.js";
 import Transaction from "../../objects/transaction.js";
 
@@ -111,167 +111,7 @@ class Blockchain {
         }
     }
     */
-    
-    // Function to read a transaction
-    public getTransaction(txID: any) {
-        const txFilePath = this.getBlockchainDataFilePath(`/transactions/${txID}.json`);
-        try {
-            if (fs.existsSync(txFilePath)) {
-                const data = fs.readFileSync(txFilePath, 'utf8');
-                return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
-            } else {
-                cli.data_message.error(`Transaktion ${txID} was not found`);
-                return {cb: Callbacks.NONE}
-            }
-        } catch (err: any) {
-            cli.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
-            return {cb: Callbacks.ERROR};
-        }
-    }
-    
-    // Function to write a UTXO
-    public addUTXOS(transactionData: Transaction, fork = "main") {
 
-        // Iterate through the recipients in the output array
-        for (const [index, output] of transactionData.output.entries()) {
-            const recipientAddress = output.recipientAddress;
-            try {
-    
-                const directoryPath = `/utxos/${recipientAddress.slice(4, 8)}`;
-                const filePath = `${recipientAddress.slice(8, 12)}.json`;
-        
-                // Ensure the existence of the directory and file for the recipient
-                this.ensureFileExists(`${directoryPath}/${filePath}`, '{}');
-    
-                // Read existing UTXOs from the recipient's file
-                const fullFilePath = this.getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
-                const existingData = fs.readFileSync(fullFilePath, 'utf8');
-                const existingUTXOs = JSON.parse(existingData);
-    
-                if (!existingUTXOs[recipientAddress]) existingUTXOs[recipientAddress] = {};
-    
-                // Add UTXOs to the recipient's file
-                existingUTXOs[recipientAddress][`${transactionData.txid}_${index}`] = {
-                    amount: output.amount
-                };
-    
-                // Write the updated UTXOs back to the recipient's file
-                fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2));
-            } catch (err: any) {
-                cli.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
-                return { cb: Callbacks.ERROR };
-            }
-        }
-    
-        return { cb: Callbacks.SUCCESS };
-    }
-    
-    // Function to read a UTXO
-    public getUTXOS(recipientAddress: string, utxoid: string | null = null, fork = "main") {
-    
-        try {
-    
-            const directoryPath = `/utxos/${recipientAddress.slice(4, 8)}`;
-            const filePath = `${recipientAddress.slice(8, 12)}.json`;
-    
-            // Check if the UTXO file for the address exists
-            const fullFilePath = this.getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
-            if (fs.existsSync(fullFilePath)) {
-                const existingData = fs.readFileSync(fullFilePath, 'utf8');
-                const existingUTXOs = JSON.parse(existingData);
-    
-                if (mempool instanceof MempoolWithUnconfirmedUTXOS) {
-                    if (mempool.deleted_utxos[recipientAddress]) {
-                        for (const [utxoid, ] of Object.entries(mempool.deleted_utxos[recipientAddress])) {
-                            delete existingUTXOs[recipientAddress][utxoid];
-                        }
-                    }
-                    if (mempool.added_utxos[recipientAddress]) {
-                        for (const [added_utxo, added_utxo_content] of Object.entries(mempool.added_utxos[recipientAddress])) {
-                            existingUTXOs[recipientAddress][added_utxo] = added_utxo_content;
-                        }
-                    }
-                }
-    
-                if (!existingUTXOs[recipientAddress]) {
-                    return { cb: Callbacks.NONE };
-                }
-    
-                if (utxoid === null) {
-                    return { cb: Callbacks.SUCCESS, data: existingUTXOs[recipientAddress] };
-                }
-    
-                if (utxoid !== null) {
-                    const utxo = existingUTXOs[recipientAddress][utxoid];
-                
-                    if (utxo) {
-                        return { cb: Callbacks.SUCCESS, data: utxo };
-                    }
-                }
-    
-                return { cb: Callbacks.NONE };
-            } else {
-                return { cb: Callbacks.NONE };
-            }
-        } catch (err: any) {
-            cli.data_message.error(`Error reading UTXOs for recipient address ${recipientAddress}: ${err.message}`);
-            return { cb: Callbacks.ERROR };
-        }
-    }
-    
-    
-    // Function to delete a UTXO
-    public deleteUTXOS(transactionData: { senderAddress: any; input: any; }) {
-    
-        try {
-    
-            const senderAddress = transactionData.senderAddress;
-    
-            const directoryPath = `/utxos/${senderAddress.slice(4, 8)}`;
-            const filePath = `${senderAddress.slice(8, 12)}.json`;
-    
-            // Check if the UTXO file for the address exists
-            const fullFilePath = this.getBlockchainDataFilePath(`${directoryPath}/${filePath}`);
-            if (fs.existsSync(fullFilePath)) {
-                const existingData = fs.readFileSync(fullFilePath, 'utf8');
-                const existingUTXOs = JSON.parse(existingData);
-    
-                if (!existingUTXOs[senderAddress]) {
-                    return { cb: Callbacks.NONE };
-                }
-    
-                for (const input of transactionData.input) {
-    
-                    // Find the UTXO to delete
-                    const utxoKey = `${input.txid}_${input.index}`;
-                    if (existingUTXOs[senderAddress][utxoKey]) {
-                        // Remove the UTXO from the object
-                        delete existingUTXOs[senderAddress][utxoKey];
-                    }
-                }
-    
-                // Update the UTXO file
-                fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs, null, 2), 'utf8');
-    
-                return { cb: Callbacks.SUCCESS };
-                
-            }
-    
-            return { cb: Callbacks.NONE };
-        } catch (err: any) {
-            cli.data_message.error(`Error deleting UTXO: ${err.message}`);
-            return { cb: Callbacks.ERROR };
-        }
-    }
-
-    public addDeletedUTXOToFork() {
-
-    }
-
-    public removeDeletedUTXOToFork() {
-        
-    }
-        
     // Function to write a block
     public addBlock(block: Block, fork = "main") {
         const blockIndex = block.index;
@@ -371,7 +211,7 @@ class Blockchain {
         }
     }
     
-    public updateLatestBlockInfo(fork = "main", latestBlockInfo: { index: number, hash: string }, parentfork = "main") {
+    public updateLatestBlockInfo(latestBlockInfo: { index: number, hash: string }, fork = "main", parentfork = "main") {
         const latestBlockInfoFilePath = this.getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
         try {
     
@@ -431,13 +271,164 @@ class Blockchain {
             return { isGenesisBlock: false, isForkOFGenesisBlock: false };
         }
     }
+    
+    // Function to read a transaction
+    public getTransaction(txID: any) {
+        const txFilePath = this.getBlockchainDataFilePath(`/transactions/${txID}.json`);
+        try {
+            if (fs.existsSync(txFilePath)) {
+                const data = fs.readFileSync(txFilePath, 'utf8');
+                return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
+            } else {
+                cli.data_message.error(`Transaktion ${txID} was not found`);
+                return {cb: Callbacks.NONE}
+            }
+        } catch (err: any) {
+            cli.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
+            return {cb: Callbacks.ERROR};
+        }
+    }
+
+    private getUTXOFilePath(address: string) {
+        return `/utxos/${address.slice(0, 4)}/${address.slice(4, 8)}/${address.slice(8, 12)}.json`;
+    }
+    
+    // Function to write a UTXO
+    public addUTXOS(transactionData: Transaction) {
+
+        // Iterate through the recipients in the output array
+        for (const [index, output] of transactionData.output.entries()) {
+            const recipientAddress = output.recipientAddress;
+            try {
+    
+                const utxoFilePath = this.getUTXOFilePath(recipientAddress);
+        
+                // Ensure the existence of the directory and file for the recipient
+                this.ensureFileExists(utxoFilePath, '{}');
+    
+                // Read existing UTXOs from the recipient's file
+                const fullFilePath = this.getBlockchainDataFilePath(utxoFilePath);
+                const existingData = fs.readFileSync(fullFilePath, 'utf8');
+                const existingUTXOs: UTXOFileData = JSON.parse(existingData);
+    
+                if (!existingUTXOs[recipientAddress]) existingUTXOs[recipientAddress] = {};
+    
+                // Add UTXOs to the recipient's file
+                existingUTXOs[recipientAddress][`${transactionData.txid}_${index}`] = {
+                    amount: output.amount
+                };
+    
+                // Write the updated UTXOs back to the recipient's file
+                fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs));
+            } catch (err: any) {
+                cli.data_message.error(`Error writing UTXOs for recipient address ${recipientAddress}: ${err.message}`);
+                return { cb: Callbacks.ERROR };
+            }
+        }
+    
+        return { cb: Callbacks.SUCCESS };
+    }
+    
+    // Function to read a UTXO
+    public getUTXOS(address: string, utxoid: string | null = null) {
+    
+        try {
+    
+            const utxoFilePath = this.getUTXOFilePath(address);
+    
+            // Check if the UTXO file for the address exists
+            const fullFilePath = this.getBlockchainDataFilePath(utxoFilePath);
+            if (fs.existsSync(fullFilePath)) {
+                const existingData = fs.readFileSync(fullFilePath, 'utf8');
+                const existingUTXOs: UTXOFileData = JSON.parse(existingData);
+                const addressUTXOs = existingUTXOs[address];
+
+                if (!addressUTXOs) {
+                    return { cb: Callbacks.NONE };
+                }
+
+                if (mempool instanceof MempoolWithUnconfirmedUTXOS) {
+                    if (mempool.deleted_utxos[address]) {
+                        for (const [utxoid, ] of Object.entries(mempool.deleted_utxos[address])) {
+                            delete addressUTXOs[utxoid];
+                        }
+                    }
+                    if (mempool.added_utxos[address]) {
+                        for (const [added_utxo, added_utxo_content] of Object.entries(mempool.added_utxos[address])) {
+                            addressUTXOs[added_utxo] = added_utxo_content;
+                        }
+                    }
+                }
+    
+                if (utxoid === null) {
+                    return { cb: Callbacks.SUCCESS, data: addressUTXOs };
+                } else {
+                    const utxo = addressUTXOs[utxoid];
+                
+                    if (utxo) {
+                        return { cb: Callbacks.SUCCESS, data: utxo };
+                    }
+                }
+    
+                return { cb: Callbacks.NONE };
+            } else {
+                return { cb: Callbacks.NONE };
+            }
+        } catch (err: any) {
+            cli.data_message.error(`Error reading UTXOs for recipient address ${address}: ${err.message}`);
+            return { cb: Callbacks.ERROR };
+        }
+    }
+    
+    
+    // Function to delete a UTXO
+    public deleteUTXOS(transactionData: Transaction) {
+    
+        try {
+    
+            const senderAddress = transactionData.senderAddress;
+    
+            const utxoFilePath = this.getUTXOFilePath(senderAddress);
+    
+            // Check if the UTXO file for the address exists
+            const fullFilePath = this.getBlockchainDataFilePath(utxoFilePath);
+            if (fs.existsSync(fullFilePath)) {
+                const existingData = fs.readFileSync(fullFilePath, 'utf8');
+                const existingUTXOs = JSON.parse(existingData) as UTXOFileData;
+
+                if (!existingUTXOs[senderAddress]) {
+                    return { cb: Callbacks.NONE };
+                }
+        
+                for (const input of transactionData.input) {
+        
+                    if (existingUTXOs[senderAddress][input.utxoid]) {
+                        // Remove the UTXO from the object
+                        delete existingUTXOs[senderAddress][input.utxoid];
+                    }
+                }
+
+                fs.writeFileSync(fullFilePath, JSON.stringify(existingUTXOs), 'utf8');
+
+                return { cb: Callbacks.SUCCESS };
+            }
+    
+            return { cb: Callbacks.NONE };
+        } catch (err: any) {
+            cli.data_message.error(`Error deleting UTXO: ${err.message}`);
+            return { cb: Callbacks.ERROR };
+        }
+    }
 
     public createFork(name: string) {
         this.ensureDirectoryExists("/blocks", name);
-        this.ensureDirectoryExists("/utxos", name);
     }
 
     public transferForkToMain(name: string) {
+
+        const tempBlockchain = {};
+
+        //const fs.readdirSync()
 
     }
 

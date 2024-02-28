@@ -72,7 +72,7 @@ function afterMiningLogic(blockResult: Block) {
 	if (validation.isValidBlock(blockResult).cb) {
 
 		blockchain.addBlock(blockResult);
-		blockchain.updateLatestBlockInfo("main", blockResult);
+		blockchain.updateLatestBlockInfo(blockResult, "main");
 		mempool.clearMempoolbyBlock(blockResult);
 
 		for (const [, transactionData] of Object.entries(blockResult.transactions)) {
@@ -84,7 +84,7 @@ function afterMiningLogic(blockResult: Block) {
 
 		cli.miner_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
 	} else {
-		cli.miner_message.error(`Mined block with hash ${blockResult.hash} is invalid.`);
+		cli.miner_message.log(`Mined block with hash ${blockResult.hash} is invalid.`);
 	}
 }
 
@@ -105,7 +105,11 @@ async function runMinerCycle() {
 
 export default async function initMinerIfActive() {
 	if (config.miner.active) {
-		runMinerCycle();
-		cli.miner_message.log("Miner started");   
+		if (config.miner.minerAddress.startsWith("lc0x")) {
+			runMinerCycle();
+			cli.miner_message.log("Miner started");
+		} else {
+			cli.miner_message.error("Miner could not be started: Invalid Miner-Address.")
+		}
 	}
 }

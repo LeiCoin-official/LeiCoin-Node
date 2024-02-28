@@ -21,21 +21,23 @@ export default function (data: any) {
 
 			blockchain.addBlock(block, validationresult.forkchain);
 			blockchain.updateLatestBlockInfo(
-				validationresult.forkchain,
 				block,
+				validationresult.forkchain,
 				validationresult.forkparent
 			);
-			
-			mempool.clearMempoolbyBlock(block);
-	
-			for (const transactionData of block.transactions) {
-				blockchain.deleteUTXOS(transactionData);
-				blockchain.addUTXOS(transactionData);
+
+			if (validationresult.forkchain === "main") {
+				mempool.clearMempoolbyBlock(block);
+
+				for (const transactionData of block.transactions) {
+					blockchain.deleteUTXOS(transactionData);
+					blockchain.addUTXOS(transactionData);
+				}
 			}
 	
 			cli.leicoin_net_message.server.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
 		} else {
-			cli.leicoin_net_message.server.error(`Received block with hash ${block.hash} is invalid. Error: ${JSON.stringify(validationresult)}`);
+			cli.leicoin_net_message.server.log(`Received block with hash ${block.hash} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
 		}
 
 		return validationresult;
