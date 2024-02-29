@@ -29,7 +29,6 @@ class Blockchain {
         this.ensureDirectoryExists('/forks');
     
         this.ensureFileExists('/indexes/latestblockinfo.json', '{"main": {"previousBlockInfo": {}, "latestBlockInfo": {}}}');
-        this.ensureFileExists('/indexes/transactions.json', '[]');
     }
     
     
@@ -113,13 +112,13 @@ class Blockchain {
     */
 
     // Function to write a block
-    public addBlock(block: Block, fork = "main") {
+    public addBlock(block: Block, fork = "main", overwrite = false) {
         const blockIndex = block.index;
         const blockFilePath = this.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, fork);
 
         try {
             // Check if the block file already exists.
-            if (!fs.existsSync(blockFilePath)) {
+            if (!fs.existsSync(blockFilePath) || overwrite) {
                 // Write the block data to the block file.
                 fs.writeFileSync(blockFilePath, JSON.stringify(block), { encoding: 'utf8', flag: 'w' });
 
@@ -140,9 +139,9 @@ class Blockchain {
         try {
             if (fs.existsSync(blockFilePath)) {
                 const data = fs.readFileSync(blockFilePath, 'utf8');
-                return {cb: Callbacks.SUCCESS, block: Block.initFromJSON(JSON.parse(data))};
+                return {cb: Callbacks.SUCCESS, data: Block.initFromJSON(JSON.parse(data))};
             } else {
-                cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
+                //cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
                 return {cb: Callbacks.NONE};
             }
         } catch (err: any) {
@@ -272,8 +271,25 @@ class Blockchain {
         }
     }
     
+    public addTransactionsToIndex(txID: string, block: number, indexInBlock: number) {
+        try {
+            const filePath = `/utxos/${txID.slice(0, 4)}/${txID.slice(4, 8)}/${txID.slice(8, 12)}.json`;
+            const fullFilePath = this.getBlockchainDataFilePath(filePath);
+            const slicedTxID = txID.slice(12, txID.length);
+
+            this.ensureFileExists(filePath, "{}");
+
+            //fs.
+
+            return { cb: Callbacks.SUCCESS };
+        } catch (err: any) {
+            cli.data_message.error(`Error adding transaction to indexes ${txID}: ${err.message}`);
+            return { cb: Callbacks.ERROR };
+        }
+    }
+
     // Function to read a transaction
-    public getTransaction(txID: any) {
+    public getTransaction(txID: string) {
         const txFilePath = this.getBlockchainDataFilePath(`/transactions/${txID}.json`);
         try {
             if (fs.existsSync(txFilePath)) {
@@ -302,6 +318,8 @@ class Blockchain {
             try {
     
                 const utxoFilePath = this.getUTXOFilePath(recipientAddress);
+
+                const slicedAddress = recipientAddress.slice(12, recipientAddress.length);
         
                 // Ensure the existence of the directory and file for the recipient
                 this.ensureFileExists(utxoFilePath, '{}');
@@ -311,10 +329,10 @@ class Blockchain {
                 const existingData = fs.readFileSync(fullFilePath, 'utf8');
                 const existingUTXOs: UTXOFileData = JSON.parse(existingData);
     
-                if (!existingUTXOs[recipientAddress]) existingUTXOs[recipientAddress] = {};
+                if (!existingUTXOs[slicedAddress]) existingUTXOs[slicedAddress] = {};
     
                 // Add UTXOs to the recipient's file
-                existingUTXOs[recipientAddress][`${transactionData.txid}_${index}`] = {
+                existingUTXOs[slicedAddress][`${transactionData.txid}_${index}`] = {
                     amount: output.amount
                 };
     
@@ -335,13 +353,15 @@ class Blockchain {
         try {
     
             const utxoFilePath = this.getUTXOFilePath(address);
+
+            const slicedAddress = address.slice(12, address.length);
     
             // Check if the UTXO file for the address exists
             const fullFilePath = this.getBlockchainDataFilePath(utxoFilePath);
             if (fs.existsSync(fullFilePath)) {
                 const existingData = fs.readFileSync(fullFilePath, 'utf8');
                 const existingUTXOs: UTXOFileData = JSON.parse(existingData);
-                const addressUTXOs = existingUTXOs[address];
+                const addressUTXOs = existingUTXOs[slicedAddress];
 
                 if (!addressUTXOs) {
                     return { cb: Callbacks.NONE };
@@ -387,6 +407,8 @@ class Blockchain {
         try {
     
             const senderAddress = transactionData.senderAddress;
+
+            const slicedAddress = senderAddress.slice(12, senderAddress.length);
     
             const utxoFilePath = this.getUTXOFilePath(senderAddress);
     
@@ -396,15 +418,15 @@ class Blockchain {
                 const existingData = fs.readFileSync(fullFilePath, 'utf8');
                 const existingUTXOs = JSON.parse(existingData) as UTXOFileData;
 
-                if (!existingUTXOs[senderAddress]) {
+                if (!existingUTXOs[slicedAddress]) {
                     return { cb: Callbacks.NONE };
                 }
         
                 for (const input of transactionData.input) {
         
-                    if (existingUTXOs[senderAddress][input.utxoid]) {
+                    if (existingUTXOs[slicedAddress][input.utxoid]) {
                         // Remove the UTXO from the object
-                        delete existingUTXOs[senderAddress][input.utxoid];
+                        delete existingUTXOs[slicedAddress][input.utxoid];
                     }
                 }
 
@@ -424,11 +446,39 @@ class Blockchain {
         this.ensureDirectoryExists("/blocks", name);
     }
 
-    public transferForkToMain(name: string) {
+    public transferForkToMain(fork: string) {
 
-        const tempBlockchain = {};
+        try {
 
-        //const fs.readdirSync()
+            const tempBlockchain = {};
+
+            const forkBlocks = fs.readdirSync(this.getBlockchainDataFilePath("/blocks", fork));
+
+            forkBlocks.sort((a: string, b: string) => {
+                const numA = parseInt(a.split('.')[0]);
+                const numB = parseInt(b.split('.')[0]);
+                return numA - numB;
+            });
+
+            for (const blockFile of forkBlocks) {
+
+                const blockIndex = parseInt(blockFile.split('.')[0]);
+
+                const block = this.getBlock(blockIndex, fork).data;
+                if (!block) {
+                    return { cb: Callbacks.ERROR };
+                }
+
+                const blockInMain = this.getBlock(blockIndex);
+
+            }
+
+            return { cb: Callbacks.SUCCESS };
+
+        } catch (err: any) {
+            cli.data_message.error(`Error transfering Fork ${fork} to Main Blockchain: ${err.message}`);
+            return { cb: Callbacks.ERROR };
+        }
 
     }
 
