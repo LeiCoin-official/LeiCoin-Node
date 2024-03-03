@@ -57,7 +57,7 @@ export class Block implements BlockLike {
 
         const coinbase = new Transaction(
             "",
-            "coinbase",
+            "lc0x6c6569636f696e6e65745f636f696e62617365",
             "coinbase", 
             [{
                 utxoid: "coinbase"

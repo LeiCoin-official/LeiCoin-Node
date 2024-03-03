@@ -1,38 +1,4 @@
-import { Level } from "level";
-import path from "path";
 
-function stringToHex(stringData: string) {
-  return Buffer.from(stringData).toString("hex");
-}
-
-function hexToString(hexData: string) {
-    return Buffer.from(hexData, "hex").toString();
-}
-
-function encodeAddressToHexKey(address: string) {
-	return address.slice(2, address.length).replace("x", "0");
-}
-
-function decodeHexKeyToAddress(hexKey: string) {
-	const splitetHexKey = hexKey.split("");
-   	splitetHexKey[1] = splitetHexKey[1].replace("0", "x");
-   	const address = "lc" + splitetHexKey.join("");
-   	return address;
-}
-
-const address = "0001da74f8d1cf98760388643407cd1d4bc19f28";
-const myhex = "7b0001da74f8d1cf98760388643407cd1d4bc19f287d";
-
-
-console.log(hexToString(myhex).split(hexToString()))
-
-async function main() {
-
-    const utxosIndex = new Level(path.join(process.cwd(), "/blockchain_data/utxos"), {keyEncoding: "hex", valueEncoding: "hex"});
-
-}
-
-/*
 
 how the utxo database should work:
 
@@ -41,21 +7,33 @@ keys:
 my address: lc0x01da74f8d1cf98760388643407cd1d4bc19f28
 
 remove lc prefix and convert the x to 0:
-0001da74f8d1cf98760388643407cd1d4bc19f28
-<><------------------------------------>
-version        address
+00|01da74f8d1cf98760388643407cd1d4bc19f28
+<> <------------------------------------>
+d1            d2
+
+d1 = version
+d2 = address
 
 this data is now the encoded hex data thats used for the key.
 
 values:
 
+015fa1fb33996a457b08f0dd7d908add0af3915a0ccacdef66fa592a3bcbe1b7|1|0|01|1E3D1
+<--------------------------------------------------------------> | | <> <--->
+                         d1                                    d2 d3 d4  d5
 
 
-*/
+d1 = txid
+d2 = utxo height lenght (1 digit)
+d3 = utxo_height
+d4 = tx amount lenght (2 digits)
+d5 = amunt of uxto E(number) stands for a amount of zeros. D marks the decimal point (e and d is not reuqired)
 
-//main();
+then the we can add this data mutiple lines
 
-/*
+
+
+
 function calculateEfficienty(wallets: number, utxos_per_wallet: number) {
 
     const hash = 32;
@@ -85,4 +63,3 @@ function calculateEfficienty(wallets: number, utxos_per_wallet: number) {
 }
 
 calculateEfficienty(100000000, 10);
-*/
