@@ -1,21 +1,10 @@
-function base64EncodeToString(data: string) {
-    return Buffer.from(data).toString('base64');
-}
+import crypto from "crypto";
 
-function base64EncodeToBuffer(data: string) {
-    return Buffer.from(data, 'base64');
-}
-
-function base64DecodeToString(data: string) {
-    return Buffer.from(data, 'base64').toString();
-}
-
-function encodePublicKeyToEncodedPublicKey(public_key_pem: string) {
-    return base64EncodeToString(public_key_pem);
-}
-
-function decodeEncodedPublicKeyToPublicKey(encoded_public_key: string) {
-    return base64DecodeToString(encoded_public_key);
+function createHash(obj: { [key: string]: any }, excludedKeys: string[] = []) {
+    return crypto.createHash('sha256')
+        .update(JSON.stringify(
+            getPreparedObjectForHashing(obj, excludedKeys)
+        )).digest('hex');
 }
 
 function getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: string[] = []): { [key: string]: any } {
@@ -44,11 +33,7 @@ function getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: 
 }
 
 export default {
-    base64EncodeToString,
-    base64DecodeToString,
-    base64EncodeToBuffer,
-    encodePublicKeyToEncodedPublicKey,
-    decodeEncodedPublicKeyToPublicKey,
+    createHash,
     getPreparedObjectForHashing
 }
 

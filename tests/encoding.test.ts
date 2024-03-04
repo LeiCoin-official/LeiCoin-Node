@@ -1,22 +1,6 @@
-import config from "../handlers/configHandler.js";
-import cryptoHandlers from "../handlers/cryptoHandlers.js";
-import encodingHandlers from "../handlers/encodingHandlers.js";
-import utils from "../utils/utils.js";
+import cryptoHandlers from "../src/handlers/cryptoHandlers.js";
+import encodingHandlers from "../src/handlers/encodingHandlers.js";
 
-export interface TransactionLike {
-
-    txid: string;
-    senderAddress: string;
-    senderPublicKey: string;
-    recipientAddress: string;
-    amount: string;
-    nonce: string;
-    timestamp: string
-    message: string;
-    signature: string;
-    readonly version: string;
-
-}
 export class Transaction {
 
     public txid: string;
@@ -48,8 +32,8 @@ export class Transaction {
             "",
             "lc0x6c6569636f696e6e65745f636f696e62617365",
             "",
-            config.miner.minerAddress,
-            utils.mining_pow,
+            "lc0x6c6569636f696e6e65745f636f696e62617365",
+            "50",
             "0",
             new Date().getTime().toString(),
             "",
@@ -122,7 +106,7 @@ export class Transaction {
             if (data.version === "00") {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
-                return utils.createInstanceFromJSON(Transaction, data);
+                return createInstanceFromJSON(Transaction, data);
             }
         } catch (err: any) {
             console.log(err.message);
@@ -135,5 +119,34 @@ export class Transaction {
 
 }
 
+interface Constructable<T> {
+    new (...args: any[]): T;
+}
 
-export default Transaction;
+
+function createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
+    // Retrieve the constructor of the class
+    const constructor = cls as any;
+
+    // Retrieve the parameter names of the constructor
+    const paramNames = constructor.toString().match(/\(([^)]+)\)/)?.[1].split(',').map((param: string) => param.trim()) || [];
+
+    // Create an array of arguments for the constructor
+    const args = paramNames.map((paramName: string) => json[paramName]);
+
+    // Instantiate the class with the arguments
+    const instance = Reflect.construct(cls, args);
+
+    // Return the instance
+    return instance;
+}
+
+describe('Encoding Testing', () => {
+    test('Test Transaction Enoding And Decoding', () => {
+        const tx = Transaction.createCoinbaseTransaction();
+        const encoded = tx.encodeToHex();
+        const decoded = Transaction.fromDecodedHex(encoded);
+
+        expect(JSON.stringify(tx)).toBe(JSON.stringify(decoded));
+    });
+});

@@ -1,12 +1,12 @@
-import utils from "../../utils/utils.js";
+import utils from "../utils/utils.js";
 import fs from "fs";
 import path from "path";
 import mempool, { MempoolWithUnconfirmedUTXOS } from "./mempool.js";
-import Block from "../../objects/block.js";
-import { Callbacks } from "../../utils/callbacks.js";
+import Block from "../objects/block.js";
+import { Callbacks } from "../utils/callbacks.js";
 import { LatestBlockInfo, UTXOFileData } from "./fileDataStructures.js";
-import cli from "../../utils/cli.js";
-import Transaction from "../../objects/transaction.js";
+import cli from "../utils/cli.js";
+import Transaction from "../objects/transaction.js";
 
 class Blockchain {
 

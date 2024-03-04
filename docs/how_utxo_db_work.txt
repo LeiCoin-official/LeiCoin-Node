@@ -24,9 +24,9 @@ values:
 
 
 d1 = txid
-d2 = utxo height lenght (1 digit)
+d2 = utxo height length (1 digit)
 d3 = utxo_height
-d4 = tx amount lenght (2 digits)
+d4 = tx amount length (2 digits)
 d5 = amunt of uxto E(number) stands for a amount of zeros. D marks the decimal point (e and d is not reuqired)
 
 then the we can add this data mutiple lines

@@ -1,13 +1,11 @@
 import crypto from "crypto";
-import config from "../handlers/configHandler.js";
 import utils from "../utils/utils.js";
 import { Transaction, TransactionLike } from "./transaction.js";
-import mempool from "../handlers/storage/mempool.js";
-import blockchain from "../handlers/storage/blockchain.js";
-import cryptoHandlers from "../handlers/cryptoHandlers.js";
+import mempool from "../storage/mempool.js";
+import blockchain from "../storage/blockchain.js";
 
 export interface BlockLike {
-    index: number;
+    index: bigint;
     hash: string;
     previousHash: string;
     timestamp: number;
@@ -17,7 +15,7 @@ export interface BlockLike {
 
 export class Block implements BlockLike {
 
-    public index: number;
+    public index: bigint;
     public hash: string;
     public previousHash: string;
     public timestamp: number;
@@ -25,11 +23,11 @@ export class Block implements BlockLike {
     public transactions: Transaction[];
 
     constructor(
-        index: number,
+        index: string,
         hash: string,
         previousHash: string,
-        timestamp: number,
-        nonce: number,
+        timestamp: string,
+        nonce: string,
         transactions: Transaction[],
     ) {
 
@@ -55,35 +53,17 @@ export class Block implements BlockLike {
         if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = '';
         else previousHash = previousBlock.hash;
 
-        const coinbase = new Transaction(
-            "",
-            "lc0x6c6569636f696e6e65745f636f696e62617365",
-            "coinbase", 
-            [{
-                utxoid: "coinbase"
-            }],
-            [{
-                recipientAddress: config.miner.minerAddress,
-                amount: utils.mining_pow
-            }],
-            "coinbase",
-            true
-        )
-
-        coinbase.txid = crypto.createHash('sha256')
-            .update(JSON.stringify(
-                cryptoHandlers.getPreparedObjectForHashing(coinbase, ["txid", "coinbase"])
-            )).digest('hex');
+        const coinbase = Transaction.createCoinbaseTransaction();
 
         const transactions = Object.values(mempool.transactions);
         transactions.unshift(coinbase)
     
         return new Block(
-            newIndex,
+            newIndex.toString(),
             '',
             previousHash,
-            new Date().getTime(),
-            0,
+            new Date().getTime().toString(),
+            "0",
             transactions
         );
 

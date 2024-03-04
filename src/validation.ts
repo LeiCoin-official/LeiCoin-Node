@@ -1,9 +1,9 @@
 import crypto from "crypto";
 import cryptoHandler from "./handlers/cryptoHandlers.js";
 import { TransactionLike } from "./objects/transaction.js";
-import mempool from "./handlers/storage/mempool.js";
+import mempool from "./storage/mempool.js";
 import { BlockLike } from "./objects/block.js";
-import blockchain from "./handlers/storage/blockchain.js";
+import blockchain from "./storage/blockchain.js";
 import { Callbacks } from "./utils/callbacks.js";
 import utils from "./utils/utils.js";
 
@@ -122,7 +122,7 @@ function isValidCoinbaseTransaction(coinbaseTransaction: TransactionLike): {
 
     const { txid, senderAddress, publicKey, output, input, signature, coinbase } = coinbaseTransaction;
 
-    if (!txid || !senderAddress || !publicKey || !output || !signature || !input || !coinbase) {
+    if (!txid || !senderAddress || !publicKey || !output || !signature || !input ||) {
         return {cb: false, status: 400, message: "Bad Request. Invalid Coinbase arguments."};
     }
 

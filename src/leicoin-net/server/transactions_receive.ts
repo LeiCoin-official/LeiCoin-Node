@@ -1,4 +1,4 @@
-import mempool, { MempoolWithUnconfirmedUTXOS } from "../../handlers/storage/mempool.js";
+import mempool, { MempoolWithUnconfirmedUTXOS } from "../../storage/mempool.js";
 import Transaction from "../../objects/transaction.js";
 import { AddedUTXO, DeletedUTXO } from "../../objects/utxo.js";
 import { Callbacks } from "../../utils/callbacks.js";

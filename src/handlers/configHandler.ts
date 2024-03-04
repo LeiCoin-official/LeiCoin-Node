@@ -15,9 +15,6 @@ interface DefaultConfigInterface {
         host: string;
         port: number;
     };
-    mempool: {
-        allowUnconfirmedUTXOS: boolean;
-    };
     miner: {
         active: boolean;
         number_of_threads: number;

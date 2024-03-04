@@ -3,7 +3,7 @@ const router = express.Router();
 import validation from "../validation.js";
 import utils from "../utils/utils.js";
 import { AddedUTXO, DeletedUTXO } from "../objects/utxo.js";
-import mempool, { MempoolWithUnconfirmedUTXOS } from "../handlers/storage/mempool.js";
+import mempool, { MempoolWithUnconfirmedUTXOS } from "../storage/mempool.js";
 import { Callbacks } from "../utils/callbacks.js";
 import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
 

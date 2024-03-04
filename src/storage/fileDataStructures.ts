@@ -10,11 +10,3 @@ export interface LatestBlockInfo {
         };
     }
 }
-
-export interface UTXOFileData {
-    [address: string]: {
-        [utxoid: string]: {
-            amount: number;
-        };
-    };
-}

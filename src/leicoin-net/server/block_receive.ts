@@ -1,5 +1,5 @@
-import blockchain from "../../handlers/storage/blockchain.js";
-import mempool from "../../handlers/storage/mempool.js";
+import blockchain from "../../storage/blockchain.js";
+import mempool from "../../storage/mempool.js";
 import Block from "../../objects/block.js";
 import cli from "../../utils/cli.js";
 import utils from "../../utils/utils.js";
