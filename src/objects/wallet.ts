@@ -1,13 +1,15 @@
-import encodingHandlers from "../handlers/encodingHandlers";
+import encodingHandlers from "../handlers/encodingHandlers.js";
+import BigNum from "../utils/bigNum.js";
+import cli from "../utils/cli.js";
 
 export class Wallet {
 
     public readonly owner: string;
-    private balance: bigint;
-    private nonce: number;
+    private balance: string;
+    private nonce: string;
     public readonly version: string;
 
-    constructor(owner: string, balance: bigint, nonce: number, verion = "00") {
+    constructor(owner: string, balance: string, nonce: string, verion = "00") {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;
@@ -15,10 +17,10 @@ export class Wallet {
     }
 
     public static createEmptyWallet(owner: string) {
-        return new Wallet(owner, BigInt(0), 0,);
+        return new Wallet(owner, "0", "0");
     }
 
-    public encodeToHex() {
+    public encodeToHex(add_empty_bytes = true) {
     
         const encoded_balance = encodingHandlers.compressZeros(this.balance.toString());
         const balance_length = encoded_balance.length.toString().padStart(2, "0");
@@ -32,7 +34,7 @@ export class Wallet {
                         nonce_length + 
                         encoded_nonce;
 
-        const empty_bytes = hexData.length % 2 !== 0 ? "0" : "";
+        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
         
         return hexData + empty_bytes;
     
@@ -40,39 +42,33 @@ export class Wallet {
     
     public static fromDecodedHex(ownerAddress: string, hexData: string) {
 
-        const version = hexData.substring(0, 2);
-    
-        if (version === "00") {
-    
-            const balance_length_string = hexData.substring(2, 4);
-            const balance_length = parseInt(balance_length_string);
+        try {
 
-            const raw_balance = hexData.substring(4, 4 + balance_length);
-            const decoded_balance = BigInt(encodingHandlers.decompressZeros(raw_balance));
-    
-            const nonce_length_string = hexData.substring(4 + balance_length, 6 + balance_length);
-            const nonce_length = parseInt(nonce_length_string);
+            const resultData = encodingHandlers.splitHex(hexData, [
+                {key: "version", length: 2},
+                {key: "balance_length", length: 2},
+                {key: "balance", length: "balance_length"},
+                {key: "nonce_length", length: 2},
+                {key: "nonce", length: "nonce_length"},
+            ]);
 
-            const raw_nonce = hexData.substring(6 + balance_length, 6 + balance_length + nonce_length);
-            const decoded_nonce = parseInt(raw_nonce);
-                
-            if (
-                (version.length !== 2) ||
-                (balance_length_string.length !== 2) ||
-                (raw_balance.length !== balance_length) ||
-                (nonce_length_string.length !== 2) ||
-                (raw_nonce.length !== nonce_length)
-            ) {
-                return Wallet.createEmptyWallet(ownerAddress);
+            const data = resultData.data;
+        
+            if (data && data.version === "00") {
+                data.balance = encodingHandlers.decompressZeros(data.balance);
+                data.nonce = encodingHandlers.decompressZeros(data.nonce);
+
+                return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }
 
-            return new Wallet(ownerAddress, decoded_balance, decoded_nonce, version);
+        } catch (err: any) {
+            cli.data_message.error(`Error loading Wallet from Decoded Hex: ${err.message}`);
         }
 
         return Wallet.createEmptyWallet(ownerAddress);
     }
 
-    public addMoney(amount: bigint) {
+    public addMoney(amount: string) {
         this.balance += amount;
     }
 
@@ -80,17 +76,17 @@ export class Wallet {
         return this.balance;
     }
 
-    public isSubtractMoneyPossible(amount: bigint) {
-        if (amount <= this.balance) {
+    public isSubtractMoneyPossible(amount: string) {
+        if (BigNum.lessOrEqual(amount, this.balance)) {
             return true;
         }
         return false;
     }
 
-    public subtractMoneyIFPossible(amount: bigint) {
+    public subtractMoneyIFPossible(amount: string) {
 
         if (this.isSubtractMoneyPossible(amount)) {
-            this.balance -= amount;
+            this.balance = BigNum.subtract(this.balance, amount);
         }
     }
 
@@ -99,7 +95,7 @@ export class Wallet {
     }
 
     public adjustNonce() {
-        this.nonce += 1;
+        this.nonce = BigNum.add(this.nonce, "1");
     }
 
 }

@@ -210,12 +210,12 @@ class Blockchain {
         }
     }
     
-    public updateLatestBlockInfo(latestBlockInfo: { index: number, hash: string }, fork = "main", parentfork = "main") {
+    public updateLatestBlockInfo(latestBlockInfo: { index: string, hash: string }, fork = "main", parentfork = "main") {
         const latestBlockInfoFilePath = this.getBlockchainDataFilePath(`/indexes/latestblockinfo.json`);
         try {
     
             const latestBlockInfoFileData = this.getLatestBlockInfo().data;
-
+            
             const previousBlockInfo = latestBlockInfoFileData[parentfork].latestBlockInfo;
 
             latestBlockInfoFileData[fork] = {

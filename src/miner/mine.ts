@@ -24,7 +24,7 @@ function mineBlock() {
 	}	
 
 	while (!stopMining) {
-		block.nonce = modifyedBlock.nonce = Math.floor(Math.random() * 4294967296); // Generate a random 32-bit nonce
+		block.nonce = modifyedBlock.nonce = Math.floor(Math.random() * 4294967296).toString(); // Generate a random 32-bit nonce
 		calculateHash();
 
 		if (block.hash.substring(0, workerData.mining_difficulty) === '0'.repeat(workerData.mining_difficulty)) {

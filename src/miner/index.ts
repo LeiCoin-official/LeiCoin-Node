@@ -105,7 +105,7 @@ async function runMinerCycle() {
 
 export default async function initMinerIfActive() {
 	if (config.miner.active) {
-		if (config.miner.minerAddress.startsWith("lc0x")) {
+		if (config.miner.minerAddress.startsWith("lc0x") && config.miner.minerAddress.length == 42) {
 			runMinerCycle();
 			cli.miner_message.log("Miner started");
 		} else {

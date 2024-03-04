@@ -1,11 +1,11 @@
 export interface LatestBlockInfo {
     [fork: string]: {
         previousBlockInfo: {
-            index: number;
+            index: string;
             hash: string;
         };
         latestBlockInfo: {
-            index: number;
+            index: string;
             hash: string;
         };
     }

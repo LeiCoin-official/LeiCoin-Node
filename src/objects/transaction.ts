@@ -2,6 +2,8 @@ import config from "../handlers/configHandler.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import encodingHandlers from "../handlers/encodingHandlers.js";
 import utils from "../utils/utils.js";
+import { Callbacks } from "../utils/callbacks.js";
+import cli from "../utils/cli.js";
 
 export interface TransactionLike {
 
@@ -17,7 +19,8 @@ export interface TransactionLike {
     readonly version: string;
 
 }
-export class Transaction {
+
+export class Transaction implements TransactionLike {
 
     public txid: string;
     public senderAddress: string;
@@ -61,7 +64,7 @@ export class Transaction {
 
     public encodeToHex(add_empty_bytes = false) {
 
-        const encoded_senderPublicKey = encodingHandlers.stringToHex(this.senderPublicKey);
+        const encoded_senderPublicKey = encodingHandlers.base64ToHex(this.senderPublicKey);
         const senderPublicKey_length = encoded_senderPublicKey.length.toString().padStart(3, "0");        
     
         const encoded_amount = encodingHandlers.compressZeros(this.amount.toString());
@@ -70,10 +73,9 @@ export class Transaction {
         const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
         const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
 
-        const timestamp_str = this.timestamp.toString();
-        const timestamp_length = timestamp_str.length.toString().padStart(2, "0");
+        const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
 
-        const encoded_message = encodingHandlers.stringToHex(this.message);
+        const encoded_message = encodingHandlers.base64ToHex(this.message);
         const message_length = encoded_message.length.toString().padStart(3, "0");
 
         const hexData = this.version +
@@ -87,7 +89,7 @@ export class Transaction {
                         nonce_length +
                         encoded_nonce +
                         timestamp_length +
-                        timestamp_str +
+                        this.timestamp +
                         message_length +
                         encoded_message +
                         this.signature;
@@ -98,10 +100,10 @@ export class Transaction {
 
     }
 
-    public static fromDecodedHex(hexData: string) {
+    public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const data = encodingHandlers.splitHex(hexData, [
+            const returnData = encodingHandlers.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "txid", length: 64},
                 {key: "senderAddress", length: 40},
@@ -114,19 +116,30 @@ export class Transaction {
                 {key: "nonce", length: "nonce_length"},
                 {key: "timestamp_length", length: 2},
                 {key: "timestamp", length: "timestamp_length"},
-                {key: "message_length", length: 2},
-                {key: "message", length: "message_length"},
+                {key: "message_length", length: 3},
+                {key: "message", length: "message_length", decode: true},
                 {key: "signature", length: 64}
-            ]);
+            ], returnLength);
+
+            const data = returnData.data;
         
-            if (data.version === "00") {
+            if (data && data.version === "00") {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
+                data.senderPublicKey = encodingHandlers.hexToBase64(data.senderPublicKey);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
-                return utils.createInstanceFromJSON(Transaction, data);
+                data.amount = encodingHandlers.decompressZeros(data.amount);
+                data.nonce = encodingHandlers.decompressZeros(data.nonce);
+                data.message = encodingHandlers.hexToBase64(data.message);
+
+                const tx = utils.createInstanceFromJSON(Transaction, data)
+
+                if (returnLength) {
+                    return {data: tx, length: returnData.lengh};
+                }
+                return tx;
             }
         } catch (err: any) {
-            console.log(err.message);
-            return null;
+            cli.data_message.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
         }
 
         return null;
