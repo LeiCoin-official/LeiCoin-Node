@@ -14,7 +14,7 @@ class Mempool {
         this.transactions = {};
     }
     
-    public static getInstance(): Mempool {
+    public static getInstance() {
       if (!Mempool.instance) {
         Mempool.instance = new Mempool();
       }

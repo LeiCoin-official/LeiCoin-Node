@@ -400,9 +400,9 @@ describe('Encoding Testing', () => {
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
 
-        const decoded2 = Block.fromDecodedHex(decoded.encodeToHex());
+        const decoded2: any = Block.fromDecodedHex(decoded.encodeToHex());
 
-        fs.writeFileSync("./blocktest.json", JSON.stringify(decoded2));
+        //fs.writeFileSync("./blockchain_data/test.dat", decoded2.encodeToHex(), {encoding: "hex", flag: "w"});
 
         expect(JSON.stringify(block)).toBe(JSON.stringify(decoded2));
     });

@@ -5,19 +5,20 @@ import Transaction from "../objects/transaction.js";
 import cli from "../utils/cli.js";
 import Wallet from "../objects/wallet.js";
 import encodingHandlers from "../handlers/encodingHandlers.js";
+import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 
-
-export default class WalletDB {
+export class WalletDB {
 
     private static instance: WalletDB;
 
     private level: Level;
   
     private constructor() {
+        BCUtils.ensureDirectoryExists('/utxos');
         this.level = new Level(path.join(process.cwd(), "/blockchain_data/wallets"), {keyEncoding: "hex", valueEncoding: "hex"});
     }
     
-    public static getInstance(): WalletDB {
+    public static getInstance() {
         if (!WalletDB.instance) {
             WalletDB.instance = new WalletDB();
         }
@@ -63,3 +64,4 @@ export default class WalletDB {
 
 }
 
+export default WalletDB;

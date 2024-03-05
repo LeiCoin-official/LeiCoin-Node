@@ -38,7 +38,7 @@ class Config {
 
     private static instance: Config;
 
-    public static getInstance(): Config {
+    public static getInstance() {
         if (!Config.instance) {
             Config.instance = new Config();
         }

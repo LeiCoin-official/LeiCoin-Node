@@ -12,7 +12,7 @@ class Utils {
 
     private static instance: Utils;
 
-    public static getInstance(): Utils {
+    public static getInstance() {
         if (!Utils.instance) {
             Utils.instance = new Utils();
         }

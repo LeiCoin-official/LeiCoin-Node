@@ -10,7 +10,7 @@ export class CLI {
 
     private static instance: CLI;
 
-    public static getInstance(): CLI {
+    public static getInstance() {
         if (!CLI.instance) {
             CLI.instance = new CLI();
         }
