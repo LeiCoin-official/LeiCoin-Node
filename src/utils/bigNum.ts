@@ -24,4 +24,12 @@ export default class BigNum {
         return BigInt(v1) <= BigInt(v2);
     }
 
+    public static max(v1: string, v2: string) {
+        return this.greater(v1, v2) ? v1 : v2;
+    }
+
+    public static min(v1: string, v2: string) {
+        return this.less(v1, v2) ? v1 : v2;
+    }
+
 }

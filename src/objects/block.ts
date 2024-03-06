@@ -49,7 +49,7 @@ export class Block implements BlockLike {
 
     public static createNewBlock() {
         
-        const previousBlock = blockchain.getLatestBlockInfo().data.main.latestBlockInfo;
+        const previousBlock = blockchain.chainstate.getChainState().main.latestBlockInfo;
     
         let newIndex;
         let previousHash;

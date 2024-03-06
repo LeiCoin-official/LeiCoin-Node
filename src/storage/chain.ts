@@ -4,13 +4,13 @@ import WalletDB from "./wallets";
 export class Chain {
 
     public name: string;
-    public 
     public blocks: BlockDB;
     public wallets: WalletDB;
-  
-    private constructor() {
-        this.blocks = BlockDB.getInstance();
-        this.wallets = WalletDB.getInstance();
+
+    constructor(name = "main") {
+        this.name = name;
+        this.blocks = new BlockDB(name);
+        this.wallets = new WalletDB();
     }
 
 }

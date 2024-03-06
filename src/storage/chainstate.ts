@@ -1,9 +1,35 @@
 import { Callbacks } from "../utils/callbacks";
-import { ChainstateData } from "./fileDataStructures";
 import fs from "fs";
 import cli from "../utils/cli.js";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
 import EncodingUtils from "../handlers/encodingHandlers";
+import Block, { BlockLike } from "../objects/block.js"
+
+export interface ChainstateData {
+    version: string;
+    chains: {
+        [fork: string]: {
+            parent: {
+                name: string;
+                base: {
+                    index: string;
+                    hash: string;
+                };
+            };
+            previousBlockInfo: {
+                index: string;
+                hash: string;
+            };
+            latestBlockInfo: BlockLike;
+            walletChanges: {
+                [address: string]: {
+                    balance: string;
+                    nonce: string;
+                };
+            }
+        }
+    }
+}
 
 export class Chainstate {
 
@@ -12,7 +38,22 @@ export class Chainstate {
     private readonly chainStateData: ChainstateData;
   
     private constructor() {
-        BCUtils.ensureFileExists('/chianstate.dat', EncodingUtils.stringToHex('{"main": {"previousBlockInfo": {}, "latestBlockInfo": {}}}'), "hex");
+        BCUtils.ensureFileExists('/chianstate.dat', EncodingUtils.stringToHex(JSON.stringify(
+            {
+                version: "00",
+                chains: {
+                    main: {
+                        parent: {
+                            name: "main",
+                            base: {},
+                        },
+                        previousBlockInfo: {},
+                        latestBlockInfo: {},
+                        walletChanges: {}
+                    }
+                }
+            }
+        )), "hex");
         this.chainStateData = this.getChainStateFile().data;
     }
     
@@ -24,8 +65,9 @@ export class Chainstate {
     }
 
     private getChainStateFile(): {cb: Callbacks, data: ChainstateData} {
-        const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
         try {
+
+            const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
             const hexData = fs.readFileSync(latestBlockInfoFilePath, { encoding: "hex" });
 
             const data = EncodingUtils.hexToString(hexData);            
@@ -44,7 +86,7 @@ export class Chainstate {
 
             const hexData = EncodingUtils.stringToHex(JSON.stringify(this.chainStateData));
     
-            fs.writeFileSync(latestBlockInfoFilePath, hexData, { encoding:'hex' });
+            fs.writeFileSync(latestBlockInfoFilePath, hexData, { encoding: "hex" });
             return {cb: Callbacks.SUCCESS};
         } catch (err: any) {
             cli.data_message.error(`Error updating Chainstate File: ${err.message}`);
@@ -56,15 +98,15 @@ export class Chainstate {
         return this.chainStateData.chains;
     }
 
-    public updateChainState(latestBlockInfo: { index: string, hash: string }, fork = "main", parentfork = "main") {
+    public updateChainState(latestBlockInfo: BlockLike, fork = "main", parentfork = "main") {
 
         try {
             
             const previousBlockInfo = this.chainStateData.chains[parentfork].latestBlockInfo;
 
             this.chainStateData.chains[fork] = {
-                "previousBlockInfo": previousBlockInfo,
-                "latestBlockInfo": latestBlockInfo
+                previousBlockInfo,
+                latestBlockInfo
             };
             
             this.updateChainStateFile();

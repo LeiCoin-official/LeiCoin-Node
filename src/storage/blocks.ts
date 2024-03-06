@@ -3,28 +3,21 @@ import cli from "../utils/cli.js";
 import Block from "../objects/block.js";
 import fs from "fs";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
-import path from "path";
 
 export class BlockDB {
-
-    private static instance: BlockDB;
-  
-    private constructor() {
-        BCUtils.ensureDirectoryExists('/blocks');
-    }
     
-    public static getInstance() {
-        if (!BlockDB.instance) {
-            BlockDB.instance = new BlockDB();
-        }
-        return BlockDB.instance;
+    private chain: string
+    
+    constructor(chain = "main") {
+        this.chain = chain;
+        BCUtils.ensureDirectoryExists('/blocks');
     }
 
     // Function to write a block
-    public addBlock(block: Block, fork = "main", overwrite = false) {
+    public addBlock(block: Block, overwrite = false) {
         const blockIndex = block.index;
         try {
-            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, fork);
+            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, this.chain);
             // Check if the block file already exists.
             if (!fs.existsSync(blockFilePath) || overwrite) {
                 // Write the block data to the block file.
@@ -32,7 +25,7 @@ export class BlockDB {
 
                 return { cb: Callbacks.SUCCESS };
             } else {
-                cli.data_message.log(`Block ${blockIndex} in Fork ${fork} already exists and cannot be overwritten.`);
+                cli.data_message.log(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
                 return { cb: Callbacks.ERROR };
             }
         } catch (err: any) {
@@ -42,9 +35,9 @@ export class BlockDB {
     }
 
     // Function to read a block
-    public getBlock(blockIndex: string, fork = "main") {
+    public getBlock(blockIndex: string) {
         try {
-            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, fork);
+            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, this.chain);
             if (fs.existsSync(blockFilePath)) {
                 const hexData = fs.readFileSync(blockFilePath, { encoding: "hex" });
                 return {cb: Callbacks.SUCCESS, data: Block.fromDecodedHex(hexData)};
@@ -58,7 +51,7 @@ export class BlockDB {
         }
     }
 
-    public getBlockInForks(index: Number, hash: String) {
+    /*public getBlockInForks(index: Number, hash: String) {
     
         const forksDirectory = BCUtils.getBlockchainDataFilePath('/forks/');
     
@@ -89,7 +82,7 @@ export class BlockDB {
             cli.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
-    }
+    }*/
 
 }
 

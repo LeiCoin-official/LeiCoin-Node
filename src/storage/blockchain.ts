@@ -1,30 +1,28 @@
-import utils from "../utils/utils.js";
 import fs from "fs";
-import path from "path";
-import mempool from "./mempool.js";
-import Block from "../objects/block.js";
 import { Callbacks } from "../utils/callbacks.js";
-import { ChainstateData } from "./fileDataStructures.js";
 import cli from "../utils/cli.js";
-import Transaction from "../objects/transaction.js";
-import WalletDB from "./wallets.js";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
-import BlockDB from "./blocks.js";
 import Chainstate from "./chainstate.js";
+import Chain from "./chain.js";
 
-class Blockchain {
+class Blockchain extends Chain {
 
     private static instance: Blockchain;
 
-    public blocks: BlockDB;
     public chainstate: Chainstate;
-    public wallets: WalletDB;
-  
+    public forks: {[chain: string]: Chain} = {};
+
     private constructor() {
+        super("main");
         this.createStorageIfNotExists();
-        this.blocks = BlockDB.getInstance();
         this.chainstate = Chainstate.getInstance();
-        this.wallets = WalletDB.getInstance();
+        this.forks["main"] = this;
+        for (const chainName in this.chainstate.getChainState()) {
+            if (chainName === "main") {
+                continue;
+            }
+            this.forks[chainName] = new Chain(chainName);
+        }
     }
     
     public static getInstance() {
@@ -45,8 +43,6 @@ class Blockchain {
             const slicedTxID = txID.slice(12, txID.length);
 
             BCUtils.ensureFileExists(filePath, "{}");
-
-            //fs.
 
             return { cb: Callbacks.SUCCESS };
         } catch (err: any) {
@@ -78,6 +74,8 @@ class Blockchain {
 
     public transferForkToMain(fork: string) {
 
+        // we have to update this later
+
         try {
 
             const tempBlockchain = {};
@@ -94,7 +92,7 @@ class Blockchain {
 
                 const blockIndex = blockFile.split('.')[0];
 
-                const block = this.blocks.getBlock(blockIndex, fork).data;
+                const block = this.blocks.getBlock(blockIndex).data;
                 if (!block) {
                     return { cb: Callbacks.ERROR };
                 }
