@@ -4,24 +4,26 @@ import cli from "../utils/cli.js";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
 import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";
+import Block from "../objects/block.js";
+import BigNum from "../utils/bigNum.js";
 
 class Blockchain extends Chain {
 
     private static instance: Blockchain;
 
     public chainstate: Chainstate;
-    public forks: {[chain: string]: Chain} = {};
+    public chains: {[chain: string]: Chain} = {};
 
     private constructor() {
         super("main");
         this.createStorageIfNotExists();
         this.chainstate = Chainstate.getInstance();
-        this.forks["main"] = this;
+        this.chains["main"] = this;
         for (const chainName in this.chainstate.getChainState()) {
             if (chainName === "main") {
                 continue;
             }
-            this.forks[chainName] = new Chain(chainName);
+            this.chains[chainName] = new Chain(chainName);
         }
     }
     
@@ -68,8 +70,25 @@ class Blockchain extends Chain {
         }
     }
 
-    public createFork(name: string) {
+    public createFork(name: string, parentChain: string, latestBlock: Block) {
         BCUtils.ensureDirectoryExists("/blocks", name);
+        const parentLatestBlock = this.chainstate.getLatestBlockInfo(parentChain);
+        const forkChain = new Chain(name);
+        this.chains[name] = forkChain;
+        this.chainstate.setChainState({
+            parent: {
+                name: parentChain,
+                base: {
+
+                }
+            },
+            previousBlockInfo: {
+                index: BigNum.subtract(latestBlock.index, "1"),
+                hash: latestBlock.previousHash
+            },
+            latestBlockInfo: latestBlock,
+            tempWallets: {}
+        });
     }
 
     public transferForkToMain(fork: string) {
