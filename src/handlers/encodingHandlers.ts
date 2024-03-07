@@ -3,7 +3,7 @@ import { Callbacks } from "../utils/callbacks";
 
 export default class EncodingUtils {
 
-    public static splitWithTail(str: string, delim: string, count: number){
+    public static splitWithTail(str: string, delim: string, count: number) {
         var parts = str.split(delim);
         var tail = parts.slice(count).join(delim);
         var result = parts.slice(0,count);
