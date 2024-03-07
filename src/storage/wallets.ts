@@ -1,7 +1,6 @@
 import { Level } from "level";
 import path from "path";
 import { Callbacks } from "../utils/callbacks.js";
-import Transaction from "../objects/transaction.js";
 import cli from "../utils/cli.js";
 import Wallet from "../objects/wallet.js";
 import encodingHandlers from "../handlers/encodingHandlers.js";
@@ -12,20 +11,19 @@ import BigNum from "../utils/bigNum.js";
 
 export class WalletDB {
 
-    private level: Level;
-    private chain: string;
+    private readonly level: Level;
+    private readonly chain: string;
 
     constructor(chain = "main") {
         BCUtils.ensureDirectoryExists('/wallets');
         this.chain = chain;
-        this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/wallets")), {keyEncoding: "hex", valueEncoding: "hex"});
+        this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/wallets", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
     public async getWallet(address: string) {
         const encodeAddress = encodingHandlers.encodeAddressToHex(address);
         const raw_wallet = await this.level.get(encodeAddress);
-        return Wallet.fromDecodedHex(address, raw_wallet);
-        
+        return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
     }
 
     public async setWallet(wallet: Wallet) {
@@ -34,28 +32,45 @@ export class WalletDB {
         return await this.level.put(encodeAddress, encodedWallet);
     }
 
+    public async existsWallet(address: string): Promise<boolean> {
+        const encodeAddress = encodingHandlers.encodeAddressToHex(address);
+        const raw_wallet = await this.level.get(encodeAddress);
+        return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
+    }
+
     public async addMoneyToWallet(address: string, amount: string) {
         const wallet = await this.getWallet(address);
+        if (this.chain === "main") {
+            for (const [chainName, chain] of Object.entries(blockchain.chains)) {
+                if (chainName === "main") continue;
+                if (!(await chain.wallets.existsWallet(address))) {
+                    chain.wallets.setWallet(wallet);
+                }
+            }
+        }
         wallet.addMoney(amount);
         await this.setWallet(wallet);
     }
 
-    public async subtractMoneyFromWallet(address: string, amount: string) {
+    public async subtractMoneyFromWallet(address: string, amount: string, adjustNonce = true) {
         const wallet = await this.getWallet(address);
+        if (this.chain === "main") {
+            for (const [chainName, chain] of Object.entries(blockchain.chains)) {
+                if (chainName === "main") continue;
+                if (!(await chain.wallets.existsWallet(address))) {
+                    chain.wallets.setWallet(wallet);
+                }
+            }
+        }
+        if (adjustNonce) {
+            wallet.adjustNonce();
+        }
         wallet.subtractMoneyIFPossible(amount);
         await this.setWallet(wallet);
     }
 
     public async adjustWalletsByBlock(block: Block) {
-
         try {
-
-            let maxBlockHeight = block.index;
-
-            for (const [, chain] of Object.entries(blockchain.chainstate.getChainState())) {
-                const chainBaseBlockHeight = chain.parent.base.index;
-                maxBlockHeight = BigNum.min(block.index, chainBaseBlockHeight);
-            }
 
             const promises = [];
 
@@ -64,7 +79,7 @@ export class WalletDB {
                 promises.push(this.subtractMoneyFromWallet(transactionData.senderAddress, amount));
                 promises.push(this.addMoneyToWallet(transactionData.recipientAddress, amount));
             }
-
+    
             Promise.all(promises);
             
             return { cb: Callbacks.SUCCESS };

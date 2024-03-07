@@ -64,12 +64,12 @@ export class Wallet {
         } catch (err: any) {
             cli.data_message.error(`Error loading Wallet from Decoded Hex: ${err.message}`);
         }
-
-        return Wallet.createEmptyWallet(ownerAddress);
+        
+        return null;
     }
 
     public addMoney(amount: string) {
-        this.balance += amount;
+        this.balance = BigNum.add(this.balance, amount);
     }
 
     public getBalance() {

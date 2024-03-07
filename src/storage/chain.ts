@@ -3,9 +3,9 @@ import WalletDB from "./wallets";
 
 export class Chain {
 
-    public name: string;
-    public blocks: BlockDB;
-    public wallets: WalletDB;
+    public readonly name: string;
+    public readonly blocks: BlockDB;
+    public readonly wallets: WalletDB;
 
     constructor(name = "main") {
         this.name = name;

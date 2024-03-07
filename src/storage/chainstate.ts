@@ -5,29 +5,32 @@ import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
 import EncodingUtils from "../handlers/encodingHandlers";
 import Block, { BlockLike } from "../objects/block.js"
 
+export interface SingleChainstateData {
+    parent: {
+        name: string;
+        base: {
+            index: string;
+            hash: string;
+        }
+    };
+    previousBlockInfo: {
+        index: string;
+        hash: string;
+    };
+    latestBlockInfo: BlockLike;
+    /*tempWallets: {
+        [address: string]: {
+            balance: string;
+            nonce: string;
+        };
+    }*/
+}
+
+
 export interface ChainstateData {
     version: string;
     chains: {
-        [fork: string]: {
-            parent: {
-                name: string;
-                base: {
-                    index: string;
-                    hash: string;
-                };
-            };
-            previousBlockInfo: {
-                index: string;
-                hash: string;
-            };
-            latestBlockInfo: BlockLike;
-            walletChanges: {
-                [address: string]: {
-                    balance: string;
-                    nonce: string;
-                };
-            }
-        }
+        [fork: string]: SingleChainstateData
     }
 }
 
@@ -45,11 +48,11 @@ export class Chainstate {
                     main: {
                         parent: {
                             name: "main",
-                            base: {},
+                            base: {}
                         },
                         previousBlockInfo: {},
                         latestBlockInfo: {},
-                        walletChanges: {}
+                        //tempWallets: {}
                     }
                 }
             }
@@ -94,20 +97,30 @@ export class Chainstate {
         }
     }
 
-    public getChainState() {
+    public getAllChainStates() {
         return this.chainStateData.chains;
     }
 
-    public updateChainState(latestBlockInfo: BlockLike, fork = "main", parentfork = "main") {
+    public getChainState(chain = "main") {
+        return this.chainStateData.chains[chain];
+    }
+
+    public setChainState(data: SingleChainstateData, chain = "main") {
+        this.chainStateData.chains[chain] = data;
+    }
+
+    public getLatestBlockInfo(chain = "main") {
+        return this.chainStateData.chains[chain].latestBlockInfo;
+    }
+
+    public updateLatestBlockInfo(latestBlockInfo: BlockLike, chain = "main", parentChain = "main") {
 
         try {
             
-            const previousBlockInfo = this.chainStateData.chains[parentfork].latestBlockInfo;
+            const previousBlockInfo = this.chainStateData.chains[parentChain].latestBlockInfo;
 
-            this.chainStateData.chains[fork] = {
-                previousBlockInfo,
-                latestBlockInfo
-            };
+            this.chainStateData.chains[chain].previousBlockInfo = previousBlockInfo;
+            this.chainStateData.chains[chain].latestBlockInfo = latestBlockInfo;
             
             this.updateChainStateFile();
 
@@ -117,6 +130,14 @@ export class Chainstate {
             return {cb: Callbacks.ERROR};
         }
 
+    }
+
+    public geTempWallet(ownerAddress: string, fork = "main") {
+        return this.chainStateData.chains[fork].tempWallets[ownerAddress];
+    }
+
+    public setTempWallet(ownerAddress: string, walletData: {balance: string; nonce: string}, fork = "main") {
+        this.chainStateData.chains[fork].tempWallets[ownerAddress] = walletData;
     }
 
     public checkNewBlockExisting(index: string, hash: string) {
