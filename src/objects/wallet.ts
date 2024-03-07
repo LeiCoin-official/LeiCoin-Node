@@ -94,8 +94,8 @@ export class Wallet {
         return this.nonce;
     }
 
-    public adjustNonce() {
-        this.nonce = BigNum.add(this.nonce, "1");
+    public adjustNonce(add = "1") {
+        this.nonce = BigNum.add(this.nonce, add);
     }
 
 }

@@ -18,12 +18,6 @@ export interface SingleChainstateData {
         hash: string;
     };
     latestBlockInfo: BlockLike;
-    /*tempWallets: {
-        [address: string]: {
-            balance: string;
-            nonce: string;
-        };
-    }*/
 }
 
 
@@ -52,7 +46,6 @@ export class Chainstate {
                         },
                         previousBlockInfo: {},
                         latestBlockInfo: {},
-                        //tempWallets: {}
                     }
                 }
             }
@@ -132,14 +125,6 @@ export class Chainstate {
 
     }
 
-    public geTempWallet(ownerAddress: string, fork = "main") {
-        return this.chainStateData.chains[fork].tempWallets[ownerAddress];
-    }
-
-    public setTempWallet(ownerAddress: string, walletData: {balance: string; nonce: string}, fork = "main") {
-        this.chainStateData.chains[fork].tempWallets[ownerAddress] = walletData;
-    }
-
     public checkNewBlockExisting(index: string, hash: string) {
         try {
             const latestBlockInfoData = this.chainStateData.chains;
@@ -159,28 +144,23 @@ export class Chainstate {
     public isValidGenesisBlock(hash: string) {
         try {
     
-            const latestblockinfoFileData = this.chainStateData.chains;
+            const latestANDPreviousForkBlockInfo = this.chainStateData.chains.main;
+
+            if (latestANDPreviousForkBlockInfo) {
     
-            const latestANDPreviousForkBlockInfo = latestblockinfoFileData.main || {};
-            if ((latestANDPreviousForkBlockInfo !== null) && (latestANDPreviousForkBlockInfo !== undefined)) {
+                const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
+                const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
     
-                const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo || null;
-                const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo || null;
-    
-                if ((previousBlockInfo !== null) && (previousBlockInfo !== undefined)) {
-                    if (typeof(previousBlockInfo) === "object") {
-                        if (((previousBlockInfo.index !== null) && (previousBlockInfo.index !== undefined)) && ((previousBlockInfo.hash !== null) && (previousBlockInfo.hash !== undefined))) {
-                            return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                        }
+                if (previousBlockInfo) {
+                    if (previousBlockInfo.index && previousBlockInfo.hash) {
+                        return { isGenesisBlock: false, isForkOFGenesisBlock: false };
                     }
                 }
-                if ((latestBlockInfo !== null) && (latestBlockInfo !== undefined)) {
-                    if (typeof(latestBlockInfo) === "object") {
-                        if (((latestBlockInfo.index !== null) && (latestBlockInfo.index !== undefined)) && ((latestBlockInfo.hash !== null) && (latestBlockInfo.hash !== undefined))) {
-                            if (latestBlockInfo.hash !== hash)
-                                return { isGenesisBlock: true, isForkOFGenesisBlock: true };
-                            return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                        }
+                if (latestBlockInfo) {
+                    if (latestBlockInfo.index && latestBlockInfo.hash) {
+                        if (latestBlockInfo.hash !== hash)
+                            return { isGenesisBlock: true, isForkOFGenesisBlock: true };
+                        return { isGenesisBlock: false, isForkOFGenesisBlock: false };
                     }
                 }
 

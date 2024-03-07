@@ -7,7 +7,6 @@ import encodingHandlers from "../handlers/encodingHandlers.js";
 import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
-import BigNum from "../utils/bigNum.js";
 
 export class WalletDB {
 
@@ -15,7 +14,7 @@ export class WalletDB {
     private readonly chain: string;
 
     constructor(chain = "main") {
-        BCUtils.ensureDirectoryExists('/wallets');
+        BCUtils.ensureDirectoryExists('/wallets', chain);
         this.chain = chain;
         this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/wallets", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }

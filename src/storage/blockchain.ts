@@ -20,9 +20,7 @@ class Blockchain extends Chain {
         this.chainstate = Chainstate.getInstance();
         this.chains["main"] = this;
         for (const chainName in this.chainstate.getChainState()) {
-            if (chainName === "main") {
-                continue;
-            }
+            if (chainName === "main") continue;
             this.chains[chainName] = new Chain(chainName);
         }
     }
@@ -37,40 +35,8 @@ class Blockchain extends Chain {
     private createStorageIfNotExists() {
         BCUtils.ensureDirectoryExists('/forks');
     }
-    
-    public addTransactionsToIndex(txID: string, block: number, indexInBlock: number) {
-        try {
-            const filePath = `/utxos/${txID.slice(0, 4)}/${txID.slice(4, 8)}/${txID.slice(8, 12)}.json`;
-            const fullFilePath = BCUtils.getBlockchainDataFilePath(filePath);
-            const slicedTxID = txID.slice(12, txID.length);
 
-            BCUtils.ensureFileExists(filePath, "{}");
-
-            return { cb: Callbacks.SUCCESS };
-        } catch (err: any) {
-            cli.data_message.error(`Error adding transaction to indexes ${txID}: ${err.message}`);
-            return { cb: Callbacks.ERROR };
-        }
-    }
-
-    // Function to read a transaction
-    public getTransaction(txID: string) {
-        const txFilePath = BCUtils.getBlockchainDataFilePath(`/transactions/${txID}.json`);
-        try {
-            if (fs.existsSync(txFilePath)) {
-                const data = fs.readFileSync(txFilePath, 'utf8');
-                return {cb: Callbacks.SUCCESS, data: JSON.parse(data)}
-            } else {
-                cli.data_message.error(`Transaktion ${txID} was not found`);
-                return {cb: Callbacks.NONE}
-            }
-        } catch (err: any) {
-            cli.data_message.error(`Error reading transaction ${txID}: ${err.message}`);
-            return {cb: Callbacks.ERROR};
-        }
-    }
-
-    public createFork(name: string, parentChain: string, latestBlock: Block) {
+    public async createFork(name: string, parentChain: string, latestBlock: Block) {
         BCUtils.ensureDirectoryExists("/blocks", name);
         const parentLatestBlock = this.chainstate.getLatestBlockInfo(parentChain);
         const forkChain = new Chain(name);
@@ -79,22 +45,33 @@ class Blockchain extends Chain {
             parent: {
                 name: parentChain,
                 base: {
-
+                    index: latestBlock.index,
+                    hash: latestBlock.hash,
                 }
             },
             previousBlockInfo: {
                 index: BigNum.subtract(latestBlock.index, "1"),
                 hash: latestBlock.previousHash
             },
-            latestBlockInfo: latestBlock,
-            tempWallets: {}
+            latestBlockInfo: latestBlock
         });
+
+        for (const transactionData of parentLatestBlock.transactions) {
+            const senderWallet = await this.wallets.getWallet(transactionData.senderAddress);
+            const recipientWallet = await this.wallets.getWallet(transactionData.recipientAddress);
+
+            senderWallet.adjustNonce("-1");
+            senderWallet.addMoney(transactionData.amount);
+            recipientWallet.subtractMoneyIFPossible(transactionData.amount);
+
+            await forkChain.wallets.setWallet(senderWallet);
+            await forkChain.wallets.setWallet(recipientWallet);
+        }
     }
 
     public transferForkToMain(fork: string) {
 
         // we have to update this later
-
         try {
 
             const tempBlockchain = {};
