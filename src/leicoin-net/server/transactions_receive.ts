@@ -12,7 +12,7 @@ export default function (data: any) {
 
     if (!(transaction.txid in mempool.transactions)) {
 
-        const validationresult = validation.isValidTransaction(transaction);
+        const validationresult = validation.validateTransaction(transaction);
 
         if (validationresult.cb) {
 

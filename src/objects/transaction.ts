@@ -50,7 +50,7 @@ export class Transaction implements TransactionLike {
         const coinbase = new Transaction(
             "",
             "lc0x6c6569636f696e6e65745f636f696e62617365",
-            "",
+            "6c6569636f696e6e65745f636f696e62617365",
             config.miner.minerAddress,
             utils.mining_pow,
             "0",
@@ -58,13 +58,13 @@ export class Transaction implements TransactionLike {
             "",
             "0000000000000000000000000000000000000000000000000000000000000000",
         );
-        coinbase.txid = cryptoHandlers.createHash(coinbase, ["txid", "version"]);
+        coinbase.txid = cryptoHandlers.sha256(coinbase, ["txid", "version"]);
         return coinbase;
     }
 
     public encodeToHex(add_empty_bytes = false) {
 
-        const encoded_senderPublicKey = encodingHandlers.base64ToHex(this.senderPublicKey);
+        const encoded_senderPublicKey = encodingHandlers.encodeBase64ToHex(this.senderPublicKey);
         const senderPublicKey_length = encoded_senderPublicKey.length.toString().padStart(3, "0");        
     
         const encoded_amount = encodingHandlers.compressZeros(this.amount.toString());
@@ -75,7 +75,7 @@ export class Transaction implements TransactionLike {
 
         const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
 
-        const encoded_message = encodingHandlers.base64ToHex(this.message);
+        const encoded_message = encodingHandlers.encodeBase64ToHex(this.message);
         const message_length = encoded_message.length.toString().padStart(3, "0");
 
         const hexData = this.version +
@@ -125,11 +125,11 @@ export class Transaction implements TransactionLike {
         
             if (data && data.version === "00") {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
-                data.senderPublicKey = encodingHandlers.hexToBase64(data.senderPublicKey);
+                data.senderPublicKey = encodingHandlers.decodeHexToBase64(data.senderPublicKey);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
                 data.amount = encodingHandlers.decompressZeros(data.amount);
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
-                data.message = encodingHandlers.hexToBase64(data.message);
+                data.message = encodingHandlers.decodeHexToBase64(data.message);
 
                 const tx = utils.createInstanceFromJSON(Transaction, data)
 

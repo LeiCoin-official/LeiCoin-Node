@@ -37,17 +37,22 @@ class Blockchain extends Chain {
     }
 
     public async createFork(name: string, parentChain: string, latestBlock: Block) {
-        BCUtils.ensureDirectoryExists("/blocks", name);
         const parentLatestBlock = this.chainstate.getLatestBlockInfo(parentChain);
+
+        if (parentChain !== "main") {
+            fs.cpSync(BCUtils.getBlockchainDataFilePath("", parentChain), BCUtils.getBlockchainDataFilePath("", name), { recursive: true });
+            fs.unlinkSync(BCUtils.getBlockchainDataFilePath(`/blocks/${parentLatestBlock.index}.dat`, name));
+        }
+
         const forkChain = new Chain(name);
         this.chains[name] = forkChain;
         this.chainstate.setChainState({
             parent: {
-                name: parentChain,
-                base: {
-                    index: latestBlock.index,
-                    hash: latestBlock.hash,
-                }
+                name: parentChain
+            },
+            base: {
+                index: latestBlock.index,
+                hash: latestBlock.hash,
             },
             previousBlockInfo: {
                 index: BigNum.subtract(latestBlock.index, "1"),
@@ -57,8 +62,8 @@ class Blockchain extends Chain {
         });
 
         for (const transactionData of parentLatestBlock.transactions) {
-            const senderWallet = await this.wallets.getWallet(transactionData.senderAddress);
-            const recipientWallet = await this.wallets.getWallet(transactionData.recipientAddress);
+            const senderWallet = await this.chains[parentChain].wallets.getWallet(transactionData.senderAddress);
+            const recipientWallet = await this.chains[parentChain].wallets.getWallet(transactionData.recipientAddress);
 
             senderWallet.adjustNonce("-1");
             senderWallet.addMoney(transactionData.amount);

@@ -11,31 +11,31 @@ export default class EncodingUtils {
         return result;
     }
     
-    public static base64EncodeToString(data: string) {
+    public static encodeBase64ToString(data: string) {
         return Buffer.from(data).toString('base64');
     }
     
-    public static base64EncodeToBuffer(data: string) {
+    public static encodeBase64ToBuffer(data: string) {
         return Buffer.from(data, 'base64');
     }
     
-    public static base64DecodeToString(data: string) {
+    public static decodeBase64ToString(data: string) {
         return Buffer.from(data, 'base64').toString();
     }
     
-    public static stringToHex(stringData: string) {
+    public static encodeStringToHex(stringData: string) {
         return Buffer.from(stringData).toString("hex");
     }
       
-    public static hexToString(hexData: string) {
+    public static decodeHexToString(hexData: string) {
         return Buffer.from(hexData, "hex").toString();
     }
     
-    public static base64ToHex(base64String: string) {
+    public static encodeBase64ToHex(base64String: string) {
         return Buffer.from(base64String, 'base64').toString('hex');
     }
     
-    public static hexToBase64(hexString: string) {
+    public static decodeHexToBase64(hexString: string) {
         return Buffer.from(hexString, 'hex').toString('base64');
     }
     
@@ -47,12 +47,12 @@ export default class EncodingUtils {
         return buffer.toString("hex");
     }*/
     
-    public static encodePublicKeyToEncodedPublicKey(public_key_pem: string) {
-        return this.base64EncodeToString(public_key_pem);
+    public static encodePublicKeyToBase64(public_key_pem: string) {
+        return this.encodeBase64ToString(public_key_pem);
     }
     
-    public static decodeEncodedPublicKeyToPublicKey(encoded_public_key: string) {
-        return this.base64DecodeToString(encoded_public_key);
+    public static decodeBase64ToPublicKey(encoded_public_key: string) {
+        return this.decodeBase64ToString(encoded_public_key);
     }
     
     
@@ -118,7 +118,7 @@ export default class EncodingUtils {
                 }
         
                 if (data.decode) {
-                    value = this.hexToString(value);
+                    value = this.decodeHexToString(value);
                 }
         
                 if (type === "int") {

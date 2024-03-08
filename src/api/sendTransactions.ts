@@ -19,7 +19,7 @@ router.use('/', (req, res, next) => {
 	const transactionData = req.body;
 
 	// Validate the transaction (add your validation logic here)
-	const validationresult = validation.isValidTransaction(transactionData);
+	const validationresult = validation.validateTransaction(transactionData);
 
 	res.status(validationresult.status)
 	res.json({message: validationresult.message});

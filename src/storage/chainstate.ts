@@ -8,10 +8,10 @@ import Block, { BlockLike } from "../objects/block.js"
 export interface SingleChainstateData {
     parent: {
         name: string;
-        base: {
-            index: string;
-            hash: string;
-        }
+    };
+    base: {
+        index: string;
+        hash: string;
     };
     previousBlockInfo: {
         index: string;
@@ -35,15 +35,15 @@ export class Chainstate {
     private readonly chainStateData: ChainstateData;
   
     private constructor() {
-        BCUtils.ensureFileExists('/chianstate.dat', EncodingUtils.stringToHex(JSON.stringify(
+        BCUtils.ensureFileExists('/chianstate.dat', EncodingUtils.encodeStringToHex(JSON.stringify(
             {
                 version: "00",
                 chains: {
                     main: {
                         parent: {
-                            name: "main",
-                            base: {}
+                            name: "main"
                         },
+                        base: {},
                         previousBlockInfo: {},
                         latestBlockInfo: {},
                     }
@@ -66,7 +66,7 @@ export class Chainstate {
             const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
             const hexData = fs.readFileSync(latestBlockInfoFilePath, { encoding: "hex" });
 
-            const data = EncodingUtils.hexToString(hexData);            
+            const data = EncodingUtils.decodeHexToString(hexData);            
 
             return {cb: Callbacks.SUCCESS, data: JSON.parse(data)};
         } catch (err: any) {
@@ -80,7 +80,7 @@ export class Chainstate {
 
             const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
 
-            const hexData = EncodingUtils.stringToHex(JSON.stringify(this.chainStateData));
+            const hexData = EncodingUtils.encodeStringToHex(JSON.stringify(this.chainStateData));
     
             fs.writeFileSync(latestBlockInfoFilePath, hexData, { encoding: "hex" });
             return {cb: Callbacks.SUCCESS};
@@ -125,53 +125,68 @@ export class Chainstate {
 
     }
 
-    public checkNewBlockExisting(index: string, hash: string) {
-        try {
-            const latestBlockInfoData = this.chainStateData.chains;
-
-            for (const [, forkLatestBlockData] of Object.entries(latestBlockInfoData)) {
-                if (forkLatestBlockData?.latestBlockInfo?.hash === hash && forkLatestBlockData?.latestBlockInfo?.index === index) {
-                    return { cb: true };
-                }
-            }
-
-        } catch (err: any) {
-            cli.data_message.error(`Error checking Block existing: ${err.message}.`);
-        }
-        return { cb: false };
-    }
-
     public isValidGenesisBlock(hash: string) {
-        try {
     
-            const latestANDPreviousForkBlockInfo = this.chainStateData.chains.main;
+        const latestANDPreviousForkBlockInfo = this.chainStateData.chains.main;
 
-            if (latestANDPreviousForkBlockInfo) {
+        if (latestANDPreviousForkBlockInfo) {
+
+            const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
+            const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
     
-                const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
-                const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
-    
-                if (previousBlockInfo) {
-                    if (previousBlockInfo.index && previousBlockInfo.hash) {
-                        return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                    }
+            if (previousBlockInfo) {
+                if (previousBlockInfo.index && previousBlockInfo.hash) {
+                    return { isGenesisBlock: false, isForkOFGenesisBlock: false };
                 }
-                if (latestBlockInfo) {
-                    if (latestBlockInfo.index && latestBlockInfo.hash) {
-                        if (latestBlockInfo.hash !== hash)
-                            return { isGenesisBlock: true, isForkOFGenesisBlock: true };
-                        return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                    }
+            }
+
+            if (latestBlockInfo) {
+                if (latestBlockInfo.index && latestBlockInfo.hash) {
+                    if (latestBlockInfo.hash !== hash)
+                        return { isGenesisBlock: true, isForkOFGenesisBlock: true };
+                    return { isGenesisBlock: false, isForkOFGenesisBlock: false };
                 }
+            }
+
+        }
+        
+        return { isGenesisBlock: true, isForkOFGenesisBlock: false };
+    }
+
+    public isBlockChainStateMatching(block: BlockLike): {
+        valid: false;
+        status: 400;
+        message: string;
+    } | {
+        valid: true;
+        name: string;
+        type: "newfork" | "child";
+        parent: string;
+    } {
+
+        for (const [chainName, chainData] of Object.entries(this.chainStateData.chains)) {
+
+            const previousBlockInfo = chainData.previousBlockInfo;
+            const latestBlockInfo = chainData.latestBlockInfo;
+
+            if (latestBlockInfo.hash === block.hash) {
+
+                return { valid: false, status: 400, message: 'Bad Request. Block aleady exists.' };
+
+            } else if ((latestBlockInfo.hash === block.previousHash) && ((latestBlockInfo.index + 1) === block.index)) {
+
+                return { valid: true, name: chainName, type: "child", parent: chainName };
+
+            } else if ((previousBlockInfo.hash === block.previousHash) && ((previousBlockInfo.index + 1) === block.index)) {
+
+                return { valid: true, name: block.hash, type: "newfork", parent: chainName };
 
             }
-        
-            return { isGenesisBlock: true, isForkOFGenesisBlock: false };
-        } catch (err: any) {
-            cli.data_message.error(`Error checking for existing blocks: ${err.message}`);
-            return { isGenesisBlock: false, isForkOFGenesisBlock: false };
         }
+
+        return { valid: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain' };   
     }
+
 }
 
 export default Chainstate;

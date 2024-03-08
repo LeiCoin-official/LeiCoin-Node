@@ -1,10 +1,15 @@
 import crypto from "crypto";
 
-function createHash(obj: { [key: string]: any }, excludedKeys: string[] = []) {
-    return crypto.createHash('sha256')
-        .update(JSON.stringify(
-            getPreparedObjectForHashing(obj, excludedKeys)
-        )).digest('hex');
+function sha256(rawData: string | { [key: string]: any }, excludedKeys: string[] = []) {
+    let data = "";
+
+    if (typeof(rawData) === "object") {
+        data = JSON.stringify(getPreparedObjectForHashing(rawData, excludedKeys))
+    } else {
+        data = rawData;
+    }
+
+    return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 function getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: string[] = []): { [key: string]: any } {
@@ -33,7 +38,7 @@ function getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: 
 }
 
 export default {
-    createHash,
+    sha256,
     getPreparedObjectForHashing
 }
 

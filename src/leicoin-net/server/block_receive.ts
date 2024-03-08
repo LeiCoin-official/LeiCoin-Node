@@ -9,17 +9,17 @@ export default function (data: any) {
 
 	const block = utils.createInstanceFromJSON(Block, data);
 
-	if (!blockchain.checkNewBlockExisting(block.index, block.hash).cb) {
+	if (!blockchain.chainstate.isBlockChainStateMatching(block).valid) {
 
 		const validationresult = validation.isValidBlock(block);
 
 		if (validationresult.cb) {
 
 			if (validationresult.forktype = "newfork") {
-				blockchain.createFork(validationresult.forkchain);
+				blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);
 			}
 
-			blockchain.addBlock(block, validationresult.forkchain);
+			blockchain.chains[validationresult.forkchain].blocks.addBlock(block);
 			blockchain.updateLatestBlockInfo(
 				block,
 				validationresult.forkchain,

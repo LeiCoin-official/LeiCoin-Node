@@ -44,13 +44,13 @@ function calculateEfficienty(wallets: number, utxos_per_wallet: number) {
     const utxos_per_transaction = 2;
     const transactions = (wallets * utxos_per_wallet) / utxos_per_transaction;
 
-    const needWhenAdressBased = (address + ((seperator + hash + height + seperator + amount + seperator) * utxos_per_wallet)) * wallets;
+    const needWhenAddressBased = (address + ((seperator + hash + height + seperator + amount + seperator) * utxos_per_wallet)) * wallets;
 
     const needWhenCTBasedBasic = (hash + (7 + ((address + seperator + amount) * utxos_per_transaction))) * transactions;
 
     //const needWhenCTBasedIndex = (address + ((hash + height) * utxos_per_wallet)) * wallets;
 
-    console.log("needWhenAdressBased", needWhenAdressBased / 1024 / 1024 / 1024);
+    console.log("needWhenAddressBased", needWhenAddressBased / 1024 / 1024 / 1024);
 
     console.log("needWhenCTBasedBasic", needWhenCTBasedBasic / 1024 / 1024 / 1024);
 
