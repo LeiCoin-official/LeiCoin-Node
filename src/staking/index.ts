@@ -6,6 +6,7 @@ import mempool from "../storage/mempool.js";
 import cli from "../utils/cli.js";
 import utils from "../utils/utils.js";
 import Validation from "../validation.js";
+import stakerpool from "./stakepool.js";
 
 export class Staking {
 
@@ -28,37 +29,36 @@ export class Staking {
 		}
 	}
 
-	private constructor() {
+	public async runNextStaking(hash: string) {
 
-	}
+		stakerpool.getNextStaker(hash)
 
-	public async runNextStaking() {
+		if (stakerpool.nextStaker.address === config.staker.address) {
 
-		const blockResult = await runInMiningParallel();
-	
-		if (blockResult !== null) {
-			afterMiningLogic(blockResult);
+			const block = Block.createNewBlock();
+			// Adjust the delay maybe later for faster Block times
+			await new Promise((resolve) => setTimeout(resolve, 10_000));
+
+			await this.broadcastBlock(block)
+
 		}
-	
-		// Adjust the delay maybe later for faster Block times
-		await new Promise((resolve) => setTimeout(resolve, 1000));
 		
 	}
 
-	private async broadcastBlock(blockResult: Block) {
-		if (Validation.isValidBlock(blockResult).cb) {
+	private async broadcastBlock(block: Block) {
+		if (Validation.isValidBlock(block).cb) {
 
-			blockchain.blocks.addBlock(blockResult);
-			blockchain.chainstate.updateLatestBlockInfo(blockResult, "main");
-			mempool.clearMempoolbyBlock(blockResult);
+			blockchain.blocks.addBlock(block);
+			blockchain.chainstate.updateLatestBlockInfo(block, "main");
+			mempool.clearMempoolbyBlock(block);
 
-			await blockchain.wallets.adjustWalletsByBlock(blockResult);
+			await blockchain.wallets.adjustWalletsByBlock(block);
 
-			utils.events.emit("block_receive", LeiCoinNetDataPackage.create("block", blockResult));
+			utils.events.emit("block_receive", LeiCoinNetDataPackage.create("block", block));
 
-			cli.staker_message.success(`Mined block with hash ${blockResult.hash} has been validated. Broadcasting now.`);
+			cli.staker_message.success(`Created block with hash ${block.hash} has been validated. Broadcasting now.`);
 		} else {
-			cli.staker_message.log(`Mined block with hash ${blockResult.hash} is invalid.`);
+			cli.staker_message.log(`Created block with hash ${block.hash} is invalid.`);
 		}
 	}
 
@@ -66,5 +66,4 @@ export class Staking {
 }
 
 const staking = Staking.getInstance();
-
 export default staking;

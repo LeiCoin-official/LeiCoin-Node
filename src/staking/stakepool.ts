@@ -1,6 +1,6 @@
 import Staker from "../objects/staker.js";
 
-export class Stakerpool {
+class Stakerpool {
 
     private static instance: Stakerpool;
 
@@ -60,4 +60,5 @@ export class Stakerpool {
 
 }
 
-export default Stakerpool;
+const stakerpool = Stakerpool.getInstance();
+export default stakerpool;
