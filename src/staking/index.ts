@@ -12,10 +12,13 @@ export class Staking {
 	private static instance: Staking;
 
 	public static getInstance() {
-        return Staking.instance;
+		if (!Staking.instance) {
+			Staking.instance = new Staking();
+		}
+		return Staking.instance;
 	}
 
-	public static initStakerIfActive() {
+	public initStakerIfActive() {
 		if (config.staker.active) {
 			if (Validation.validateAddress(config.staker.address)) {
 				cli.staker_message.log("Staker started");
@@ -23,14 +26,13 @@ export class Staking {
 				cli.staker_message.error("Staker could not be started: Invalid Address.")
 			}
 		}
-		return new Staking();
 	}
 
 	private constructor() {
 
 	}
 
-	public async runNextStakingCycle() {
+	public async runNextStaking() {
 
 		const blockResult = await runInMiningParallel();
 	
@@ -63,4 +65,6 @@ export class Staking {
 
 }
 
-export default Staking;
+const staking = Staking.getInstance();
+
+export default staking;
