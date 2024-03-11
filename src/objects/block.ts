@@ -6,13 +6,13 @@ import blockchain from "../storage/blockchain.js";
 import encodingHandlers from "../handlers/encodingHandlers.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
+import cryptoHandlers from "../handlers/cryptoHandlers.js";
 
 export interface BlockLike {
     index: string;
     hash: string;
     previousHash: string;
     timestamp: string;
-    nonce: string;
     transactions: Transaction[];
     readonly version: string;
 }
@@ -23,7 +23,6 @@ export class Block implements BlockLike {
     public hash: string;
     public previousHash: string;
     public timestamp: string;
-    public nonce: string;
     public transactions: Transaction[];
     public readonly version: string;
 
@@ -32,7 +31,6 @@ export class Block implements BlockLike {
         hash: string,
         previousHash: string,
         timestamp: string,
-        nonce: string,
         transactions: Transaction[],
         version = "00"
     ) {
@@ -41,7 +39,6 @@ export class Block implements BlockLike {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
-        this.nonce = nonce;
         this.transactions = transactions;
         this.version = version;
 
@@ -65,15 +62,17 @@ export class Block implements BlockLike {
         const transactions = Object.values(mempool.transactions);
         transactions.unshift(coinbase)
     
-        return new Block(
+        const newBlock = new Block(
             newIndex,
             '',
             previousHash,
             new Date().getTime().toString(),
-            "0",
             transactions
         );
+        
+        newBlock.calculateHash();
 
+        return newBlock;
     }
 
     public encodeToHex(add_empty_bytes = true) {   
@@ -82,9 +81,6 @@ export class Block implements BlockLike {
         const index_length = encoded_index.length.toString().padStart(2, "0");
 
         const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
-
-        const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
-        const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
 
         let encoded_transactions = this.transactions.length.toString() + "E";
 
@@ -99,8 +95,6 @@ export class Block implements BlockLike {
                         this.previousHash +
                         timestamp_length +
                         this.timestamp +
-                        nonce_length +
-                        encoded_nonce + 
                         encoded_transactions;
 
         const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
@@ -120,8 +114,6 @@ export class Block implements BlockLike {
                 {key: "previousHash", length: 64},
                 {key: "timestamp_length", length: 2},
                 {key: "timestamp", length: "timestamp_length"},
-                {key: "nonce_length", length: 2},
-                {key: "nonce", length: "nonce_length"},
                 {key: "transactions", length: "", type: "array", arrayFunc: Transaction.fromDecodedHex}
             ]);
 
@@ -129,7 +121,6 @@ export class Block implements BlockLike {
         
             if (data && data.version === "00") {
                 data.index = encodingHandlers.decompressZeros(data.index);
-                data.nonce = encodingHandlers.decompressZeros(data.nonce);
 
                 return utils.createInstanceFromJSON(Block, data);
             }
@@ -140,15 +131,8 @@ export class Block implements BlockLike {
         return null;
     }
 
-    public static createCopy(block: Block) {
-        //return Block.initFromJSON(block);
-    }
-
-    public calculateHash(modifyedBlock: {[key: string]: any}) {
-        this.hash = crypto
-            .createHash('sha256')
-            .update(JSON.stringify(modifyedBlock))
-            .digest('hex');
+    public calculateHash() {
+        this.hash = cryptoHandlers.sha256(this, ["hash"]);
     }
 
 }

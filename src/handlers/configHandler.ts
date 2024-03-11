@@ -15,10 +15,9 @@ interface DefaultConfigInterface {
         host: string;
         port: number;
     };
-    miner: {
+    staker: {
         active: boolean;
-        number_of_threads: number;
-        minerAddress: string
+        address: string
     };
     experimental: boolean
 }

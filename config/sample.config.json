@@ -8,10 +8,9 @@
         "host": "0.0.0.0",
         "port": 12200
     },
-    "miner": {
+    "staker": {
         "active": true,
-        "number_of_threads": 8,
-        "minerAddress": ""
+        "address": ""
     },
     "experimental": false
 }

@@ -42,7 +42,7 @@ export class CLI {
     }
 
     public readonly default_message = new CLI.LogMessage('Global', '#ffffff');
-    public readonly miner_message = new CLI.LogMessage('Miner', '#00ffff');
+    public readonly staker_message = new CLI.LogMessage('Staker', '#00ffff');
     public readonly api_message = new CLI.LogMessage('API', '#c724b1');
     public readonly data_message = new CLI.LogMessage('Data', '#1711df');
     public readonly leicoin_net_message = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
@@ -112,7 +112,7 @@ export class CLI {
             case 'help':
                 this.default_message.log('Available commands:');
                 this.default_message.log(' - help: Show available commands');
-                this.default_message.log(' - stop: Stops The Server and Miner');
+                this.default_message.log(' - stop: Stops The Server and Staker');
                 break;
             case 'stop':
                 utils.gracefulShutdown();

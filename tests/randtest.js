@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export default function findMostSimilarString(inputString, stringArray) {
     let highestSimilarity = -1;
     let mostSimilarString = null;
@@ -61,4 +63,75 @@ function stringSimilarity(string1, string2) {
     // Calculate the similarity percentage
     let similarityPercentage = ((maxLength - distance) / maxLength) * 100;
     return similarityPercentage;
+}
+
+export function startTimer() {
+    return performance.now();
+}
+
+export function endTimer(startTime) {
+    const endTime = performance.now();
+    const elapsedTime = endTime - startTime;
+    return elapsedTime; // Return the elapsed time in milliseconds
+}
+
+export function sha256(data) {
+    const hash = crypto.createHash('sha256');
+    hash.update(data);
+    return hash.digest('hex');
+}
+
+export function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+export function customSort(input, arr) {
+    arr.sort((a, b) => {
+        const hashA = sha256(a + input);
+        const hashB = sha256(b + input);
+        return hashA.localeCompare(hashB);
+    });
+    return arr;
+}
+
+export function getNextValidator(hash, validatorArray) {
+
+    const idealScores = [];
+
+    const bestScoreDifferences = [];
+    let mostSimilar = "";
+
+	for (let i = 0; i < hash.length; i++) {
+		const charCode = hash.charCodeAt(i);
+	    idealScores.push(charCode);
+        bestScoreDifferences.push(128);
+	}
+
+    for (const validator of validatorArray) {
+
+        for (let i = 0; i < idealScores.length; i++) {
+            
+            const scoreDifference = Math.abs(idealScores[i] - validator.charCodeAt(0));
+
+            if (scoreDifference == bestScoreDifferences[i]) {
+                bestScoreDifferences[i] = scoreDifference;
+            } else if (scoreDifference < bestScoreDifferences[i]) {
+                bestScoreDifferences[i] = scoreDifference;
+                mostSimilar = validator;
+            } else {
+                break;
+            }
+
+        }
+
+    }
+
+    console.log(bestScoreDifferences);
+
+    return mostSimilar;
+
 }

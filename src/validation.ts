@@ -23,7 +23,7 @@ interface BlockValidationValidResult {
     forkparent: string;
 }
 
-export class Validator {
+export class Validation {
 
     public static validateAddress(address: string) {
         return address.startsWith("lc0x");
@@ -197,4 +197,4 @@ export class Validator {
   
 }
 
-export default Validator;
+export default Validation;
