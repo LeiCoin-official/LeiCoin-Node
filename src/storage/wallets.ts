@@ -71,7 +71,7 @@ export class WalletDB {
     public async adjustWalletsByBlock(block: Block) {
         try {
 
-            const promises = [];
+            const promises: Promise<void>[] = [];
 
             for (const transactionData of block.transactions) {
                 const amount = transactionData.amount;
@@ -79,7 +79,7 @@ export class WalletDB {
                 promises.push(this.addMoneyToWallet(transactionData.recipientAddress, amount));
             }
     
-            Promise.all(promises);
+            await Promise.all(promises);
             
             return { cb: Callbacks.SUCCESS };
 

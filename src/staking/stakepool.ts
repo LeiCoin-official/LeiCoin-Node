@@ -1,5 +1,11 @@
 import Staker from "../objects/staker.js";
 
+export interface StakersList {
+    [address: string]: {
+        stake: string;
+    }
+}
+
 class Stakerpool {
 
     private static instance: Stakerpool;
@@ -11,20 +17,26 @@ class Stakerpool {
         return Stakerpool.instance;
     }
 
-    private validators: Array<Staker>;
+    private stakers: StakersList;
 
     public nextStaker: Staker;
 
     private constructor() {
-        this.validators = [];
+        this.stakers = {};
+        this.nextStaker = new Staker("", "");
     }
 
-    public getNextStaker(hash: string) {
+    public getNextStaker(hash: string) {    
+        this.nextStaker = this.calculateStaker(hash);
+        return this.nextStaker;
+    
+    }
 
+    public calculateStaker(hash: string) {
         const idealScores: number[] = [];
     
         const bestScoreDifferences: number[] = [];
-        let nextStaker = this.validators[0];
+        let nextStaker = this.nextStaker;
     
         for (let i = 0; i < hash.length; i++) {
             const charCode = hash.charCodeAt(i);
@@ -32,9 +44,7 @@ class Stakerpool {
             bestScoreDifferences.push(128);
         }
     
-        for (const staker of this.validators) {
-
-            const address = staker.address;
+        for (const [address, data] of Object.entries(this.stakers)) {
     
             for (let i = 0; i < idealScores.length; i++) {
                 
@@ -44,7 +54,7 @@ class Stakerpool {
                     bestScoreDifferences[i] = scoreDifference;
                 } else if (scoreDifference < bestScoreDifferences[i]) {
                     bestScoreDifferences[i] = scoreDifference;
-                    nextStaker = staker;
+                    nextStaker = new Staker(address, data.stake);
                 } else {
                     break;
                 }
@@ -52,10 +62,7 @@ class Stakerpool {
             }
     
         }
-        
-        this.nextStaker = nextStaker;
         return nextStaker;
-    
     }
 
 }
