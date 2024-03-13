@@ -135,3 +135,66 @@ export function getNextValidator(hash, validatorArray) {
     return mostSimilar;
 
 }
+
+export class SpecialObject {
+    constructor() {
+      this.data = {};
+    }
+    insert(index, item) {
+      const newData = {};
+      // Copy existing data to the new object
+      for (const key in this.data) {
+        const numericKey = parseInt(key);
+        if (numericKey >= index) {
+          // Shift existing keys greater than or equal to the new index by one position
+          newData[numericKey + 1] = this.data[numericKey];
+        } else {
+          newData[numericKey] = this.data[numericKey];
+        }
+      }
+      // Insert the new item at the specified index
+      newData[index] = item;
+      // Update the data reference
+      this.data = newData;
+    }
+    getData() {
+      return this.data;
+    }
+  }
+  
+export class SpecialObject2 {
+  
+    constructor() {
+      this.data = {};
+    }
+  
+    insert(index, item) {
+      const newData = {};
+  
+      // Copy existing data to the new object
+      for (const key in this.data) {
+        if (key.localeCompare(index) >= 0) {
+          // Shift existing keys greater than or equal to the new index by one position
+          newData[this.getNextAlphabeticalKey(key)] = this.data[key];
+        } else {
+          newData[key] = this.data[key];
+        }
+      }
+  
+      // Insert the new item at the specified index
+      newData[index] = item;
+  
+      // Update the data reference
+      this.data = newData;
+    }
+  
+    getData() {
+      return this.data;
+    }
+  
+    getNextAlphabeticalKey(key) {
+      const nextCharCode = key.charCodeAt(0) + 1;
+      return String.fromCharCode(nextCharCode) + key.slice(1);
+    }
+  }
+  
