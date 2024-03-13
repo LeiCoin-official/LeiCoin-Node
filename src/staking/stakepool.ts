@@ -26,10 +26,9 @@ class Stakerpool {
         this.nextStaker = new Staker("", "");
     }
 
-    public getNextStaker(hash: string) {    
+    public getNextStaker(hash: string) {
         this.nextStaker = this.calculateStaker(hash);
         return this.nextStaker;
-    
     }
 
     public calculateStaker(hash: string) {
@@ -50,15 +49,13 @@ class Stakerpool {
                 
                 const scoreDifference = Math.abs(idealScores[i] - address.charCodeAt(0));
     
-                if (scoreDifference == bestScoreDifferences[i]) {
-                    bestScoreDifferences[i] = scoreDifference;
+                if (scoreDifference > bestScoreDifferences[i]) {
+                    break;
                 } else if (scoreDifference < bestScoreDifferences[i]) {
                     bestScoreDifferences[i] = scoreDifference;
                     nextStaker = new Staker(address, data.stake);
-                } else {
-                    break;
                 }
-    
+
             }
     
         }
