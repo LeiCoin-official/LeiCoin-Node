@@ -27,7 +27,7 @@ interface ENVConfigInterface {
 }
 
 interface ConfigInterface extends DefaultConfigInterface, ENVConfigInterface {
-    peers: [string];
+    peers: string[];
 }
   
 

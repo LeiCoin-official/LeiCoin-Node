@@ -52,6 +52,10 @@ export class Validation {
             return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
         }
 
+        if (tx.version !== "00") {
+            return {cb: false, status: 400, message: "Bad Request. Invalid version."};
+        }
+
         if (!this.validateTXSignature(tx)) {
             return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
         }
@@ -85,7 +89,7 @@ export class Validation {
         return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
     }
 
-    private static isValidCoinbaseTransaction(coinbase: TransactionLike): {
+    private static isValidCoinbaseTransaction(tx: TransactionLike): {
         cb: true;
     } | {
         cb: false;
@@ -93,20 +97,32 @@ export class Validation {
         message: string;
     } {
 
-        if (!coinbase || !senderAddress || !publicKey || !output || !signature || !input ||) {
+        if (!tx.txid || !tx.senderAddress || !tx.senderPublicKey || !tx.recipientAddress || !tx.amount || !tx.nonce || !tx.timestamp || !tx.signature || !tx.version)  {
             return {cb: false, status: 400, message: "Bad Request. Invalid Coinbase arguments."};
         }
 
-        if (cryptoHandlers.sha256(coinbaseTransaction, ["txid", "coinbase"]) !== txid) {
+        if (tx.version !== "00") {
+            return {cb: false, status: 400, message: "Bad Request. Invalid Coinbase version."};
+        }
+
+        if (cryptoHandlers.sha256(tx, ["txid"]) !== tx.txid) {
             return {cb: false, status: 400, message: "Bad Request. Coinbase hash does not correspond to its data."};
         }
 
-        if (![senderAddress, publicKey, input[0].utxoid, signature].every(value => value === "coinbase")) {
-            return {cb: false, status: 400, message: 'Bad Request. Coinbase Data is invalid.'};
+        if (tx.senderAddress !== "lc0x6c6569636f696e6e65745f636f696e62617365" || tx.senderPublicKey !== "6c6569636f696e6e65745f636f696e62617365") {
+            return {cb: false, status: 400, message: 'Bad Request. Coinbase Sender Data is invalid.'};
         }
 
-        if (output[0].amount !== utils.mining_pow) {
+        if (tx.amount !== utils.mining_pow) {
             return {cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.'};
+        }
+
+        if (tx.nonce !== "0") {
+            return {cb: false, status: 400, message: 'Bad Request. Coinbase nonce is invalid.'};
+        }
+
+        if (tx.signature !== "0000000000000000000000000000000000000000000000000000000000000000") {
+            return {cb: false, status: 400, message: 'Bad Request. Coinbase signature is invalid.'};
         }
 
         return {cb: true};
@@ -114,9 +130,8 @@ export class Validation {
     }
 
     public static isValidBlock(block: BlockLike): BlockValidationInvalidResult | BlockValidationValidResult {
-        const { index, previousHash, transactions, timestamp, nonce, hash } = block;
 
-        if ((!index && index !== 0) || (!previousHash && index !== 0) || !transactions || !timestamp || !nonce || !hash) {
+        if (!block.index || !block.hash || !block.previousHash || !block.timestamp || !block.transactions || !block.version) {
             return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
         }
 

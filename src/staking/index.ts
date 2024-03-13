@@ -19,27 +19,30 @@ export class Staking {
 		return Staking.instance;
 	}
 
-	public initStakerIfActive() {
+	public initIfActive() {
 		if (config.staker.active) {
 			if (Validation.validateAddress(config.staker.address)) {
 				cli.staker_message.log("Staker started");
 			} else {
-				cli.staker_message.error("Staker could not be started: Invalid Address.")
+				cli.staker_message.error("Staker could not be started: Invalid Address.");
 			}
 		}
 	}
 
 	public async runNextStaking(hash: string) {
 
-		stakerpool.getNextStaker(hash)
+		const nextStaker = stakerpool.getNextStaker(hash);
 
-		if (stakerpool.nextStaker.address === config.staker.address) {
+		if (nextStaker.address === config.staker.address) {
 
 			const block = Block.createNewBlock();
-			// Adjust the delay maybe later for faster Block times
-			await new Promise((resolve) => setTimeout(resolve, 10_000));
 
-			await this.broadcastBlock(block)
+			// Adjust the delay maybe later for faster Block times
+			//await new Promise((resolve) => setTimeout(resolve, 10_000));
+
+			await this.broadcastBlock(block);
+
+			this.runNextStaking(block.hash);
 
 		}
 		

@@ -2,23 +2,23 @@ import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
 import { Callbacks } from "../utils/callbacks.js";
 
-class Mempool {
+class Mempool {                                                                                                                                                                                                         
+
+    private static instance: Mempool;
 
     public transactions: {
         [txid: string]: Transaction
-    };                                                                                                                                                                                                              
-
-    private static instance: Mempool;
+    };
   
-    public constructor() {
+    private constructor() {
         this.transactions = {};
     }
     
     public static getInstance() {
-      if (!Mempool.instance) {
-        Mempool.instance = new Mempool();
-      }
-      return Mempool.instance;
+        if (!Mempool.instance) {
+            Mempool.instance = new Mempool();
+        }
+        return Mempool.instance;
     }
 
     public clearMempoolbyBlock(block: Block) {

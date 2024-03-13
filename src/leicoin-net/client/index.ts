@@ -2,122 +2,70 @@ import WebSocket from "ws";
 import utils from "../../utils/utils.js";
 import config from "../../handlers/configHandler.js";
 import cli from "../../utils/cli.js";
+import LeiCoinNetClient from "./client.js";
 
-export interface WebSocketClientConnection {
-    host: string;
-    client: WebSocket | null;
-    initialized: boolean;
-}
+export class LeiCoinNetClientsHandler {
 
-// An array to store WebSocket connections
-const wsConnections: WebSocketClientConnection[] = [];
+    public static instance: LeiCoinNetClientsHandler;
 
-// Function to establish a WebSocket connection to a peer server
-function connectToPeer(peerConnection: WebSocketClientConnection) {
-    const wsclient = new WebSocket(`ws://${peerConnection.host}/`);
-    //const peerConnection = { server: peerServer, client: wsclient };
+    public readonly connections: LeiCoinNetClient[];
 
-    wsclient.on('open', () => {
-        cli.leicoin_net_message.client.log(`Connected to: ${peerConnection.host}`);
-        peerConnection.initialized = true;
-    });
-
-    wsclient.on('error', (error) => {
-        cli.leicoin_net_message.client.error(`Error connecting to ${peerConnection.host}: ${error.message}`);
-    });
-
-    wsclient.on('close', (code) => {
-        cli.leicoin_net_message.client.log(`Connection to ${peerConnection.host} closed. Exit-Code: ${code}`);
-        peerConnection.initialized = false;
-    });
-
-    peerConnection.client = wsclient;
-    return peerConnection;
-}
-
-function reconnectToPeer(peerConnection: WebSocketClientConnection) {
-    if (!peerConnection.client || peerConnection.client.readyState !== WebSocket.OPEN) {
-        peerConnection = connectToPeer(peerConnection);
-        cli.leicoin_net_message.client.log(`Retrying connection to ${peerConnection.host}`);
-        return { needed: true, connection: peerConnection };
+    private constructor() {
+        this.connections = [];
     }
-    return { needed: false };
-}
-
-utils.events.on("block_receive", function (data) {
-    wsConnections.forEach((peerConnection) => {
-        const reconnect = reconnectToPeer(peerConnection);
-        if (reconnect.needed && reconnect.connection) {
-            peerConnection = reconnect.connection;
-            setTimeout(() => {
-                sendBlock(peerConnection, data);
-            }, 2000); // Wait for 2 seconds before sending data
-        } else {
-            sendBlock(peerConnection, data);
+    
+    public static getInstance() {
+        if (!LeiCoinNetClientsHandler.instance) {
+            LeiCoinNetClientsHandler.instance = new LeiCoinNetClientsHandler();
         }
-    });
-});
-
-utils.events.on("transaction_receive", function (data) {
-    wsConnections.forEach((peerConnection) => {
-        const reconnect = reconnectToPeer(peerConnection);
-        if (reconnect.needed && reconnect.connection) {
-            peerConnection = reconnect.connection;
-            setTimeout(() => {
-                sendTransaction(peerConnection, data);
-            }, 2000); // Wait for 2 seconds before sending data
-        } else {
-            sendTransaction(peerConnection, data);
-        }
-    });
-});
-
-function sendBlock(peerConnection: WebSocketClientConnection, data: any) {
-    if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
-        try {
-            peerConnection.client.send(data);
-            //cli.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            cli.leicoin_net_message.client.log(`Block sent to ${peerConnection.host}`);
-        } catch (err: any) {
-            cli.leicoin_net_message.client.error(`Error sending Block to ${peerConnection.host}: ${err.message}`);
-        }
-    } else {
-        //cli.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+        return LeiCoinNetClientsHandler.instance;
     }
-}
 
-function sendTransaction(peerConnection: WebSocketClientConnection, data: any) {
-    if (peerConnection.client && peerConnection.client.readyState === WebSocket.OPEN) {
-        try {
-            peerConnection.client.send(data);
-            //cli.ws_client_message.log(`Data sent to ${peerConnection.server}: ${data}`);
-            cli.leicoin_net_message.client.log(`Transaction sent to ${peerConnection.host}`);
-        } catch (err: any) {
-            cli.leicoin_net_message.client.error(`Error sending Transaction to ${peerConnection.host}: ${err.message}`);
+    public async initAllClients() {
+        const promises: Promise<void>[] = [];
+
+        // Connect to other peer nodes and create peer-to-peer connections
+        for (const host of config.peers) {
+            promises.push(this.initClient(host));
         }
-    } else {
-        //cli.ws_client_message.log(`Waiting to send data to ${peerConnection.server}...`);
+        
+        await Promise.all(promises);
     }
-}
 
-export function initLeiCoinNetClient() {
-    // Connect to other peer nodes and create peer-to-peer connections
-    config.peers.forEach((host: string) => {
-        const peerConnection = connectToPeer({
-            host: host,
-            client: null,
-            initialized: false,
-        }); 
-        wsConnections.push(peerConnection);
-    });
+    private async initClient(host: string) {
+        const connection = new LeiCoinNetClient(host);
+        await connection.connect();
+        this.connections.push(connection);
+    }
 
-    return wsConnections;
-}
-
-export function shutdownLeiCoinNetClient() {
-    wsConnections.forEach(connection => {
-        if (connection.initialized) {
-            connection.client?.close(1000);
+    public shutdown() {
+        for (const connection of this.connections) {
+            if (connection.isReady()) {
+                connection.close();
+            }
         }
-    });
+    }
+
+    public async broadcastBlock(data: any) {
+
+        const promises: Promise<any>[] = [];
+
+        for (const connection of this.connections) {
+            promises.push(connection.sendBlock(data));
+        }
+
+        await Promise.all(promises);
+    }
+
+    public async broadcastTransaction(data: any) {
+
+        const promises: Promise<any>[] = [];
+
+        for (const connection of this.connections) {
+            promises.push(connection.sendTransaction(data));
+        }
+
+        await Promise.all(promises);
+    }
+
 }
