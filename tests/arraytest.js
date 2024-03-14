@@ -113,5 +113,5 @@ console.log(arrayObj[Math.floor(Math.random()*arrayObj.length)])
 console.log("Elapsed time 1:", elapsedTime1 / 1000, "seconds");
 console.log("Elapsed time 2:", elapsedTime2 / 1000, "seconds");
 
-//fs.writeFileSync("./tests/one.json", JSON.stringify(filteredArray));
+fs.writeFileSync("./tests/one.json", JSON.stringify(sortedObj));
   
