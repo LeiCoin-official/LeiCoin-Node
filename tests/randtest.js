@@ -136,71 +136,65 @@ export function getNextValidator(hash, validatorArray) {
 
 }
 
-export function getNextValidators(seedHash, validatorArray) {
-
-    const idealScores = [];
-
-    const bestScoreDifferences = [];
-    let mostSimilar = "";
-
-	for (let i = 0; i < hash.length; i++) {
-		const charCode = hash.charCodeAt(i);
-	    idealScores.push(charCode);
-        bestScoreDifferences.push(128);
-	}
-
-    for (const [index, validator] of Object.entries(validatorArray)) {
-
-        for (let i = 0; i < idealScores.length; i++) {
-            
-            const scoreDifference = Math.abs(idealScores[i] - validator.charCodeAt(0));
-
-            if (scoreDifference == bestScoreDifferences[i]) {
-                bestScoreDifferences[i] = scoreDifference;
-            } else if (scoreDifference < bestScoreDifferences[i]) {
-                bestScoreDifferences[i] = scoreDifference;
-                mostSimilar = validator;
-            } else {
-                break;
-            }
-
+export class SpecialObject {
+    constructor() {
+      this.data = {};
+    }
+    insert(index, item) {
+      const newData = {};
+      // Copy existing data to the new object
+      for (const key in this.data) {
+        const numericKey = parseInt(key);
+        if (numericKey >= index) {
+          // Shift existing keys greater than or equal to the new index by one position
+          newData[numericKey + 1] = this.data[numericKey];
+        } else {
+          newData[numericKey] = this.data[numericKey];
         }
-
+      }
+      // Insert the new item at the specified index
+      newData[index] = item;
+      // Update the data reference
+      this.data = newData;
     }
-
-    console.log(bestScoreDifferences);
-
-    return mostSimilar;
-
-}
-
-export function getNextValidators(hash, validatorArray) {
-    const idealScores: number[] = [];
-
-    const bestScoreDifferences: number[] = [];
-    let nextStaker = this.nextStaker;
-
-    for (let i = 0; i < hash.length; i++) {
-        const charCode = hash.charCodeAt(i);
-        idealScores.push(charCode);
-        bestScoreDifferences.push(128);
+    getData() {
+      return this.data;
     }
-
-    for (const [address, data] of Object.entries(this.stakers)) {
-
-        for (let i = 0; i < idealScores.length; i++) {
-            
-            const scoreDifference = Math.abs(idealScores[i] - address.charCodeAt(0));
-
-            if (scoreDifference > bestScoreDifferences[i]) {
-                break;
-            } else if (scoreDifference < bestScoreDifferences[i]) {
-                bestScoreDifferences[i] = scoreDifference;
-                nextStaker = new Staker(address, data.stake);
-            }
-
+  }
+  
+export class SpecialObject2 {
+  
+    constructor() {
+      this.data = {};
+    }
+  
+    insert(index, item) {
+      const newData = {};
+  
+      // Copy existing data to the new object
+      for (const key in this.data) {
+        if (key.localeCompare(index) >= 0) {
+          // Shift existing keys greater than or equal to the new index by one position
+          newData[this.getNextAlphabeticalKey(key)] = this.data[key];
+        } else {
+          newData[key] = this.data[key];
         }
-
+      }
+  
+      // Insert the new item at the specified index
+      newData[index] = item;
+  
+      // Update the data reference
+      this.data = newData;
     }
-    return nextStaker;
-}
+  
+    getData() {
+      return this.data;
+    }
+  
+    getNextAlphabeticalKey(key) {
+      const nextCharCode = key.charCodeAt(0) + 1;
+      return String.fromCharCode(nextCharCode) + key.slice(1);
+    }
+  }
+  
