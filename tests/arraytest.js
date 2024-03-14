@@ -87,6 +87,39 @@ function sortObjectAlphabetical(obj) {
     return sortedObj;
 }
 
+function sortObjectAlphabetical2(obj, excludedKeys = []) {
+    const deepSort = (input) => {
+        if (typeof input !== 'object' || input === null) {
+            return input;
+        }
+
+        if (Array.isArray(input)) {
+            return input.map(deepSort);
+        }
+
+        const sortedObj = {};
+        if (excludedKeys.length > 0) {
+            Object.keys(input)
+                .sort()
+                .forEach(key => {
+                    if (!excludedKeys.includes(key)) {
+                        sortedObj[key] = deepSort(input[key]);
+                    }
+                });
+        } else {
+            Object.keys(input)
+                .sort()
+                .forEach(key => {
+                    sortedObj[key] = deepSort(input[key]);
+                });
+        }
+        return sortedObj;
+    };
+
+    const sortedObj = deepSort(obj);
+    return sortedObj;
+}
+
 const obj = {};
 
 const startTime1 = startTimer();
@@ -105,13 +138,22 @@ const arrayObj = Object.entries(sortedObj);
 
 const elapsedTime2 = endTimer(startTime2);
 
+const startTime3 = startTimer();
+
+const sortedObj2 = sortObjectAlphabetical2(obj);
+const arrayObj2 = Object.entries(sortedObj2);
+
+const elapsedTime3 = endTimer(startTime3);
+
 //specialObj.insert(1_000_001, "lc0x" + crypto.randomBytes(19).toString("hex"));
 
 
 console.log(arrayObj[Math.floor(Math.random()*arrayObj.length)])
+console.log(arrayObj2[Math.floor(Math.random()*arrayObj2.length)])
 
 console.log("Elapsed time 1:", elapsedTime1 / 1000, "seconds");
 console.log("Elapsed time 2:", elapsedTime2 / 1000, "seconds");
+console.log("Elapsed time 3:", elapsedTime3 / 1000, "seconds");
 
-fs.writeFileSync("./tests/one.json", JSON.stringify(sortedObj));
+//fs.writeFileSync("./tests/one.json", JSON.stringify(sortedObj));
   

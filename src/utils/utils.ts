@@ -81,6 +81,29 @@ class Utils {
         return instance;
     }
 
+    public sortObjectAlphabetical(obj: { [key: string]: any }): { [key: string]: any } {
+        const deepSort = (input: any): any => {
+            if (typeof input !== 'object' || input === null) {
+                return input;
+            }
+    
+            if (Array.isArray(input)) {
+                return input.map(deepSort);
+            }
+    
+            const sortedObj: { [key: string]: any } = {};
+            Object.keys(input)
+                .sort()
+                .forEach(key => {
+                    sortedObj[key] = deepSort(input[key]);
+                });
+            return sortedObj;
+        };
+    
+        const sortedObj = deepSort(obj);
+        return sortedObj;
+    }
+
 }
 
 export default Utils.getInstance();
