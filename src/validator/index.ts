@@ -8,15 +8,15 @@ import utils from "../utils/utils.js";
 import Validation from "../validation.js";
 import stakerpool from "./stakepool.js";
 
-export class Staking {
+export class Validator {
 
-	private static instance: Staking;
+	private static instance: Validator;
 
 	public static getInstance() {
-		if (!Staking.instance) {
-			Staking.instance = new Staking();
+		if (!Validator.instance) {
+			Validator.instance = new Validator();
 		}
-		return Staking.instance;
+		return Validator.instance;
 	}
 
 	public initIfActive() {
@@ -68,5 +68,5 @@ export class Staking {
 
 }
 
-const staking = Staking.getInstance();
+const staking = Validator.getInstance();
 export default staking;

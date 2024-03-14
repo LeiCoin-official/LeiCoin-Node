@@ -34,7 +34,7 @@ export class Transaction {
         const coinbase = new Transaction(
             "",
             "lc0x6c6569636f696e6e65745f636f696e62617365",
-            "",
+            "2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d465977454159484b6f5a497a6a3043415159464b34454541416f44516741452f632b5135304b38736253325854692b5466474c6a496b525a7054546e54554b0d0a42724d586168304c37393230366344446376494e556f572b4a6473384a4d444652795375556c2f752b59426b597879535567795848513d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d0d0a",
             "lc0x01da74f8d1cf98760388643407cd1d4bc19f28",
             "100000",
             "0",
@@ -42,14 +42,14 @@ export class Transaction {
             "",
             "0000000000000000000000000000000000000000000000000000000000000000",
         );
-        coinbase.txid = cryptoHandlers.createHash(coinbase, ["txid", "version"]);
+        coinbase.txid = cryptoHandlers.sha256(coinbase, ["txid", "version"]);
         return coinbase;
     }
 
     public encodeToHex(add_empty_bytes = false) {
 
-        const encoded_senderPublicKey = encodingHandlers.base64ToHex(this.senderPublicKey);
-        const senderPublicKey_length = encoded_senderPublicKey.length.toString().padStart(3, "0");        
+        //const encoded_senderPublicKey = encodingHandlers.encodeBase64ToHex(this.senderPublicKey);
+        const senderPublicKey_length = this.senderPublicKey.length.toString().padStart(4, "0");        
     
         const encoded_amount = encodingHandlers.compressZeros(this.amount.toString());
         const amount_length = encoded_amount.length.toString().padStart(2, "0");
@@ -59,14 +59,14 @@ export class Transaction {
 
         const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
 
-        const encoded_message = encodingHandlers.base64ToHex(this.message);
+        const encoded_message = encodingHandlers.encodeBase64ToHex(this.message);
         const message_length = encoded_message.length.toString().padStart(3, "0");
 
         const hexData = this.version +
                         this.txid +
                         encodingHandlers.encodeAddressToHex(this.senderAddress) +
                         senderPublicKey_length +
-                        encoded_senderPublicKey +
+                        this.senderPublicKey +
                         encodingHandlers.encodeAddressToHex(this.recipientAddress) +
                         amount_length +
                         encoded_amount +
@@ -91,7 +91,7 @@ export class Transaction {
                 {key: "version", length: 2},
                 {key: "txid", length: 64},
                 {key: "senderAddress", length: 40},
-                {key: "senderPublicKey_length", length: 3},
+                {key: "senderPublicKey_length", length: 4},
                 {key: "senderPublicKey", length: "senderPublicKey_length"},
                 {key: "recipientAddress", length: 40},
                 {key: "amount_length", length: 2},
@@ -109,11 +109,10 @@ export class Transaction {
         
             if (data && data.version === "00") {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
-                data.senderPublicKey = encodingHandlers.hexToBase64(data.senderPublicKey);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
                 data.amount = encodingHandlers.decompressZeros(data.amount);
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
-                data.message = encodingHandlers.hexToBase64(data.message);
+                data.message = encodingHandlers.decodeHexToBase64(data.message);
 
                 const tx = createInstanceFromJSON(Transaction, data)
 
@@ -170,8 +169,8 @@ export class Block {
     
         return new Block(
             "1000000",
-            cryptoHandlers.createHash({1: "123"}),
-            cryptoHandlers.createHash({1: "abc"}),
+            cryptoHandlers.sha256({1: "123"}),
+            cryptoHandlers.sha256({1: "abc"}),
             new Date().getTime().toString(),
             "1000000000",
             transactions
@@ -402,7 +401,8 @@ describe('Encoding Testing', () => {
 
         const decoded2: any = Block.fromDecodedHex(decoded.encodeToHex());
 
-        //fs.writeFileSync("./blockchain_data/test.dat", decoded2.encodeToHex(), {encoding: "hex", flag: "w"});
+        fs.writeFileSync("./blockchain_data/test.bin", decoded2.encodeToHex(), {encoding: "hex", flag: "w"});
+        //console.log(decoded2?.encodeToHex().length);
 
         expect(JSON.stringify(block)).toBe(JSON.stringify(decoded2));
     });
