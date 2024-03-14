@@ -81,7 +81,7 @@ class Utils {
         return instance;
     }
 
-    public sortObjectAlphabetical(obj: { [key: string]: any }): { [key: string]: any } {
+    public sortObjectAlphabetical<T extends Object>(obj: T): T {
         const deepSort = (input: any): any => {
             if (typeof input !== 'object' || input === null) {
                 return input;

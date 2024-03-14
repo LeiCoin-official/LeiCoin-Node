@@ -66,7 +66,23 @@ class Stakerpool {
 
     public calculateNextValidators(seedHash: string) {
 
-        const stakersArray = Object.entries(utils.sortObjectAlphabetical(this.stakers));
+        const validatorsArray = Object.entries(utils.sortObjectAlphabetical(this.stakers));
+
+        const selected: StakersList = {};
+
+        let nextHash = seedHash;
+
+        for (let i = 0; i < 128; i++) {
+            const index = parseInt((BigInt(`0x${nextHash}`) % BigInt(validatorsArray.length)).toString());
+
+            selected[validatorsArray[index][0]] = validatorsArray[index][1];
+
+            validatorsArray.splice(index, 1);
+
+            nextHash = cryptoHandlers.sha256(nextHash);
+        }
+
+        return selected;
 
     }
 
