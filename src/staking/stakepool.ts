@@ -1,3 +1,4 @@
+import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import Staker from "../objects/staker.js";
 
 export interface StakersList {
@@ -41,6 +42,54 @@ class Stakerpool {
             const charCode = hash.charCodeAt(i);
             idealScores.push(charCode);
             bestScoreDifferences.push(128);
+        }
+    
+        for (const [address, data] of Object.entries(this.stakers)) {
+    
+            for (let i = 0; i < idealScores.length; i++) {
+                
+                const scoreDifference = Math.abs(idealScores[i] - address.charCodeAt(0));
+    
+                if (scoreDifference > bestScoreDifferences[i]) {
+                    break;
+                } else if (scoreDifference < bestScoreDifferences[i]) {
+                    bestScoreDifferences[i] = scoreDifference;
+                    nextStaker = new Staker(address, data.stake);
+                }
+
+            }
+    
+        }
+        return nextStaker;
+    }
+
+    public calculateNextValidators(seedHash: string) {
+
+        const comparingData: {
+            idealScores: number[],
+            bestScoreDifferences: number[],
+            nextValidator: Staker,
+        }[] = [];
+        
+        for (let validatorIndex = 0; validatorIndex < 128; validatorIndex++) {
+
+            const nextHash = cryptoHandlers.sha256(seedHash + validatorIndex.toString());
+
+            const idealScores: number[] = [];
+            const bestScoreDifferences: number[] = [];
+
+            for (let hashCharIndex = 0; hashCharIndex < nextHash.length; hashCharIndex++) {
+                const charCode = nextHash.charCodeAt(hashCharIndex);
+                idealScores.push(charCode);
+                bestScoreDifferences.push(128);
+            }
+
+            comparingData.push({
+                idealScores,
+                bestScoreDifferences,
+                nextValidator: new Staker("", "")
+            });
+
         }
     
         for (const [address, data] of Object.entries(this.stakers)) {

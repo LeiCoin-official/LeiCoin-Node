@@ -4,17 +4,17 @@ import { startTimer, endTimer, shuffleArray, sha256, getNextValidator } from './
 
 const inputString = sha256(crypto.randomBytes(32).toString('hex'));
 
-const arrayToSort = [];
+const objectToSort = {};
 
 for (let i = 0; i < 1000000; i++) {
-    arrayToSort.push("lc0x" + crypto.randomBytes(19).toString('hex'));
+    objectToSort[i] = ("lc0x" + crypto.randomBytes(19).toString('hex'));
 }
 
-const shuffledArray = shuffleArray(arrayToSort)
+const shuffledArray = shuffleArray(objectToSort)
 
 const startTime = startTimer();
 
-const r1 = getNextValidator(inputString, arrayToSort);
+const r1 = getNextValidator(inputString, objectToSort);
 
 const elapsedTime = endTimer(startTime);
 

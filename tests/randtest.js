@@ -111,7 +111,7 @@ export function getNextValidator(hash, validatorArray) {
         bestScoreDifferences.push(128);
 	}
 
-    for (const validator of validatorArray) {
+    for (const [index, validator] of Object.entries(validatorArray)) {
 
         for (let i = 0; i < idealScores.length; i++) {
             
@@ -134,4 +134,73 @@ export function getNextValidator(hash, validatorArray) {
 
     return mostSimilar;
 
+}
+
+export function getNextValidators(seedHash, validatorArray) {
+
+    const idealScores = [];
+
+    const bestScoreDifferences = [];
+    let mostSimilar = "";
+
+	for (let i = 0; i < hash.length; i++) {
+		const charCode = hash.charCodeAt(i);
+	    idealScores.push(charCode);
+        bestScoreDifferences.push(128);
+	}
+
+    for (const [index, validator] of Object.entries(validatorArray)) {
+
+        for (let i = 0; i < idealScores.length; i++) {
+            
+            const scoreDifference = Math.abs(idealScores[i] - validator.charCodeAt(0));
+
+            if (scoreDifference == bestScoreDifferences[i]) {
+                bestScoreDifferences[i] = scoreDifference;
+            } else if (scoreDifference < bestScoreDifferences[i]) {
+                bestScoreDifferences[i] = scoreDifference;
+                mostSimilar = validator;
+            } else {
+                break;
+            }
+
+        }
+
+    }
+
+    console.log(bestScoreDifferences);
+
+    return mostSimilar;
+
+}
+
+export function getNextValidators(hash, validatorArray) {
+    const idealScores: number[] = [];
+
+    const bestScoreDifferences: number[] = [];
+    let nextStaker = this.nextStaker;
+
+    for (let i = 0; i < hash.length; i++) {
+        const charCode = hash.charCodeAt(i);
+        idealScores.push(charCode);
+        bestScoreDifferences.push(128);
+    }
+
+    for (const [address, data] of Object.entries(this.stakers)) {
+
+        for (let i = 0; i < idealScores.length; i++) {
+            
+            const scoreDifference = Math.abs(idealScores[i] - address.charCodeAt(0));
+
+            if (scoreDifference > bestScoreDifferences[i]) {
+                break;
+            } else if (scoreDifference < bestScoreDifferences[i]) {
+                bestScoreDifferences[i] = scoreDifference;
+                nextStaker = new Staker(address, data.stake);
+            }
+
+        }
+
+    }
+    return nextStaker;
 }
