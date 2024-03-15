@@ -24,6 +24,7 @@
 	},
 	"homepage": "https://github.com/LeiCraft/LeiCoin-Node#readme",
 	"dependencies": {
+		"@noble/ed25519": "^2.0.0",
 		"@types/level": "^6.0.3",
 		"@types/ws": "^8.5.10",
 		"ansi-escapes": "^6.2.0",
