@@ -10,6 +10,8 @@
     },
     "staker": {
         "active": true,
+        "publicKey": "",
+        "privateKey": "",
         "address": ""
     },
     "experimental": false

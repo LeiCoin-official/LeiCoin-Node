@@ -17,6 +17,8 @@ interface DefaultConfigInterface {
     };
     staker: {
         active: boolean;
+        publicKey: string;
+        privateKey: string;
         address: string
     };
     experimental: boolean

@@ -3,7 +3,7 @@ import Staker from "../objects/staker.js";
 import utils from "../utils/utils.js";
 
 export interface StakersList {
-    [address: string]: {
+    [publicKey: string]: {
         stake: string;
     }
 }

@@ -1,11 +1,11 @@
 
 export class Staker {
 
-    public readonly address: string;
+    public readonly publicKey: string;
     public stake: string;
 
-    constructor(address: string, stake: string) {
-        this.address = address;
+    constructor(publicKey: string, stake: string) {
+        this.publicKey = publicKey;
         this.stake = stake;
     }
 

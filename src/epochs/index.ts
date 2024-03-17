@@ -10,6 +10,19 @@ export class Epochs {
         return Epochs.instance;
     }
 
+    public currentIndex: string;
+    
+
+    private constructor() {
+        
+        this.name = "Epochs";
+
+        
+    }
+    public a() {
+        this.name = "Epochs";
+    }
+    
 
 }
 

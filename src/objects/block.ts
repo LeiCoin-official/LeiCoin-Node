@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import utils from "../utils/utils.js";
 import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
@@ -7,12 +6,16 @@ import encodingHandlers from "../handlers/encodingHandlers.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
+import Attestation from "./attestation.js";
+import config from "../handlers/configHandler.js";
 
 export interface BlockLike {
     index: string;
     hash: string;
     previousHash: string;
     timestamp: string;
+    proposer: string;
+    attestations: Attestation[];
     transactions: Transaction[];
     readonly version: string;
 }
@@ -23,6 +26,8 @@ export class Block implements BlockLike {
     public hash: string;
     public previousHash: string;
     public timestamp: string;
+    public proposer: string;
+    public attestations: Attestation[];
     public transactions: Transaction[];
     public readonly version: string;
 
@@ -31,6 +36,8 @@ export class Block implements BlockLike {
         hash: string,
         previousHash: string,
         timestamp: string,
+        proposer: string,
+        attestations: Attestation[],
         transactions: Transaction[],
         version = "00"
     ) {
@@ -39,6 +46,8 @@ export class Block implements BlockLike {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
+        this.proposer = proposer;
+        this.attestations = attestations;
         this.transactions = transactions;
         this.version = version;
 
@@ -60,13 +69,15 @@ export class Block implements BlockLike {
         const coinbase = Transaction.createCoinbaseTransaction();
 
         const transactions = Object.values(mempool.transactions);
-        transactions.unshift(coinbase)
+        transactions.unshift(coinbase);
     
         const newBlock = new Block(
             newIndex,
             '',
             previousHash,
             new Date().getTime().toString(),
+            config.staker.publicKey,
+            [],
             transactions
         );
         
@@ -133,6 +144,10 @@ export class Block implements BlockLike {
 
     public calculateHash() {
         this.hash = cryptoHandlers.sha256(this, ["hash"]);
+    }
+
+    public addAttestation(attestation: Attestation) {
+        this.attestations.push(attestation);
     }
 
 }
