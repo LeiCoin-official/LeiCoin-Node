@@ -4,10 +4,10 @@ export class Epochs {
     private static instance: Epochs;
 
     public static getInstance() {
-        if (!Epochs.instance) {
-            Epochs.instance = new Epochs();
+        if (!this.instance) {
+            this.instance = new this();
         }
-        return Epochs.instance;
+        return this.instance;
     }
 
     public currentIndex: string;

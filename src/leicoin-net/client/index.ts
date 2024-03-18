@@ -3,15 +3,14 @@ import utils from "../../utils/utils.js";
 import config from "../../handlers/configHandler.js";
 import cli from "../../utils/cli.js";
 import LeiCoinNetClient from "./client.js";
+import LeiCoinNetClientsBasicHandler from "./basicHandler.js";
 
-class LeiCoinNetClientsHandler {
+class LeiCoinNetClientsHandler extends LeiCoinNetClientsBasicHandler {
 
     public static instance: LeiCoinNetClientsHandler;
 
-    public readonly connections: LeiCoinNetClient[];
-
     private constructor() {
-        this.connections = [];
+        super();
     }
     
     public static getInstance() {
@@ -29,31 +28,6 @@ class LeiCoinNetClientsHandler {
             promises.push(this.initClient(host));
         }
         
-        await Promise.all(promises);
-    }
-
-    private async initClient(host: string) {
-        const connection = new LeiCoinNetClient(host);
-        await connection.connect();
-        this.connections.push(connection);
-    }
-
-    public shutdown() {
-        for (const connection of this.connections) {
-            if (connection.isReady()) {
-                connection.close();
-            }
-        }
-    }
-
-    public async broadcastData(data: Buffer) {
-
-        const promises: Promise<any>[] = [];
-
-        for (const connection of this.connections) {
-            promises.push(connection.sendData(data));
-        }
-
         await Promise.all(promises);
     }
 

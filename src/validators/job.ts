@@ -1,5 +1,5 @@
 import Block from "../objects/block.js";
-import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 import cli from "../utils/cli.js";
@@ -7,15 +7,15 @@ import utils from "../utils/utils.js";
 import Validation from "../validation.js";
 
 
-class ValidatorJob {
+class AttesterJob {
 
-	private static instance: ValidatorJob;
+	private static instance: AttesterJob;
 
 	public static getInstance() {
-		if (!ValidatorJob.instance) {
-            ValidatorJob.instance = new ValidatorJob();
+		if (!AttesterJob.instance) {
+            AttesterJob.instance = new AttesterJob();
         }
-        return ValidatorJob.instance;
+        return AttesterJob.instance;
 	}
 
 }
@@ -61,7 +61,7 @@ class ProposerJob {
 
 		await blockchain.wallets.adjustWalletsByBlock(this.block);
 
-		utils.events.emit("block_receive", LeiCoinNetDataPackage.create("block", this.block));
+		utils.events.emit("block_receive", LeiCoinNetDataPackage.create(this.block));
 
 		cli.staker_message.success(`Created block with hash ${this.block.hash} has been validated. Broadcasting now.`);
 		return;
@@ -70,5 +70,5 @@ class ProposerJob {
 
 }
 
-export const validatorJob = ValidatorJob.getInstance();
+export const attesterJob = AttesterJob.getInstance();
 export const proposerJob = ProposerJob.getInstance();

@@ -4,9 +4,9 @@ import Constants from "../utils/constants.js";
 import utils from "../utils/utils.js";
 import Validation from "../validation.js";
 import validatorsCommittee from "./committee.js";
-import { proposerJob, validatorJob } from "./job.js";
+import { proposerJob, attesterJob } from "./job.js";
 
-export class Validator {
+class Validator {
 
 	private static instance: Validator;
 
@@ -71,7 +71,7 @@ export class Validator {
 
 		const nextProposer = validatorsCommittee.calculateNextProposer(lastBlockHash);
 
-		if (validatorsCommittee.getValidators()[this.publicKey]) {
+		if (this.publicKey in validatorsCommittee.getValidators()) {
 
 			this.isInCurrentCommittee = true;
 
@@ -95,5 +95,5 @@ export class Validator {
 
 }
 
-const staking = Validator.getInstance();
-export default staking;
+const validator = Validator.getInstance();
+export default validator;

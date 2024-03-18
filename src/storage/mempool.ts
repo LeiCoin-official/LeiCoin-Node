@@ -34,7 +34,7 @@ class Mempool {
     public addTransactionToMempool(transaction: Transaction) {
         const txid = transaction.txid;
     
-        if (this.transactions[txid]) {
+        if (txid in this.transactions) {
             //cli.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
             return { cb: 'exists' };
         }
@@ -46,7 +46,7 @@ class Mempool {
     // Function to remove a transaction from the Mempool
     public removeTransactionFromMempool(txid: string) {
     
-        if (this.transactions[txid]) {
+        if (txid in this.transactions) {
             delete this.transactions[txid];
             return { cb: Callbacks.SUCCESS };
         }

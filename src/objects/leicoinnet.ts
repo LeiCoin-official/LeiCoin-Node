@@ -1,13 +1,22 @@
-import EncodingUtils from "../handlers/encodingHandlers";
+import EncodingUtils from "../handlers/encodingHandlers.js";
+import Block from "./block.js";
+import Transaction from "./transaction.js";
 
 export enum LeiCoinNetDataPackageType {
     BLOCK = "0001",
     TRANSACTION = "0002",
-    MESSAGE = "0003"
+    MESSAGE = "0003",
+    VALIDATOR_PROPOSE = "0101",
+    VALIDATOR_VOTE = "0102",
 }
 
+const objectTypesTransaltionIndex: [any, LeiCoinNetDataPackageType][] = [
+    [Block, LeiCoinNetDataPackageType.BLOCK],
+    [Transaction, LeiCoinNetDataPackageType.TRANSACTION]
+]
+
 interface LeiCoinNetDataPackageLike {
-    type: string;
+    type: LeiCoinNetDataPackageType;
     content: string;
 }
 
@@ -21,16 +30,37 @@ interface LeiCoinNetDataPackageContentContructor {
 
 export class LeiCoinNetDataPackage {
 
-    public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content: T) {
-        return EncodingUtils.hexToBuffer(type + content.encodeToHex(true));
+    public static create(type: LeiCoinNetDataPackageType, hexData: string): Buffer;
+    public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content: T): Buffer;
+    public static create<T extends LeiCoinNetDataPackageContentObject>(content: T): Buffer;
+    public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content?: T, hexData?: string) {
+
+        if (content) {
+
+            if (!type) {
+                var type = LeiCoinNetDataPackageType.MESSAGE;
+
+                for (const objType of objectTypesTransaltionIndex) {
+                    if (content instanceof objType[0]) {
+                        type = objType[1];
+                    }
+                }
+            }
+
+            return EncodingUtils.hexToBuffer(type + content.encodeToHex(true));
+        } else if (hexData) {
+            return EncodingUtils.hexToBuffer(type + hexData);
+        }
+
+
     }
 
     public static extract(data: Buffer): LeiCoinNetDataPackageLike {
         const decoded = EncodingUtils.bufferToHex(data);
-        const type = decoded.substring(0, 4);
+        const type = decoded.substring(0, 4) as LeiCoinNetDataPackageType;
         const content = decoded.substring(4, decoded.length);
 
-        return {type, content };
+        return { type, content };
     }
 
 }

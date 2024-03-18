@@ -40,10 +40,10 @@ class Config {
     private static instance: Config;
 
     public static getInstance() {
-        if (!Config.instance) {
-            Config.instance = new Config();
+        if (!this.instance) {
+            this.instance = new this();
         }
-        return Config.instance;
+        return this.instance;
     }
 
     private constructor() {
