@@ -1,8 +1,7 @@
 import utils from "../utils/utils";
-import { StakersList } from "./stakepool";
+import stakerpool, { StakersList } from "./stakepool";
 
-
-export class ValidatorsCommittee {
+class ValidatorsCommittee {
 
     private static instance: ValidatorsCommittee;
 
@@ -13,12 +12,12 @@ export class ValidatorsCommittee {
         return ValidatorsCommittee.instance;
     }
 
-    private currentSlot: string;
+    //private currentSlot: string;
     private nextProposer: string;
     private validators: StakersList;
 
     private constructor() {
-        this.currentSlot = "0";
+        //this.currentSlot = "0";
         this.nextProposer = "";
         this.validators = {};
     }
@@ -31,6 +30,10 @@ export class ValidatorsCommittee {
         return this.validators;
     }
 
+    public createNewCommittee(lastBlockHash: string) {
+        this.validators = stakerpool.calculateNextValidators(lastBlockHash);
+    }
+
     public calculateNextProposer(hash: string) {
         const validatorsArray = Object.entries(utils.sortObjectAlphabetical(this.validators));
 
@@ -38,6 +41,10 @@ export class ValidatorsCommittee {
         this.nextProposer = validatorsArray[index][0];
 
         return validatorsArray[index][0];
+    }
+
+    public getNextProposer() {
+        return this.nextProposer;
     }
 
 }

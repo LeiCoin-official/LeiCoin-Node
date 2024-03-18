@@ -62,10 +62,7 @@ export class Transaction implements TransactionLike {
         return coinbase;
     }
 
-    public encodeToHex(add_empty_bytes = false) {
-
-        const encoded_senderPublicKey = encodingHandlers.encodeBase64ToHex(this.senderPublicKey);
-        const senderPublicKey_length = encoded_senderPublicKey.length.toString().padStart(3, "0");        
+    public encodeToHex(add_empty_bytes = false) {      
     
         const encoded_amount = encodingHandlers.compressZeros(this.amount.toString());
         const amount_length = encoded_amount.length.toString().padStart(2, "0");
@@ -75,14 +72,12 @@ export class Transaction implements TransactionLike {
 
         const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
 
-        const encoded_message = encodingHandlers.encodeBase64ToHex(this.message);
-        const message_length = encoded_message.length.toString().padStart(3, "0");
+        const message_length = this.message.length.toString().padStart(3, "0");
 
         const hexData = this.version +
                         this.txid +
                         encodingHandlers.encodeAddressToHex(this.senderAddress) +
-                        senderPublicKey_length +
-                        encoded_senderPublicKey +
+                        this.senderPublicKey +
                         encodingHandlers.encodeAddressToHex(this.recipientAddress) +
                         amount_length +
                         encoded_amount +
@@ -91,7 +86,7 @@ export class Transaction implements TransactionLike {
                         timestamp_length +
                         this.timestamp +
                         message_length +
-                        encoded_message +
+                        this.message +
                         this.signature;
 
         const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
@@ -107,8 +102,7 @@ export class Transaction implements TransactionLike {
                 {key: "version", length: 2},
                 {key: "txid", length: 64},
                 {key: "senderAddress", length: 40},
-                {key: "senderPublicKey_length", length: 3},
-                {key: "senderPublicKey", length: "senderPublicKey_length"},
+                {key: "senderPublicKey", length: 64},
                 {key: "recipientAddress", length: 40},
                 {key: "amount_length", length: 2},
                 {key: "amount", length: "amount_length"},
@@ -117,7 +111,7 @@ export class Transaction implements TransactionLike {
                 {key: "timestamp_length", length: 2},
                 {key: "timestamp", length: "timestamp_length"},
                 {key: "message_length", length: 3},
-                {key: "message", length: "message_length", decode: true},
+                {key: "message", length: "message_length"},
                 {key: "signature", length: 64}
             ], returnLength);
 
@@ -125,11 +119,9 @@ export class Transaction implements TransactionLike {
         
             if (data && data.version === "00") {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
-                data.senderPublicKey = encodingHandlers.decodeHexToBase64(data.senderPublicKey);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
                 data.amount = encodingHandlers.decompressZeros(data.amount);
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
-                data.message = encodingHandlers.decodeHexToBase64(data.message);
 
                 const tx = utils.createInstanceFromJSON(Transaction, data)
 

@@ -1,11 +1,11 @@
 import config from "./handlers/configHandler.js";
 import utils from "./utils/utils.js";
 import initAPI from "./api/index.js";
-import { initLeiCoinNetClient, shutdownLeiCoinNetClient, WebSocketClientConnection } from "./leicoin-net/client/index.js";
 import initLeiCoinNetServer from "./leicoin-net/server/index.js";
 import http from "http";
 import WebSocket from "ws";
 import cli from "./utils/cli.js";
+import leiCoinNetClientsHandler from "./leicoin-net/client/index.js";
 
 export default async function initNetConnections() {
     
@@ -42,7 +42,7 @@ export default async function initNetConnections() {
 
     // Initialize LeiCoinNet-Client
     //leiCoinNetClient = initLeiCoinNetClient();
-    initLeiCoinNetClient();
+    leiCoinNetClientsHandler.initAllClients();
     cli.leicoin_net_message.client.log("LeiCoinNet-Client started");
 
     // handle shutdown
@@ -59,7 +59,7 @@ export default async function initNetConnections() {
         cli.leicoin_net_message.server.log(`LeiCoinNet-Server stopped`);
 
         // LeiCoinNet-Server shutdown
-        shutdownLeiCoinNetClient();
+        leiCoinNetClientsHandler.shutdown();
         cli.leicoin_net_message.client.log(`LeiCoinNet-Client stopped`);
     });
 

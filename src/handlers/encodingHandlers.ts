@@ -1,4 +1,3 @@
-import { buffer } from "stream/consumers";
 import { Callbacks } from "../utils/callbacks";
 
 export default class EncodingUtils {
@@ -31,21 +30,13 @@ export default class EncodingUtils {
         return Buffer.from(hexData, "hex").toString();
     }
     
-    public static encodeBase64ToHex(base64String: string) {
-        return Buffer.from(base64String, 'base64').toString('hex');
-    }
-    
-    public static decodeHexToBase64(hexString: string) {
-        return Buffer.from(hexString, 'hex').toString('base64');
-    }
-    
-    /*public static hexToBinary(hexData: string) {
+    public static hexToBuffer(hexData: string) {
         return Buffer.from(hexData, "hex");
     }
 
-    public static binaryToHex(buffer: Buffer) {
+    public static bufferToHex(buffer: Buffer) {
         return buffer.toString("hex");
-    }*/
+    }
     
     public static encodePublicKeyToBase64(public_key_pem: string) {
         return this.encodeBase64ToString(public_key_pem);
@@ -92,7 +83,7 @@ export default class EncodingUtils {
         return address;
     }
     
-    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array", decode?: boolean, arrayFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
+    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array", arrayFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
         
         const final_data: {[key: string]: any} = {};
         let current_length = 0;
@@ -115,10 +106,6 @@ export default class EncodingUtils {
                 let value = hexData.substring(current_length, current_length + length);
                 if (value.length !== length) {
                     return { cb: Callbacks.NONE };
-                }
-        
-                if (data.decode) {
-                    value = this.decodeHexToString(value);
                 }
         
                 if (type === "int") {

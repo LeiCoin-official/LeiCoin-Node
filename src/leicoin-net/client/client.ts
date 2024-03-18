@@ -40,40 +40,20 @@ export class LeiCoinNetClient {
         this.client?.close(code);
     }
 
-
-    public async sendBlock(data: any) {
+    public async sendData(data: Buffer, trys = 1) {
         if (this.ready && this.client) {
             try {
                 this.client.send(data);
-                cli.leicoin_net_message.client.log(`Block sent to ${this.host}`);
+                //cli.leicoin_net_message.client.log(`Data sent to ${this.host}`);
                 return Callbacks.SUCCESS;
             } catch (err: any) {
-                cli.leicoin_net_message.client.error(`Error sending Block to ${this.host}: ${err.message}`);
+                cli.leicoin_net_message.client.error(`Error sending Binary Data to ${this.host}: ${err.message}`);
             }
-        } else {
+        } else if (trys > 0) {
             await this.connect();
             // Wait for 2 seconds before sending data
             setTimeout(() => {
-                return this.sendBlock(data);
-            }, 2000);
-        }
-        return Callbacks.ERROR;
-    }
-
-    public async sendTransaction(data: any) {
-        if (this.ready && this.client) {
-            try {
-                this.client.send(data);
-                cli.leicoin_net_message.client.log(`Transaction sent to ${this.host}`);
-                return Callbacks.SUCCESS;
-            } catch (err: any) {
-                cli.leicoin_net_message.client.error(`Error sending Transaction to ${this.host}: ${err.message}`);
-            }
-        } else {
-            await this.connect();
-            // Wait for 2 seconds before sending data
-            setTimeout(() => {
-                return this.sendTransaction(data);
+                return this.sendData(data, 0);
             }, 2000);
         }
         return Callbacks.ERROR;

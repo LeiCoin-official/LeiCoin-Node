@@ -18,28 +18,33 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
         cli.leicoin_net_message.server.log(`${req.headers.host} established as connection to this Server.`);
 
         // Listen for messages from clients connected to the node
-        ws.on('message', (rawdata) => {
+        ws.on('message', (rawdata: Buffer, isBinary) => {
 
-            const data = LeiCoinNetDataPackage.extract(rawdata.toString());
+            if (isBinary) {
+
+                const data = LeiCoinNetDataPackage.extract(rawdata);
             
-            switch (data.type) {
-                case 'block':
-                    const block_receive_job_result = block_receive_job(data.content);
-                    if (block_receive_job_result.cb) {
-                        utils.events.emit("block_receive", rawdata.toString());
-                    }
-                    break;
-                case "transaction":
-                    const transactions_receive_job_result = transactions_receive_job(data.content);
-                    if (transactions_receive_job_result.cb) {
-                        utils.events.emit("transaction_receive", rawdata.toString());
-                    }
-                    break;
-                case "message":
-                    break;
-                default:
-                    break;
+                switch (data.type) {
+                    case 'Block':
+                        const block_receive_job_result = block_receive_job(data.content);
+                        if (block_receive_job_result.cb) {
+                            utils.events.emit("block_receive", rawdata);
+                        }
+                        break;
+                    case "transaction":
+                        const transactions_receive_job_result = transactions_receive_job(data.content);
+                        if (transactions_receive_job_result.cb) {
+                            utils.events.emit("transaction_receive", rawdata);
+                        }
+                        break;
+                    case "message":
+                        break;
+                    default:
+                        break;
+                }
+
             }
+
         });
 
         ws.on('error', (error) => {

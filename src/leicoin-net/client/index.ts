@@ -4,7 +4,7 @@ import config from "../../handlers/configHandler.js";
 import cli from "../../utils/cli.js";
 import LeiCoinNetClient from "./client.js";
 
-export class LeiCoinNetClientsHandler {
+class LeiCoinNetClientsHandler {
 
     public static instance: LeiCoinNetClientsHandler;
 
@@ -46,26 +46,18 @@ export class LeiCoinNetClientsHandler {
         }
     }
 
-    public async broadcastBlock(data: any) {
+    public async broadcastData(data: Buffer) {
 
         const promises: Promise<any>[] = [];
 
         for (const connection of this.connections) {
-            promises.push(connection.sendBlock(data));
-        }
-
-        await Promise.all(promises);
-    }
-
-    public async broadcastTransaction(data: any) {
-
-        const promises: Promise<any>[] = [];
-
-        for (const connection of this.connections) {
-            promises.push(connection.sendTransaction(data));
+            promises.push(connection.sendData(data));
         }
 
         await Promise.all(promises);
     }
 
 }
+
+const leiCoinNetClientsHandler = LeiCoinNetClientsHandler.getInstance();
+export default leiCoinNetClientsHandler;

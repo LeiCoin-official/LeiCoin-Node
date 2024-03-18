@@ -1,6 +1,8 @@
 import process from "process";
 import { EventEmitter } from "events";
 import type { CLI } from "./cli.js";
+import Constants from "./constants.js";
+import BigNum from "./bigNum.js";
 
 // Define a generic interface representing the class structure
 interface Constructable<T> {
@@ -102,6 +104,12 @@ class Utils {
     
         const sortedObj = deepSort(obj);
         return sortedObj;
+    }
+
+    public calculateEpochAndRelativeSlot(slotIndex: string) {
+        const currentEpoch = BigNum.divide(slotIndex, Constants.BLOCKS_PER_EPOCH);
+        const relativeSlot = BigNum.mod(slotIndex, Constants.BLOCKS_PER_EPOCH);
+        return { currentEpoch, relativeSlot };
     }
 
 }

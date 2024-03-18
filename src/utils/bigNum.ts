@@ -1,35 +1,49 @@
-export default class BigNum {
+export class BigNum {
 
-    public static add(v1: string, v2: string) {
+    static add(v1: any, v2: any) {
         return (BigInt(v1) + BigInt(v2)).toString();
     }
 
-    public static subtract(v1: string, v2: string) {
+    static subtract(v1: any, v2: any) {
         return (BigInt(v1) - BigInt(v2)).toString();
     }
 
-    public static greater(v1: string, v2: string) {
+    static multiply(v1: any, v2: any) {
+        return (BigInt(v1) * BigInt(v2)).toString();
+    }
+
+    static divide(v1: any, v2: any) {
+        return (BigInt(v1) / BigInt(v2)).toString();
+    }
+
+    static mod(v1: any, v2: any) {
+        return (BigInt(v1) % BigInt(v2)).toString();
+    }
+
+    static greater(v1: any, v2: any) {
         return BigInt(v1) > BigInt(v2);
     }
 
-    public static greaterOrEqual(v1: string, v2: string) {
+    static greaterOrEqual(v1: any, v2: any) {
         return BigInt(v1) >= BigInt(v2);
     }
 
-    public static less(v1: string, v2: string) {
+    static less(v1: any, v2: any) {
         return BigInt(v1) < BigInt(v2);
     }
 
-    public static lessOrEqual(v1: string, v2: string) {
+    static lessOrEqual(v1: any, v2: any) {
         return BigInt(v1) <= BigInt(v2);
     }
 
-    public static max(v1: string, v2: string) {
+    static max(v1: any, v2: any): string {
         return this.greater(v1, v2) ? v1 : v2;
     }
 
-    public static min(v1: string, v2: string) {
+    static min(v1: any, v2: any): string {
         return this.less(v1, v2) ? v1 : v2;
     }
 
 }
+
+export default BigNum;
