@@ -22,11 +22,11 @@ export class Wallet {
 
     public encodeToHex(add_empty_bytes = true) {
     
-        const encoded_balance = encodingHandlers.compressZeros(this.balance.toString());
-        const balance_length = encoded_balance.length.toString().padStart(2, "0");
+        const encoded_balance = BigNum.numToHex(this.balance.toString());
+        const balance_length = BigNum.numToHex(encoded_balance.length);
     
-        const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
-        const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
+        const encoded_nonce =  BigNum.numToHex(this.nonce.toString());
+        const nonce_length =  BigNum.numToHex(encoded_nonce.length)
 
         const hexData = this.version + 
                         balance_length + 
@@ -46,18 +46,15 @@ export class Wallet {
 
             const resultData = encodingHandlers.splitHex(hexData, [
                 {key: "version", length: 2},
-                {key: "balance_length", length: 2},
-                {key: "balance", length: "balance_length"},
-                {key: "nonce_length", length: 2},
-                {key: "nonce", length: "nonce_length"},
+                {key: "balance_length", length: 2, type: "int"},
+                {key: "balance", length: "balance_length", type: "int"},
+                {key: "nonce_length", length: 2, type: "int"},
+                {key: "nonce", length: "nonce_length", type: "int"},
             ]);
 
             const data = resultData.data;
         
             if (data && data.version === "00") {
-                data.balance = encodingHandlers.decompressZeros(data.balance);
-                data.nonce = encodingHandlers.decompressZeros(data.nonce);
-
                 return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }
 

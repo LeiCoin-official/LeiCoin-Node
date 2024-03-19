@@ -71,7 +71,7 @@ class Validator {
 
 		const nextProposer = validatorsCommittee.calculateNextProposer(lastBlockHash);
 
-		if (this.publicKey in validatorsCommittee.getValidators()) {
+		if (validatorsCommittee.isMember(this.publicKey)) {
 
 			this.isInCurrentCommittee = true;
 

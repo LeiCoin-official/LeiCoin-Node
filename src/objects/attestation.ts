@@ -101,7 +101,7 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
 
     }
 
-    public static fromDecodedHex(hexData: string, returnLength = false) {
+    public static fromDecodedHex(hexData: string) {
 
         try {
             const returnData = encodingHandlers.splitHex(hexData, [
@@ -112,18 +112,12 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
                 {key: "nonce_length", length: 2, type: "int"},
                 {key: "nonce", length: "nonce_length", type: "bigint"},
                 {key: "signature", length: 64}
-            ], returnLength);
+            ]);
 
             const data = returnData.data;
         
             if (data && data.version === "00") {
-
-                const attestation = utils.createInstanceFromJSON(AttestationSendData, data);
-
-                if (returnLength) {
-                    return {data: attestation, length: returnData.length};
-                }
-                return attestation;
+                return utils.createInstanceFromJSON(AttestationSendData, data);
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
