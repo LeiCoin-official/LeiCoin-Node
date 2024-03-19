@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 import validation from "../validation.js";
-import utils from "../utils/utils.js";
+import utils from "../utils/index.js";
 import { AddedUTXO, DeletedUTXO } from "../objects/utxo.js";
 import mempool, { MempoolWithUnconfirmedUTXOS } from "../storage/mempool.js";
 import { Callbacks } from "../utils/callbacks.js";

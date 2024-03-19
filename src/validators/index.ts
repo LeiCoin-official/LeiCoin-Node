@@ -1,7 +1,7 @@
 import config from "../handlers/configHandler.js";
 import cli from "../utils/cli.js";
 import Constants from "../utils/constants.js";
-import utils from "../utils/utils.js";
+import utils from "../utils/index.js";
 import Validation from "../validation.js";
 import validatorsCommittee from "./committee.js";
 import { proposerJob, attesterJob } from "./job.js";

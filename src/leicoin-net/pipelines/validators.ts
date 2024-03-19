@@ -9,9 +9,11 @@ export default class ValidatorPipeline {
 
             case LeiCoinNetDataPackageType.VALIDATOR_PROPOSE:
 
+                
                 break;
 
             case LeiCoinNetDataPackageType.VALIDATOR_VOTE:
+
 
                 break;
             

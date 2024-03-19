@@ -1,6 +1,6 @@
 import mempool from "../../storage/mempool.js";
 import cli from "../../utils/cli.js";
-import utils from "../../utils/utils.js";
+import utils from "../../utils/index.js";
 import validation from "../../validation.js"
 import blockchain from "../../storage/blockchain.js";
 import Block from "../../objects/block.js";

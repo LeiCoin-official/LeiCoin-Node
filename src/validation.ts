@@ -4,7 +4,7 @@ import mempool from "./storage/mempool.js";
 import { BlockLike } from "./objects/block.js";
 import blockchain from "./storage/blockchain.js";
 import { Callbacks } from "./utils/callbacks.js";
-import utils from "./utils/utils.js";
+import utils from "./utils/index.js";
 import EncodingUtils from "./handlers/encodingHandlers.js";
 import cryptoHandlers from "./handlers/cryptoHandlers.js";
 
@@ -31,15 +31,12 @@ export class Validation {
 
     private static validateTXSignature(tx: TransactionLike) {
     
-        // Prepare transaction data for verification (exclude the signature and txid)
-        const modifyedTransactionData = cryptoHandlers.getPreparedObjectForHashing(tx, ["txid", "signature"]);
-    
         // decode the senderPublicKey
         const publicKeyPEM = EncodingUtils.decodeBase64ToPublicKey(tx.senderPublicKey);
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');
-        verifier.update(JSON.stringify(modifyedTransactionData));
+        verifier.update(tx.txid);
         const signatureBuffer = EncodingUtils.encodeBase64ToBuffer(tx.signature);
 
         return verifier.verify(publicKeyPEM, signatureBuffer);

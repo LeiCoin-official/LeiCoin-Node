@@ -1,4 +1,4 @@
-import { Callbacks } from "../utils/callbacks";
+import { Callbacks } from "../utils/callbacks.js";
 
 export default class EncodingUtils {
 
@@ -47,7 +47,7 @@ export default class EncodingUtils {
     }
     
     
-    public static compressZeros(numberStr: string) {
+    /*public static compressZeros(numberStr: string) {
         // Define a regular expression pattern to match consecutive zeros
         const pattern = /0{3,9}/g; // Matches 4 or more consecutive zeros globally
     
@@ -69,7 +69,7 @@ export default class EncodingUtils {
         });
     
         return decompressedStr;
-    }
+    }*/
     
     public static encodeAddressToHex(address: string) {
         return address.slice(2, address.length).replace("x", "0");
@@ -83,7 +83,7 @@ export default class EncodingUtils {
         return address;
     }
     
-    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array", arrayFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
+    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool", arrayFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
         
         const final_data: {[key: string]: any} = {};
         let current_length = 0;
@@ -109,9 +109,11 @@ export default class EncodingUtils {
                 }
         
                 if (type === "int") {
-                    final_data[key] = parseInt(value);
+                    final_data[key] = parseInt(`0x${value}`).toString();
                 } else if (type === "bigint") {
-                    final_data[key] = BigInt(value);
+                    final_data[key] = BigInt(`0x${value}`).toString();
+                } else if (type === "bool") {
+                    final_data[key] = ((value === "1") ? true : false);
                 } else {
                     final_data[key] = value;
                 }
@@ -123,13 +125,21 @@ export default class EncodingUtils {
                 const final_array = [];
     
                 let total_arrayLength = 0;
+
+                let lenghValueLen = 0;
     
                 try {
+
+                    if (typeof(data.length) === "string") {
+                        lenghValueLen = parseInt(data.length);
+                    } else {
+                        lenghValueLen = data.length;
+                    }
                 
-                    const arrayDataWithLength = this.splitWithTail(hexData.substring(current_length, hexData.length), "E", 1);
-                    const length = parseInt(arrayDataWithLength[0]);
+                    const arrayDataWithLength = hexData.substring(current_length, hexData.length);
+                    const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
         
-                    let arrayData = arrayDataWithLength[1];
+                    let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
     
                     total_arrayLength = arrayDataWithLength[0].length + 1;
                     
@@ -156,7 +166,7 @@ export default class EncodingUtils {
         }
     
         if (returnLength) {
-            return { cb: Callbacks.SUCCESS, data: final_data, lengh: current_length };
+            return { cb: Callbacks.SUCCESS, data: final_data, length: current_length };
         }
     
         return { cb: Callbacks.SUCCESS, data: final_data };

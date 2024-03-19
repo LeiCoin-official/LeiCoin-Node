@@ -3,7 +3,7 @@ import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/lei
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 import cli from "../utils/cli.js";
-import utils from "../utils/utils.js";
+import utils from "../utils/index.js";
 import Validation from "../validation.js";
 
 

@@ -44,6 +44,25 @@ export class BigNum {
         return this.less(v1, v2) ? v1 : v2;
     }
 
+    static numToHex(num: any, minLength = 2): string {
+        try {
+            const hexNum = BigInt(num).toString(16).toUpperCase();
+            return hexNum.padStart(minLength, "0");
+        } catch (error: any) {
+            return error.message;
+        }
+    }
+    
+    // Decode a hexadecimal string to a numeric string
+    static hexToNum(hexStr: string) {
+        try {
+            let num = BigInt(`0x${hexStr}`).toString();
+            return num;
+        } catch (error: any) {
+            return "Invalid input: Please provide a valid hexadecimal string.";
+        }
+    }
+
 }
 
 export default BigNum;

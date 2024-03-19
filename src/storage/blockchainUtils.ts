@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import cli from "../utils/cli.js";
-import utils from "../utils/utils.js";
+import utils from "../utils/index.js";
 import EncodingUtils from "../handlers/encodingHandlers.js";
 import { Callbacks } from "../utils/callbacks.js";
 

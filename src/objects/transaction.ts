@@ -1,9 +1,10 @@
 import config from "../handlers/configHandler.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import encodingHandlers from "../handlers/encodingHandlers.js";
-import utils from "../utils/utils.js";
+import utils from "../utils/index.js";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
+import BigNum from "../utils/bigNum.js";
 
 export interface TransactionLike {
 
@@ -64,15 +65,16 @@ export class Transaction implements TransactionLike {
 
     public encodeToHex(add_empty_bytes = false) {      
     
-        const encoded_amount = encodingHandlers.compressZeros(this.amount.toString());
-        const amount_length = encoded_amount.length.toString().padStart(2, "0");
+        const encoded_amount = BigNum.numToHex(this.amount);
+        const amount_length = BigNum.numToHex(encoded_amount.length);
 
-        const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
-        const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
+        const encoded_nonce = BigNum.numToHex(this.nonce);
+        const nonce_length = BigNum.numToHex(encoded_nonce.length);
 
-        const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
+        const encoded_timestamp = BigNum.numToHex(this.timestamp);
+        const timestamp_length = BigNum.numToHex(encoded_timestamp.length);
 
-        const message_length = this.message.length.toString().padStart(3, "0");
+        const message_length = BigNum.numToHex(this.message.length);
 
         const hexData = this.version +
                         this.txid +
@@ -84,7 +86,7 @@ export class Transaction implements TransactionLike {
                         nonce_length +
                         encoded_nonce +
                         timestamp_length +
-                        this.timestamp +
+                        encoded_timestamp +
                         message_length +
                         this.message +
                         this.signature;
@@ -104,13 +106,13 @@ export class Transaction implements TransactionLike {
                 {key: "senderAddress", length: 40},
                 {key: "senderPublicKey", length: 64},
                 {key: "recipientAddress", length: 40},
-                {key: "amount_length", length: 2},
-                {key: "amount", length: "amount_length"},
-                {key: "nonce_length", length: 2},
-                {key: "nonce", length: "nonce_length"},
-                {key: "timestamp_length", length: 2},
-                {key: "timestamp", length: "timestamp_length"},
-                {key: "message_length", length: 3},
+                {key: "amount_length", length: 2, type: "int"},
+                {key: "amount", length: "amount_length", type: "bigint"},
+                {key: "nonce_length", length: 2, type: "int"},
+                {key: "nonce", length: "nonce_length", type: "bigint"},
+                {key: "timestamp_length", length: 2, type: "int"},
+                {key: "timestamp", length: "timestamp_length", type: "bigint"},
+                {key: "message_length", length: 3, type: "int"},
                 {key: "message", length: "message_length"},
                 {key: "signature", length: 64}
             ], returnLength);
@@ -120,13 +122,11 @@ export class Transaction implements TransactionLike {
             if (data && data.version === "00") {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
-                data.amount = encodingHandlers.decompressZeros(data.amount);
-                data.nonce = encodingHandlers.decompressZeros(data.nonce);
 
-                const tx = utils.createInstanceFromJSON(Transaction, data)
+                const tx = utils.createInstanceFromJSON(Transaction, data);
 
                 if (returnLength) {
-                    return {data: tx, length: returnData.lengh};
+                    return {data: tx, length: returnData.length};
                 }
                 return tx;
             }

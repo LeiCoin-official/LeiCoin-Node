@@ -4,7 +4,7 @@ import process from "process";
 import ansiEscapes from "ansi-escapes";
 import fs from "fs";
 import { dirname } from "path";
-import utils from "./utils.js";
+import utils from "./index.js";
 
 export class CLI {
 

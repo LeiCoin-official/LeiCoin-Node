@@ -1,7 +1,7 @@
 import mempool from "../../storage/mempool.js";
 import Transaction from "../../objects/transaction.js";
 import cli from "../../utils/cli.js";
-import utils from "../../utils/utils.js";
+import utils from "../../utils/index.js";
 import validation from "../../validation.js"
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";

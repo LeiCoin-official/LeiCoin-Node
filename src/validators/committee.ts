@@ -1,5 +1,12 @@
-import utils from "../utils/utils";
-import stakerpool, { StakersList } from "./stakepool";
+import utils from "../utils/index.js";
+import stakerpool from "./stakepool.js";
+
+export interface CommitteeMemberList {
+    [publicKey: string]: {
+        stake: string;
+        nonce: string;
+    };
+}
 
 class ValidatorsCommittee {
 
@@ -14,7 +21,7 @@ class ValidatorsCommittee {
 
     //private currentSlot: string;
     private nextProposer: string;
-    private validators: StakersList;
+    private validators: CommitteeMemberList;
 
     private constructor() {
         //this.currentSlot = "0";
@@ -22,7 +29,7 @@ class ValidatorsCommittee {
         this.validators = {};
     }
 
-    public setValidators(committee: StakersList) {
+    public setValidators(committee: CommitteeMemberList) {
         this.validators = committee;
     }
 
