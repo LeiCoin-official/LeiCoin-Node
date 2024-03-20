@@ -65,16 +65,6 @@ function stringSimilarity(string1, string2) {
     return similarityPercentage;
 }
 
-export function startTimer() {
-    return performance.now();
-}
-
-export function endTimer(startTime) {
-    const endTime = performance.now();
-    const elapsedTime = endTime - startTime;
-    return elapsedTime; // Return the elapsed time in milliseconds
-}
-
 export function sha256(data) {
     const hash = crypto.createHash('sha256');
     hash.update(data);
