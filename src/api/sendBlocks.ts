@@ -1,5 +1,5 @@
 import express from "express";
-import validation from "../validation.js";
+import Verification from "../verification.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 
@@ -17,7 +17,7 @@ router.use('/', (req, res, next) => {
 	const blockData = req.body;
 	
 	// Validate the transaction (add your validation logic here)
-	const validationresult = validation.isValidBlock(blockData);
+	const validationresult = Verification.verifyBlock(blockData);
 
     res.status(validationresult.status);
 	res.json({ message: validationresult.message });

@@ -5,6 +5,8 @@ import validatorsCommittee from "../../validators/committee.js";
 import validator from "../../validators/index.js";
 import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
+import Verification from "../../verification.js";
+import cryptoHandlers from "../../handlers/cryptoHandlers.js";
 
 export default class ValidatorPipeline {
 
@@ -12,10 +14,9 @@ export default class ValidatorPipeline {
 
         const proposition = Proposition.fromDecodedHex(data);
 
-        if (!proposition) return { cb: false };
-        if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return { cb: false };
-
-        if ()
+        if (!proposition) return;
+        if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return;
+        if (!await Verification.verifySignature(proposition.block.hash, proposition.proposer, proposition.signature)) return;
 
         (async function() {
 
@@ -33,8 +34,8 @@ export default class ValidatorPipeline {
 
         const attestation = AttestationSendData.fromDecodedHex(data);
 
-        if (!attestation) return { cb: false };
-        if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return { cb: false };
+        if (!attestation) return;
+        if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return;
 
         (async function() {
 

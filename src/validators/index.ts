@@ -2,7 +2,7 @@ import config from "../handlers/configHandler.js";
 import cli from "../utils/cli.js";
 import Constants from "../utils/constants.js";
 import utils from "../utils/index.js";
-import Validation from "../validation.js";
+import Verification from "../verification.js";
 import validatorsCommittee from "./committee.js";
 import { proposerJob, attesterJob } from "./job.js";
 
@@ -37,7 +37,7 @@ class Validator {
 	public initIfActive() {
 
 		if (this.active) {
-			if (Validation.validateAddress(this.address)) {
+			if (Verification.verifyAddress(this.address)) {
 				cli.staker_message.log("Staker started");
 			} else {
 				cli.staker_message.error("Staker could not be started: Invalid Address.");

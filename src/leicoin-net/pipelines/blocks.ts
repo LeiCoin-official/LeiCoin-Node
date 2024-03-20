@@ -1,7 +1,7 @@
 import mempool from "../../storage/mempool.js";
 import cli from "../../utils/cli.js";
 import utils from "../../utils/index.js";
-import validation from "../../validation.js"
+import Verification from "../../verification.js"
 import blockchain from "../../storage/blockchain.js";
 import Block from "../../objects/block.js";
 import leiCoinNetClientsHandler from "../client/index.js";
@@ -15,7 +15,7 @@ export default class BlockPipeline {
 
         if (!blockchain.chainstate.isBlockChainStateMatching(block).valid) {
     
-            const validationresult = validation.isValidBlock(block);
+            const validationresult = Verification.verifyBlock(block);
     
             if (validationresult.cb) {
     

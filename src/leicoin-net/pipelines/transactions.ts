@@ -2,7 +2,7 @@ import mempool from "../../storage/mempool.js";
 import Transaction from "../../objects/transaction.js";
 import cli from "../../utils/cli.js";
 import utils from "../../utils/index.js";
-import validation from "../../validation.js"
+import Verification from "../../verification.js"
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
 
@@ -14,7 +14,7 @@ export default class TransactionPipeline {
     
         if (!(transaction.txid in mempool.transactions)) {
     
-            const validationresult = await validation.validateTransaction(transaction);
+            const validationresult = await Verification.verifyTransaction(transaction);
     
             if (validationresult.cb) {
 

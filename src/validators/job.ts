@@ -4,7 +4,7 @@ import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 import cli from "../utils/cli.js";
 import utils from "../utils/index.js";
-import Validation from "../validation.js";
+import Verification from "../verification.js";
 
 
 class AttesterJob {
@@ -45,7 +45,7 @@ class ProposerJob {
 
     public async broadcastBlock(block: Block) {
 
-		if (!block || !Validation.isValidBlock(block).cb) {
+		if (!block || !Verification.verifyBlock(block).cb) {
 			cli.staker_message.log(`Created block with hash ${block?.hash} is invalid.`);
 			return;
 		}

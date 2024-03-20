@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import validation from "../validation.js";
+import Verification from "../verification.js";
 import utils from "../utils/index.js";
 import { AddedUTXO, DeletedUTXO } from "../objects/utxo.js";
 import mempool, { MempoolWithUnconfirmedUTXOS } from "../storage/mempool.js";
@@ -19,7 +19,7 @@ router.use('/', (req, res, next) => {
 	const transactionData = req.body;
 
 	// Validate the transaction (add your validation logic here)
-	const validationresult = validation.validateTransaction(transactionData);
+	const validationresult = Verification.verifyTransaction(transactionData);
 
 	res.status(validationresult.status)
 	res.json({message: validationresult.message});
