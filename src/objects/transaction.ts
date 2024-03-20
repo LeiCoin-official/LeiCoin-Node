@@ -123,7 +123,7 @@ export class Transaction implements TransactionLike {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
 
-                const tx = utils.createInstanceFromJSON(Transaction, data);
+                const tx = utils.createInstanceFromJSON(this, data);
 
                 if (returnLength) {
                     return {data: tx, length: returnData.length};

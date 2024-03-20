@@ -121,7 +121,7 @@ export class Block implements BlockLike {
 
     }
 
-    public static fromDecodedHex(hexData: string) {
+    public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
             const returnData = encodingHandlers.splitHex(hexData, [
@@ -133,14 +133,19 @@ export class Block implements BlockLike {
                 {key: "timestamp_length", length: 2, type: "int"},
                 {key: "timestamp", length: "timestamp_length", type: "bigint"},
                 {key: "proposer", length: 64},
-                {key: "attestations", length: 2, type: "array", arrayFunc: AttestationInBlock.fromDecodedHex},
-                {key: "transactions", length: 2, type: "array", arrayFunc: Transaction.fromDecodedHex}
-            ]);
+                {key: "attestations", length: 2, type: "array", decodeFunc: AttestationInBlock.fromDecodedHex},
+                {key: "transactions", length: 2, type: "array", decodeFunc: Transaction.fromDecodedHex}
+            ], returnLength);
 
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(Block, data);
+                const block = utils.createInstanceFromJSON(this, data);
+
+                if (returnLength) {
+                    return {data: block, length: returnData.length};
+                }
+                return block;
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Block from Decoded Hex: ${err.message}`);

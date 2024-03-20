@@ -5,7 +5,7 @@ import validation from "../../validation.js"
 import blockchain from "../../storage/blockchain.js";
 import Block from "../../objects/block.js";
 import leiCoinNetClientsHandler from "../client/index.js";
-import { LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
 
 export default class BlockPipeline {
 
@@ -38,19 +38,18 @@ export default class BlockPipeline {
         
                 cli.leicoin_net_message.server.success(`Received block with hash ${block.hash} has been validated. Adding to Blockchain.`);
                 
+                this.broadcast(type, data);
+
             } else {
                 cli.leicoin_net_message.server.log(`Received block with hash ${block.hash} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
             }
-    
-            return validationresult;
+
         }
-    
-        return {cb: false};
 
     }
 
-    public static async broadcast(rawData: Buffer) {
-        await leiCoinNetClientsHandler.broadcastData(rawData);
+    public static async broadcast(type: LeiCoinNetDataPackageType, data: string) {
+        await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
     
 
