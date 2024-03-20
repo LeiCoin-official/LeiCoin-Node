@@ -52,7 +52,7 @@ export class AttestationInBlock implements AttestationInBlockLike {
         
             if (data && data.version === "00") {
 
-                const attestation = utils.createInstanceFromJSON(AttestationInBlock, data);
+                const attestation = utils.createInstanceFromJSON(this, data);
 
                 if (returnLength) {
                     return {data: attestation, length: returnData.length};
@@ -117,7 +117,7 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(AttestationSendData, data);
+                return utils.createInstanceFromJSON(this, data);
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);

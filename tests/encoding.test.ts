@@ -114,7 +114,7 @@ export class Transaction {
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
                 data.message = encodingHandlers.decodeHexToBase64(data.message);
 
-                const tx = createInstanceFromJSON(Transaction, data)
+                const tx = createInstanceFromJSON(this, data)
 
                 if (returnLength) {
                     return {data: tx, length: returnData.lengh};
@@ -233,7 +233,7 @@ export class Block {
                 data.index = encodingHandlers.decompressZeros(data.index);
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
 
-                return createInstanceFromJSON(Block, data);
+                return createInstanceFromJSON(this, data);
             }
         } catch (err: any) {
             //cli.data_message.error(`Error loading Block from Decoded Hex: ${err.message}`);

@@ -8,6 +8,10 @@ import utils from "./utils/index.js";
 import EncodingUtils from "./handlers/encodingHandlers.js";
 import cryptoHandlers from "./handlers/cryptoHandlers.js";
 
+import * as ed25519 from '@noble/ed25519';
+import { webcrypto } from 'node:crypto';
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
+
 interface BlockValidationInvalidResult {
     cb: false;
     status: 400 | 500;
@@ -29,10 +33,7 @@ export class Validation {
         return address.startsWith("lc0x");
     }
 
-    private static validateTXSignature(tx: TransactionLike) {
-    
-        // decode the senderPublicKey
-        const publicKeyPEM = EncodingUtils.decodeBase64ToPublicKey(tx.senderPublicKey);
+    private static validateSignature(data: string, publicKey: string, signature: string) {
 
         // Verify the signature
         const verifier = crypto.createVerify('RSA-SHA256');

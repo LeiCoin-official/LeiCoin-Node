@@ -83,7 +83,7 @@ export default class EncodingUtils {
         return address;
     }
     
-    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool", arrayFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
+    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool" | "object", decodeFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
         
         const final_data: {[key: string]: any} = {};
         let current_length = 0;
@@ -91,50 +91,23 @@ export default class EncodingUtils {
         for (const data of values) {
     
             const key = data.key;
-    
-            if (data.type !== "array") {
-    
-                let length: number;
-                const type = data.type;
-    
-                if (typeof(data.length) === "string") {
-                    length = parseInt(final_data[data.length]);
-                } else {
-                    length = data.length;
-                }
-                
-                let value = hexData.substring(current_length, current_length + length);
-                if (value.length !== length) {
-                    return { cb: Callbacks.NONE };
-                }
-        
-                if (type === "int") {
-                    final_data[key] = parseInt(`0x${value}`).toString();
-                } else if (type === "bigint") {
-                    final_data[key] = BigInt(`0x${value}`).toString();
-                } else if (type === "bool") {
-                    final_data[key] = ((value === "1") ? true : false);
-                } else {
-                    final_data[key] = value;
-                }
-        
-                current_length += length;
-    
-            } else if (data.arrayFunc) {
+            
+            if (data.type === "object" && data.decodeFunc) {
+
+                const rawObj = hexData.substring(current_length, hexData.length);
+                const object = data.decodeFunc(rawObj, true);
+                final_data[key] = object;
+                current_length += object.length;
+
+            } else if (data.type === "array" && data.decodeFunc) {
     
                 const final_array = [];
     
                 let total_arrayLength = 0;
 
-                let lenghValueLen = 0;
+                const lenghValueLen = data.length as number;;
     
                 try {
-
-                    if (typeof(data.length) === "string") {
-                        lenghValueLen = parseInt(data.length);
-                    } else {
-                        lenghValueLen = data.length;
-                    }
                 
                     const arrayDataWithLength = hexData.substring(current_length, hexData.length);
                     const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
@@ -145,7 +118,7 @@ export default class EncodingUtils {
                     
                     for (let i = 0; i < length; i++) {
         
-                        const array_item = data.arrayFunc(arrayData, true);
+                        const array_item = data.decodeFunc(arrayData, true);
         
                         final_array.push(array_item.data);
                         
@@ -161,7 +134,44 @@ export default class EncodingUtils {
     
                 final_data[key] = final_array;
     
-            }
+            } else {
+    
+                let length: number;
+                const type = data.type;
+    
+                if (typeof(data.length) === "string") {
+                    length = parseInt(final_data[data.length]);
+                } else {
+                    length = data.length;
+                }
+                
+                let value = hexData.substring(current_length, current_length + length);
+                if (value.length !== length) {
+                    return { cb: Callbacks.NONE };
+                }
+                
+                switch (type) {
+                    case "int": {
+                        final_data[key] = parseInt(`0x${value}`).toString();
+                        break;
+                    }
+                    case "bigint": {
+                        final_data[key] = BigInt(`0x${value}`).toString();
+                        break;
+                    }
+                    case "bool": {
+                        final_data[key] = (value === "1");
+                        break;
+                    }
+                    default: {
+                        final_data[key] = value;
+                        break;
+                    }
+                }
+        
+                current_length += length;
+    
+            } 
     
         }
     

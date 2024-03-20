@@ -1,5 +1,12 @@
+import Block from "../objects/block.js";
 import utils from "../utils/index.js";
 import stakerpool from "./stakepool.js";
+
+interface CurrentSlot {
+    //index: string;
+    proposer: string;
+    block: Block | null;
+}
 
 export interface CommitteeMemberList {
     [publicKey: string]: {
@@ -19,13 +26,11 @@ class ValidatorsCommittee {
         return ValidatorsCommittee.instance;
     }
 
-    //private currentSlot: string;
-    private nextProposer: string;
+    private currentSlot: CurrentSlot | null = null;
     private members: CommitteeMemberList;
 
     private constructor() {
-        //this.currentSlot = "0";
-        this.nextProposer = "";
+        this.currentSlot = null;
         this.members = {};
     }
 
@@ -53,13 +58,16 @@ class ValidatorsCommittee {
         const validatorsArray = Object.entries(utils.sortObjectAlphabetical(this.members));
 
         const index = parseInt((BigInt(`0x${hash}`) % BigInt(validatorsArray.length)).toString());
-        this.nextProposer = validatorsArray[index][0];
+        this.currentSlot = {
+            proposer: validatorsArray[index][0],
+            block: null
+        };
 
         return validatorsArray[index][0];
     }
 
-    public getNextProposer() {
-        return this.nextProposer;
+    public getCurrentProposer() {
+        return this.currentSlot?.proposer;
     }
 
 }

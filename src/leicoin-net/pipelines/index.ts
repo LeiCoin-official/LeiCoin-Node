@@ -1,14 +1,12 @@
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
-import Staker from "../../objects/staker.js";
 import { Callbacks } from "../../utils/callbacks.js";
-import validator from "../../validators/index.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
 import ValidatorPipeline from "./validators.js";
 
 export interface PipelineLike {
-    receive(type: LeiCoinNetDataPackageType, data: string): any;
-    broadcast(rawData: Buffer): any;
+    receive(type: LeiCoinNetDataPackageType, data: string): Promise<void>;
+    broadcast(type: LeiCoinNetDataPackageType, data: string): Promise<void>;
 }
 
 export class Pipelines {
@@ -44,15 +42,11 @@ export class Pipelines {
             return { cb: Callbacks.NONE, message: `Unknown Data Type: ${data.type}` };
         }
 
-        const receiveResult = await this.pipelines[data.type].receive(data.type, data.content);
-
-        if (receiveResult.cb) {
-            await this.pipelines[data.type].broadcast(rawData);
-        }
+        await this.pipelines[data.type].receive(data.type, data.content);
 
     }
 
 }
 
-const pipelines = Pipelines.getInstance()
+const pipelines = Pipelines.getInstance();
 export default pipelines;
