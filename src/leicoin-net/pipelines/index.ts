@@ -6,7 +6,7 @@ import ValidatorPipeline from "./validators.js";
 
 export interface PipelineLike {
     receive(type: LeiCoinNetDataPackageType, data: string): Promise<void>;
-    broadcast(type: LeiCoinNetDataPackageType, data: string): Promise<void>;
+    broadcast(type: LeiCoinNetDataPackageType, data: string, ...args: any[]): Promise<void>;
 }
 
 export class Pipelines {

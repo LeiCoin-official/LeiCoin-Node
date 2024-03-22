@@ -1,5 +1,5 @@
 import express from "express";
-import Verification from "../verification.js";
+import Verification from "../verification/index.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 

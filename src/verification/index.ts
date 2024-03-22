@@ -1,14 +1,16 @@
 import crypto from "crypto";
-import { TransactionLike } from "./objects/transaction.js";
-import mempool from "./storage/mempool.js";
-import { BlockLike } from "./objects/block.js";
-import blockchain from "./storage/blockchain.js";
-import { Callbacks } from "./utils/callbacks.js";
-import utils from "./utils/index.js";
-import EncodingUtils from "./handlers/encodingHandlers.js";
-import cryptoHandlers from "./handlers/cryptoHandlers.js";
+import { TransactionLike } from "../objects/transaction.js";
+import mempool from "../storage/mempool.js";
+import { BlockLike } from "../objects/block.js";
+import blockchain from "../storage/blockchain.js";
+import { Callbacks } from "../utils/callbacks.js";
+import utils from "../utils/index.js";
+import EncodingUtils from "../handlers/encodingHandlers.js";
+import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import * as ed25519 from '@noble/ed25519';
-import Proposition, { PropositionLike } from "./objects/proposition.js";
+import Proposition, { PropositionLike } from "../objects/proposition.js";
+import validatorsCommittee from "../validators/committee.js";
+
 
 interface BlockValidationInvalidResult {
     cb: false;
@@ -55,7 +57,7 @@ export class Verification {
         }
 
         if (!this.verifyAddress(tx.recipientAddress)) {
-            return {cb: false, status: 400, message: "Bad Request. SenderAddress is not a LeiCoin Address."};
+            return {cb: false, status: 400, message: "Bad Request. RecipientAddress is not a LeiCoin Address."};
         }
 
         if (("lc0x" + cryptoHandlers.sha256(tx.senderPublicKey).slice(0, 38)) !== tx.senderAddress) {
@@ -119,7 +121,7 @@ export class Verification {
 
     }
 
-    public static verifyBlock(block: BlockLike): BlockValidationInvalidResult | BlockValidationValidResult {
+    public static async verifyBlock(block: BlockLike): Promise<BlockValidationInvalidResult | BlockValidationValidResult> {
 
         if (!block.index || !block.hash || !block.previousHash || !block.timestamp || !block.transactions || !block.version) {
             return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
@@ -129,70 +131,37 @@ export class Verification {
         let forktype: "child" | "newfork" = "child";
         let forkparent = "main";
 
-        if (index === 0) {
+        if (block.index === "0") {
 
-            const isGenesisBlockResult = blockchain.isValidGenesisBlock(hash);
+            const isGenesisBlockResult = blockchain.chainstate.isValidGenesisBlock(block.hash);
 
             if (!isGenesisBlockResult.isGenesisBlock)
                 return {cb: false, status: 400, message: 'Bad Request. Block is not a valid Genesis Block.'};
 
             if (isGenesisBlockResult.isForkOFGenesisBlock) {
-                forkchain = hash;
+                forkchain = block.hash;
                 forktype = "newfork";
             }
 
         } else {
 
-            const latestblockinfoFileData = blockchain.getLatestBlockInfo();
-
-            if (latestblockinfoFileData.cb === Callbacks.SUCCESS) {
-                let previousBlockInfoExists = false;
-                for (const [forkName, latestANDPreviousForkBlockInfo] of Object.entries(latestblockinfoFileData.data)) {
-                    const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
-                    const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
-                    if (latestBlockInfo.hash === hash) {
-                        return {cb: false, status: 400, message: 'Bad Request. Block aleady exists.'};
-                    } else if ((latestBlockInfo.hash === previousHash) && ((latestBlockInfo.index + 1) === index)) {
-                        forkchain = forkName;
-                        forktype = "child";
-                        forkparent = forkName;
-                        previousBlockInfoExists = true;
-                    } else if ((previousBlockInfo.hash === previousHash) && ((previousBlockInfo.index + 1) === index)) {
-                        forkchain = hash;
-                        forktype = "newfork";
-                        forkparent = forkName;
-                        previousBlockInfoExists = true;
-                    }
-                }
-                if (!previousBlockInfoExists) {
-                    return {cb: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain'};   
-                }
-            } else {
-                return {cb: false, status: 500, message: 'Internal Server Error. LatestBlockInfoData could not be readed.'};
-            }
+            
 
         }
         
-        if (crypto.createHash('sha256').update(JSON.stringify(cryptoHandler.getPreparedObjectForHashing(block, ["hash"]))).digest('hex') !== hash) {
+        if (cryptoHandlers.sha256(block, ["hash"]) !== block.hash) {
             return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
         }
 
-
-        // Verify that the hash of the block meets the mining difficulty criteria
-        const hashPrefix = '0'.repeat(utils.mining_difficulty);
-        if (hash.substring(0, utils.mining_difficulty) !== hashPrefix) {
-            return {cb: false, status: 400, message: 'Bad Request. Block hash is invalid.'};
-        }
-
-        const isValidCoinbaseTransactionResult = isValidCoinbaseTransaction(transactions[0])
+        const isValidCoinbaseTransactionResult = this.isValidCoinbaseTransaction(block.transactions[0])
 
         if (!isValidCoinbaseTransactionResult.cb) {
             return isValidCoinbaseTransactionResult;
         }
         
         if (forkchain === "main" || forktype === "newfork") {
-            for (const transactionData of transactions) {
-                const transactionsValid = isValidTransaction(transactionData);
+            for (const transactionData of block.transactions) {
+                const transactionsValid = await this.verifyTransaction(transactionData);
                 if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
             }
         }
@@ -200,9 +169,13 @@ export class Verification {
         return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forkchain: forkchain, forktype: forktype, forkparent: forkparent};
     }
 
-    public static async verifyBlockProposition(proposition: PropositionLike) {
+    public static async verifyBlockProposition(proposition: PropositionLike | null) {
 
-        
+        if (!proposition) return 12501;
+        if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return 12508;
+        if (!await Verification.verifySignature(proposition.block.hash, proposition.proposer, proposition.signature)) return 12506;
+
+        return 12000;
 
     }
   

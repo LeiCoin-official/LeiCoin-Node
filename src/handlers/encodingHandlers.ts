@@ -85,101 +85,104 @@ export default class EncodingUtils {
     
     public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool" | "object", decodeFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
         
-        const final_data: {[key: string]: any} = {};
-        let current_length = 0;
-    
-        for (const data of values) {
-    
-            const key = data.key;
-            
-            if (data.type === "object" && data.decodeFunc) {
+        try {
 
-                const rawObj = hexData.substring(current_length, hexData.length);
-                const object = data.decodeFunc(rawObj, true);
-                final_data[key] = object;
-                current_length += object.length;
-
-            } else if (data.type === "array" && data.decodeFunc) {
-    
-                const final_array = [];
-    
-                let total_arrayLength = 0;
-
-                const lenghValueLen = data.length as number;;
-    
-                try {
+            const final_data: {[key: string]: any} = {};
+            let current_length = 0;
+        
+            for (const data of values) {
+        
+                const key = data.key;
                 
+                if (data.type === "object" && data.decodeFunc) {
+
+                    const rawObj = hexData.substring(current_length, hexData.length);
+                    const object = data.decodeFunc(rawObj, true);
+                    final_data[key] = object;
+                    current_length += object.length;
+
+                } else if (data.type === "array" && data.decodeFunc) {
+        
+                    const final_array = [];
+        
+                    let total_arrayLength = 0;
+
+                    const lenghValueLen = data.length as number;
+        
+                    
                     const arrayDataWithLength = hexData.substring(current_length, hexData.length);
                     const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
-        
+            
                     let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
-    
+        
                     total_arrayLength = arrayDataWithLength[0].length + 1;
-                    
-                    for (let i = 0; i < length; i++) {
-        
-                        const array_item = data.decodeFunc(arrayData, true);
-        
-                        final_array.push(array_item.data);
                         
+                    for (let i = 0; i < length; i++) {
+            
+                        const array_item = data.decodeFunc(arrayData, true);
+            
+                        final_array.push(array_item.data);
+                            
                         arrayData = arrayData.substring(array_item.length);
-    
-                        total_arrayLength += array_item.length;
-    
-                    }
-    
-                } catch {}
-    
-                current_length += total_arrayLength;
-    
-                final_data[key] = final_array;
-    
-            } else {
-    
-                let length: number;
-                const type = data.type;
-    
-                if (typeof(data.length) === "string") {
-                    length = parseInt(final_data[data.length]);
-                } else {
-                    length = data.length;
-                }
-                
-                let value = hexData.substring(current_length, current_length + length);
-                if (value.length !== length) {
-                    return { cb: Callbacks.NONE };
-                }
-                
-                switch (type) {
-                    case "int": {
-                        final_data[key] = parseInt(`0x${value}`).toString();
-                        break;
-                    }
-                    case "bigint": {
-                        final_data[key] = BigInt(`0x${value}`).toString();
-                        break;
-                    }
-                    case "bool": {
-                        final_data[key] = (value === "1");
-                        break;
-                    }
-                    default: {
-                        final_data[key] = value;
-                        break;
-                    }
-                }
         
-                current_length += length;
-    
-            } 
-    
+                        total_arrayLength += array_item.length;
+        
+                    }
+        
+                    current_length += total_arrayLength;
+        
+                    final_data[key] = final_array;
+        
+                } else {
+        
+                    let length: number;
+                    const type = data.type;
+        
+                    if (typeof(data.length) === "string") {
+                        length = parseInt(final_data[data.length]);
+                    } else {
+                        length = data.length;
+                    }
+                    
+                    let value = hexData.substring(current_length, current_length + length);
+                    if (value.length !== length) {
+                        return { cb: Callbacks.NONE };
+                    }
+                    
+                    switch (type) {
+                        case "int": {
+                            final_data[key] = parseInt(`0x${value}`).toString();
+                            break;
+                        }
+                        case "bigint": {
+                            final_data[key] = BigInt(`0x${value}`).toString();
+                            break;
+                        }
+                        case "bool": {
+                            final_data[key] = (value === "1");
+                            break;
+                        }
+                        default: {
+                            final_data[key] = value;
+                            break;
+                        }
+                    }
+            
+                    current_length += length;
+        
+                } 
+        
+            }
+        
+            if (returnLength) {
+                return { cb: Callbacks.SUCCESS, data: final_data, length: current_length };
+            }
+        
+            return { cb: Callbacks.SUCCESS, data: final_data };
+
+        } catch (err: any) {
+            return { cb: Callbacks.NONE };
         }
-    
-        if (returnLength) {
-            return { cb: Callbacks.SUCCESS, data: final_data, length: current_length };
-        }
-    
-        return { cb: Callbacks.SUCCESS, data: final_data };
     
     }
 }

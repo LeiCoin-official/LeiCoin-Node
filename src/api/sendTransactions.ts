@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import Verification from "../verification.js";
+import Verification from "../verification/index.js";
 import utils from "../utils/index.js";
 import { AddedUTXO, DeletedUTXO } from "../objects/utxo.js";
 import mempool, { MempoolWithUnconfirmedUTXOS } from "../storage/mempool.js";

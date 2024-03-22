@@ -1,4 +1,5 @@
 import Block from "../objects/block.js";
+import BigNum from "../utils/bigNum.js";
 import utils from "../utils/index.js";
 import stakerpool from "./stakepool.js";
 
@@ -8,11 +9,28 @@ interface CurrentSlot {
     block: Block | null;
 }
 
+export class CommitteeMember {
+
+    public stake: string;
+    public nonce: string;
+
+    constructor(stake: string, nonce: string) {
+        this.stake = stake;
+        this.nonce = nonce;
+    }
+
+    public static create(stake: string) {
+        return new CommitteeMember(stake, "0");
+    }
+
+    public adjustNonce() {
+        this.nonce = BigNum.add(this.nonce, 1);
+    }
+
+}
+
 export interface CommitteeMemberList {
-    [publicKey: string]: {
-        stake: string;
-        nonce: string;
-    };
+    [publicKey: string]: CommitteeMember;
 }
 
 class ValidatorsCommittee {

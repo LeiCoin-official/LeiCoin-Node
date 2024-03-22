@@ -1,7 +1,7 @@
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import Staker from "../objects/staker.js";
 import utils from "../utils/index.js";
-import { CommitteeMemberList } from "./committee.js";
+import { CommitteeMember, CommitteeMemberList } from "./committee.js";
 
 export interface StakersList {
     [publicKey: string]: {
@@ -39,10 +39,7 @@ class Stakerpool {
 
         if (validatorsArray.length <= 128) {
             for (let i = 0; i < validatorsArray.length; i++) {
-                selected[validatorsArray[i][0]] = {
-                    stake: validatorsArray[i][1].stake,
-                    nonce: "0"
-                };
+                selected[validatorsArray[i][0]] = CommitteeMember.create(validatorsArray[i][1].stake);
             }
             return selected;
         } 
@@ -50,7 +47,7 @@ class Stakerpool {
         for (let i = 0; i < 128; i++) {
 
             const index = parseInt((BigInt(`0x${nextHash}`) % BigInt(validatorsArray.length)).toString());
-            selected[validatorsArray[index][0]] = { stake: validatorsArray[index][1].stake, nonce: "0" };
+            selected[validatorsArray[index][0]] = CommitteeMember.create(validatorsArray[index][1].stake);
             validatorsArray.splice(index, 1);
 
             nextHash = cryptoHandlers.sha256(nextHash);

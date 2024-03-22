@@ -5,24 +5,24 @@ import validatorsCommittee from "../../validators/committee.js";
 import validator from "../../validators/index.js";
 import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
-import Verification from "../../verification.js";
+import Verification from "../../verification/index.js";
 import cryptoHandlers from "../../handlers/cryptoHandlers.js";
 
 export default class ValidatorPipeline {
 
     private static async receiveProposition(type: LeiCoinNetDataPackageType, data: string) {
 
-        const proposition = Proposition.fromDecodedHex(data);
+        const proposition = Proposition.fromDecodedHex(data) as Proposition;
 
-        if (!proposition) return;
-        if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return;
-        if (!await Verification.verifySignature(proposition.block.hash, proposition.proposer, proposition.signature)) return;
+        if (await Verification.verifyBlockProposition(proposition) !== 12000) return;
+
+        this.broadcast(type, data, proposition.proposer);
 
         (async function() {
 
-            if (validator.active && validatorsCommittee.isMember(validator.privateKey)) {
+            if (validator.active && validatorsCommittee.isMember(validator.privateKey) && (validatorsCommittee.getCurrentProposer() !== proposition.proposer)) {
 
-
+                                    
 
             }
 
@@ -41,7 +41,7 @@ export default class ValidatorPipeline {
 
             if (validator.active && validatorsCommittee.getCurrentProposer() === validator.publicKey) {
                         
-
+                
 
             }            
 
@@ -64,7 +64,8 @@ export default class ValidatorPipeline {
         }
     }
 
-    public static async broadcast(type: LeiCoinNetDataPackageType, data: string) {
+    public static async broadcast(type: LeiCoinNetDataPackageType, data: string, committeeMemberPubKey: string) {
+        validatorsCommittee.getMember(committeeMemberPubKey).adjustNonce();
         await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
     
