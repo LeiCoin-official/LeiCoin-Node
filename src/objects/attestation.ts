@@ -1,5 +1,5 @@
 import encodingHandlers from "../handlers/encodingHandlers.js";
-import utils from "../utils";
+import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 
@@ -45,14 +45,14 @@ export class AttestationInBlock implements AttestationInBlockLike {
             const returnData = encodingHandlers.splitHex(hexData, [
                 {key: "publicKey", length: 64},
                 {key: "vote", length: 1, type: "bool"},
-                {key: "signature", length: 64}
+                {key: "signature", length: 128}
             ], returnLength);
 
             const data = returnData.data;
         
             if (data && data.version === "00") {
 
-                const attestation = utils.createInstanceFromJSON(this, data);
+                const attestation = utils.createInstanceFromJSON(AttestationInBlock, data);
 
                 if (returnLength) {
                     return {data: attestation, length: returnData.length};
@@ -111,13 +111,13 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
                 {key: "vote", length: 1, type: "bool"},
                 {key: "nonce_length", length: 2, type: "int"},
                 {key: "nonce", length: "nonce_length", type: "bigint"},
-                {key: "signature", length: 64}
+                {key: "signature", length: 128}
             ]);
 
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(this, data);
+                return utils.createInstanceFromJSON(AttestationSendData, data);
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);

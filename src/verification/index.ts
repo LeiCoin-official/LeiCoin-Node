@@ -172,6 +172,7 @@ export class Verification {
     public static async verifyBlockProposition(proposition: PropositionLike | null) {
 
         if (!proposition) return 12501;
+        if (validatorsCommittee.isCurrentProposer(proposition.proposer)) return 12541;
         if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return 12508;
         if (!await Verification.verifySignature(proposition.block.hash, proposition.proposer, proposition.signature)) return 12506;
 

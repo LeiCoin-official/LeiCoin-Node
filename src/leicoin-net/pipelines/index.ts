@@ -11,7 +11,7 @@ export interface PipelineLike {
 
 export class Pipelines {
 
-    private static instance: Pipelines | null = null;
+    private static instance: Pipelines;
 
     public static getInstance() {
         if (!this.instance) {

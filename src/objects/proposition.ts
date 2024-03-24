@@ -54,14 +54,14 @@ export class Proposition implements PropositionLike {
                 {key: "proposer", length: 64},
                 {key: "nonce_length", length: 2, type: "int"},
                 {key: "nonce", length: "nonce_length", type: "bigint"},
-                {key: "signature", length: 64},
+                {key: "signature", length: 128},
                 {key: "block", length: "", type: "object", decodeFunc: Block.fromDecodedHex}
             ]);
 
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(this, data);
+                return utils.createInstanceFromJSON(Proposition, data);
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Proposition from Decoded Hex: ${err.message}`);

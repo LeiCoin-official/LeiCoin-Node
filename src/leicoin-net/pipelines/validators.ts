@@ -7,6 +7,7 @@ import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import Verification from "../../verification/index.js";
 import cryptoHandlers from "../../handlers/cryptoHandlers.js";
+import { proposerJob } from "../../validators/job.js";
 
 export default class ValidatorPipeline {
 
@@ -19,13 +20,11 @@ export default class ValidatorPipeline {
         this.broadcast(type, data, proposition.proposer);
 
         (async function() {
+            if (validatorsCommittee.isCurrentAttestor(validator.publicKey)) {
 
-            if (validator.active && validatorsCommittee.isMember(validator.privateKey) && (validatorsCommittee.getCurrentProposer() !== proposition.proposer)) {
-
-                                    
+                proposerJob.create
 
             }
-
         })();
 
     }
@@ -38,13 +37,11 @@ export default class ValidatorPipeline {
         if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return;
 
         (async function() {
-
-            if (validator.active && validatorsCommittee.getCurrentProposer() === validator.publicKey) {
-                        
+            if (validatorsCommittee.isCurrentProposer(validator.publicKey)) {
+            
                 
-
-            }            
-
+            
+            }
         })();
 
     }

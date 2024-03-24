@@ -57,7 +57,7 @@ export class Transaction implements TransactionLike {
             "0",
             new Date().getTime().toString(),
             "",
-            "0000000000000000000000000000000000000000000000000000000000000000",
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         );
         coinbase.txid = cryptoHandlers.sha256(coinbase, ["txid", "version"]);
         return coinbase;
@@ -112,9 +112,9 @@ export class Transaction implements TransactionLike {
                 {key: "nonce", length: "nonce_length", type: "bigint"},
                 {key: "timestamp_length", length: 2, type: "int"},
                 {key: "timestamp", length: "timestamp_length", type: "bigint"},
-                {key: "message_length", length: 3, type: "int"},
+                {key: "message_length", length: 2, type: "int"},
                 {key: "message", length: "message_length"},
-                {key: "signature", length: 64}
+                {key: "signature", length: 128}
             ], returnLength);
 
             const data = returnData.data;
@@ -123,7 +123,7 @@ export class Transaction implements TransactionLike {
                 data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
                 data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
 
-                const tx = utils.createInstanceFromJSON(this, data);
+                const tx = utils.createInstanceFromJSON(Transaction, data);
 
                 if (returnLength) {
                     return {data: tx, length: returnData.length};

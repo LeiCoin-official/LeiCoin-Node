@@ -140,7 +140,7 @@ export class Block implements BlockLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                const block = utils.createInstanceFromJSON(this, data);
+                const block = utils.createInstanceFromJSON(Block, data);
 
                 if (returnLength) {
                     return {data: block, length: returnData.length};

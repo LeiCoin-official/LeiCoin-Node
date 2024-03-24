@@ -111,7 +111,7 @@ export default class EncodingUtils {
         
                     
                     const arrayDataWithLength = hexData.substring(current_length, hexData.length);
-                    const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
+                    const length = parseInt(`0x${arrayDataWithLength.substring(0, lenghValueLen)}`);
             
                     let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
         

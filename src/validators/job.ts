@@ -1,3 +1,4 @@
+import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
 import Block from "../objects/block.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import blockchain from "../storage/blockchain.js";
@@ -7,45 +8,29 @@ import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
 
 
-class AttesterJob {
+export class AttesterJob {
 
-	private static instance: AttesterJob;
-
-	public static getInstance() {
-		if (!AttesterJob.instance) {
-            AttesterJob.instance = new AttesterJob();
-        }
-        return AttesterJob.instance;
-	}
+	
 
 }
 
-class ProposerJob {
+export class ProposerJob {
 
-	private static instance: ProposerJob;
-
-	public static getInstance() {
-		if (!ProposerJob.instance) {
-            ProposerJob.instance = new ProposerJob();
-        }
-        return ProposerJob.instance;
-	}
-
-    public create() {
+    public static create() {
 		return Block.createNewBlock();
         // Adjust the delay maybe later for faster Block times
         //await new Promise((resolve) => setTimeout(resolve, 10_000));
     }
 
-    public sendToCommittee(block: Block) {
+    public static sendToCommittee(block: Block) {
         
-
+		//ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.VALIDATOR_PROPOSE, block.)
 
     }
 
-    public async broadcastBlock(block: Block) {
+    public static async broadcastBlock(block: Block) {
 
-		if (!block || !Verification.verifyBlock(block).cb) {
+		if (!block || !(await Verification.verifyBlock(block)).cb) {
 			cli.staker_message.log(`Created block with hash ${block?.hash} is invalid.`);
 			return;
 		}
@@ -65,5 +50,3 @@ class ProposerJob {
 
 }
 
-export const attesterJob = AttesterJob.getInstance();
-export const proposerJob = ProposerJob.getInstance();

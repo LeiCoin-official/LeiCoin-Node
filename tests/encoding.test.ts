@@ -102,7 +102,7 @@ export class Transaction {
                 {key: "timestamp", length: "timestamp_length"},
                 {key: "message_length", length: 3},
                 {key: "message", length: "message_length", decode: true},
-                {key: "signature", length: 64}
+                {key: "signature", length: 128}
             ], returnLength);
 
             const data = returnData.data;
@@ -114,7 +114,7 @@ export class Transaction {
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
                 data.message = encodingHandlers.decodeHexToBase64(data.message);
 
-                const tx = createInstanceFromJSON(this, data)
+                const tx = createInstanceFromJSON(Transaction, data)
 
                 if (returnLength) {
                     return {data: tx, length: returnData.lengh};
@@ -233,7 +233,7 @@ export class Block {
                 data.index = encodingHandlers.decompressZeros(data.index);
                 data.nonce = encodingHandlers.decompressZeros(data.nonce);
 
-                return createInstanceFromJSON(this, data);
+                return createInstanceFromJSON(Block, data);
             }
         } catch (err: any) {
             //cli.data_message.error(`Error loading Block from Decoded Hex: ${err.message}`);
@@ -401,7 +401,7 @@ describe('Encoding Testing', () => {
 
         const decoded2: any = Block.fromDecodedHex(decoded.encodeToHex());
 
-        fs.writeFileSync("./blockchain_data/test.bin", decoded2.encodeToHex(), {encoding: "hex", flag: "w"});
+        //fs.writeFileSync("./blockchain_data/test.bin", decoded2.encodeToHex(), {encoding: "hex", flag: "w"});
         //console.log(decoded2?.encodeToHex().length);
 
         expect(JSON.stringify(block)).toBe(JSON.stringify(decoded2));
