@@ -2,3 +2,4 @@
 1 lei is 0,00000001 of a leicoin.
 
 all money in the datebase is stored as leis. so we dont need decimal points for safe math.
+
