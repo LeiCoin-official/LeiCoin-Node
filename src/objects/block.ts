@@ -7,7 +7,6 @@ import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import { AttestationInBlock } from "./attestation.js";
-import config from "../handlers/configHandler.js";
 
 export interface BlockLike {
     index: string;
@@ -17,7 +16,7 @@ export interface BlockLike {
     proposer: string;
     attestations: AttestationInBlock[];
     transactions: Transaction[];
-    readonly version: string;
+    version: string;
 }
 
 export class Block implements BlockLike {
@@ -53,7 +52,7 @@ export class Block implements BlockLike {
 
     }
 
-    public static createNewBlock() {
+    public static createNewBlock(proposerPublicKey: string) {
         
         const previousBlock = blockchain.chainstate.getChainState().latestBlockInfo;
     
@@ -76,7 +75,7 @@ export class Block implements BlockLike {
             '',
             previousHash,
             new Date().getTime().toString(),
-            config.staker.publicKey,
+            proposerPublicKey,
             [],
             transactions
         );

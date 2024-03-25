@@ -7,7 +7,7 @@ import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import Verification from "../../verification/index.js";
 import cryptoHandlers from "../../handlers/cryptoHandlers.js";
-import { proposerJob } from "../../validators/job.js";
+import { AttesterJob, ProposerJob } from "../../validators/job.js";
 
 export default class ValidatorPipeline {
 
@@ -22,7 +22,7 @@ export default class ValidatorPipeline {
         (async function() {
             if (validatorsCommittee.isCurrentAttestor(validator.publicKey)) {
 
-                proposerJob.create
+                AttesterJob.create();
 
             }
         })();

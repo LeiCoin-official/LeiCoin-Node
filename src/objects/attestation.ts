@@ -2,6 +2,7 @@ import encodingHandlers from "../handlers/encodingHandlers.js";
 import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
+import CryptoHandlers from "../handlers/cryptoHandlers.js";
 
 export interface AttestationInBlockLike {
     publicKey: string;
@@ -17,9 +18,9 @@ export interface AttestationSendDataLike extends AttestationInBlockLike {
 
 export class AttestationInBlock implements AttestationInBlockLike {
     
-    public readonly publicKey: string;
-    public readonly vote: boolean;
-    public readonly signature: string;
+    public publicKey: string;
+    public vote: boolean;
+    public signature: string;
 
     constructor(publicKey: string, vote: boolean, signature: string) {
         this.publicKey = publicKey;
@@ -71,8 +72,8 @@ export class AttestationInBlock implements AttestationInBlockLike {
 
 export class AttestationSendData extends AttestationInBlock implements AttestationSendDataLike {
     
-    public readonly blockHash: string;
-    public readonly nonce: string;
+    public blockHash: string;
+    public nonce: string;
     public readonly version: string;
 
     constructor(publicKey: string, blockHash: string, vote: boolean, nonce: string, signature: string, version = "00") {
@@ -125,6 +126,10 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
 
         return null;
 
+    }
+
+    public calculateHash() {
+        return CryptoHandlers.sha256(this, ["signature"]);
     }
 
 }

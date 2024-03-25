@@ -1,14 +1,10 @@
-import crypto from "crypto";
-import { TransactionLike } from "../objects/transaction.js";
-import mempool from "../storage/mempool.js";
-import { BlockLike } from "../objects/block.js";
+import Transaction from "../objects/transaction.js";
+import Block from "../objects/block.js";
 import blockchain from "../storage/blockchain.js";
-import { Callbacks } from "../utils/callbacks.js";
 import utils from "../utils/index.js";
-import EncodingUtils from "../handlers/encodingHandlers.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import * as ed25519 from '@noble/ed25519';
-import Proposition, { PropositionLike } from "../objects/proposition.js";
+import Proposition from "../objects/proposition.js";
 import validatorsCommittee from "../validators/committee.js";
 
 
@@ -37,7 +33,7 @@ export class Verification {
         return await ed25519.verifyAsync(Buffer.from(signature, "hex"), Buffer.from(data, "hex"), Buffer.from(publicKey, "hex"));
     }
 
-    public static async verifyTransaction(tx: TransactionLike, chain = "main", coinbase = false) {
+    public static async verifyTransaction(tx: Transaction, chain = "main", coinbase = false) {
         
         // Ensure that all required fields are present
         if (!tx.txid || !tx.senderAddress || !tx.senderPublicKey|| !tx.recipientAddress || !tx.amount || !tx.nonce || !tx.timestamp || !tx.signature || !tx.version) {
@@ -81,7 +77,7 @@ export class Verification {
         return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
     }
 
-    private static isValidCoinbaseTransaction(tx: TransactionLike): {
+    private static isValidCoinbaseTransaction(tx: Transaction): {
         cb: true;
     } | {
         cb: false;
@@ -121,7 +117,7 @@ export class Verification {
 
     }
 
-    public static async verifyBlock(block: BlockLike): Promise<BlockValidationInvalidResult | BlockValidationValidResult> {
+    public static async verifyBlock(block: Block): Promise<BlockValidationInvalidResult | BlockValidationValidResult> {
 
         if (!block.index || !block.hash || !block.previousHash || !block.timestamp || !block.transactions || !block.version) {
             return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
@@ -169,12 +165,12 @@ export class Verification {
         return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forkchain: forkchain, forktype: forktype, forkparent: forkparent};
     }
 
-    public static async verifyBlockProposition(proposition: PropositionLike | null) {
+    public static async verifyBlockProposition(proposition: Proposition | null) {
 
         if (!proposition) return 12501;
         if (validatorsCommittee.isCurrentProposer(proposition.proposer)) return 12541;
         if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return 12508;
-        if (!await Verification.verifySignature(proposition.block.hash, proposition.proposer, proposition.signature)) return 12506;
+        if (!await Verification.verifySignature(proposition.calculateHash(), proposition.proposer, proposition.signature)) return 12506;
 
         return 12000;
 

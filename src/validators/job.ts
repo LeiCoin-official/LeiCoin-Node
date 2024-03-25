@@ -1,23 +1,44 @@
-import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
+import CryptoHandlers from "../handlers/cryptoHandlers.js";
+import { AttestationSendData } from "../objects/attestation.js";
 import Block from "../objects/block.js";
-import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
+import Proposition from "../objects/proposition.js";
+import Transaction from "../objects/transaction.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
+import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
+import validatorsCommittee from "./committee.js";
+import validator from "./index.js";
 
 
 export class AttesterJob {
 
-	
+	public static async create(block: Block) {
+		const vote = (await Verification.verifyBlock(block)).cb;
+		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
+		const attestation = new AttestationSendData(validator.publicKey, block.hash, vote, nonce, "");
+		attestation.signature = CryptoHandlers.sign(attestation.calculateHash(), validator.privateKey);
+	}
+
+	public static sendToCommittee(attestation: AttestationSendData) {
+
+
+
+	}
 
 }
 
 export class ProposerJob {
 
     public static create() {
-		return Block.createNewBlock();
+		
+		const block = Block.createNewBlock(validator.publicKey);
+		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
+		const proposition = new Proposition(validator.publicKey, nonce, "", block)
+
         // Adjust the delay maybe later for faster Block times
         //await new Promise((resolve) => setTimeout(resolve, 10_000));
     }

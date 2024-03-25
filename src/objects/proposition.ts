@@ -3,11 +3,12 @@ import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
+import CryptoHandlers from "../handlers/cryptoHandlers.js";
 
 export interface PropositionLike {
-    proposer: string;
-    nonce: string;
-    signature: string;
+    readonly proposer: string;
+    readonly nonce: string;
+     signature: string;
     block: Block;
     version: string;
 }
@@ -16,7 +17,7 @@ export class Proposition implements PropositionLike {
     
     public readonly proposer: string;
     public readonly nonce: string;
-    public readonly signature: string;
+    public signature: string;
     public readonly block: Block;
     public readonly version: string;
 
@@ -69,6 +70,12 @@ export class Proposition implements PropositionLike {
 
         return null;
 
+    }
+
+    public calculateHash() {
+        const objWithoutBlock = JSON.parse(JSON.stringify(this));
+        objWithoutBlock.blockHash = objWithoutBlock.block.hash;
+        return CryptoHandlers.sha256(objWithoutBlock, ["signature", "block"]);
     }
 
 }
