@@ -96,6 +96,17 @@ class ValidatorsCommittee {
         return this.isMember(publicKey) && !this.isCurrentProposer(publicKey);
     }
 
+    public getCurrentBlock() {
+        return this.currentSlot?.block;
+    }
+
+    public setCurrentBlock(block: Block) {
+        if (this.currentSlot) {
+            this.currentSlot.block = block;
+        } else {
+            this.currentSlot = {block, proposer: block.proposer};
+        }
+    }
 }
 
 const validatorsCommittee = ValidatorsCommittee.getInstance();

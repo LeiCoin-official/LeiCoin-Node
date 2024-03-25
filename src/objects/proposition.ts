@@ -8,9 +8,9 @@ import CryptoHandlers from "../handlers/cryptoHandlers.js";
 export interface PropositionLike {
     readonly proposer: string;
     readonly nonce: string;
-     signature: string;
-    block: Block;
-    version: string;
+    signature: string;
+    readonly block: Block;
+    readonly version: string;
 }
 
 export class Proposition implements PropositionLike {

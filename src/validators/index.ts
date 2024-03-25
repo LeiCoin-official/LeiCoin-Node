@@ -4,7 +4,7 @@ import Constants from "../utils/constants.js";
 import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
 import validatorsCommittee from "./committee.js";
-import { proposerJob, attesterJob } from "./job.js";
+import { ProposerJob } from "./job.js";
 
 class Validator {
 
@@ -77,7 +77,7 @@ class Validator {
 
 			if (nextProposer === this.publicKey) {
 
-				proposerJob.create();
+				await ProposerJob.createProposition();
 
 			} else {
 

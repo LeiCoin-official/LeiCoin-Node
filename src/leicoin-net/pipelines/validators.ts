@@ -6,7 +6,6 @@ import validator from "../../validators/index.js";
 import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import Verification from "../../verification/index.js";
-import cryptoHandlers from "../../handlers/cryptoHandlers.js";
 import { AttesterJob, ProposerJob } from "../../validators/job.js";
 
 export default class ValidatorPipeline {
@@ -18,14 +17,7 @@ export default class ValidatorPipeline {
         if (await Verification.verifyBlockProposition(proposition) !== 12000) return;
 
         this.broadcast(type, data, proposition.proposer);
-
-        (async function() {
-            if (validatorsCommittee.isCurrentAttestor(validator.publicKey)) {
-
-                AttesterJob.create();
-
-            }
-        })();
+        AttesterJob.processProposition(proposition);
 
     }
 
@@ -36,13 +28,7 @@ export default class ValidatorPipeline {
         if (!attestation) return;
         if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return;
 
-        (async function() {
-            if (validatorsCommittee.isCurrentProposer(validator.publicKey)) {
-            
-                
-            
-            }
-        })();
+        ProposerJob.processAttestation(attestation);
 
     }
 

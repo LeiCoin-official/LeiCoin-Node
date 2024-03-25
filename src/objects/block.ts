@@ -9,25 +9,25 @@ import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import { AttestationInBlock } from "./attestation.js";
 
 export interface BlockLike {
-    index: string;
+    readonly index: string;
     hash: string;
-    previousHash: string;
-    timestamp: string;
-    proposer: string;
-    attestations: AttestationInBlock[];
-    transactions: Transaction[];
-    version: string;
+    readonly previousHash: string;
+    readonly timestamp: string;
+    readonly proposer: string;
+    readonly attestations: AttestationInBlock[];
+    readonly transactions: Transaction[];
+    readonly version: string;
 }
 
 export class Block implements BlockLike {
 
-    public index: string;
+    public readonly index: string;
     public hash: string;
-    public previousHash: string;
-    public timestamp: string;
-    public proposer: string;
-    public attestations: AttestationInBlock[];
-    public transactions: Transaction[];
+    public readonly previousHash: string;
+    public readonly timestamp: string;
+    public readonly proposer: string;
+    public readonly attestations: AttestationInBlock[];
+    public readonly transactions: Transaction[];
     public readonly version: string;
 
     constructor(
