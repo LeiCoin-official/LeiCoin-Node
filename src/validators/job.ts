@@ -26,6 +26,7 @@ export class AttesterJob {
 
 		if (validatorsCommittee.isCurrentAttestor(validator.publicKey)) {
 			const attestation = await this.createAttestation(proposition.block);
+			validatorsCommittee.setCurrentBlock(proposition.block);
 			ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.VALIDATOR_VOTE, attestation.encodeToHex(), attestation.publicKey);
 		}
 
@@ -44,7 +45,7 @@ export class ProposerJob {
 		return proposition;
 
         // Adjust the delay maybe later for faster Block times
-        //await new Promise((resolve) => setTimeout(resolve, 10_000));
+        //await new Promise((resolve) => setTimeout(resolve, 15_000));
     }
 
     public static async broadcastBlock(block: Block) {
@@ -71,7 +72,7 @@ export class ProposerJob {
 
 		if (validatorsCommittee.isCurrentProposer(validator.publicKey)) {
             
-			validatorsCommittee
+			validatorsCommittee.getCurrentBlock()?.addAttestation(attestation.toAttestationInBlock());
             
 		}
 

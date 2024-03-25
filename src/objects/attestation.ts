@@ -132,5 +132,9 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
         return CryptoHandlers.sha256(this, ["signature"]);
     }
 
+    public toAttestationInBlock() {
+        return new AttestationInBlock(this.publicKey, this.vote, this.signature);
+    }
+
 }
 

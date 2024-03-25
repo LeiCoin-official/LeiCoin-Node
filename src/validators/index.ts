@@ -77,7 +77,8 @@ class Validator {
 
 			if (nextProposer === this.publicKey) {
 
-				await ProposerJob.createProposition();
+				const proposition = await ProposerJob.createProposition();
+				validatorsCommittee.setCurrentBlock(proposition.block);
 
 			} else {
 
