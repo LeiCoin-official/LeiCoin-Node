@@ -1,4 +1,6 @@
 import config from "../handlers/configHandler.js";
+import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
+import { LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import cli from "../utils/cli.js";
 import Constants from "../utils/constants.js";
 import utils from "../utils/index.js";
@@ -78,8 +80,8 @@ class Validator {
 			if (nextProposer === this.publicKey) {
 
 				const proposition = await ProposerJob.createProposition();
-				validatorsCommittee.setCurrentBlock(proposition.block);
-
+				ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.VALIDATOR_PROPOSE, proposition.encodeToHex(), this.publicKey);
+				
 			} else {
 
 				
