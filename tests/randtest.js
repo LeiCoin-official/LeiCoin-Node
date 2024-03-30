@@ -79,6 +79,26 @@ export function shuffleArray(array) {
     return array;
 }
 
+export function shuffleObject(obj) {
+  // Get the keys of the object
+  const keys = Object.keys(obj);
+  
+  // Shuffle the keys using Fisher-Yates shuffle algorithm
+  for (let i = keys.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [keys[i], keys[j]] = [keys[j], keys[i]];
+  }
+  
+  // Create a new object with shuffled properties
+  const shuffledObj = {};
+  for (const key of keys) {
+    shuffledObj[key] = obj[key];
+  }
+  
+  return shuffledObj;
+}
+
+
 export function customSort(input, arr) {
     arr.sort((a, b) => {
         const hashA = sha256(a + input);
@@ -86,6 +106,30 @@ export function customSort(input, arr) {
         return hashA.localeCompare(hashB);
     });
     return arr;
+}
+
+
+export function sortObjectAlphabetical(obj) {
+  const deepSort = (input) => {
+      if (typeof input !== 'object' || input === null) {
+          return input;
+      }
+
+      if (Array.isArray(input)) {
+          return input.map(deepSort);
+      }
+
+      const sortedObj = {};
+      Object.keys(input)
+          .sort()
+          .forEach(key => {
+              sortedObj[key] = input[key];
+          });
+      return sortedObj;
+  };
+
+  const sortedObj = deepSort(obj);
+  return sortedObj;
 }
 
 export function getNextValidator(hash, validatorArray) {
@@ -188,5 +232,43 @@ export class SpecialObject2 {
     }
   }
   
+class CommitteeMember {
 
+    constructor(stake, nonce) {
+        this.stake = stake;
+        this.nonce = nonce;
+    }
 
+    static create(stake) {
+        return new CommitteeMember(stake, "0");
+    }
+
+}
+
+export function calculateNextValidators(seedHash) {
+
+    const validatorsArray = Object.keys(globalThis.stakers).sort();
+
+    const selected = {};
+
+    let nextHash = seedHash;
+
+    if (validatorsArray.length <= 8) {
+        for (let i = 0; i < validatorsArray.length; i++) {
+            selected[validatorsArray[i]] = CommitteeMember.create(globalThis.stakers[validatorsArray[i]].stake);
+        }
+        return selected;
+    } 
+
+    for (let i = 0; i < 8; i++) {
+
+        const index = parseInt((BigInt(`0x${nextHash}`) % BigInt(validatorsArray.length)).toString());
+        selected[validatorsArray[index]] = CommitteeMember.create(globalThis.stakers[validatorsArray[index]].stake);
+        validatorsArray.splice(index, 1);
+
+        nextHash = sha256(nextHash);
+    }
+
+    return selected;
+
+}
