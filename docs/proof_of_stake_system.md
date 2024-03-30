@@ -16,3 +16,14 @@ the proposer now send it to the network if not they send just the emtpy slot wit
 
 the network then chose if the block is valid whoi gets slahed.
 
+
+
+Clock:
+
+
+Clock starts:
+
+
+Proposer propose it:
+
+
