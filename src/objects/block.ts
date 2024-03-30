@@ -85,7 +85,7 @@ export class Block implements BlockLike {
         return newBlock;
     }
 
-    public encodeToHex(add_empty_bytes = true) {   
+    public encodeToHex(add_empty_bytes = true) {
     
         const encoded_index = BigNum.numToHex(this.index);
         const index_length = BigNum.numToHex(encoded_index.length);
