@@ -26,9 +26,10 @@ export class AttesterJob {
 
 	public static async processProposition(proposition: Proposition) {
 
+		validatorsCommittee.setCurrentBlock(proposition.block);
+
 		if (validatorsCommittee.isCurrentAttestor(validator.publicKey)) {
 			const attestation = await this.createAttestation(proposition.block);
-			validatorsCommittee.setCurrentBlock(proposition.block);
 			ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.VALIDATOR_VOTE, attestation.encodeToHex(), attestation.publicKey);
 		}
 
