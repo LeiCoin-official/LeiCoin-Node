@@ -1,7 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import getUTXOS_router from "./getUTXOS.js";
 import sendTransactions_router from "./sendTransactions.js";
 
 export default function initAPI() {
@@ -22,7 +21,6 @@ export default function initAPI() {
     });
     
     app.use('/sendtransactions', sendTransactions_router);
-    app.use('/getutxos', getUTXOS_router);
 
     return app;
 }

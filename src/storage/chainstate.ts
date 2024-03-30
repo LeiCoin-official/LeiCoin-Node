@@ -1,8 +1,8 @@
-import { Callbacks } from "../utils/callbacks";
+import { Callbacks } from "../utils/callbacks.js";
 import fs from "fs";
 import cli from "../utils/cli.js";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
-import EncodingUtils from "../handlers/encodingHandlers";
+import EncodingUtils from "../handlers/encodingHandlers.js";
 import Block, { BlockLike } from "../objects/block.js"
 
 export interface SingleChainstateData {

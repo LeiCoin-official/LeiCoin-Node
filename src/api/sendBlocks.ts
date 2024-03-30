@@ -6,7 +6,7 @@ import mempool from "../storage/mempool.js";
 const router = express.Router();
 
 // Route for receiving new transactions
-router.use('/', (req, res, next) => {
+router.use('/', async (req, res, next) => {
 
     if (req.method !== 'POST') {
         res.status(405);
@@ -17,7 +17,7 @@ router.use('/', (req, res, next) => {
 	const blockData = req.body;
 	
 	// Validate the transaction (add your validation logic here)
-	const validationresult = Verification.verifyBlock(blockData);
+	const validationresult = await Verification.verifyBlock(blockData);
 
     res.status(validationresult.status);
 	res.json({ message: validationresult.message });
@@ -27,7 +27,7 @@ router.use('/', (req, res, next) => {
 	}
 
     // Add the transaction to the mempool (replace with your blockchain logic)
-    blockchain.addBlock(blockData);
+    blockchain.blocks.addBlock(blockData);
     //blockchain.updateLatestBlockInfo(blockData.index, blockData.hash);
     mempool.clearMempoolbyBlock(blockData);
 

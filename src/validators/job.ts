@@ -15,11 +15,13 @@ import validator from "./index.js";
 export class AttesterJob {
 
 	public static async createAttestation(block: Block) {
+
 		const vote = (await Verification.verifyBlock(block)).cb;
 		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
 		const attestation = new AttestationSendData(validator.publicKey, block.hash, vote, nonce, "");
 		attestation.signature = await CryptoHandlers.sign(attestation.calculateHash(), validator.privateKey);
 		return attestation;
+		
 	}
 
 	public static async processProposition(proposition: Proposition) {
@@ -45,7 +47,7 @@ export class ProposerJob {
 		return proposition;
 
         // Adjust the delay maybe later for faster Block times
-        //await new Promise((resolve) => setTimeout(resolve, 15_000));
+        // await new Promise((resolve) => setTimeout(resolve, 15_000));
     }
 
     public static async broadcastBlock(block: Block) {

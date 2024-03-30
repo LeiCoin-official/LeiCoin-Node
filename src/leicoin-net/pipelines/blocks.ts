@@ -15,7 +15,7 @@ export default class BlockPipeline {
 
         if (!blockchain.chainstate.isBlockChainStateMatching(block).valid) {
     
-            const validationresult = Verification.verifyBlock(block);
+            const validationresult = await Verification.verifyBlock(block);
     
             if (validationresult.cb) {
     

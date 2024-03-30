@@ -1,5 +1,5 @@
-import BlockDB from "./blocks";
-import WalletDB from "./wallets";
+import BlockDB from "./blocks.js";
+import WalletDB from "./wallets.js";
 
 export class Chain {
 
