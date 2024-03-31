@@ -1,12 +1,12 @@
 import { pipeline } from "stream";
 import { AttestationSendData } from "../../objects/attestation.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
-import validatorsCommittee from "../../validators/committee.js";
-import validator from "../../validators/index.js";
+import validatorsCommittee from "../../staker/committee.js";
+import validator from "../../staker/index.js";
 import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import Verification from "../../verification/index.js";
-import { AttesterJob, ProposerJob } from "../../validators/job.js";
+import { AttesterJob, ProposerJob } from "../../staker/job.js";
 
 export default class ValidatorPipeline {
 

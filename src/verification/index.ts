@@ -5,7 +5,7 @@ import utils from "../utils/index.js";
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import * as ed25519 from '@noble/ed25519';
 import Proposition from "../objects/proposition.js";
-import validatorsCommittee from "../validators/committee.js";
+import validatorsCommittee from "../staker/committee.js";
 
 
 interface BlockValidationInvalidResult {

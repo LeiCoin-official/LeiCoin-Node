@@ -20,6 +20,8 @@ class Stakerpool {
         return Stakerpool.instance;
     }
 
+    
+
     private stakers: StakersList;
 
     public nextStaker: Staker;
