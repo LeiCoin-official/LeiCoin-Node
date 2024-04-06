@@ -1,5 +1,7 @@
 import crypto from "crypto";
 import { startTimer, endTimer } from "./testUtils.js"
+import fs from "fs";
+import path from "path";
 
 function createInstanceFromJSON(cls, json) {
     var _a;
@@ -453,3 +455,5 @@ const elapsedTime = endTimer(startTime);
 console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
 console.log(block.encodeToHex() === block2.encodeToHex());
+
+//fs.writeFileSync(path.join(process.cwd(), `/blockchain_data/tests/blocks/${block.index}.lcb`), block.encodeToHex(), "hex");

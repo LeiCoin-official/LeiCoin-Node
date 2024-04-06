@@ -17,11 +17,11 @@ export class BlockDB {
     public addBlock(block: Block, overwrite = false) {
         const blockIndex = block.index;
         try {
-            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, this.chain);
+            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
             // Check if the block file already exists.
             if (!fs.existsSync(blockFilePath) || overwrite) {
                 // Write the block data to the block file.
-                fs.writeFileSync(blockFilePath, block.encodeToHex(), { encoding: 'hex'});                
+                fs.writeFileSync(blockFilePath, block.encodeToHex(), "hex");                
 
                 return { cb: Callbacks.SUCCESS };
             } else {
@@ -37,9 +37,9 @@ export class BlockDB {
     // Function to read a block
     public getBlock(blockIndex: string) {
         try {
-            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.json`, this.chain);
+            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
             if (fs.existsSync(blockFilePath)) {
-                const hexData = fs.readFileSync(blockFilePath, { encoding: "hex" });
+                const hexData = fs.readFileSync(blockFilePath, "hex");
                 return {cb: Callbacks.SUCCESS, data: Block.fromDecodedHex(hexData)};
             } else {
                 //cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
