@@ -6,8 +6,12 @@ export enum LeiCoinNetDataPackageType {
     BLOCK = "0001",
     TRANSACTION = "0002",
     MESSAGE = "0003",
-    VALIDATOR_PROPOSE = "0101",
-    VALIDATOR_VOTE = "0102",
+
+    // V means Validator
+    V_PROPOSE = "0101",
+    V_VOTE = "0102",
+    V_SLASH_PROPOSER = "0102",
+    V_SLASH_ATTESTOR = "0102",
 }
 
 const objectTypesTransaltionIndex: [any, LeiCoinNetDataPackageType][] = [

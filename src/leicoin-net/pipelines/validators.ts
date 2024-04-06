@@ -35,12 +35,12 @@ export default class ValidatorPipeline {
 
     public static async receive(type: LeiCoinNetDataPackageType, data: string) {
         switch (type) {
-            case LeiCoinNetDataPackageType.VALIDATOR_PROPOSE: {
+            case LeiCoinNetDataPackageType.V_PROPOSE: {
                 await this.receiveProposition(type, data);
                 break;
             }
 
-            case LeiCoinNetDataPackageType.VALIDATOR_VOTE: {   
+            case LeiCoinNetDataPackageType.V_VOTE: {   
                 await this.receiveAttestation(type, data);  
                 break;
             }

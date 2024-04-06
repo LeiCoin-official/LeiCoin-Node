@@ -80,7 +80,7 @@ class Validator {
 			if (nextProposer === this.publicKey) {
 
 				const proposition = await ProposerJob.createProposition();
-				ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.VALIDATOR_PROPOSE, proposition.encodeToHex(), this.publicKey);
+				ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.V_PROPOSE, proposition.encodeToHex(), this.publicKey);
 				
 			} else {
 
