@@ -1,5 +1,5 @@
 
-export class Staker {
+export class Validator {
 
     public readonly publicKey: string;
     public stake: string;
@@ -11,4 +11,4 @@ export class Staker {
 
 }
 
-export default Staker;
+export default Validator;

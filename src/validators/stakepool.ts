@@ -1,5 +1,5 @@
 import cryptoHandlers from "../handlers/cryptoHandlers.js";
-import Staker from "../objects/staker.js";
+import Validator from "../objects/validator.js";
 import utils from "../utils/index.js";
 import { CommitteeMember, CommitteeMemberList } from "./committee.js";
 
@@ -22,11 +22,11 @@ class Stakerpool {
 
     private stakers: StakersList;
 
-    public nextStaker: Staker;
+    public nextStaker: Validator;
 
     private constructor() {
         this.stakers = {};
-        this.nextStaker = new Staker("", "");
+        this.nextStaker = new Validator("", "");
     }
 
     public calculateNextValidators(seedHash: string) {

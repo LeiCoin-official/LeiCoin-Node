@@ -6,6 +6,7 @@ import cryptoHandlers from "../handlers/cryptoHandlers.js";
 import * as ed25519 from '@noble/ed25519';
 import Proposition from "../objects/proposition.js";
 import validatorsCommittee from "../validators/committee.js";
+import { AttestationSendData } from "../objects/attestation.js";
 
 
 interface BlockValidationInvalidResult {
@@ -171,6 +172,17 @@ export class Verification {
         if (validatorsCommittee.isCurrentProposer(proposition.proposer)) return 12541;
         if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return 12508;
         if (!await Verification.verifySignature(proposition.calculateHash(), proposition.proposer, proposition.signature)) return 12506;
+
+        return 12000;
+
+    }
+
+    public static async verifyBlockAttestation(attestation: AttestationSendData | null) {
+
+        if (!attestation) return 12501;
+        if (validatorsCommittee.isCurrentAttestor(attestation.publicKey)) return 12551;
+        if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return 12508;
+        if (!await Verification.verifySignature(attestation.calculateHash(), attestation.publicKey, attestation.signature)) return 12506;
 
         return 12000;
 

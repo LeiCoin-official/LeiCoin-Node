@@ -10,8 +10,8 @@ export enum LeiCoinNetDataPackageType {
     // V means Validator
     V_PROPOSE = "0101",
     V_VOTE = "0102",
-    V_SLASH_PROPOSER = "0102",
-    V_SLASH_ATTESTOR = "0102",
+    V_SLASH_ATTESTOR = "0103",
+    // V_SLASH_PROPOSER = "0104",
 }
 
 const objectTypesTransaltionIndex: [any, LeiCoinNetDataPackageType][] = [

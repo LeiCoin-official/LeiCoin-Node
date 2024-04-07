@@ -72,18 +72,6 @@ class ValidatorsCommittee {
         this.members = stakerpool.calculateNextValidators(lastBlockHash);
     }
 
-    public calculateNextProposer(hash: string) {
-        const validatorsArray = Object.entries(utils.sortObjectAlphabetical(this.members));
-
-        const index = parseInt((BigInt(`0x${hash}`) % BigInt(validatorsArray.length)).toString());
-        this.currentSlot = {
-            proposer: validatorsArray[index][0],
-            block: null
-        };
-
-        return validatorsArray[index][0];
-    }
-
     public getCurrentProposer() {
         return this.currentSlot?.proposer;
     }
@@ -111,3 +99,22 @@ class ValidatorsCommittee {
 
 const validatorsCommittee = ValidatorsCommittee.getInstance();
 export default validatorsCommittee;
+
+/*
+    private static currentCommittee: ValidatorsCommittee;
+    private static previousCommittee: ValidatorsCommittee | null;
+
+    public static getCurrentCommittee() {
+        if (!this.currentCommittee) {
+            this.currentCommittee = new ValidatorsCommittee();
+        }
+        return this.currentCommittee;
+    }
+    public static getCVC = this.getCurrentCommittee;
+
+    public static getPreviousCommittee() {
+        return this.previousCommittee;
+    }
+    public static getPVC = this.getPreviousCommittee;
+
+*/

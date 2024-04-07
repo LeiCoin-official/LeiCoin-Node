@@ -15,7 +15,9 @@ export class ValidatorDB {
         this.inactiveLevel = new Level(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
-    
+    public addActiveValidator() {
+        
+    }
 
 }
 

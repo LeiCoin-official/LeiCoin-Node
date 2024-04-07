@@ -45,11 +45,12 @@ export const VerificationCodes: {[key: number]: string} =  {
     12530: "Invalid Block",
     12531: "Invalid Previous Hash",
 
-    // Proposition
+    // Proposition Only
     12540: "Invalid Proposition",
-    12541: "Invalid Proposer",
+    12541: "Invalid Proposer for Slot",
 
-    // Attestation
-    
+    // Attestation Only
+    12550: "Invalid Attestation",
+    12551: "Invalid Attestor for Slot",
     
 };
