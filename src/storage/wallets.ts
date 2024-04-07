@@ -28,7 +28,7 @@ export class WalletDB {
     public async setWallet(wallet: Wallet) {
         const encodeAddress = encodingHandlers.encodeAddressToHex(wallet.owner);
         const encodedWallet = wallet.encodeToHex();
-        return await this.level.put(encodeAddress, encodedWallet);
+        await this.level.put(encodeAddress, encodedWallet);
     }
 
     public async existsWallet(address: string): Promise<boolean> {

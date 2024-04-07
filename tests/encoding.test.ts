@@ -262,11 +262,11 @@ export class Wallet {
     private nonce: string;
     public readonly version: string;
 
-    constructor(owner: string, balance: string, nonce: string, verion = "00") {
+    constructor(owner: string, balance: string, nonce: string, version = "00") {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;
-        this.version = verion;
+        this.version = version;
     }
 
     public static createEmptyWallet(owner: string) {

@@ -9,11 +9,11 @@ export class Wallet {
     private nonce: string;
     public readonly version: string;
 
-    constructor(owner: string, balance: string, nonce: string, verion = "00") {
+    constructor(owner: string, balance: string, nonce: string, version = "00") {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;
-        this.version = verion;
+        this.version = version;
     }
 
     public static createEmptyWallet(owner: string) {
@@ -47,9 +47,9 @@ export class Wallet {
             const resultData = encodingHandlers.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "balance_length", length: 2, type: "int"},
-                {key: "balance", length: "balance_length", type: "int"},
+                {key: "balance", length: "balance_length", type: "bigint"},
                 {key: "nonce_length", length: 2, type: "int"},
-                {key: "nonce", length: "nonce_length", type: "int"},
+                {key: "nonce", length: "nonce_length", type: "bigint"},
             ]);
 
             const data = resultData.data;
