@@ -1,7 +1,6 @@
 import elliptic from 'elliptic';
 const { ec: EC } = elliptic;
 import crypto from 'crypto';
-import { startTimer, endTimer } from "./testUtils.js";
 
 // Create an ECDSA instance using the curve you're working with (e.g., secp256k1)
 const ec = new EC('secp256k1');
@@ -25,14 +24,14 @@ const publicKeyHex = keyPair.getPublic("hex");
 // Sample signed message and its signature
 //const message = crypto.randomBytes(32);
 const message = "Hello, world!";
-const messageHash = crypto.createHash("sha256").update(message).digest();
+const messageHash = crypto.createHash().update(message).digest();
 const signature = keyPair.sign(messageHash);
 
 
 // console.log("Signature Original:", JSON.stringify(signature));
 
-// const signatureDERHex = signature.toDER("hex");
-// console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
+const signatureDERHex = signature.toDER("hex");
+console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
 
 const signatureHex = encodeSignature(signature);
 console.log("Signature Hex:", signatureHex, signatureHex.length);

@@ -2,7 +2,7 @@ import encodingHandlers from "../handlers/encodingHandlers.js";
 import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
-import CryptoHandlers from "../handlers/cryptoHandlers.js";
+import Crypto from "../crypto/index.js";
 
 export interface AttestationInBlockLike {
     publicKey: string;
@@ -129,7 +129,7 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
     }
 
     public calculateHash() {
-        return CryptoHandlers.sha256(this, ["signature"]);
+        return Crypto.sha256(this, ["signature"]);
     }
 
     public toAttestationInBlock() {

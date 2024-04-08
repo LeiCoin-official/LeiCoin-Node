@@ -5,7 +5,7 @@ import blockchain from "../storage/blockchain.js";
 import encodingHandlers from "../handlers/encodingHandlers.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
-import cryptoHandlers from "../handlers/cryptoHandlers.js";
+import cryptoHandlers from "../crypto/index.js";
 import { AttestationInBlock } from "./attestation.js";
 
 export interface BlockLike {

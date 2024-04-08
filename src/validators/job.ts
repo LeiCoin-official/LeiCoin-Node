@@ -1,4 +1,4 @@
-import CryptoHandlers from "../handlers/cryptoHandlers.js";
+import Crypto from "../crypto/index.js";
 import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
 import { AttestationSendData } from "../objects/attestation.js";
 import Block from "../objects/block.js";
@@ -19,7 +19,7 @@ export class AttesterJob {
 		const vote = (await Verification.verifyBlock(block)).cb;
 		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
 		const attestation = new AttestationSendData(validator.publicKey, block.hash, vote, nonce, "");
-		attestation.signature = await CryptoHandlers.sign(attestation.calculateHash(), validator.privateKey);
+		attestation.signature = await Crypto.sign(attestation.calculateHash(), validator.privateKey);
 		return attestation;
 		
 	}
@@ -44,7 +44,7 @@ export class ProposerJob {
 		const block = Block.createNewBlock(validator.publicKey);
 		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
 		const proposition = new Proposition(validator.publicKey, nonce, "", block);
-		proposition.signature = await CryptoHandlers.sign(proposition.calculateHash(), validator.privateKey);
+		proposition.signature = await Crypto.sign(proposition.calculateHash(), validator.privateKey);
 		return proposition;
 
         // Adjust the delay maybe later for faster Block times

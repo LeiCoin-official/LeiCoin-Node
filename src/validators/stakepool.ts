@@ -1,4 +1,4 @@
-import cryptoHandlers from "../handlers/cryptoHandlers.js";
+import cryptoHandlers from "../crypto/index.js";
 import Validator from "../objects/validator.js";
 import utils from "../utils/index.js";
 import { CommitteeMember, CommitteeMemberList } from "./committee.js";

@@ -3,7 +3,7 @@ import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
-import CryptoHandlers from "../handlers/cryptoHandlers.js";
+import Crypto from "../crypto/index.js";
 
 export interface PropositionLike {
     readonly proposer: string;
@@ -75,7 +75,7 @@ export class Proposition implements PropositionLike {
     public calculateHash() {
         const objWithoutBlock = JSON.parse(JSON.stringify(this));
         objWithoutBlock.blockHash = objWithoutBlock.block.hash;
-        return CryptoHandlers.sha256(objWithoutBlock, ["signature", "block"]);
+        return Crypto.sha256(objWithoutBlock, ["signature", "block"]);
     }
 
 }
