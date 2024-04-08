@@ -19,8 +19,8 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 const keyPair = ec.keyFromPrivate(privateKeyHex, 'hex');
 const publicKeyHex = keyPair.getPublic("hex");
 
-console.log("Public Key:", publicKeyHex, publicKeyHex.length);
-console.log("Private Key:", privateKeyHex, privateKeyHex.length);
+// console.log("Public Key:", publicKeyHex, publicKeyHex.length);
+// console.log("Private Key:", privateKeyHex, privateKeyHex.length);
 
 // Sample signed message and its signature
 //const message = crypto.randomBytes(32);
@@ -28,10 +28,11 @@ const message = "Hello, world!";
 const messageHash = crypto.createHash("sha256").update(message).digest();
 const signature = keyPair.sign(messageHash);
 
-console.log("Signature Original:", JSON.stringify(signature));
 
-const signatureDERHex = signature.toDER("hex");
-console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
+// console.log("Signature Original:", JSON.stringify(signature));
+
+// const signatureDERHex = signature.toDER("hex");
+// console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
 
 const signatureHex = encodeSignature(signature);
 console.log("Signature Hex:", signatureHex, signatureHex.length);
@@ -46,6 +47,6 @@ const recoverPubKeyHex = recoverPubKey.encode('hex');
 
 const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
 
-console.log('Recovered Public Key:', recoverPubKeyHex);
-//console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
+console.log('Recovered Public Key:', recoverPubKeyHex, recoverPubKeyHex.length);
+console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
 console.log("Signature is Valid:", isSignatureValid);
