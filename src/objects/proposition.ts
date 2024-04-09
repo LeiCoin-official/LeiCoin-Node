@@ -1,4 +1,4 @@
-import encodingHandlers from "../handlers/encodingHandlers.js";
+import encodingHandlers from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import Block from "./block.js";

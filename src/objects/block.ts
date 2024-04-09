@@ -2,7 +2,7 @@ import utils from "../utils/index.js";
 import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
 import blockchain from "../storage/blockchain.js";
-import encodingHandlers from "../handlers/encodingHandlers.js";
+import encodingHandlers from "../handlers/encodingUtils.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import cryptoHandlers from "../crypto/index.js";

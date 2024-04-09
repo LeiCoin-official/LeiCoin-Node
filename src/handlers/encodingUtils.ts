@@ -1,4 +1,7 @@
+import elliptic from "elliptic";
+
 import { Callbacks } from "../utils/callbacks.js";
+import { SignatureWithRecovery } from "../crypto/index.js";
 
 export default class EncodingUtils {
 
@@ -11,7 +14,7 @@ export default class EncodingUtils {
     }
     
     public static encodeBase64ToString(data: string) {
-        return Buffer.from(data).toString('base64');
+        return Buffer.from(data).toString("base64");
     }
     
     public static encodeBase64ToBuffer(data: string) {
@@ -81,6 +84,24 @@ export default class EncodingUtils {
         splitetHexKey[1] = splitetHexKey[1].replace("0", "x");
         const address = "lc" + splitetHexKey.join("");
         return address;
+    }
+
+    public static encodeSignature(senderType = "00", signature: SignatureWithRecovery) {
+        return (
+            senderType +
+            signature.r.toString("hex") +
+            signature.s.toString("hex") +
+            signature.recoveryParam.toString(16).padStart(2, "0")
+        );
+    }
+    
+    public static decodeSignature(hexData: string) {
+        return {
+            senderType: hexData.substring(0, 2),
+            r: hexData.substring(2, 66),
+            s: hexData.substring(66, 130),
+            recoveryParam: parseInt(hexData.substring(130, 132), 16)
+        };
     }
     
     public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool" | "object", decodeFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
