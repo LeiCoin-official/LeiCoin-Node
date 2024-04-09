@@ -2,7 +2,8 @@ import crypto from "crypto";
 import { sha256 } from "./randtest.js";
 import { startTimer, endTimer } from "./testUtils.js"
 
-const leiCoinAddress32Chars = '123456789abcdefghjklmnpqrstuvwyz';
+//const leiCoinAddress32Chars = '123456789abcdefghjklmnpqrstuvwyz';
+const leiCoinAddress32Chars = '0123456789abcdefghijklmnopqrstuv';
 
 function hexToAddress32(hexString) {
     let decimalValue = BigInt('0x' + hexString);
@@ -23,12 +24,12 @@ function address32ToHex(address32) {
 }
 
 function hexToAddress322(hex) {
-    let binary = '';
+    let binary = "";
 
     // Convert hex to binary
-    for (let i = 0; i < hex.length; i += 2) {
-        const byte = parseInt(hex.substring(i, i + 2), 16);
-        binary += byte.toString(2).padStart(8, '0');
+    for (let i = 0; i < hex.length; i++) {
+        const byte = parseInt(hex[i], 16);
+        binary += byte.toString(2).padStart(4, '0');
     }
 
     // Pad binary to ensure it's a multiple of 5
@@ -47,7 +48,7 @@ function hexToAddress322(hex) {
 }
 
 function address32ToHex2(address32) {
-    let binary = '';
+    let binary = [];
 
     // Convert address32 to binary
     for (let i = 0; i < address32.length; i++) {
@@ -67,13 +68,15 @@ function address32ToHex2(address32) {
     return hex.substring(0, hex.length - 2);
 }
 
-function example() {
-    const hexAddress = "00074e1c5a92b6b4d27967fc6abddee7dd58d6";
+function test0() {
+    const hexAddress = "10074e1c5a92b6b4d27967fc6abddee7dd58d6";
     const address32 = hexToAddress322(hexAddress);
     console.log('Encoded:', address32, address32.length);
 
     const hexDecoded = address32ToHex2(address32);
     console.log('Is Equal: ' + (hexDecoded === hexAddress));
+
+    console.log(BigInt("0x" + hexAddress).toString(32))
 }
 
 function test1() {
@@ -132,4 +135,4 @@ function test2() {
 
 //test1();
 //test2();
-example();
+test0();
