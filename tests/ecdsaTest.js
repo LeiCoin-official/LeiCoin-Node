@@ -15,7 +15,7 @@ function decodeSignature(hexData) {
 
 const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa";
 
-const keyPair = ec.keyFromPrivate(privateKeyHex, 'hex');
+const keyPair = ec.keyFromPrivate(privateKeyHex, "hex");
 const publicKeyHex = keyPair.getPublic("hex");
 
 // console.log("Public Key:", publicKeyHex, publicKeyHex.length);
@@ -24,7 +24,7 @@ const publicKeyHex = keyPair.getPublic("hex");
 // Sample signed message and its signature
 //const message = crypto.randomBytes(32);
 const message = "Hello, world!";
-const messageHash = crypto.createHash().update(message).digest();
+const messageHash = crypto.createHash("sha256").update(message).digest();
 const signature = keyPair.sign(messageHash);
 
 

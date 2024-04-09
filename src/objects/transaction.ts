@@ -1,6 +1,6 @@
 import config from "../handlers/configHandler.js";
 import cryptoHandlers from "../crypto/index.js";
-import encodingHandlers from "../handlers/encodingHandlers.js";
+import encodingHandlers from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";

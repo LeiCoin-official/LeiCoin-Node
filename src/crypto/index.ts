@@ -1,6 +1,16 @@
 import crypto from "crypto";
+import elliptic from 'elliptic';
+import BN from "bn.js"
+
+export interface SignatureWithRecovery extends elliptic.ec.Signature {
+    r: BN;
+    s: BN;
+    recoveryParam: number;
+}
 
 export class Crypto {
+
+    public static readonly ec = new elliptic.ec("secp256k1");
 
     public static sha256(rawData: string | { [key: string]: any }, excludedKeys: string[] = []) {
         let data = "";
@@ -14,8 +24,9 @@ export class Crypto {
         return crypto.createHash('sha256').update(data).digest('hex');
     }
 
-    public static async sign(data: string, privateKey: string) {
-        return (await ed25519.signAsync(Buffer.from(data, "hex"), Buffer.from(privateKey, "hex"))).toString();
+    public static async sign(hashData: Buffer, privateKey: string) {
+        const keyPair = this.ec.keyFromPrivate(privateKey, "hex");
+        return keyPair.sign(hashData);
     }
 
     public static getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: string[] = []): { [key: string]: any } {
