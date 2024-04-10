@@ -1,7 +1,7 @@
 import elliptic from "elliptic";
 
 import { Callbacks } from "../utils/callbacks.js";
-import { SignatureWithRecovery } from "../crypto/index.js";
+import { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
 
 export default class EncodingUtils {
 
@@ -73,22 +73,10 @@ export default class EncodingUtils {
     
         return decompressedStr;
     }*/
-    
-    public static encodeAddressToHex(address: string) {
-        return address.slice(2, address.length).replace("x", "0");
-    }
-    
-    public static decodeHexToAddress(hexKey: string) {
-        const splitetHexKey = hexKey.split("");
-    
-        splitetHexKey[1] = splitetHexKey[1].replace("0", "x");
-        const address = "lc" + splitetHexKey.join("");
-        return address;
-    }
 
-    public static encodeSignature(senderType = "00", signature: SignatureWithRecovery) {
+    public static encodeSignature(signerType = "00", signature: LeiCoinBinarySignature) {
         return (
-            senderType +
+            signerType +
             signature.r.toString("hex") +
             signature.s.toString("hex") +
             signature.recoveryParam.toString(16).padStart(2, "0")
@@ -97,7 +85,7 @@ export default class EncodingUtils {
     
     public static decodeSignature(hexData: string) {
         return {
-            senderType: hexData.substring(0, 2),
+            signerType: hexData.substring(0, 2),
             r: hexData.substring(2, 66),
             s: hexData.substring(66, 130),
             recoveryParam: parseInt(hexData.substring(130, 132), 16)

@@ -1,12 +1,11 @@
 import crypto from "crypto";
 import elliptic from 'elliptic';
 import BN from "bn.js"
+import EncodingUtils from "../handlers/encodingUtils.js";
 
-export interface SignatureWithRecovery extends elliptic.ec.Signature {
-    r: BN;
-    s: BN;
-    recoveryParam: number;
-}
+interface LeiCoinSignatureAddon { signerType: string; }
+export interface LeiCoinBinarySignature extends LeiCoinSignatureAddon, elliptic.ec.Signature { recoveryParam: number; }
+export interface LeiCoinSignature extends LeiCoinSignatureAddon { r: string; s: string; recoveryParam: number; }
 
 export class Crypto {
 
@@ -25,8 +24,22 @@ export class Crypto {
     }
 
     public static async sign(hashData: Buffer, privateKey: string) {
-        const keyPair = this.ec.keyFromPrivate(privateKey, "hex");
-        return keyPair.sign(hashData);
+        try {
+            const keyPair = this.ec.keyFromPrivate(privateKey, "hex");
+            const signature = keyPair.sign(hashData);
+            return signature;   
+        } catch (error: any) {
+            return false;
+        }
+    }
+
+    public static async getAddress(hashData: Buffer, signatureHex: string) {
+        try {
+            const signature = EncodingUtils.decodeSignature(signatureHex);
+            const key =  this.ec.recoverPubKey(hashData, signature, signature.recoveryParam);   
+        } catch (error: any) {
+            return false;
+        }
     }
 
     public static getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: string[] = []): { [key: string]: any } {
