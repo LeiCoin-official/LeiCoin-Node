@@ -20,7 +20,7 @@ export class LeiCoinNetClient {
         this.client = new WebSocket(`ws://${this.host}/`);
     
         this.client.on('open', () => {
-            cli.leicoin_net_message.client.log(`Connected to: ${this.host}`);
+            cli.leicoin_net_message.client.info(`Connected to: ${this.host}`);
             this.ready = true;
         });
     
@@ -30,7 +30,7 @@ export class LeiCoinNetClient {
     
         this.client.on('close', (code: number) => {
             if (code !== 1000) {
-                cli.leicoin_net_message.client.log(`Connection to ${this.host} closed. Exit-Code: ${code}`);
+                cli.leicoin_net_message.client.info(`Connection to ${this.host} closed. Exit-Code: ${code}`);
             }
             this.ready = false;
         });

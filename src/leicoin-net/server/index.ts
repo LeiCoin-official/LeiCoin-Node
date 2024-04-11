@@ -12,7 +12,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
 
         nodeConnections.push(ws);
 
-        cli.leicoin_net_message.server.log(`${req.headers.host} established as connection to this Server.`);
+        cli.leicoin_net_message.server.info(`${req.headers.host} established as connection to this Server.`);
 
         // Listen for messages from clients connected to the node
         ws.on('message', async (rawdata: Buffer, isBinary) => {
@@ -24,7 +24,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
         });
 
         ws.on('error', (error) => {
-            cli.leicoin_net_message.server.log(`Websocket Server Error: ${error.message}`);
+            cli.leicoin_net_message.server.info(`Websocket Server Error: ${error.message}`);
             //utils.events.emit("ws_reconnect");
         });
 
@@ -35,7 +35,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
             if (index !== -1) {
                 nodeConnections.splice(index, 1);
             }
-            cli.leicoin_net_message.server.log(`WebSocket connection to ${req.headers.host} closed.`);
+            cli.leicoin_net_message.server.info(`WebSocket connection to ${req.headers.host} closed.`);
         });
         
     });

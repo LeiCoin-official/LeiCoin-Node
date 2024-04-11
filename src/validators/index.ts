@@ -40,7 +40,7 @@ class Validator {
 
 		if (this.active) {
 			if (Verification.verifyAddress(this.address)) {
-				cli.staker_message.log("Staker started");
+				cli.staker_message.info("Staker started");
 			} else {
 				cli.staker_message.error("Staker could not be started: Invalid Address.");
 			}

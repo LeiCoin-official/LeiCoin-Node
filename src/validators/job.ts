@@ -54,7 +54,7 @@ export class ProposerJob {
     public static async broadcastBlock(block: Block) {
 
 		if (!block || !(await Verification.verifyBlock(block)).cb) {
-			cli.staker_message.log(`Created block with hash ${block?.hash} is invalid.`);
+			cli.staker_message.info(`Created block with hash ${block?.hash} is invalid.`);
 			return;
 		}
 

@@ -1,6 +1,6 @@
 import process from "process";
 import { EventEmitter } from "events";
-import type { CLI } from "./cli.js";
+import type { CLILike } from "./cli.js";
 import Constants from "./constants.js";
 import BigNum from "./bigNum.js";
 
@@ -21,7 +21,7 @@ class Utils {
         return Utils.instance;
     }
 
-    private cli: CLI | null = null;
+    private cli: CLILike | null = null;
 
     public readonly events = new EventEmitter();
 
@@ -53,10 +53,10 @@ class Utils {
         try {
             if (!this.cli)
             this.cli = (await import("./cli.js")).default;
-            this.cli.default_message.log('Shutting down...');
+            this.cli.default_message.info('Shutting down...');
             this.events.emit("stop_server");
             setTimeout(async() => {
-                this.cli?.default_message.log('LeiCoin-Node stopped.');
+                this.cli?.default_message.info('LeiCoin-Node stopped.');
                 await this.cli?.close();
                 process.exit(exitCode);
             }, 1000);

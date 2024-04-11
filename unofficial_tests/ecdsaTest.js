@@ -18,6 +18,8 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 const keyPair = ec.keyFromPrivate(privateKeyHex, "hex");
 const publicKeyHex = keyPair.getPublic("hex");
 
+const address = "lc0x" + crypto.createHash("sha256").update(publicKeyHex).digest("hex").substring(0, 38);
+
 // console.log("Public Key:", publicKeyHex, publicKeyHex.length);
 // console.log("Private Key:", privateKeyHex, privateKeyHex.length);
 
@@ -49,3 +51,5 @@ const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey
 console.log('Recovered Public Key:', recoverPubKeyHex, recoverPubKeyHex.length);
 console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
 console.log("Signature is Valid:", isSignatureValid);
+
+console.log("Address:", address, address.length);

@@ -5,6 +5,7 @@ import utils from "../utils/index.js";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
 import BigNum from "../utils/bigNum.js";
+import Address from "./address.js";
 
 export interface TransactionLike {
 
@@ -78,9 +79,9 @@ export class Transaction implements TransactionLike {
 
         const hexData = this.version +
                         this.txid +
-                        encodingHandlers.encodeAddressToHex(this.senderAddress) +
+                        Address.encodeToHex(this.senderAddress) +
                         this.senderPublicKey +
-                        encodingHandlers.encodeAddressToHex(this.recipientAddress) +
+                        Address.encodeToHex(this.recipientAddress) +
                         amount_length +
                         encoded_amount +
                         nonce_length +
@@ -120,8 +121,8 @@ export class Transaction implements TransactionLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
-                data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
+                data.senderAddress = Address.fromDecodedHex(data.senderAddress);
+                data.recipientAddress = Address.fromDecodedHex(data.recipientAddress);
 
                 const tx = utils.createInstanceFromJSON(Transaction, data);
 

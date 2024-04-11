@@ -41,7 +41,7 @@ export default class BlockPipeline {
                 this.broadcast(type, data);
 
             } else {
-                cli.leicoin_net_message.server.log(`Received block with hash ${block.hash} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
+                cli.leicoin_net_message.server.info(`Received block with hash ${block.hash} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
             }
 
         }

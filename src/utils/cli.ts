@@ -1,20 +1,46 @@
 import { createInterface } from "readline";
-import { Chalk, ChalkInstance } from "chalk";
+import type { ChalkInstance } from "chalk";
 import process from "process";
 import ansiEscapes from "ansi-escapes";
 import fs from "fs";
 import { dirname } from "path";
 import utils from "./index.js";
 
-export class CLI {
+interface LogMessageLike {
+    info(message: string): void;
+    success(message: string): void;
+    error(message: string): void;
+    warn(message: string): void;
+}
+
+interface LeiCoinNetLogMessageLike {
+    server: LogMessageLike;
+    client: LogMessageLike;
+}
+
+export interface CLILike {
+    default_message: LogMessageLike;
+    staker_message: LogMessageLike;
+    api_message: LogMessageLike;
+    data_message: LogMessageLike;
+    leicoin_net_message: LeiCoinNetLogMessageLike;
+    close(): Promise<any>;
+}
+
+class CLI {
 
     private static instance: CLI;
 
-    public static getInstance() {
-        if (!CLI.instance) {
-            CLI.instance = new CLI();
+    public static createInstance() {
+        if (!this.instance) {
+            this.instance = new this();
+            this.instance.createChalk();
         }
-        return CLI.instance;
+        return this.instance;
+    }
+
+    public static getInstance() {
+        return this.instance;
     }
     
     private static LogMessage = class {
@@ -27,7 +53,7 @@ export class CLI {
         private _log(message: string, type: string) {
             CLI.getInstance().logToConsole(this.prefix, this.color, message, type);
         }
-        public log(message: string) {this._log(message, "log");}
+        public info(message: string) {this._log(message, "info");}
         public success(message: string) {this._log(message, "success");}
         public error(message: string) {this._log(message, "error");}
         public warn(message: string) {this._log(message, "warn");}
@@ -41,20 +67,23 @@ export class CLI {
         }
     }
 
-    public readonly default_message = new CLI.LogMessage('Global', '#ffffff');
-    public readonly staker_message = new CLI.LogMessage('Staker', '#00ffff');
-    public readonly api_message = new CLI.LogMessage('API', '#c724b1');
-    public readonly data_message = new CLI.LogMessage('Data', '#1711df');
-    public readonly leicoin_net_message = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
+    public readonly default_message: LogMessageLike = new CLI.LogMessage('Global', '#ffffff');
+    public readonly staker_message: LogMessageLike = new CLI.LogMessage('Staker', '#00ffff');
+    public readonly api_message: LogMessageLike = new CLI.LogMessage('API', '#c724b1');
+    public readonly data_message: LogMessageLike = new CLI.LogMessage('Data', '#1711df');
+    public readonly leicoin_net_message: LeiCoinNetLogMessageLike = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
 
-    private readonly ctx = new Chalk({level: 3});
+    private ctx: ChalkInstance | null = null;
 
-    private readonly message_styles: { [key: string]: ChalkInstance } = {
-        reset: this.ctx.reset,
-        success: this.ctx.green,
-        error: this.ctx.red,
-        warn: this.ctx.yellow,
-    };
+    private readonly message_styles: { [key: string]: ChalkInstance } = {};
+
+    private async createChalk() {
+        this.ctx = new (await import("chalk")).Chalk({level: 3});
+        this.message_styles.reset = this.ctx.reset;
+        this.message_styles.success = this.ctx.green;
+        this.message_styles.error = this.ctx.red;
+        this.message_styles.warn = this.ctx.yellow;
+    }
 
     private readonly rl = createInterface({
         input: process.stdin,
@@ -90,9 +119,9 @@ export class CLI {
         });
     }
 
-    private logToConsole(prefix: string, color: string, message: string, type = 'log') {
+    private logToConsole(prefix: string, color: string, message: string, type = 'info') {
     
-        const colorizedPrefix = this.ctx.hex(color).visible(`[${prefix}]`);
+        const colorizedPrefix = this.ctx?.hex(color).visible(`[${prefix}]`);
         const styleFunction = this.message_styles[type] || this.message_styles.reset;
         const styledMessage = `${colorizedPrefix} ${styleFunction(message)}`;
     
@@ -110,20 +139,20 @@ export class CLI {
     private handleCommand(command: string) {
         switch (command) {
             case 'help':
-                this.default_message.log('Available commands:');
-                this.default_message.log(' - help: Show available commands');
-                this.default_message.log(' - stop: Stops The Server and Staker');
+                this.default_message.info('Available commands:');
+                this.default_message.info(' - help: Show available commands');
+                this.default_message.info(' - stop: Stops The Server and Staker');
                 break;
             case 'stop':
                 utils.gracefulShutdown();
                 break;
             default:
-                this.default_message.log('Command not recognized. Type "help" for available commands.');
+                this.default_message.info('Command not recognized. Type "help" for available commands.');
                 break;
         }
     }
 
-    public async close() {
+    public async close(): Promise<any> {
         return new Promise((resolve, reject) => {
             this.rl.setPrompt("");
             this.rl.prompt();
@@ -142,4 +171,55 @@ export class CLI {
  
 }
 
-export default CLI.getInstance();
+class NoCLI implements CLILike {
+
+    private static instance: NoCLI;
+
+    public static getInstance() {
+        if (!this.instance) {
+            this.instance = new this();
+        }
+        return this.instance;
+    }
+    
+    private static LogMessage = class {
+        private readonly prefix: string;
+        constructor(prefix: string) {
+            this.prefix = prefix;
+        }
+        private _log(message: string, type: string) {
+            const styledMessage = `[${type.toUpperCase()}]: [${this.prefix}] ${message}`;
+            console.log(styledMessage);
+        }
+        public info(message: string) {this._log(message, "info");}
+        public success(message: string) {this._log(message, "success");}
+        public error(message: string) {this._log(message, "error");}
+        public warn(message: string) {this._log(message, "warn");}
+    }
+    
+    private static LeiCoinNetLogMessage = class extends NoCLI.LogMessage {
+        public readonly server = new NoCLI.LogMessage('LeiCoinNet-Server');
+        public readonly client = new NoCLI.LogMessage('LeiCoinNet-Client');
+        constructor(prefix: string) {
+            super(prefix);
+        }
+    }
+
+    public readonly default_message: LogMessageLike = new NoCLI.LogMessage('Global');
+    public readonly staker_message: LogMessageLike = new NoCLI.LogMessage('Staker');
+    public readonly api_message: LogMessageLike = new NoCLI.LogMessage('API');
+    public readonly data_message: LogMessageLike = new NoCLI.LogMessage('Data');
+    public readonly leicoin_net_message: LeiCoinNetLogMessageLike = new NoCLI.LeiCoinNetLogMessage('LeiCoinNet');
+
+    public async close() { return; }
+
+}
+
+let cli: CLILike;
+if (process.env.nocli === "true") {
+    cli = NoCLI.getInstance();
+} else {
+    cli = await CLI.createInstance();
+}
+
+export default cli;

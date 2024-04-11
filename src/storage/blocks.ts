@@ -25,7 +25,7 @@ export class BlockDB {
 
                 return { cb: Callbacks.SUCCESS };
             } else {
-                cli.data_message.log(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
+                cli.data_message.info(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
                 return { cb: Callbacks.ERROR };
             }
         } catch (err: any) {
