@@ -17,5 +17,6 @@ module.exports = {
         'hash.js': 'hash.js',
         '(.+)\\.js': '$1'
     },
-    extensionsToTreatAsEsm: ['.ts']
+    extensionsToTreatAsEsm: ['.ts'],
+    setupFiles: ['tests/setup.ts'],
 };

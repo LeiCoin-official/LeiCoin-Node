@@ -5,6 +5,7 @@ import ansiEscapes from "ansi-escapes";
 import fs from "fs";
 import { dirname } from "path";
 import utils from "./index.js";
+import { Dict } from "../objects/dictonary.js";
 
 interface LogMessageLike {
     info(message: string): void;
@@ -24,6 +25,7 @@ export interface CLILike {
     api_message: LogMessageLike;
     data_message: LogMessageLike;
     leicoin_net_message: LeiCoinNetLogMessageLike;
+    setup(): Promise<void>;
     close(): Promise<any>;
 }
 
@@ -31,15 +33,10 @@ class CLI {
 
     private static instance: CLI;
 
-    public static createInstance() {
+    public static getInstance() {
         if (!this.instance) {
             this.instance = new this();
-            this.instance.createChalk();
         }
-        return this.instance;
-    }
-
-    public static getInstance() {
         return this.instance;
     }
     
@@ -75,14 +72,16 @@ class CLI {
 
     private ctx: ChalkInstance | null = null;
 
-    private readonly message_styles: { [key: string]: ChalkInstance } = {};
+    private readonly message_styles: Dict<ChalkInstance> = {};
 
-    private async createChalk() {
-        this.ctx = new (await import("chalk")).Chalk({level: 3});
-        this.message_styles.reset = this.ctx.reset;
-        this.message_styles.success = this.ctx.green;
-        this.message_styles.error = this.ctx.red;
-        this.message_styles.warn = this.ctx.yellow;
+    public async setup() {
+        if (!this.ctx) {
+            this.ctx = new (await import("chalk")).Chalk({level: 3});
+            this.message_styles.reset = this.ctx.reset;
+            this.message_styles.success = this.ctx.green;
+            this.message_styles.error = this.ctx.red;
+            this.message_styles.warn = this.ctx.yellow;
+        }
     }
 
     private readonly rl = createInterface({
@@ -211,6 +210,7 @@ class NoCLI implements CLILike {
     public readonly data_message: LogMessageLike = new NoCLI.LogMessage('Data');
     public readonly leicoin_net_message: LeiCoinNetLogMessageLike = new NoCLI.LeiCoinNetLogMessage('LeiCoinNet');
 
+    public async setup() { return; }
     public async close() { return; }
 
 }
@@ -219,7 +219,7 @@ let cli: CLILike;
 if (process.env.nocli === "true") {
     cli = NoCLI.getInstance();
 } else {
-    cli = await CLI.createInstance();
+    cli = CLI.getInstance();
 }
 
 export default cli;

@@ -1,9 +1,14 @@
-import "./utils/index.js";
-import "./handlers/configHandler.js";
-import "./storage/blockchain.js";
-import initNetConnections from "./netInitialization.js";
-import staking from "./validators/index.js";
+async function main() {
 
+    await import("./utils/index.js");
+    (await import("./utils/cli.js")).default.setup();
 
-initNetConnections();
-staking.initIfActive();
+    await import("./handlers/configHandler.js");
+    await import("./storage/blockchain.js");
+    
+    (await import("./netInitialization.js")).default();
+    (await import("./validators/index.js")).default.initIfActive();
+
+}
+
+main();

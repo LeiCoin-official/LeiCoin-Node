@@ -1,14 +1,9 @@
 import crypto from "crypto";
-import { startTimer, endTimer } from "./testUtils.js"
-import fs from "fs";
-import path from "path";
-
 function createInstanceFromJSON(cls, json) {
-    var _a;
     // Retrieve the constructor of the class
     const constructor = cls;
     // Retrieve the parameter names of the constructor
-    const paramNames = ((_a = constructor.toString().match(/\(([^)]+)\)/)) === null || _a === void 0 ? void 0 : _a[1].split(',').map((param) => param.trim())) || [];
+    const paramNames = constructor.toString().match(/\(([^)]+)\)/)?.[1].split(',').map((param) => param.trim()) || [];
     // Create an array of arguments for the constructor
     const args = paramNames.map((paramName) => json[paramName]);
     // Instantiate the class with the arguments
@@ -191,7 +186,7 @@ class EncodingUtils {
                     let total_arrayLength = 0;
                     const lenghValueLen = data.length;
                     const arrayDataWithLength = hexData.substring(current_length, hexData.length);
-                    const length = parseInt(`0x${arrayDataWithLength.substring(0, lenghValueLen)}`);
+                    const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
                     let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
                     total_arrayLength = arrayDataWithLength[0].length + 1;
                     for (let i = 0; i < length; i++) {
@@ -248,6 +243,16 @@ class EncodingUtils {
     }
 }
 class Transaction {
+    txid;
+    senderAddress;
+    senderPublicKey;
+    recipientAddress;
+    amount;
+    nonce;
+    timestamp;
+    message;
+    signature;
+    version;
     constructor(txid, senderAddress, senderPublicKey, recipientAddress, amount, nonce, timestamp, message, signature, version = "00") {
         this.txid = txid;
         this.senderAddress = senderAddress;
@@ -261,7 +266,7 @@ class Transaction {
         this.version = version;
     }
     static createCoinbaseTransaction() {
-        const coinbase = new Transaction("", "lc0x6c6569636f696e6e65745f636f696e62617365", "0000000000000000000000000000000000000000000000000000000000000000", "lc0x6c6569636f696e6e65745f636f696e62617365", "32", "0", new Date().getTime().toString(), "", "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+        const coinbase = new Transaction("", "lc0x6c6569636f696e6e65745f636f696e62617365", "0000000000000000000000000000000000000000000000000000000000000000", "lc0x6c6569636f696e6e65745f636f696e62617365", "32", "0", new Date().getTime().toString(), "", "0000000000000000000000000000000000000000000000000000000000000000");
         coinbase.txid = sha256(coinbase, ["txid", "version"]);
         return coinbase;
     }
@@ -304,7 +309,7 @@ class Transaction {
                 { key: "nonce", length: "nonce_length", type: "bigint" },
                 { key: "timestamp_length", length: 2, type: "int" },
                 { key: "timestamp", length: "timestamp_length", type: "bigint" },
-                { key: "message_length", length: 2, type: "int" },
+                { key: "message_length", length: 3, type: "int" },
                 { key: "message", length: "message_length" },
                 { key: "signature", length: 128 }
             ], returnLength);
@@ -326,6 +331,9 @@ class Transaction {
     }
 }
 class AttestationInBlock {
+    publicKey;
+    vote;
+    signature;
     constructor(publicKey, vote, signature) {
         this.publicKey = publicKey;
         this.vote = vote;
@@ -361,6 +369,14 @@ class AttestationInBlock {
     }
 }
 class Block {
+    index;
+    hash;
+    previousHash;
+    timestamp;
+    proposer;
+    attestations;
+    transactions;
+    version;
     constructor(index, hash, previousHash, timestamp, proposer, attestations, transactions, version = "00") {
         this.index = index;
         this.hash = hash;
@@ -441,19 +457,3 @@ class Block {
         this.attestations.push(attestation);
     }
 }
-
-const block = Block.createNewBlock();
-let block2 = block;
-
-const startTime = startTimer();
-
-for (let i = 0; i < 3; i++) {
-    block2 = Block.fromDecodedHex(block2.encodeToHex());
-}
-
-const elapsedTime = endTimer(startTime);
-console.log("Elapsed time:", elapsedTime / 1000, "seconds");
-
-console.log(block.encodeToHex() === block2.encodeToHex());
-
-//fs.writeFileSync(path.join(process.cwd(), `/blockchain_data/tests/blocks/${block.index}.lcb`), block.encodeToHex(), "hex");
