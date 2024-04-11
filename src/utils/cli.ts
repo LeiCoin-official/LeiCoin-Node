@@ -1,7 +1,6 @@
 import { createInterface } from "readline";
 import type { ChalkInstance } from "chalk";
 import process from "process";
-import ansiEscapes from "ansi-escapes";
 import fs from "fs";
 import { dirname } from "path";
 import utils from "./index.js";
@@ -74,6 +73,8 @@ class CLI {
 
     private readonly message_styles: Dict<ChalkInstance> = {};
 
+    private ansiEscapes: any = null;
+
     public async setup() {
         if (!this.ctx) {
             this.ctx = new (await import("chalk")).Chalk({level: 3});
@@ -81,6 +82,9 @@ class CLI {
             this.message_styles.success = this.ctx.green;
             this.message_styles.error = this.ctx.red;
             this.message_styles.warn = this.ctx.yellow;
+        }
+        if (!this.ansiEscapes) {
+            this.ansiEscapes = (await import("ansi-escapes")).default;
         }
     }
 
@@ -125,8 +129,8 @@ class CLI {
         const styledMessage = `${colorizedPrefix} ${styleFunction(message)}`;
     
         // Clear the current line and move the cursor to the beginning
-        process.stdout.write(ansiEscapes.eraseLines(1)); // Clear the current line
-        process.stdout.write(ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
+        process.stdout.write(this.ansiEscapes.eraseLines(1)); // Clear the current line
+        process.stdout.write(this.ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
     
         console.log(styledMessage);
         this.logStream.write(`[${prefix}] ${message}\n`);

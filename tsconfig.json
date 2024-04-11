@@ -109,6 +109,7 @@
   "exclude": [
     "unofficial_tests/**/*",
     "localtests/**/*",
+    "scripts/**/*",
     "tests/**/*",
     "jest.config.cjs"
   ],

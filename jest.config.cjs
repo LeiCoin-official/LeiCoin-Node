@@ -18,5 +18,5 @@ module.exports = {
         '(.+)\\.js': '$1'
     },
     extensionsToTreatAsEsm: ['.ts'],
-    setupFiles: ['tests/setup.ts'],
+    setupFiles: ['./tests/setupTestEnv.cjs'],
 };
