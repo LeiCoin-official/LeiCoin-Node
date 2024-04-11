@@ -107,6 +107,8 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
   },
   "exclude": [
+    "unofficial_tests/**/*",
+    "localtests/**/*",
     "tests/**/*",
     "jest.config.cjs"
   ],

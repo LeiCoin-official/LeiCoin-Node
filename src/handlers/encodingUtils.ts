@@ -1,7 +1,7 @@
 import elliptic from "elliptic";
 
 import { Callbacks } from "../utils/callbacks.js";
-import { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
+import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
 
 export default class EncodingUtils {
 

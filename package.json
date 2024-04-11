@@ -2,16 +2,16 @@
 	"name": "leicoin-node",
 	"version": "1.0.0",
 	"description": "",
-	"exports": "./index.ts",
+	"exports": "./src/index.ts",
 	"type": "module",
 	"scripts": {
 		"setup-dev-env": "node scripts/setup-dev-env.mjs",
 		"test": "npx jest",
-		"caslb": "npx tsc && cd build && node index.js",
-		"slb": "cd build && node index.js",
-		"dev": "npx ts-node --esm index.ts",
+		"caslb": "npx tsc && cd build && node src/index.js",
+		"slb": "cd build && node src/index.js",
+		"dev": "npx ts-node --esm src/index.ts",
 		"build": "npx tsc",
-		"start": "node index.js"
+		"start": "node src/index.js"
 	},
 	"repository": {
 		"type": "git",
