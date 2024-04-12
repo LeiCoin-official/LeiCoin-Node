@@ -4,6 +4,7 @@ import crypto from "crypto"
 import BigNum from "../src/utils/bigNum.js";
 import fs from "fs";
 import Address from "../src/objects/address.js";
+import { Dict } from "../src/objects/dictonary.js";
 
 export class Transaction {
 
@@ -247,7 +248,7 @@ export class Block {
         //return Block.initFromJSON(block);
     }
 
-    public calculateHash(modifyedBlock: {[key: string]: any}) {
+    public calculateHash(modifyedBlock: Dict<any>) {
         this.hash = crypto
             .createHash('sha256')
             .update(JSON.stringify(modifyedBlock))

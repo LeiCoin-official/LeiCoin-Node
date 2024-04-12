@@ -44,12 +44,10 @@ export class Wallet {
 
         try {
 
-            const resultData = EncodingUtils.splitHex(hexData, [
-                {key: "version", length: 2},
-                {key: "balance_length", length: 2, type: "int"},
-                {key: "balance", length: "balance_length", type: "bigint"},
-                {key: "nonce_length", length: 2, type: "int"},
-                {key: "nonce", length: "nonce_length", type: "bigint"},
+            const resultData = EncodingUtils.getDataFromHex(hexData, [
+                {key: "version"},
+                {key: "balance", length: 2, lengthBefore: true, type: "bigint"},
+                {key: "nonce", length: 2, lengthBefore: true, type: "bigint"},
             ]);
 
             const data = resultData.data;

@@ -50,13 +50,12 @@ export class Proposition implements PropositionLike {
     public static fromDecodedHex(hexData: string) {
 
         try {
-            const returnData = EncodingUtils.splitHex(hexData, [
-                {key: "version", length: 2},
-                {key: "proposer", length: 64},
-                {key: "nonce_length", length: 2, type: "int"},
-                {key: "nonce", length: "nonce_length", type: "bigint"},
-                {key: "signature", length: 128},
-                {key: "block", length: "", type: "object", decodeFunc: Block.fromDecodedHex}
+            const returnData = EncodingUtils.getDataFromHex(hexData, [
+                {key: "version"},
+                {key: "proposer", type: "address"},
+                {key: "nonce"},
+                {key: "signature"},
+                {key: "block", type: "object", decodeFunc: Block.fromDecodedHex}
             ]);
 
             const data = returnData.data;

@@ -1,9 +1,25 @@
-import elliptic from "elliptic";
-
 import { Callbacks } from "../utils/callbacks.js";
 import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
 import Address from "../objects/address.js";
 import { Dict } from "../objects/dictonary.js";
+
+type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object";
+type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
+type DefaultDataTypes = BasicTypes | AdvancedTypes;
+
+interface DataFromHexArguments {
+    key: string;
+    length?: number;
+    lengthBefore?: boolean;
+    type?: DefaultDataTypes;
+    decodeFunc?(hexData: string, returnLength: boolean): any;
+}
+
+interface HexDataType {
+    defaultLength?: number;
+    lengthBefore?: boolean;
+    parse?(value: string): any;
+}
 
 export default class EncodingUtils {
 
@@ -94,10 +110,7 @@ export default class EncodingUtils {
         };
     }
 
-    private static hexDataTypes: Dict<{
-        defaultLength?: number;
-        parse(value: string): any;
-    }> = {
+    private static hexDataTypes: Dict<HexDataType> = {
         int: {
             parse: (value: string) => parseInt(`0x${value}`).toString()
         },
@@ -112,63 +125,74 @@ export default class EncodingUtils {
             defaultLength: 40,
             parse: Address.fromDecodedHex
         },
-        default: {
-            parse: (value: string) => value
-        }
+        signature: { defaultLength: 128 },
+        hash: { defaultLength: 64 },
+        nonce: {
+            defaultLength: 2, lengthBefore: true,
+            parse: (value: string) => BigInt(`0x${value}`).toString()
+        },
+        index: {
+            defaultLength: 2, lengthBefore: true,
+            parse: (value: string) => BigInt(`0x${value}`).toString()
+        },
+        timestamp: {
+            defaultLength: 2, lengthBefore: true,
+            parse: (value: string) => BigInt(`0x${value}`).toString()
+        },
+        version: { defaultLength: 2 },
     }
 
-    private static getValueFromHex(hexDataSubstring: string, data: { length?: number, lengthBefore?: boolean, type?: string }) {
+    private static getValueFromHex(hexDataSubstring: string, data: DataFromHexArguments) {
 
-        const hexDataType = this.hexDataTypes[data.type || "default"];
+        let hexDataType: HexDataType;
+        let lengthBefore = data.lengthBefore;
 
+        if (data.key in this.hexDataTypes) {
+            hexDataType = this.hexDataTypes[data.key];
+            if (hexDataType.lengthBefore && !lengthBefore) {
+                lengthBefore = hexDataType.lengthBefore;
+            }
+        } else {
+            hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
+        }
+        
         let length: number;
 
         if (data.length) length = data.length;
         else if (hexDataType.defaultLength) length = hexDataType.defaultLength;
-        else if (data.lengthBefore) length = 2;
-        else return { cb: Callbacks.NONE };
+        else if (lengthBefore) length = 2;
+        else return null;
 
-        if (data.lengthBefore) {
+        let totalLength = length;
+
+        if (lengthBefore) {
             const tmpLength = length;
             length = parseInt(hexDataSubstring.substring(0, tmpLength));
+            totalLength += length;
             hexDataSubstring = hexDataSubstring.substring(tmpLength);
         }
         
-        let value = hexDataSubstring.substring(0, 0 + length);
-        if (value.length !== length) {
-            return { cb: Callbacks.NONE };
+        let hexValue = hexDataSubstring.substring(0, 0 + length);
+        if (hexValue.length !== length) {
+            return null;
         }
         
-        switch (type) {
-            case "int": {
-                final_data[key] = parseInt(`0x${value}`).toString();
-                break;
-            }
-            case "bigint": {
-                final_data[key] = BigInt(`0x${value}`).toString();
-                break;
-            }
-            case "bool": {
-                final_data[key] = (value === "1");
-                break;
-            }
-            case "address": {
-                final_data[key] = Address.fromDecodedHex(value);
-                break;
-            }
-            default: {
-                final_data[key] = value;
-                break;
-            }
+        let value: any;
+        if (hexDataType.parse) {
+            value = hexDataType.parse(hexValue);
+        } else {
+            value = hexValue;
         }
+
+        return { value, length: totalLength };
 
     }
     
-    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool" | "object" | "address", decodeFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
+    public static getDataFromHex(hexData: string, values: DataFromHexArguments[], returnLength = false) {
         
         try {
 
-            const final_data: {[key: string]: any} = {};
+            const final_data: Dict<any> = {};
             let current_length = 0;
         
             for (const data of values) {
@@ -185,41 +209,39 @@ export default class EncodingUtils {
                 } else if (data.type === "array" && data.decodeFunc) {
         
                     const final_array = [];
-        
-                    let total_arrayLength = 0;
 
                     const lenghValueLen = data.length as number;
-        
                     
                     const arrayDataWithLength = hexData.substring(current_length, hexData.length);
-                    const length = parseInt(`0x${arrayDataWithLength.substring(0, lenghValueLen)}`);
+                    const arrayDataHexLength = arrayDataWithLength.substring(0, lenghValueLen)
+                    const length = parseInt(`0x${arrayDataHexLength}`);
             
                     let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
         
-                    total_arrayLength = arrayDataWithLength[0].length + 1;
+                    let total_arrayLength = arrayDataHexLength.length;
                         
                     for (let i = 0; i < length; i++) {
             
                         const array_item = data.decodeFunc(arrayData, true);
-            
                         final_array.push(array_item.data);
-                            
                         arrayData = arrayData.substring(array_item.length);
-        
                         total_arrayLength += array_item.length;
         
                     }
         
                     current_length += total_arrayLength;
-        
                     final_data[key] = final_array;
         
                 } else {
-        
                     
-            
-                    current_length += length;
-        
+                    const value = this.getValueFromHex(hexData.substring(current_length, hexData.length), data);
+
+                    if (!value) {
+                        return { cb: Callbacks.NONE };
+                    }
+                    
+                    final_data[key] = value.value;
+                    current_length += value.length;
                 } 
         
             }

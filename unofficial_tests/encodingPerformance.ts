@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { Dict } from "../src/objects/dictonary.js"
 
 interface Constructable<T> {
     new (...args: any[]): T;
@@ -22,7 +23,7 @@ function createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
     return instance;
 }
 
-function sha256(rawData: string | { [key: string]: any }, excludedKeys: string[] = []) {
+function sha256(rawData: string | Dict<any>, excludedKeys: string[] = []) {
     let data = "";
 
     if (typeof(rawData) === "object") {
@@ -34,7 +35,7 @@ function sha256(rawData: string | { [key: string]: any }, excludedKeys: string[]
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-function getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: string[] = []): { [key: string]: any } {
+function getPreparedObjectForHashing(obj: Dict<any>, excludedKeys: string[] = []): Dict<any> {
     const deepSort = (input: any): any => {
         if (typeof input !== 'object' || input === null) {
             return input;
@@ -44,7 +45,7 @@ function getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: 
             return input.map(deepSort);
         }
 
-        const sortedObj: { [key: string]: any } = {};
+        const sortedObj: Dict<any> = {};
         Object.keys(input)
             .sort()
             .forEach(key => {
@@ -221,7 +222,7 @@ class EncodingUtils {
         
         try {
 
-            const final_data: {[key: string]: any} = {};
+            const final_data: Dict<any> = {};
             let current_length = 0;
         
             for (const data of values) {

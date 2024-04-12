@@ -2,6 +2,7 @@ import crypto from "crypto";
 import elliptic from 'elliptic';
 import EncodingUtils from "../handlers/encodingUtils.js";
 import Address from "../objects/address.js";
+import { Dict } from "../objects/dictonary.js";
 
 export interface LeiCoinBinarySignature extends elliptic.ec.Signature { recoveryParam: number; }
 export interface LeiCoinSignature {
@@ -15,9 +16,9 @@ export class Crypto {
 
     public static readonly ec = new elliptic.ec("secp256k1");
 
-    public static sha256(rawData: string | { [key: string]: any }, excludedKeys?: string[], outputType?: "string"): string;
-    public static sha256(rawData: string | { [key: string]: any }, excludedKeys?: string[], outputType?: "buffer"): Buffer;
-    public static sha256(rawData: string | { [key: string]: any }, excludedKeys: string[] = [], outputType: "string" | "buffer" = "string") {
+    public static sha256(rawData: string | Dict<any>, excludedKeys?: string[], outputType?: "string"): string;
+    public static sha256(rawData: string | Dict<any>, excludedKeys?: string[], outputType?: "buffer"): Buffer;
+    public static sha256(rawData: string | Dict<any>, excludedKeys: string[] = [], outputType: "string" | "buffer" = "string") {
         let data = "";
 
         if (typeof(rawData) === "object") {
@@ -61,7 +62,7 @@ export class Crypto {
         }
     }
 
-    public static getPreparedObjectForHashing(obj: { [key: string]: any }, excludedKeys: string[] = []): { [key: string]: any } {
+    public static getPreparedObjectForHashing(obj: Dict<any>, excludedKeys: string[] = []): Dict<any> {
         const deepSort = (input: any): any => {
             if (typeof input !== 'object' || input === null) {
                 return input;
@@ -71,7 +72,7 @@ export class Crypto {
                 return input.map(deepSort);
             }
 
-            const sortedObj: { [key: string]: any } = {};
+            const sortedObj: Dict<any> = {};
             Object.keys(input)
                 .sort()
                 .forEach(key => {

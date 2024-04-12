@@ -4,6 +4,7 @@ import process from "process";
 import utils from "../utils/index.js";
 import dotenv from "dotenv";
 import cli from "../utils/cli.js";
+import { Dict } from "../objects/dictonary.js";
 
 interface DefaultConfigInterface {
     api: {
@@ -24,9 +25,7 @@ interface DefaultConfigInterface {
     experimental: boolean
 }
 
-interface ENVConfigInterface {
-    [key: string]: any;
-}
+interface ENVConfigInterface extends Dict<any> {}
 
 interface ConfigInterface extends DefaultConfigInterface, ENVConfigInterface {
     peers: string[];
@@ -71,9 +70,11 @@ class Config {
 
     private parseArgs() {
         // Define default argument information with default values, types, and required flags
-        const defaultArgInfo : {
-            [key: string]: {default: string | number | boolean, type: string, required: boolean}
-        } = {
+        const defaultArgInfo: Dict<{
+            default: string | number | boolean,
+            type: string,
+            required: boolean
+        }> = {
             'internal-port': { default: 12200, type: 'number', required: false },
             'internal-host': { default: "0.0.0.0", type: 'string', required: false },
             '--experimental': { default: false, type: 'boolean', required: false }

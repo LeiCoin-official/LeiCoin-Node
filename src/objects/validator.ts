@@ -33,10 +33,9 @@ export class Validator {
 
         try {
 
-            const resultData = EncodingUtils.splitHex(hexData, [
-                {key: "version", length: 2},
-                {key: "stake_length", length: 2, type: "int"},
-                {key: "stake", length: "stake_length", type: "bigint"},
+            const resultData = EncodingUtils.getDataFromHex(hexData, [
+                {key: "version"},
+                {key: "stake", length: 2, lengthBefore: true, type: "bigint"},
             ]);
 
             const data = resultData.data;

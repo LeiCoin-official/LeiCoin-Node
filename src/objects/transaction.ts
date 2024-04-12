@@ -101,21 +101,17 @@ export class Transaction implements TransactionLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = EncodingUtils.splitHex(hexData, [
-                {key: "version", length: 2},
-                {key: "txid", length: 64},
-                {key: "senderAddress", length: 40},
+            const returnData = EncodingUtils.getDataFromHex(hexData, [
+                {key: "version"},
+                {key: "txid", type: "hash"},
+                {key: "senderAddress", type: "address"},
                 {key: "senderPublicKey", length: 64},
                 {key: "recipientAddress", length: 40},
-                {key: "amount_length", length: 2, type: "int"},
-                {key: "amount", length: "amount_length", type: "bigint"},
-                {key: "nonce_length", length: 2, type: "int"},
-                {key: "nonce", length: "nonce_length", type: "bigint"},
-                {key: "timestamp_length", length: 2, type: "int"},
-                {key: "timestamp", length: "timestamp_length", type: "bigint"},
-                {key: "message_length", length: 2, type: "int"},
-                {key: "message", length: "message_length"},
-                {key: "signature", length: 128}
+                {key: "amount", length: 2, lengthBefore: true, type: "bigint"},
+                {key: "nonce"},
+                {key: "timestamp"},
+                {key: "message", length: 2, lengthBefore: true},
+                {key: "signature"}
             ], returnLength);
 
             const data = returnData.data;

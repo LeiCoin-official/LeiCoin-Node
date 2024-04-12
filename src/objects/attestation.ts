@@ -43,10 +43,10 @@ export class AttestationInBlock implements AttestationInBlockLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = EncodingUtils.splitHex(hexData, [
+            const returnData = EncodingUtils.getDataFromHex(hexData, [
                 {key: "publicKey", length: 64},
-                {key: "vote", length: 1, type: "bool"},
-                {key: "signature", length: 128}
+                {key: "vote", type: "bool"},
+                {key: "signature"}
             ], returnLength);
 
             const data = returnData.data;
@@ -105,14 +105,13 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
     public static fromDecodedHex(hexData: string) {
 
         try {
-            const returnData = EncodingUtils.splitHex(hexData, [
-                {key: "version", length: 2},
+            const returnData = EncodingUtils.getDataFromHex(hexData, [
+                {key: "version"},
                 {key: "publicKey", length: 64},
-                {key: "blockHash", length: 64},
-                {key: "vote", length: 1, type: "bool"},
-                {key: "nonce_length", length: 2, type: "int"},
-                {key: "nonce", length: "nonce_length", type: "bigint"},
-                {key: "signature", length: 128}
+                {key: "blockHash", type: "hash"},
+                {key: "vote", type: "bool"},
+                {key: "nonce"},
+                {key: "signature"}
             ]);
 
             const data = returnData.data;

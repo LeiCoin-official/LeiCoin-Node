@@ -125,15 +125,13 @@ export class Block implements BlockLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = EncodingUtils.splitHex(hexData, [
-                {key: "version", length: 2},
-                {key: "index_length", length: 2, type: "int"},
-                {key: "index", length: "index_length", type: "bigint"},
-                {key: "hash", length: 64},
-                {key: "previousHash", length: 64},
-                {key: "timestamp_length", length: 2, type: "int"},
-                {key: "timestamp", length: "timestamp_length", type: "bigint"},
-                {key: "proposer", length: 40, type: "address"},
+            const returnData = EncodingUtils.getDataFromHex(hexData, [
+                {key: "version"},
+                {key: "index"},
+                {key: "hash"},
+                {key: "previousHash", type: "hash"},
+                {key: "timestamp"},
+                {key: "proposer", type: "address"},
                 {key: "attestations", length: 2, type: "array", decodeFunc: AttestationInBlock.fromDecodedHex},
                 {key: "transactions", length: 2, type: "array", decodeFunc: Transaction.fromDecodedHex}
             ], returnLength);
