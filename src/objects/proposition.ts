@@ -1,4 +1,4 @@
-import encodingHandlers from "../handlers/encodingUtils.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import Block from "./block.js";
@@ -50,7 +50,7 @@ export class Proposition implements PropositionLike {
     public static fromDecodedHex(hexData: string) {
 
         try {
-            const returnData = encodingHandlers.splitHex(hexData, [
+            const returnData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "proposer", length: 64},
                 {key: "nonce_length", length: 2, type: "int"},

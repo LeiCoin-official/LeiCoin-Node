@@ -41,7 +41,7 @@ export class ProposerJob {
 
     public static async createProposition() {
 		
-		const block = Block.createNewBlock(validator.publicKey);
+		const block = Block.createNewBlock();
 		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
 		const proposition = new Proposition(validator.publicKey, nonce, "", block);
 		proposition.signature = await Crypto.sign(proposition.calculateHash(), validator.privateKey);

@@ -1,7 +1,7 @@
 import fs from "fs";
 
 function getLatestBlockInfo() {
-  const latestBlockInfoFilePath = process.cwd() + `/blockchain_data/indexes/latestblockinfo.json`;
+  const latestBlockInfoFilePath = process.cwd() + `/blockchain_data/chainstate.dat`;
   try {
       const data = fs.readFileSync(latestBlockInfoFilePath, 'utf8');
       return {cb: "success", data: JSON.parse(data)}

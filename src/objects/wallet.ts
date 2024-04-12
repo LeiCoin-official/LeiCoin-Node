@@ -1,4 +1,4 @@
-import encodingHandlers from "../handlers/encodingUtils.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 
@@ -44,7 +44,7 @@ export class Wallet {
 
         try {
 
-            const resultData = encodingHandlers.splitHex(hexData, [
+            const resultData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "balance_length", length: 2, type: "int"},
                 {key: "balance", length: "balance_length", type: "bigint"},

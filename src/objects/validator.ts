@@ -1,4 +1,4 @@
-import encodingHandlers from "../handlers/encodingUtils.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 
@@ -33,7 +33,7 @@ export class Validator {
 
         try {
 
-            const resultData = encodingHandlers.splitHex(hexData, [
+            const resultData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "stake_length", length: 2, type: "int"},
                 {key: "stake", length: "stake_length", type: "bigint"},

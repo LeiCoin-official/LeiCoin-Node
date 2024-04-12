@@ -2,11 +2,13 @@ import utils from "../utils/index.js";
 import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
 import blockchain from "../storage/blockchain.js";
-import encodingHandlers from "../handlers/encodingUtils.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import cryptoHandlers from "../crypto/index.js";
 import { AttestationInBlock } from "./attestation.js";
+import config from "../handlers/configHandler.js";
+import Address from "./address.js";
 
 export interface BlockLike {
     readonly index: string;
@@ -52,9 +54,9 @@ export class Block implements BlockLike {
 
     }
 
-    public static createNewBlock(proposerPublicKey: string) {
+    public static createNewBlock() {
         
-        const previousBlock = blockchain.chainstate.getChainState().latestBlockInfo;
+        const previousBlock = blockchain.chainstate.getLatestBlockInfo();
     
         let newIndex;
         let previousHash;
@@ -62,7 +64,7 @@ export class Block implements BlockLike {
         if (!previousBlock || (typeof(previousBlock.index) !== 'number')) newIndex = "0";
         else newIndex = BigNum.add(previousBlock.index, "1");
     
-        if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = '';
+        if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = '0000000000000000000000000000000000000000000000000000000000000000';
         else previousHash = previousBlock.hash;
 
         const coinbase = Transaction.createCoinbaseTransaction();
@@ -75,7 +77,7 @@ export class Block implements BlockLike {
             '',
             previousHash,
             new Date().getTime().toString(),
-            proposerPublicKey,
+            config.staker.publicKey,
             [],
             transactions
         );
@@ -110,7 +112,7 @@ export class Block implements BlockLike {
                         this.previousHash +
                         timestamp_length +
                         encoded_timestamp +
-                        this.proposer +
+                        Address.encodeToHex(this.proposer);
                         encoded_attestations +
                         encoded_transactions;
 
@@ -123,7 +125,7 @@ export class Block implements BlockLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = encodingHandlers.splitHex(hexData, [
+            const returnData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "index_length", length: 2, type: "int"},
                 {key: "index", length: "index_length", type: "bigint"},
@@ -131,7 +133,7 @@ export class Block implements BlockLike {
                 {key: "previousHash", length: 64},
                 {key: "timestamp_length", length: 2, type: "int"},
                 {key: "timestamp", length: "timestamp_length", type: "bigint"},
-                {key: "proposer", length: 64},
+                {key: "proposer", length: 40, type: "address"},
                 {key: "attestations", length: 2, type: "array", decodeFunc: AttestationInBlock.fromDecodedHex},
                 {key: "transactions", length: 2, type: "array", decodeFunc: Transaction.fromDecodedHex}
             ], returnLength);

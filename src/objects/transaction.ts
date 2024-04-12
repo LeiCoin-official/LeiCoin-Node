@@ -1,6 +1,6 @@
 import config from "../handlers/configHandler.js";
 import cryptoHandlers from "../crypto/index.js";
-import encodingHandlers from "../handlers/encodingUtils.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
@@ -52,8 +52,8 @@ export class Transaction implements TransactionLike {
         const coinbase = new Transaction(
             "",
             "lc0x6c6569636f696e6e65745f636f696e62617365",
-            "6c6569636f696e6e65745f636f696e62617365",
-            config.miner.minerAddress,
+            "6c6569636f696e6e65745f636f696e6261736500000000000000000000000000",
+            config.staker.address,
             utils.mining_pow,
             "0",
             new Date().getTime().toString(),
@@ -101,7 +101,7 @@ export class Transaction implements TransactionLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = encodingHandlers.splitHex(hexData, [
+            const returnData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "txid", length: 64},
                 {key: "senderAddress", length: 40},

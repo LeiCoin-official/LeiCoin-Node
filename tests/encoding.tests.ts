@@ -1,8 +1,9 @@
 import cryptoHandlers from "../src/crypto/index.js";
-import encodingHandlers from "../src/handlers/encodingUtils.js";
+import EncodingUtils from "../src/handlers/encodingUtils.js";
 import crypto from "crypto"
 import BigNum from "../src/utils/bigNum.js";
 import fs from "fs";
+import Address from "../src/objects/address.js";
 
 export class Transaction {
 
@@ -48,26 +49,26 @@ export class Transaction {
 
     public encodeToHex(add_empty_bytes = false) {
 
-        //const encoded_senderPublicKey = encodingHandlers.encodeBase64ToHex(this.senderPublicKey);
+        //const encoded_senderPublicKey = EncodingUtils.encodeBase64ToHex(this.senderPublicKey);
         const senderPublicKey_length = this.senderPublicKey.length.toString().padStart(4, "0");        
     
-        const encoded_amount = encodingHandlers.compressZeros(this.amount.toString());
+        const encoded_amount = EncodingUtils.compressZeros(this.amount.toString());
         const amount_length = encoded_amount.length.toString().padStart(2, "0");
 
-        const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
+        const encoded_nonce = EncodingUtils.compressZeros(this.nonce.toString());
         const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
 
         const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
 
-        const encoded_message = encodingHandlers.encodeBase64ToHex(this.message);
+        const encoded_message = EncodingUtils.encodeBase64ToHex(this.message);
         const message_length = encoded_message.length.toString().padStart(3, "0");
 
         const hexData = this.version +
                         this.txid +
-                        encodingHandlers.encodeAddressToHex(this.senderAddress) +
+                        Address.encodeToHex(this.senderAddress) +
                         senderPublicKey_length +
                         this.senderPublicKey +
-                        encodingHandlers.encodeAddressToHex(this.recipientAddress) +
+                        Address.encodeToHex(this.recipientAddress) +
                         amount_length +
                         encoded_amount +
                         nonce_length +
@@ -87,7 +88,7 @@ export class Transaction {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = encodingHandlers.splitHex(hexData, [
+            const returnData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "txid", length: 64},
                 {key: "senderAddress", length: 40},
@@ -108,11 +109,11 @@ export class Transaction {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                data.senderAddress = encodingHandlers.decodeHexToAddress(data.senderAddress);
-                data.recipientAddress = encodingHandlers.decodeHexToAddress(data.recipientAddress);
-                data.amount = encodingHandlers.decompressZeros(data.amount);
-                data.nonce = encodingHandlers.decompressZeros(data.nonce);
-                data.message = encodingHandlers.decodeHexToBase64(data.message);
+                data.senderAddress = Address.fromDecodedHex(data.senderAddress);
+                data.recipientAddress = Address.fromDecodedHex(data.recipientAddress);
+                data.amount = EncodingUtils.decompressZeros(data.amount);
+                data.nonce = EncodingUtils.decompressZeros(data.nonce);
+                data.message = EncodingUtils.decodeHexToBase64(data.message);
 
                 const tx = createInstanceFromJSON(Transaction, data)
 
@@ -180,12 +181,12 @@ export class Block {
 
     public encodeToHex(add_empty_bytes = true) {   
     
-        const encoded_index = encodingHandlers.compressZeros(this.index);
+        const encoded_index = EncodingUtils.compressZeros(this.index);
         const index_length = encoded_index.length.toString().padStart(2, "0");
 
         const timestamp_length = this.timestamp.length.toString().padStart(2, "0");
 
-        const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
+        const encoded_nonce = EncodingUtils.compressZeros(this.nonce.toString());
         const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
 
         let encoded_transactions = this.transactions.length.toString() + "E";
@@ -214,7 +215,7 @@ export class Block {
     public static fromDecodedHex(hexData: string) {
 
         try {
-            const returnData = encodingHandlers.splitHex(hexData, [
+            const returnData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "index_length", length: 2},
                 {key: "index", length: "index_length"},
@@ -230,8 +231,8 @@ export class Block {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                data.index = encodingHandlers.decompressZeros(data.index);
-                data.nonce = encodingHandlers.decompressZeros(data.nonce);
+                data.index = EncodingUtils.decompressZeros(data.index);
+                data.nonce = EncodingUtils.decompressZeros(data.nonce);
 
                 return createInstanceFromJSON(Block, data);
             }
@@ -275,10 +276,10 @@ export class Wallet {
 
     public encodeToHex(add_empty_bytes = true) {
     
-        const encoded_balance = encodingHandlers.compressZeros(this.balance.toString());
+        const encoded_balance = EncodingUtils.compressZeros(this.balance.toString());
         const balance_length = encoded_balance.length.toString().padStart(2, "0");
     
-        const encoded_nonce = encodingHandlers.compressZeros(this.nonce.toString());
+        const encoded_nonce = EncodingUtils.compressZeros(this.nonce.toString());
         const nonce_length = encoded_nonce.length.toString().padStart(2, "0");
 
         const hexData = this.version + 
@@ -297,7 +298,7 @@ export class Wallet {
 
         try {
 
-            const resultData = encodingHandlers.splitHex(hexData, [
+            const resultData = EncodingUtils.splitHex(hexData, [
                 {key: "version", length: 2},
                 {key: "balance_length", length: 2},
                 {key: "balance", length: "balance_length"},
@@ -308,8 +309,8 @@ export class Wallet {
             const data = resultData.data;
         
             if (data && data.version === "00") {
-                data.balance = encodingHandlers.decompressZeros(data.balance);
-                data.nonce = encodingHandlers.decompressZeros(data.nonce);
+                data.balance = EncodingUtils.decompressZeros(data.balance);
+                data.nonce = EncodingUtils.decompressZeros(data.nonce);
 
                 return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }

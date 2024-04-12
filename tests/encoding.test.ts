@@ -22,7 +22,7 @@ describe('Encoding Testing', () => {
     });
     test('Block Enoding And Decoding', () => {
 
-        const block = Block.createNewBlock("01da74f8d1cf98760388643407cd1d4bc19f2857a1a1f499b0ef100af4f009b8");
+        const block = Block.createNewBlock();
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
 

@@ -3,10 +3,11 @@ import path from "path";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
 import Wallet from "../objects/wallet.js";
-import encodingHandlers from "../handlers/encodingUtils.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
+import Address from "../objects/address.js";
 
 export class WalletDB {
 
@@ -20,19 +21,19 @@ export class WalletDB {
     }
 
     public async getWallet(address: string) {
-        const encodeAddress = encodingHandlers.encodeAddressToHex(address);
+        const encodeAddress = Address.encodeToHex(address);
         const raw_wallet = await this.level.get(encodeAddress);
         return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
     }
 
     public async setWallet(wallet: Wallet) {
-        const encodeAddress = encodingHandlers.encodeAddressToHex(wallet.owner);
+        const encodeAddress = Address.encodeToHex(wallet.owner);
         const encodedWallet = wallet.encodeToHex();
         await this.level.put(encodeAddress, encodedWallet);
     }
 
     public async existsWallet(address: string): Promise<boolean> {
-        const encodeAddress = encodingHandlers.encodeAddressToHex(address);
+        const encodeAddress = Address.encodeToHex(address);
         const raw_wallet = await this.level.get(encodeAddress);
         return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
     }

@@ -35,7 +35,7 @@ export class Chainstate {
     private readonly chainStateData: ChainstateData;
   
     private constructor() {
-        BCUtils.ensureFileExists('/chianstate.dat', EncodingUtils.encodeStringToHex(JSON.stringify(
+        BCUtils.ensureFileExists('/chainstate.dat', EncodingUtils.encodeStringToHex(JSON.stringify(
             {
                 version: "00",
                 chains: {

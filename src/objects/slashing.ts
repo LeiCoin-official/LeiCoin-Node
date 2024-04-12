@@ -1,22 +1,17 @@
+
 import EncodingUtils from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 
-export interface AttestationInBlockLike {
+export interface SlashingLike {
     publicKey: string;
     vote: boolean;
     signature: string;
 }
 
-export interface AttestationSendDataLike extends AttestationInBlockLike {
-    blockHash: string;
-    nonce: string;
-    version: string;
-}
-
-export class AttestationInBlock implements AttestationInBlockLike {
+export class Slashing implements SlashingLike {
     
     public publicKey: string;
     public vote: boolean;

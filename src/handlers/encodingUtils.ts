@@ -2,6 +2,8 @@ import elliptic from "elliptic";
 
 import { Callbacks } from "../utils/callbacks.js";
 import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
+import Address from "../objects/address.js";
+import { Dict } from "../objects/dictonary.js";
 
 export default class EncodingUtils {
 
@@ -91,8 +93,78 @@ export default class EncodingUtils {
             recoveryParam: parseInt(hexData.substring(130, 132), 16)
         };
     }
+
+    private static hexDataTypes: Dict<{
+        defaultLength?: number;
+        parse(value: string): any;
+    }> = {
+        int: {
+            parse: (value: string) => parseInt(`0x${value}`).toString()
+        },
+        bigint: {
+            parse: (value: string) => BigInt(`0x${value}`).toString()
+        },
+        bool: {
+            defaultLength: 1,
+            parse: (value: string) => (value === "1")
+        },
+        address: { 
+            defaultLength: 40,
+            parse: Address.fromDecodedHex
+        },
+        default: {
+            parse: (value: string) => value
+        }
+    }
+
+    private static getValueFromHex(hexDataSubstring: string, data: { length?: number, lengthBefore?: boolean, type?: string }) {
+
+        const hexDataType = this.hexDataTypes[data.type || "default"];
+
+        let length: number;
+
+        if (data.length) length = data.length;
+        else if (hexDataType.defaultLength) length = hexDataType.defaultLength;
+        else if (data.lengthBefore) length = 2;
+        else return { cb: Callbacks.NONE };
+
+        if (data.lengthBefore) {
+            const tmpLength = length;
+            length = parseInt(hexDataSubstring.substring(0, tmpLength));
+            hexDataSubstring = hexDataSubstring.substring(tmpLength);
+        }
+        
+        let value = hexDataSubstring.substring(0, 0 + length);
+        if (value.length !== length) {
+            return { cb: Callbacks.NONE };
+        }
+        
+        switch (type) {
+            case "int": {
+                final_data[key] = parseInt(`0x${value}`).toString();
+                break;
+            }
+            case "bigint": {
+                final_data[key] = BigInt(`0x${value}`).toString();
+                break;
+            }
+            case "bool": {
+                final_data[key] = (value === "1");
+                break;
+            }
+            case "address": {
+                final_data[key] = Address.fromDecodedHex(value);
+                break;
+            }
+            default: {
+                final_data[key] = value;
+                break;
+            }
+        }
+
+    }
     
-    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool" | "object", decodeFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
+    public static splitHex(hexData: string, values: { key: string, length: number | string, type?: "string" | "int" | "bigint" | "array" | "bool" | "object" | "address", decodeFunc?: (hexData: string, returnLength: boolean) => any }[], returnLength = false) {
         
         try {
 
@@ -144,38 +216,7 @@ export default class EncodingUtils {
         
                 } else {
         
-                    let length: number;
-                    const type = data.type;
-        
-                    if (typeof(data.length) === "string") {
-                        length = parseInt(final_data[data.length]);
-                    } else {
-                        length = data.length;
-                    }
                     
-                    let value = hexData.substring(current_length, current_length + length);
-                    if (value.length !== length) {
-                        return { cb: Callbacks.NONE };
-                    }
-                    
-                    switch (type) {
-                        case "int": {
-                            final_data[key] = parseInt(`0x${value}`).toString();
-                            break;
-                        }
-                        case "bigint": {
-                            final_data[key] = BigInt(`0x${value}`).toString();
-                            break;
-                        }
-                        case "bool": {
-                            final_data[key] = (value === "1");
-                            break;
-                        }
-                        default: {
-                            final_data[key] = value;
-                            break;
-                        }
-                    }
             
                     current_length += length;
         

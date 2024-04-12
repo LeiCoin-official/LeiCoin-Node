@@ -29,7 +29,7 @@ async function getSenderAddress(data, signatureHex) {
     try {
         const signature = decodeSignature(signatureHex);
         const publicKey = ec.recoverPubKey(data, signature, signature.recoveryParam).encode('hex');
-        return `lc1${crypto.createHash("sha256").update(publicKey).digest("hex").substring(0, 38)}`;
+        return `lc0x${crypto.createHash("sha256").update(publicKey).digest("hex").substring(0, 38)}`;
     } catch (error) {
         return;
     }
@@ -56,6 +56,20 @@ async function asyncMain() {
 
 }
 
+async function syncMain() {
+
+    const startTime = startTimer();
+
+    for (let i = 0; i < 1; i++) {
+        await gen();
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log("Elapsed time 2:", elapsedTime / 1000, "seconds");
+
+}
+
+
 function main() {
 
     const startTime = startTimer();
@@ -65,7 +79,7 @@ function main() {
     }
 
     const elapsedTime = endTimer(startTime);
-    console.log("Elapsed time 2:", elapsedTime / 1000, "seconds");
+    console.log("Elapsed time 3:", elapsedTime / 1000, "seconds");
 
 }
 
@@ -73,7 +87,9 @@ function main() {
 
 (async function () {
 
-    await asyncMain();
+    //await asyncMain();
+
+    await syncMain();
 
     console.log(await getSenderAddress(messageHash, encodedSignature) === address);
 
