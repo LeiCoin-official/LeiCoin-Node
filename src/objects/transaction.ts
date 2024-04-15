@@ -101,7 +101,7 @@ export class Transaction implements TransactionLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = EncodingUtils.getDataFromHex(hexData, [
+            const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
                 {key: "txid", type: "hash"},
                 {key: "senderAddress", type: "address"},

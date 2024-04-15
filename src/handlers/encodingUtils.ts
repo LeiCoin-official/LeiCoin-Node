@@ -21,6 +21,10 @@ interface HexDataType {
     parse?(value: string): any;
 }
 
+interface HexDataAdvancedType extends HexDataType {
+    extendsType?: string;
+}
+
 export default class EncodingUtils {
 
     public static splitWithTail(str: string, delim: string, count: number) {
@@ -110,21 +114,8 @@ export default class EncodingUtils {
         };
     }
 
-    private static hexDataTypes: Dict<HexDataType> = {
-        int: {
-            parse: (value: string) => parseInt(`0x${value}`).toString()
-        },
-        bigint: {
-            parse: (value: string) => BigInt(`0x${value}`).toString()
-        },
-        bool: {
-            defaultLength: 1,
-            parse: (value: string) => (value === "1")
-        },
-        address: { 
-            defaultLength: 40,
-            parse: Address.fromDecodedHex
-        },
+    private static hexDataAdvancedTypes: Dict<HexDataType> = {
+        address: { defaultLength: 40, parse: Address.fromDecodedHex },
         signature: { defaultLength: 128 },
         hash: { defaultLength: 64 },
         nonce: {
@@ -139,7 +130,21 @@ export default class EncodingUtils {
             defaultLength: 2, lengthBefore: true,
             parse: (value: string) => BigInt(`0x${value}`).toString()
         },
-        version: { defaultLength: 2 },
+        version: { defaultLength: 2 }
+    }
+
+    private static hexDataTypes: Dict<HexDataType> = {
+        int: {
+            parse: (value: string) => parseInt(`0x${value}`).toString()
+        },
+        bigint: {
+            parse: (value: string) => BigInt(`0x${value}`).toString()
+        },
+        bool: {
+            defaultLength: 1,
+            parse: (value: string) => (value === "1")
+        },
+        ...this.hexDataAdvancedTypes,
         default: {}
     }
 
@@ -189,7 +194,7 @@ export default class EncodingUtils {
 
     }
     
-    public static getDataFromHex(hexData: string, values: DataFromHexArguments[], returnLength = false) {
+    public static getObjectFromHex(hexData: string, values: DataFromHexArguments[], returnLength = false) {
         
         try {
 

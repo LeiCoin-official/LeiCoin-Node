@@ -50,7 +50,7 @@ export class Proposition implements PropositionLike {
     public static fromDecodedHex(hexData: string) {
 
         try {
-            const returnData = EncodingUtils.getDataFromHex(hexData, [
+            const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
                 {key: "proposer", type: "address"},
                 {key: "nonce"},

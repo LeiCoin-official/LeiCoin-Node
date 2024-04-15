@@ -87,7 +87,7 @@ export class Block implements BlockLike {
         return newBlock;
     }
 
-    public encodeToHex(add_empty_bytes = true) {   
+    public encodeToHex(add_empty_bytes = true, forHash = false) {   
     
         const encoded_index = BigNum.numToHex(this.index);
         const index_length = BigNum.numToHex(encoded_index.length);
@@ -108,7 +108,7 @@ export class Block implements BlockLike {
         const hexData = this.version +
                         index_length +
                         encoded_index +
-                        this.hash +
+                        forHash ? this.hash : "" +
                         this.previousHash +
                         timestamp_length +
                         encoded_timestamp +
@@ -125,7 +125,7 @@ export class Block implements BlockLike {
     public static fromDecodedHex(hexData: string, returnLength = false) {
 
         try {
-            const returnData = EncodingUtils.getDataFromHex(hexData, [
+            const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
                 {key: "index"},
                 {key: "hash"},

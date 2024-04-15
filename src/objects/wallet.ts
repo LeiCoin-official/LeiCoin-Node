@@ -44,7 +44,7 @@ export class Wallet {
 
         try {
 
-            const resultData = EncodingUtils.getDataFromHex(hexData, [
+            const resultData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
                 {key: "balance", length: 2, lengthBefore: true, type: "bigint"},
                 {key: "nonce", length: 2, lengthBefore: true, type: "bigint"},

@@ -33,7 +33,7 @@ export class Validator {
 
         try {
 
-            const resultData = EncodingUtils.getDataFromHex(hexData, [
+            const resultData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
                 {key: "stake", length: 2, lengthBefore: true, type: "bigint"},
             ]);
