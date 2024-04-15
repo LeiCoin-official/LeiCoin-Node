@@ -106,7 +106,7 @@ export class Transaction implements TransactionLike {
                 {key: "txid", type: "hash"},
                 {key: "senderAddress", type: "address"},
                 {key: "senderPublicKey", length: 64},
-                {key: "recipientAddress", length: 40},
+                {key: "recipientAddress", type: "address"},
                 {key: "amount", length: 2, lengthBefore: true, type: "bigint"},
                 {key: "nonce"},
                 {key: "timestamp"},
@@ -117,9 +117,6 @@ export class Transaction implements TransactionLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                data.senderAddress = Address.fromDecodedHex(data.senderAddress);
-                data.recipientAddress = Address.fromDecodedHex(data.recipientAddress);
-
                 const tx = utils.createInstanceFromJSON(Transaction, data);
 
                 if (returnLength) {

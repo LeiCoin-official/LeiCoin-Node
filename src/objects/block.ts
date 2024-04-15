@@ -77,7 +77,7 @@ export class Block implements BlockLike {
             '',
             previousHash,
             new Date().getTime().toString(),
-            config.staker.publicKey,
+            config.staker.address,
             [],
             transactions
         );
@@ -112,7 +112,7 @@ export class Block implements BlockLike {
                         this.previousHash +
                         timestamp_length +
                         encoded_timestamp +
-                        Address.encodeToHex(this.proposer);
+                        Address.encodeToHex(this.proposer) +
                         encoded_attestations +
                         encoded_transactions;
 

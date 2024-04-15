@@ -140,6 +140,7 @@ export default class EncodingUtils {
             parse: (value: string) => BigInt(`0x${value}`).toString()
         },
         version: { defaultLength: 2 },
+        default: {}
     }
 
     private static getValueFromHex(hexDataSubstring: string, data: DataFromHexArguments) {
@@ -167,7 +168,7 @@ export default class EncodingUtils {
 
         if (lengthBefore) {
             const tmpLength = length;
-            length = parseInt(hexDataSubstring.substring(0, tmpLength));
+            length = parseInt(hexDataSubstring.substring(0, tmpLength), 16);
             totalLength += length;
             hexDataSubstring = hexDataSubstring.substring(tmpLength);
         }

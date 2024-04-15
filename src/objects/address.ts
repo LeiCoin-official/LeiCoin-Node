@@ -7,6 +7,10 @@ export class Address {
     }
 
     public static encodeToHex(address: string) {
+        /*if (address.toLowerCase().startsWith("lc")) {
+            return address.slice(2, address.length).replace("x", "0");
+        }
+        return address.replace("x", "0");*/
         return address.slice(2, address.length).replace("x", "0");
     }
     
