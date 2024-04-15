@@ -24,8 +24,8 @@ export class Wallet {
     
         const resultData = EncodingUtils.encodeObjectToHex(this, [
             {key: "version"},
-            {key: "balance", lengthBefore: true, type: "bigint"},
-            {key: "nonce", lengthBefore: true, type: "bigint"},
+            {key: "balance", type: "bigintWithLenPrefix"},
+            {key: "nonce"},
         ], add_empty_bytes);
 
         return resultData.data;
@@ -38,8 +38,8 @@ export class Wallet {
 
             const resultData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
-                {key: "balance", length: 2, lengthBefore: true, type: "bigint"},
-                {key: "nonce", length: 2, lengthBefore: true, type: "bigint"},
+                {key: "balance", type: "bigintWithLenPrefix"},
+                {key: "nonce"},
             ]);
 
             const data = resultData.data;

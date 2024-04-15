@@ -18,7 +18,7 @@ export class Validator {
     
         const resultData = EncodingUtils.encodeObjectToHex(this, [
             {key: "version"},
-            {key: "stake", lengthBefore: true, type: "bigint"},
+            {key: "stake", type: "bigintWithLenPrefix"},
         ], add_empty_bytes);
 
         return resultData.data;
@@ -31,7 +31,7 @@ export class Validator {
 
             const resultData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
-                {key: "stake", length: 2, lengthBefore: true, type: "bigint"},
+                {key: "stake", type: "bigintWithLenPrefix"},
             ]);
 
             const data = resultData.data;

@@ -68,9 +68,7 @@ export class Proposition implements PropositionLike {
     }
 
     public calculateHash() {
-        const objWithoutBlock = JSON.parse(JSON.stringify(this));
-        objWithoutBlock.blockHash = objWithoutBlock.block.hash;
-        return Crypto.sha256(objWithoutBlock, ["signature", "block"]);
+        return Crypto.sha256(this.encodeToHex(false, true));
     }
 
 }

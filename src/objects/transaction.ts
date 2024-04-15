@@ -16,7 +16,7 @@ export interface TransactionLike {
     amount: string;
     nonce: string;
     timestamp: string
-    message: string;
+    input: string;
     signature: string;
     readonly version: string;
 
@@ -31,11 +31,11 @@ export class Transaction implements TransactionLike {
     public amount: string;
     public nonce: string;
     public timestamp: string
-    public message: string;
+    public input: string;
     public signature: string;
     public readonly version: string;
 
-    constructor(txid: string, senderAddress: string, senderPublicKey: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, message: string, signature: string, version = "00") {
+    constructor(txid: string, senderAddress: string, senderPublicKey: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, input: string, signature: string, version = "00") {
         this.txid = txid;
         this.senderAddress = senderAddress;
         this.senderPublicKey = senderPublicKey;
@@ -43,7 +43,7 @@ export class Transaction implements TransactionLike {
         this.amount = amount;
         this.nonce = nonce;
         this.timestamp = timestamp;
-        this.message = message;
+        this.input = input;
         this.signature = signature;
         this.version = version;
     }
@@ -72,10 +72,10 @@ export class Transaction implements TransactionLike {
             {key: "senderAddress", type: "address"},
             {key: "senderPublicKey"},
             {key: "recipientAddress", type: "address"},
-            {key: "amount", lengthBefore: true, type: "bigint"},
+            {key: "amount", type: "bigintWithLenPrefix"},
             {key: "nonce"},
             {key: "timestamp"},
-            {key: "message", lengthBefore: true},
+            {key: "input", lengthBefore: true},
             (forHash ? null : {key: "signature"})
         ], add_empty_bytes);
 
@@ -92,10 +92,10 @@ export class Transaction implements TransactionLike {
                 {key: "senderAddress", type: "address"},
                 {key: "senderPublicKey", length: 64},
                 {key: "recipientAddress", type: "address"},
-                {key: "amount", length: 2, lengthBefore: true, type: "bigint"},
+                {key: "amount", type: "bigintWithLenPrefix"},
                 {key: "nonce"},
                 {key: "timestamp"},
-                {key: "message", length: 2, lengthBefore: true},
+                {key: "input", length: 2, lengthBefore: true},
                 {key: "signature"}
             ], returnLength);
 
