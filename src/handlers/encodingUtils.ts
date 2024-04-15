@@ -161,16 +161,16 @@ export default class EncodingUtils {
         let hexDataType: HexDataType;
         let lengthBefore = data.lengthBefore;
 
-        if (data.key in this.hexDataAdvancedTypes) {
+        if (data.key in this.hexDataTypes) {
 
             hexDataType = this.hexDataTypes[data.key];
 
-            if (hexDataType.lengthBefore && !lengthBefore) {
-                lengthBefore = hexDataType.lengthBefore;
-            }
-
         } else {
             hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
+        }
+        
+        if (hexDataType.lengthBefore && !lengthBefore) {
+            lengthBefore = hexDataType.lengthBefore;
         }
 
         let hexValue: string;
@@ -199,12 +199,12 @@ export default class EncodingUtils {
 
             hexDataType = this.hexDataTypes[data.key];
 
-            if (hexDataType.lengthBefore && !lengthBefore) {
-                lengthBefore = hexDataType.lengthBefore;
-            }
-
         } else {
             hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
+        }
+
+        if (hexDataType.lengthBefore && !lengthBefore) {
+            lengthBefore = hexDataType.lengthBefore;
         }
         
         let length: number;
