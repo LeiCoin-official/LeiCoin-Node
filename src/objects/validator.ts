@@ -16,16 +16,12 @@ export class Validator {
 
     public encodeToHex(add_empty_bytes = true) {
     
-        const encoded_stake = BigNum.numToHex(this.stake.toString());
-        const stake_length = BigNum.numToHex(encoded_stake.length);
+        const resultData = EncodingUtils.encodeObjectToHex(this, [
+            {key: "version"},
+            {key: "stake", lengthBefore: true, type: "bigint"},
+        ], add_empty_bytes);
 
-        const hexData = this.version + 
-                        stake_length + 
-                        encoded_stake;
-
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-        
-        return hexData + empty_bytes;
+        return resultData.data;
     
     }
 

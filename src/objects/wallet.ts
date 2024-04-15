@@ -22,22 +22,14 @@ export class Wallet {
 
     public encodeToHex(add_empty_bytes = true) {
     
-        const encoded_balance = BigNum.numToHex(this.balance.toString());
-        const balance_length = BigNum.numToHex(encoded_balance.length);
-    
-        const encoded_nonce =  BigNum.numToHex(this.nonce.toString());
-        const nonce_length =  BigNum.numToHex(encoded_nonce.length)
+        const resultData = EncodingUtils.encodeObjectToHex(this, [
+            {key: "version"},
+            {key: "balance", lengthBefore: true, type: "bigint"},
+            {key: "nonce", lengthBefore: true, type: "bigint"},
+        ], add_empty_bytes);
 
-        const hexData = this.version + 
-                        balance_length + 
-                        encoded_balance + 
-                        nonce_length + 
-                        encoded_nonce;
+        return resultData.data;
 
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-        
-        return hexData + empty_bytes;
-    
     }
     
     public static fromDecodedHex(ownerAddress: string, hexData: string) {

@@ -4,101 +4,45 @@ import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 
-export interface AttestationInBlockLike {
+export interface AttestationLike {
     publicKey: string;
-    vote: boolean;
-    signature: string;
-}
-
-export interface AttestationSendDataLike extends AttestationInBlockLike {
     blockHash: string;
+    vote: boolean;
     nonce: string;
+    signature: string;
     version: string;
 }
 
-export class AttestationInBlock implements AttestationInBlockLike {
+export class Attestation implements AttestationLike {
     
     public publicKey: string;
-    public vote: boolean;
-    public signature: string;
-
-    constructor(publicKey: string, vote: boolean, signature: string) {
-        this.publicKey = publicKey;
-        this.vote = vote;
-        this.signature = signature;
-    }
-
-    public encodeToHex(add_empty_bytes = false) {
-
-        const hexData = this.publicKey +
-                        this.vote +
-                        this.signature;
-
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-        
-        return hexData + empty_bytes;
-
-    }
-
-    public static fromDecodedHex(hexData: string, returnLength = false) {
-
-        try {
-            const returnData = EncodingUtils.getObjectFromHex(hexData, [
-                {key: "publicKey", length: 64},
-                {key: "vote", type: "bool"},
-                {key: "signature"}
-            ], returnLength);
-
-            const data = returnData.data;
-        
-            if (data && data.version === "00") {
-
-                const attestation = utils.createInstanceFromJSON(AttestationInBlock, data);
-
-                if (returnLength) {
-                    return {data: attestation, length: returnData.length};
-                }
-                return attestation;
-            }
-        } catch (err: any) {
-            cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
-        }
-
-        return null;
-
-    }
-
-}
-
-export class AttestationSendData extends AttestationInBlock implements AttestationSendDataLike {
-    
     public blockHash: string;
+    public vote: boolean;
     public nonce: string;
+    public signature: string;
     public readonly version: string;
 
     constructor(publicKey: string, blockHash: string, vote: boolean, nonce: string, signature: string, version = "00") {
-        super(publicKey, vote, signature);
+        this.publicKey = publicKey;
         this.blockHash = blockHash;
+        this.vote = vote;
         this.nonce = nonce;
+        this.signature = signature;
         this.version = version;
     }
 
     public encodeToHex(add_empty_bytes = true, forHash = false) {
 
-        const encoded_nonce = BigNum.numToHex(this.nonce);
-        const nonce_length = BigNum.numToHex(encoded_nonce.length);
+        const returnData = EncodingUtils.encodeObjectToHex(this, [
+            {key: "version"},
+            {key: "publicKey"},
+            {key: "blockHash", type: "hash"},
+            {key: "vote", type: "bool"},
+            {key: "nonce"},
+            (forHash ? null : {key: "signature"})
+        ], add_empty_bytes);
 
-        const hexData = this.version +
-                        this.publicKey +
-                        this.blockHash +
-                        this.vote +
-                        nonce_length +
-                        encoded_nonce +
-                        (forHash ? "" : this.signature);
-
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-        
-        return hexData + empty_bytes;
+        return returnData.data;
 
     }
 
@@ -117,7 +61,7 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(AttestationSendData, data);
+                return utils.createInstanceFromJSON(Attestation, data);
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
@@ -128,12 +72,9 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
     }
 
     public calculateHash() {
-        return Crypto.sha256(this, ["signature"]);
-    }
-
-    public toAttestationInBlock() {
-        return new AttestationInBlock(this.publicKey, this.vote, this.signature);
+        return Crypto.sha256(this.encodeToHex(false, true));
     }
 
 }
 
+export default Attestation;

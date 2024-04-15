@@ -1,5 +1,5 @@
 import config from "../handlers/configHandler.js";
-import cryptoHandlers from "../crypto/index.js";
+import cryptoHandlers, { Crypto } from "../crypto/index.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
 import { Callbacks } from "../utils/callbacks.js";
@@ -64,37 +64,22 @@ export class Transaction implements TransactionLike {
         return coinbase;
     }
 
-    public encodeToHex(add_empty_bytes = false) {      
+    public encodeToHex(add_empty_bytes = false, forHash = false) {
     
-        const encoded_amount = BigNum.numToHex(this.amount);
-        const amount_length = BigNum.numToHex(encoded_amount.length);
+        const returnData = EncodingUtils.encodeObjectToHex(this, [
+            {key: "version"},
+            (forHash ? null : {key: "txid", type: "hash"}),
+            {key: "senderAddress", type: "address"},
+            {key: "senderPublicKey"},
+            {key: "recipientAddress", type: "address"},
+            {key: "amount", lengthBefore: true, type: "bigint"},
+            {key: "nonce"},
+            {key: "timestamp"},
+            {key: "message", lengthBefore: true},
+            (forHash ? null : {key: "signature"})
+        ], add_empty_bytes);
 
-        const encoded_nonce = BigNum.numToHex(this.nonce);
-        const nonce_length = BigNum.numToHex(encoded_nonce.length);
-
-        const encoded_timestamp = BigNum.numToHex(this.timestamp);
-        const timestamp_length = BigNum.numToHex(encoded_timestamp.length);
-
-        const message_length = BigNum.numToHex(this.message.length);
-
-        const hexData = this.version +
-                        this.txid +
-                        Address.encodeToHex(this.senderAddress) +
-                        this.senderPublicKey +
-                        Address.encodeToHex(this.recipientAddress) +
-                        amount_length +
-                        encoded_amount +
-                        nonce_length +
-                        encoded_nonce +
-                        timestamp_length +
-                        encoded_timestamp +
-                        message_length +
-                        this.message +
-                        this.signature;
-
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-        
-        return hexData + empty_bytes;
+        return returnData.data;
 
     }
 
@@ -130,6 +115,10 @@ export class Transaction implements TransactionLike {
 
         return null;
 
+    }
+
+    public calculateHash() {
+        return this.txid = Crypto.sha256(this.encodeToHex(false, true));
     }
 
 }

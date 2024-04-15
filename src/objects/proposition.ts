@@ -29,21 +29,17 @@ export class Proposition implements PropositionLike {
         this.version = version;
     }
 
-    public encodeToHex(add_empty_bytes = true) {
+    public encodeToHex(add_empty_bytes = true, forHash = false) {
 
-        const encoded_nonce = BigNum.numToHex(this.nonce);
-        const nonce_length = BigNum.numToHex(encoded_nonce.length);
-
-        const hexData = this.version +
-                        this.proposer +
-                        nonce_length +
-                        encoded_nonce +
-                        this.signature +
-                        this.block.encodeToHex(false);
-
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
+        const returnData = EncodingUtils.encodeObjectToHex(this, [
+            {key: "version"},
+            {key: "proposer", type: "address"},
+            {key: "nonce"},
+            (forHash ? null : {key: "signature"}),
+            {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex}
+        ], add_empty_bytes);
         
-        return hexData + empty_bytes;
+        return returnData.data;
 
     }
 

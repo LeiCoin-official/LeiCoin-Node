@@ -6,7 +6,7 @@ import EncodingUtils from "../handlers/encodingUtils.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
-import { AttestationInBlock } from "./attestation.js";
+import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
 
 export interface BlockLike {
@@ -15,7 +15,7 @@ export interface BlockLike {
     readonly previousHash: string;
     readonly timestamp: string;
     readonly proposer: string;
-    readonly attestations: AttestationInBlock[];
+    readonly attestations: Attestation[];
     readonly transactions: Transaction[];
     readonly version: string;
 }
@@ -27,7 +27,7 @@ export class Block implements BlockLike {
     public readonly previousHash: string;
     public readonly timestamp: string;
     public readonly proposer: string;
-    public readonly attestations: AttestationInBlock[];
+    public readonly attestations: Attestation[];
     public readonly transactions: Transaction[];
     public readonly version: string;
 
@@ -37,7 +37,7 @@ export class Block implements BlockLike {
         previousHash: string,
         timestamp: string,
         proposer: string,
-        attestations: AttestationInBlock[],
+        attestations: Attestation[],
         transactions: Transaction[],
         version = "00"
     ) {
@@ -95,7 +95,7 @@ export class Block implements BlockLike {
             {key: "previousHash", type: "hash"},
             {key: "timestamp"},
             {key: "proposer", type: "address"},
-            {key: "attestations", type: "array", encodeFunc: AttestationInBlock.prototype.encodeToHex},
+            {key: "attestations", type: "array", encodeFunc: Attestation.prototype.encodeToHex},
             {key: "transactions", type: "array", encodeFunc: Transaction.prototype.encodeToHex}
         ], add_empty_bytes);
 
@@ -113,7 +113,7 @@ export class Block implements BlockLike {
                 {key: "previousHash", type: "hash"},
                 {key: "timestamp"},
                 {key: "proposer", type: "address"},
-                {key: "attestations", length: 2, type: "array", decodeFunc: AttestationInBlock.fromDecodedHex},
+                {key: "attestations", length: 2, type: "array", decodeFunc: Attestation.fromDecodedHex},
                 {key: "transactions", length: 2, type: "array", decodeFunc: Transaction.fromDecodedHex}
             ], returnLength);
 
@@ -138,7 +138,7 @@ export class Block implements BlockLike {
         return this.hash = Crypto.sha256(this.encodeToHex(false, true));
     }
 
-    public addAttestation(attestation: AttestationInBlock) {
+    public addAttestation(attestation: Attestation) {
         this.attestations.push(attestation);
     }
 
