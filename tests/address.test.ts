@@ -1,6 +1,4 @@
 import Crypto from "../src/crypto/index.js"
-import Address from "../src/objects/address.js";
-import Transaction from "../src/objects/transaction.js";
 
 describe('Address Testing', () => {
     test('Address Enoding And Decoding', async() => {
