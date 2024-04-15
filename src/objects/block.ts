@@ -108,7 +108,7 @@ export class Block implements BlockLike {
         const hexData = this.version +
                         index_length +
                         encoded_index +
-                        forHash ? this.hash : "" +
+                        (forHash ? "" : this.hash) +
                         this.previousHash +
                         timestamp_length +
                         encoded_timestamp +
