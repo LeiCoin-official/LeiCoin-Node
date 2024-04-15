@@ -83,7 +83,7 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
         this.version = version;
     }
 
-    public encodeToHex(add_empty_bytes = true) {
+    public encodeToHex(add_empty_bytes = true, forHash = false) {
 
         const encoded_nonce = BigNum.numToHex(this.nonce);
         const nonce_length = BigNum.numToHex(encoded_nonce.length);
@@ -94,7 +94,7 @@ export class AttestationSendData extends AttestationInBlock implements Attestati
                         this.vote +
                         nonce_length +
                         encoded_nonce +
-                        this.signature;
+                        (forHash ? "" : this.signature);
 
         const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
         

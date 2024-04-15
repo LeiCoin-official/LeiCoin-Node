@@ -4,7 +4,7 @@ import process from "process";
 import fs from "fs";
 import { dirname } from "path";
 import utils from "./index.js";
-import { Dict } from "../objects/dictonary.js";
+import { Dict } from "./objects.js";
 
 interface LogMessageLike {
     info(message: string): void;

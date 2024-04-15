@@ -45,22 +45,13 @@ export class BigNum {
     }
 
     static numToHex(num: any, minLength = 2): string {
-        try {
-            const hexNum = BigInt(num).toString(16).toUpperCase();
-            return hexNum.padStart(minLength, "0");
-        } catch (error: any) {
-            return error.message;
-        }
+        const hexNum = BigInt(num).toString(16).toUpperCase();
+        return hexNum.padStart(minLength, "0");
     }
     
     // Decode a hexadecimal string to a numeric string
     static hexToNum(hexStr: string) {
-        try {
-            let num = BigInt(`0x${hexStr}`).toString();
-            return num;
-        } catch (error: any) {
-            return "Invalid input: Please provide a valid hexadecimal string.";
-        }
+        return BigInt(`0x${hexStr}`).toString();
     }
 
 }

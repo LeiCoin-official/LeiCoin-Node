@@ -1,9 +1,10 @@
 import { Callbacks } from "../utils/callbacks.js";
 import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
 import Address from "../objects/address.js";
-import { Dict } from "../objects/dictonary.js";
+import { AnyObj, Dict } from "../utils/objects.js";
+import BigNum from "../utils/bigNum.js";
 
-type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object";
+type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object" | "bigintWithLenPrefix";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
 type DefaultDataTypes = BasicTypes | AdvancedTypes;
 
@@ -15,15 +16,21 @@ interface DataFromHexArguments {
     decodeFunc?(hexData: string, returnLength: boolean): any;
 }
 
+interface DataToHexArguments {
+    key: string;
+    lengthBefore?: boolean;
+    type?: DefaultDataTypes;
+    encodeFunc?(add_empty_bytes: boolean, forHash: boolean): string;
+}
+
 interface HexDataType {
     defaultLength?: number;
     lengthBefore?: boolean;
+    encode?(value: any): string;
     parse?(value: string): any;
 }
 
-interface HexDataAdvancedType extends HexDataType {
-    extendsType?: string;
-}
+type HexDataTypes = Dict<HexDataType>;
 
 export default class EncodingUtils {
 
@@ -114,50 +121,88 @@ export default class EncodingUtils {
         };
     }
 
-    private static hexDataAdvancedTypes: Dict<HexDataType> = {
-        address: { defaultLength: 40, parse: Address.fromDecodedHex },
-        signature: { defaultLength: 128 },
-        hash: { defaultLength: 64 },
-        nonce: {
-            defaultLength: 2, lengthBefore: true,
-            parse: (value: string) => BigInt(`0x${value}`).toString()
-        },
-        index: {
-            defaultLength: 2, lengthBefore: true,
-            parse: (value: string) => BigInt(`0x${value}`).toString()
-        },
-        timestamp: {
-            defaultLength: 2, lengthBefore: true,
-            parse: (value: string) => BigInt(`0x${value}`).toString()
-        },
-        version: { defaultLength: 2 }
-    }
-
-    private static hexDataTypes: Dict<HexDataType> = {
-        int: {
-            parse: (value: string) => parseInt(`0x${value}`).toString()
-        },
+    private static hexDataBasicTypes: Dict<HexDataType> = {
         bigint: {
-            parse: (value: string) => BigInt(`0x${value}`).toString()
+            encode: BigNum.numToHex, parse: BigNum.hexToNum
         },
         bool: {
             defaultLength: 1,
+            encode: (value: any) => (value ? "1" : "0"),
             parse: (value: string) => (value === "1")
         },
-        ...this.hexDataAdvancedTypes,
         default: {}
+    }
+
+    private static hexDataTemplateTypes: HexDataTypes = {
+        bigintWithLenPrefix: {
+            defaultLength: 2, lengthBefore: true,
+            ...this.hexDataBasicTypes.bigint
+        }
+    }
+
+    private static hexDataAdvancedTypes: HexDataTypes = {
+        address: { defaultLength: 40, encode: Address.encodeToHex, parse: Address.fromDecodedHex },
+        signature: { defaultLength: 128 },
+        hash: { defaultLength: 64 },
+        nonce: this.hexDataTemplateTypes.bigintWithLenPrefix,
+        index: this.hexDataTemplateTypes.bigintWithLenPrefix,
+        timestamp: this.hexDataTemplateTypes.bigintWithLenPrefix,
+        version: { defaultLength: 2 }
+    }
+
+    private static hexDataTypes: HexDataTypes = {
+        ...this.hexDataBasicTypes,
+        ...this.hexDataTemplateTypes,
+        ...this.hexDataAdvancedTypes
+    }
+
+    private static encodeValueToHex(value: any, data: DataToHexArguments) {
+
+        let hexDataType: HexDataType;
+        let lengthBefore = data.lengthBefore;
+
+        if (data.key in this.hexDataAdvancedTypes) {
+
+            hexDataType = this.hexDataTypes[data.key];
+
+            if (hexDataType.lengthBefore && !lengthBefore) {
+                lengthBefore = hexDataType.lengthBefore;
+            }
+
+        } else {
+            hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
+        }
+
+        let hexValue: string;
+        if (hexDataType.encode) {
+            hexValue = hexDataType.encode(value);
+        } else {
+            hexValue = value;
+        }
+
+        if (lengthBefore) {
+            let hexValueLength = BigNum.numToHex(hexValue.length);
+            return hexValueLength + hexValue;
+        }
+
+        return hexValue;
+
     }
 
     private static getValueFromHex(hexDataSubstring: string, data: DataFromHexArguments) {
 
         let hexDataType: HexDataType;
-        let lengthBefore = data.lengthBefore;
 
-        if (data.key in this.hexDataTypes) {
+        let lengthBefore = data.lengthBefore;
+        
+        if (data.key in this.hexDataAdvancedTypes) {
+
             hexDataType = this.hexDataTypes[data.key];
+
             if (hexDataType.lengthBefore && !lengthBefore) {
                 lengthBefore = hexDataType.lengthBefore;
             }
+
         } else {
             hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
         }
@@ -191,6 +236,52 @@ export default class EncodingUtils {
         }
 
         return { value, length: totalLength };
+
+    }
+
+    public static encodeObjectToHex(object: AnyObj, keys: (DataToHexArguments | null)[], add_empty_bytes: boolean) {
+
+        try {
+
+            let hexData = "";
+
+            for (const data of keys) {
+
+                if (!data) continue;
+
+                const value = object[data.key];
+
+                if (data.type === "object" && data.encodeFunc) {
+
+                    hexData += data.encodeFunc.call(value, false, false);
+
+                } else if (data.type === "array" && data.encodeFunc) {
+
+                    hexData += BigNum.numToHex(value.length);
+
+                    for (let item of value) {
+                        hexData += data.encodeFunc.call(item, false, false);
+                    }
+
+                } else {
+                    const hexValue = this.encodeValueToHex(value, data);
+
+                    if (!hexValue) {
+                        return { cb: Callbacks.ERROR, data: "" };
+                    }
+
+                    hexData += hexValue;
+                }
+            }
+
+            const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
+            const finalHexData = hexData + empty_bytes;
+
+            return { cb: Callbacks.SUCCESS, data: finalHexData };
+
+        } catch (err: any) {
+            return { cb: Callbacks.ERROR, data: "" };
+        }
 
     }
     
@@ -243,13 +334,12 @@ export default class EncodingUtils {
                     const value = this.getValueFromHex(hexData.substring(current_length, hexData.length), data);
 
                     if (!value) {
-                        return { cb: Callbacks.NONE };
+                        return { cb: Callbacks.ERROR };
                     }
                     
                     final_data[key] = value.value;
                     current_length += value.length;
-                } 
-        
+                }
             }
         
             if (returnLength) {
@@ -259,7 +349,7 @@ export default class EncodingUtils {
             return { cb: Callbacks.SUCCESS, data: final_data };
 
         } catch (err: any) {
-            return { cb: Callbacks.NONE };
+            return { cb: Callbacks.ERROR };
         }
     
     }

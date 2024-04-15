@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import type { CLILike } from "./cli.js";
 import Constants from "./constants.js";
 import BigNum from "./bigNum.js";
-import { Dict } from "../objects/dictonary.js";
+import { Dict } from "./objects.js";
 
 // Define a generic interface representing the class structure
 interface Constructable<T> {

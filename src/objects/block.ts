@@ -5,10 +5,9 @@ import blockchain from "../storage/blockchain.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
-import cryptoHandlers from "../crypto/index.js";
+import Crypto from "../crypto/index.js";
 import { AttestationInBlock } from "./attestation.js";
 import config from "../handlers/configHandler.js";
-import Address from "./address.js";
 
 export interface BlockLike {
     readonly index: string;
@@ -87,38 +86,20 @@ export class Block implements BlockLike {
         return newBlock;
     }
 
-    public encodeToHex(add_empty_bytes = true, forHash = false) {   
-    
-        const encoded_index = BigNum.numToHex(this.index);
-        const index_length = BigNum.numToHex(encoded_index.length);
+    public encodeToHex(add_empty_bytes = true, forHash = false) {
 
-        const encoded_timestamp = BigNum.numToHex(this.timestamp);
-        const timestamp_length = BigNum.numToHex(encoded_timestamp.length);
+        const returnData = EncodingUtils.encodeObjectToHex(this, [
+            {key: "version"},
+            {key: "index"},
+            (forHash ? null : {key: "hash"}),
+            {key: "previousHash", type: "hash"},
+            {key: "timestamp"},
+            {key: "proposer", type: "address"},
+            {key: "attestations", type: "array", encodeFunc: AttestationInBlock.prototype.encodeToHex},
+            {key: "transactions", type: "array", encodeFunc: Transaction.prototype.encodeToHex}
+        ], add_empty_bytes);
 
-        let encoded_attestations = BigNum.numToHex(this.attestations.length);
-        for (let attestation of this.attestations) {
-            encoded_attestations += attestation.encodeToHex();
-        }
-
-        let encoded_transactions = BigNum.numToHex(this.transactions.length);
-        for (let transaction of this.transactions) {
-            encoded_transactions += transaction.encodeToHex();
-        }
-
-        const hexData = this.version +
-                        index_length +
-                        encoded_index +
-                        (forHash ? "" : this.hash) +
-                        this.previousHash +
-                        timestamp_length +
-                        encoded_timestamp +
-                        Address.encodeToHex(this.proposer) +
-                        encoded_attestations +
-                        encoded_transactions;
-
-        const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-        
-        return hexData + empty_bytes;
+        return returnData.data;
 
     }
 
@@ -154,7 +135,7 @@ export class Block implements BlockLike {
     }
 
     public calculateHash() {
-        this.hash = cryptoHandlers.sha256(this, ["hash"]);
+        return this.hash = Crypto.sha256(this.encodeToHex(false, true));
     }
 
     public addAttestation(attestation: AttestationInBlock) {

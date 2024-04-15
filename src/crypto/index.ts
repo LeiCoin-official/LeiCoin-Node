@@ -2,7 +2,7 @@ import crypto from "crypto";
 import elliptic from 'elliptic';
 import EncodingUtils from "../handlers/encodingUtils.js";
 import Address from "../objects/address.js";
-import { Dict } from "../objects/dictonary.js";
+import { Dict } from "../utils/objects.js";
 
 export interface LeiCoinBinarySignature extends elliptic.ec.Signature { recoveryParam: number; }
 export interface LeiCoinSignature {

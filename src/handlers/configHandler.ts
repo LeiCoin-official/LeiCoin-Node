@@ -4,7 +4,7 @@ import process from "process";
 import utils from "../utils/index.js";
 import dotenv from "dotenv";
 import cli from "../utils/cli.js";
-import { Dict } from "../objects/dictonary.js";
+import { Dict } from "../utils/objects.js";
 
 interface DefaultConfigInterface {
     api: {
