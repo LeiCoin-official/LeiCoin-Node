@@ -3,6 +3,7 @@ import utils from "../utils/index.js";
 import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
+import Address from "./address.js";
 
 export interface AttestationLike {
     attester: string;
@@ -35,7 +36,6 @@ export class Attestation implements AttestationLike {
 
         const returnData = EncodingUtils.encodeObjectToHex(this, [
             {key: "version"},
-            {key: "attester", type: "address"},
             {key: "blockHash", type: "hash"},
             {key: "vote", type: "bool"},
             {key: "nonce"},
@@ -46,12 +46,11 @@ export class Attestation implements AttestationLike {
 
     }
 
-    public static fromDecodedHex(hexData: string) {
+    public static fromDecodedHex(hexData: string, withAttesterAddress = true) {
 
         try {
             const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
-                {key: "attester", type: "address"},
                 {key: "blockHash", type: "hash"},
                 {key: "vote", type: "bool"},
                 {key: "nonce"},
@@ -61,7 +60,16 @@ export class Attestation implements AttestationLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(Attestation, data);
+
+                data.attester = "";
+                const instance = utils.createInstanceFromJSON(Attestation, data);
+
+                if (withAttesterAddress) {
+                    const hash = Crypto.sha256(instance.encodeToHex(false, true), [], "buffer");
+                    instance.attester = Address.fromSignature(hash, data.signature);
+                }
+
+                return instance;
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);

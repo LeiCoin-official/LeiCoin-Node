@@ -100,14 +100,18 @@ export class Transaction implements TransactionLike {
         
             if (data && data.version === "00") {
 
-                data.senderAddress = withSenderAddress ? Address.fromSignature(EncodingUtils.hexToBuffer(data.txid), data.signature) : "";
+                data.senderAddress = "";
+                const instance = utils.createInstanceFromJSON(Transaction, data);
 
-                const tx = utils.createInstanceFromJSON(Transaction, data);
+                if (withSenderAddress) {
+                    const hash = EncodingUtils.hexToBuffer(data.txid);
+                    instance.senderAddress = Address.fromSignature(hash, data.signature);
+                }
 
                 if (returnLength) {
-                    return {data: tx, length: returnData.length};
+                    return {data: instance, length: returnData.length};
                 }
-                return tx;
+                return instance;
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Transaction from Decoded Hex: ${err.message}`);

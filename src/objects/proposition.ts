@@ -3,9 +3,10 @@ import utils from "../utils/index.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
+import Address from "./address.js";
 
 export interface PropositionLike {
-    readonly proposer: string;
+    proposer: string;
     readonly nonce: string;
     signature: string;
     readonly block: Block;
@@ -14,7 +15,7 @@ export interface PropositionLike {
 
 export class Proposition implements PropositionLike {
     
-    public readonly proposer: string;
+    public proposer: string;
     public readonly nonce: string;
     public signature: string;
     public readonly block: Block;
@@ -32,7 +33,6 @@ export class Proposition implements PropositionLike {
 
         const returnData = EncodingUtils.encodeObjectToHex(this, [
             {key: "version"},
-            {key: "proposer", type: "address"},
             {key: "nonce"},
             (forHash ? null : {key: "signature"}),
             {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex}
@@ -42,12 +42,11 @@ export class Proposition implements PropositionLike {
 
     }
 
-    public static fromDecodedHex(hexData: string) {
+    public static fromDecodedHex(hexData: string, withProposerAddress = true) {
 
         try {
             const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
-                {key: "proposer", type: "address"},
                 {key: "nonce"},
                 {key: "signature"},
                 {key: "block", type: "object", decodeFunc: Block.fromDecodedHex}
@@ -56,7 +55,16 @@ export class Proposition implements PropositionLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                return utils.createInstanceFromJSON(Proposition, data);
+
+                data.proposer = "";
+                const instance = utils.createInstanceFromJSON(Proposition, data);
+
+                if (withProposerAddress) {
+                    const hash = Crypto.sha256(instance.encodeToHex(false, true), [], "buffer");
+                    instance.proposer = Address.fromSignature(hash, data.signature);
+                }
+
+                return instance;
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Proposition from Decoded Hex: ${err.message}`);
