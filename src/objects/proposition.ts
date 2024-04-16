@@ -1,6 +1,5 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
-import BigNum from "../utils/bigNum.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
@@ -21,8 +20,8 @@ export class Proposition implements PropositionLike {
     public readonly block: Block;
     public readonly version: string;
 
-    constructor(publicKey: string, nonce: string, signature: string, block: Block, version = "00") {
-        this.proposer = publicKey;
+    constructor(proposer: string, nonce: string, signature: string, block: Block, version = "00") {
+        this.proposer = proposer;
         this.nonce = nonce;
         this.signature = signature;
         this.block = block;

@@ -142,7 +142,7 @@ export default class EncodingUtils {
 
     private static hexDataAdvancedTypes: HexDataTypes = {
         address: { defaultLength: 40, encode: Address.encodeToHex, parse: Address.fromDecodedHex },
-        signature: { defaultLength: 128 },
+        signature: { defaultLength: 132 },
         hash: { defaultLength: 64 },
         nonce: this.hexDataTemplateTypes.bigintWithLenPrefix,
         index: this.hexDataTemplateTypes.bigintWithLenPrefix,
@@ -300,7 +300,7 @@ export default class EncodingUtils {
 
                     const rawObj = hexData.substring(current_length, hexData.length);
                     const object = data.decodeFunc(rawObj, true);
-                    final_data[key] = object;
+                    final_data[key] = object.data;
                     current_length += object.length;
 
                 } else if (data.type === "array" && data.decodeFunc) {
