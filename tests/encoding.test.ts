@@ -9,9 +9,7 @@ import utils from "../src/utils/index.js";
 describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
 
-        //const block = Block.createNewBlock();
-
-        const block = utils.createInstanceFromJSON(Block, JSON.parse("{\"index\":\"0\",\"hash\":\"297040b8eecf1c48fdf7a58ce0df4a585e95c6b7418890051924ecc3328ff799\",\"previousHash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"timestamp\":\"1713299151676\",\"proposer\":\"lc0x1e4dd45874ec12bad77ac350369ca819e4f12f\",\"attestations\":[],\"transactions\":[{\"txid\":\"ee82f9c49cd73edf22fe17c6baf7b0b1f24c398ae4a5a7a577cec5e493f62f87\",\"senderAddress\":\"lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41\",\"recipientAddress\":\"lc0x1e4dd45874ec12bad77ac350369ca819e4f12f\",\"amount\":\"10\",\"nonce\":\"0\",\"timestamp\":\"1713299151600\",\"input\":\"\",\"signature\":\"00c8dd9ccc8d0e385f93a87118b4269d1d08bd45dcd031462dbce8b49b85780afb35751fd378193834a49027e549b77da668e0efa2cc2fefa8a75735cd572769e01\",\"version\":\"00\"}],\"version\":\"00\"}"));
+        const block = Block.createNewBlock();
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
         const decoded2 = Block.fromDecodedHex(decoded.encodeToHex());
@@ -53,8 +51,6 @@ describe('encoding_testing', () => {
     test('transaction_enoding_and_decoding', () => {
 
         const tx = Transaction.createCoinbaseTransaction();
-
-        //const tx = utils.createInstanceFromJSON(Transaction, JSON.parse("{\"txid\":\"ee82f9c49cd73edf22fe17c6baf7b0b1f24c398ae4a5a7a577cec5e493f62f87\",\"senderAddress\":\"lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41\",\"recipientAddress\":\"lc0x1e4dd45874ec12bad77ac350369ca819e4f12f\",\"amount\":\"10\",\"nonce\":\"0\",\"timestamp\":\"1713299151600\",\"input\":\"\",\"signature\":\"00c8dd9ccc8d0e385f93a87118b4269d1d08bd45dcd031462dbce8b49b85780afb35751fd378193834a49027e549b77da668e0efa2cc2fefa8a75735cd572769e01\",\"version\":\"00\"}"));
 
         const decoded: any = Transaction.fromDecodedHex(tx.encodeToHex());
         const decoded2 = Transaction.fromDecodedHex(decoded.encodeToHex());
