@@ -37,7 +37,9 @@ export class Crypto {
         try {
             const keyPair = this.ec.keyFromPrivate(privateKey, "hex");
             const signature = keyPair.sign(hashData);
-            return EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
+            //return EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
+            const encoded = EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
+            return encoded;
         } catch (error: any) {
             return "";
         }

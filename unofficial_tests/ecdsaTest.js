@@ -14,6 +14,7 @@ function decodeSignature(hexData) {
 }
 
 const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa";
+//const privateKeyHex = "0000000000000000000000000000000000000000000000000000000000000001";
 
 const keyPair = ec.keyFromPrivate(privateKeyHex, "hex");
 const publicKeyHex = keyPair.getPublic("hex");
@@ -39,6 +40,7 @@ const signatureHex = encodeSignature(signature);
 console.log("Signature Hex:", signatureHex, signatureHex.length);
 
 const decoded_signature = decodeSignature(signatureHex);
+//const decoded_signature = decodeSignature(signatureHex);
 console.log("Signature JSON:", decoded_signature);
 
 // Recover the public key from the signature and message hash
@@ -46,10 +48,13 @@ const recoverPubKey = ec.recoverPubKey(messageHash, decoded_signature, decoded_s
 
 const recoverPubKeyHex = recoverPubKey.encode('hex');
 
+const recoverAddress = "lc0x" + crypto.createHash("sha256").update(recoverPubKeyHex).digest("hex").substring(0, 38);
+
 const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
 
 console.log('Recovered Public Key:', recoverPubKeyHex, recoverPubKeyHex.length);
 console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
+console.log("Recovered Address is equal to Original Address:", address === recoverAddress);
 console.log("Signature is Valid:", isSignatureValid);
 
 console.log("Address:", address, address.length);
