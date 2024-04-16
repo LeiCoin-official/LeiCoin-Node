@@ -49,7 +49,7 @@ export class Transaction implements TransactionLike {
 
         const coinbase = new Transaction(
             "",
-            "",
+            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
             config.staker.address,
             utils.mining_pow,
             "0",
