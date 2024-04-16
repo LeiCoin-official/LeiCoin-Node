@@ -5,8 +5,8 @@ import Attestation from "../src/objects/attestation.js";
 import Proposition from "../src/objects/proposition.js";
 import Validator from "../src/objects/validator.js";
 
-describe('Encoding Testing', () => {
-    test('Block Enoding And Decoding', () => {
+describe('encoding_testing', () => {
+    test('block_enoding_and_decoding', () => {
 
         const block = Block.createNewBlock();
 
@@ -18,7 +18,7 @@ describe('Encoding Testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(block));
     });
-    test('Attestation Enoding And Decoding', () => {
+    test('attestation_enoding_and_decoding', () => {
 
         const attestation = new Attestation(
             "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
@@ -33,7 +33,7 @@ describe('Encoding Testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(attestation));
     });
-    test('Proposition Enoding And Decoding', () => {
+    test('proposition_enoding_and_decoding', () => {
 
         const proposition = new Proposition(
             "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
@@ -47,7 +47,7 @@ describe('Encoding Testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(proposition));
     });
-    test('Transaction Enoding And Decoding', () => {
+    test('transaction_enoding_and_decoding', () => {
 
         const tx = Transaction.createCoinbaseTransaction();
 
@@ -56,7 +56,7 @@ describe('Encoding Testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(tx));
     });
-    test('Validator Enoding And Decoding', () => {
+    test('validator_enoding_and_decoding', () => {
 
         const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41";
 
@@ -71,7 +71,7 @@ describe('Encoding Testing', () => {
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(validator));
 
     });
-    test('Wallet Enoding And Decoding', () => {
+    test('wallet_enoding_and_decoding', () => {
 
         const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41";
         
