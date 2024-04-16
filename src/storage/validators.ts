@@ -22,7 +22,7 @@ export class ValidatorDB {
     }
 
     private async setValidatorInLevel(validator: Validator, level: Level) {
-        await level.put(validator.publicKey, validator.encodeToHex());
+        await level.put(validator.address, validator.encodeToHex());
     }
 
     public async addActiveValidator(validator: Validator) {

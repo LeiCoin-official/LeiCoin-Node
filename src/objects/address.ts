@@ -1,4 +1,5 @@
 import Crypto from "../crypto/index.js";
+import EncodingUtils from "../handlers/encodingUtils.js";
 
 export class Address {
 
@@ -25,6 +26,16 @@ export class Address {
     public static fromPublicKey(addressType: string, publicKey: string) {
         const address = this.fromDecodedHex(addressType) + Crypto.sha256(publicKey).substring(0, 38);
         return address;
+    }
+
+    public static fromPrivateKey(addressType: string, privateKey: string) {
+        return this.fromPublicKey(addressType, Crypto.getPublicKeyFromPrivateKey(privateKey));
+    }
+
+    public static fromSignature(hashData: Buffer, signatureHex: string) {
+        const signature = EncodingUtils.decodeSignature(signatureHex);
+        const publicKey = Crypto.getPublicKeyFromSignature(hashData, signature);
+        return this.fromPublicKey(signature.signerType, publicKey);
     }
 
 }

@@ -81,7 +81,7 @@ export class Block implements BlockLike {
             transactions
         );
         
-        newBlock.calculateHash();
+        newBlock.hash = newBlock.calculateHash();
 
         return newBlock;
     }
@@ -135,7 +135,7 @@ export class Block implements BlockLike {
     }
 
     public calculateHash() {
-        return this.hash = Crypto.sha256(this.encodeToHex(false, true));
+        return Crypto.sha256(this.encodeToHex(false, true));
     }
 
     public addAttestation(attestation: Attestation) {

@@ -112,7 +112,7 @@ export default class EncodingUtils {
         );
     }
     
-    public static decodeSignature(hexData: string) {
+    public static decodeSignature(hexData: string): LeiCoinSignature {
         return {
             signerType: hexData.substring(0, 2),
             r: hexData.substring(2, 66),

@@ -33,32 +33,29 @@ export class Crypto {
         return crypto.createHash('sha256').update(data).digest();
     }
 
-    public static async sign(hashData: Buffer, signerType: string, privateKey: string) {
+    public static sign(hashData: Buffer, signerType: string, privateKey: string) {
         try {
             const keyPair = this.ec.keyFromPrivate(privateKey, "hex");
             const signature = keyPair.sign(hashData);
             return EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
         } catch (error: any) {
-            return false;
+            return "";
         }
     }
 
-    public static async getAddressFromPrivateKey(type: string, privateKey: string) {
+    public static getPublicKeyFromPrivateKey(privateKey: string) {
         try {
-            const publicKey = this.ec.keyFromPrivate(privateKey, "hex").getPublic("hex");
-            return Address.fromPublicKey(type, publicKey);
+            return this.ec.keyFromPrivate(privateKey, "hex").getPublic("hex");
         } catch (error: any) {
-            return false;
+            return "";
         }
     }
 
-    public static async getAddressFromSignature(hashData: Buffer, signatureHex: string) {
+    public static getPublicKeyFromSignature(hashData: Buffer, signature: LeiCoinSignature){
         try {
-            const signature = EncodingUtils.decodeSignature(signatureHex);
-            const publicKey =  this.ec.recoverPubKey(hashData, signature, signature.recoveryParam);
-            return Address.fromPublicKey(signature.signerType, publicKey.encode("hex"));
+            return this.ec.recoverPubKey(hashData, signature, signature.recoveryParam).encode("hex") as string;
         } catch (error: any) {
-            return false;
+            return "";
         }
     }
 

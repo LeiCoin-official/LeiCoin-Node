@@ -1,4 +1,6 @@
-import { startTimer, endTimer } from './randtest.js';
+import { startTimer, endTimer } from './testUtils.js';
+import { sha256 } from './cryptoUtils.js';
+import crypto from "crypto";
 
 class BigNum {
 
@@ -48,18 +50,42 @@ class BigNum {
 
 }
 
-const array1 = [];
+function test1() {
 
-const r2 = "22742734291";
+    const array1 = [];
 
-const startTime = startTimer();
+    const r2 = "22742734291";
 
-for (let i = 0; i < 1_000_000; i++) {
-    const r = i.toString();
-    array1.push(BigNum.add(r, r2), BigNum.subtract(r, r2), BigNum.multiply(r, r2), BigNum.divide(r, r2), BigNum.mod(r, r2));
+    const startTime = startTimer();
+
+
+    for (let i = 0; i < 1_000_000; i++) {
+        const r = i.toString();
+        array1.push(BigNum.add(r, r2), BigNum.subtract(r, r2), BigNum.multiply(r, r2), BigNum.divide(r, r2), BigNum.mod(r, r2));
+    }
+
+    const elapsedTime = endTimer(startTime);
+
+    console.log(array1);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+
 }
 
-const elapsedTime = endTimer(startTime);
+function test2() {
 
-console.log(array1);
-console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+    const bytes = crypto.randomBytes(2048).toString("hex");
+    let hash;
+
+    const startTime = startTimer();
+
+    for (let i = 0; i < 1_000; i++) {
+        hash = sha256(bytes);
+    }
+
+    const elapsedTime = endTimer(startTime);
+
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+    
+}
+
+test2();

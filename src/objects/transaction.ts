@@ -10,6 +10,7 @@ import Address from "./address.js";
 export interface TransactionLike {
 
     txid: string;
+    senderAddress: string;
     recipientAddress: string;
     amount: string;
     nonce: string;
@@ -23,6 +24,7 @@ export interface TransactionLike {
 export class Transaction implements TransactionLike {
 
     public txid: string;
+    public senderAddress: string;
     public recipientAddress: string;
     public amount: string;
     public nonce: string;
@@ -31,8 +33,9 @@ export class Transaction implements TransactionLike {
     public signature: string;
     public readonly version: string;
 
-    constructor(txid: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, input: string, signature: string, version = "00") {
+    constructor(txid: string, senderAddress: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, input: string, signature: string, version = "00") {
         this.txid = txid;
+        this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
         this.amount = amount;
         this.nonce = nonce;
@@ -43,16 +46,22 @@ export class Transaction implements TransactionLike {
     }
 
     public static createCoinbaseTransaction() {
+
         const coinbase = new Transaction(
+            "",
             "",
             config.staker.address,
             utils.mining_pow,
             "0",
             new Date().getTime().toString(),
             "",
-            "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "",
         );
-        coinbase.txid = cryptoHandlers.sha256(coinbase, ["txid", "version"]);
+
+        const hash = Crypto.sha256(coinbase.encodeToHex(false, true), [], "buffer");
+        coinbase.txid = EncodingUtils.bufferToHex(hash);
+        coinbase.signature = Crypto.sign(hash, "00", "0000000000000000000000000000000000000000000000000000000000000000");
+
         return coinbase;
     }
 
@@ -73,7 +82,7 @@ export class Transaction implements TransactionLike {
 
     }
 
-    public static fromDecodedHex(hexData: string, returnLength = false) {
+    public static fromDecodedHex(hexData: string, returnLength = false, withSenderAddress = true) {
 
         try {
             const returnData = EncodingUtils.getObjectFromHex(hexData, [
@@ -90,6 +99,9 @@ export class Transaction implements TransactionLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
+
+                data.senderAddress = withSenderAddress ? Address.fromSignature(EncodingUtils.hexToBuffer(data.txid), data.signature) : "";
+
                 const tx = utils.createInstanceFromJSON(Transaction, data);
 
                 if (returnLength) {
@@ -106,7 +118,7 @@ export class Transaction implements TransactionLike {
     }
 
     public calculateHash() {
-        return this.txid = Crypto.sha256(this.encodeToHex(false, true));
+        return Crypto.sha256(this.encodeToHex(false, true));
     }
 
 }
