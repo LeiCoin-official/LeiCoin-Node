@@ -21,7 +21,7 @@ describe('Encoding Testing', () => {
     test('Attestation Enoding And Decoding', () => {
 
         const attestation = new Attestation(
-            "lc0e00000000000000000000000000000000000000",
+            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
             "0000000000000000000000000000000000000000000000000000000000000000",
             true,
             "1",
@@ -36,7 +36,7 @@ describe('Encoding Testing', () => {
     test('Proposition Enoding And Decoding', () => {
 
         const proposition = new Proposition(
-            "lc0e00000000000000000000000000000000000000",
+            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
             "1",
             "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
             Block.createNewBlock()
@@ -58,22 +58,22 @@ describe('Encoding Testing', () => {
     });
     test('Validator Enoding And Decoding', () => {
 
-        const publicKey = "0000000000000000000000000000000000000000000000000000000000000000";
+        const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41";
 
         const validator = new Validator(
-            publicKey,
+            address,
             "32" +"0000" + "0000"
         );
 
-        const decoded: any = Validator.fromDecodedHex(publicKey, validator.encodeToHex());
-        const decoded2 = Validator.fromDecodedHex(publicKey, decoded.encodeToHex());
+        const decoded: any = Validator.fromDecodedHex(address, validator.encodeToHex());
+        const decoded2 = Validator.fromDecodedHex(address, decoded.encodeToHex());
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(validator));
 
     });
-    test('Test Wallet Enoding And Decoding', () => {
+    test('Wallet Enoding And Decoding', () => {
 
-        const address = "lc0x6c6569636f696e6e65745f636f696e62617365";
+        const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41";
         
         const wallet = new Wallet(
             address,
