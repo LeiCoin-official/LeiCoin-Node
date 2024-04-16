@@ -51,6 +51,6 @@ export const VerificationCodes: {[key: number]: string} =  {
 
     // Attestation Only
     12550: "Invalid Attestation",
-    12551: "Invalid Attestor for Slot",
+    12551: "Invalid Attester for Slot",
     
 };

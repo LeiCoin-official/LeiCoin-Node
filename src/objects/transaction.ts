@@ -10,8 +10,6 @@ import Address from "./address.js";
 export interface TransactionLike {
 
     txid: string;
-    senderAddress: string;
-    senderPublicKey: string;
     recipientAddress: string;
     amount: string;
     nonce: string;
@@ -25,8 +23,6 @@ export interface TransactionLike {
 export class Transaction implements TransactionLike {
 
     public txid: string;
-    public senderAddress: string;
-    public senderPublicKey: string;
     public recipientAddress: string;
     public amount: string;
     public nonce: string;
@@ -35,10 +31,8 @@ export class Transaction implements TransactionLike {
     public signature: string;
     public readonly version: string;
 
-    constructor(txid: string, senderAddress: string, senderPublicKey: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, input: string, signature: string, version = "00") {
+    constructor(txid: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, input: string, signature: string, version = "00") {
         this.txid = txid;
-        this.senderAddress = senderAddress;
-        this.senderPublicKey = senderPublicKey;
         this.recipientAddress = recipientAddress;
         this.amount = amount;
         this.nonce = nonce;
@@ -51,8 +45,6 @@ export class Transaction implements TransactionLike {
     public static createCoinbaseTransaction() {
         const coinbase = new Transaction(
             "",
-            "lc0x6c6569636f696e6e65745f636f696e62617365",
-            "6c6569636f696e6e65745f636f696e6261736500000000000000000000000000",
             config.staker.address,
             utils.mining_pow,
             "0",
@@ -69,8 +61,6 @@ export class Transaction implements TransactionLike {
         const returnData = EncodingUtils.encodeObjectToHex(this, [
             {key: "version"},
             (forHash ? null : {key: "txid", type: "hash"}),
-            {key: "senderAddress", type: "address"},
-            {key: "senderPublicKey"},
             {key: "recipientAddress", type: "address"},
             {key: "amount", type: "bigintWithLenPrefix"},
             {key: "nonce"},
@@ -89,8 +79,6 @@ export class Transaction implements TransactionLike {
             const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
                 {key: "txid", type: "hash"},
-                {key: "senderAddress", type: "address"},
-                {key: "senderPublicKey", length: 64},
                 {key: "recipientAddress", type: "address"},
                 {key: "amount", type: "bigintWithLenPrefix"},
                 {key: "nonce"},

@@ -1,15 +1,14 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
-import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 
 export class Validator {
 
-    public readonly publicKey: string;
+    public readonly address: string;
     public stake: string;
     public readonly version: string;
 
-    constructor(publicKey: string, stake: string, version = "00") {
-        this.publicKey = publicKey;
+    constructor(address: string, stake: string, version = "00") {
+        this.address = address;
         this.stake = stake;
         this.version = version;
     }
@@ -25,7 +24,7 @@ export class Validator {
     
     }
 
-    public static fromDecodedHex(publicKey: string, hexData: string) {
+    public static fromDecodedHex(address: string, hexData: string) {
 
         try {
 
@@ -37,7 +36,7 @@ export class Validator {
             const data = resultData.data;
         
             if (data && data.version === "00") {
-                return new Validator(publicKey, data.stake, data.version);
+                return new Validator(address, data.stake, data.version);
             }
 
         } catch (err: any) {

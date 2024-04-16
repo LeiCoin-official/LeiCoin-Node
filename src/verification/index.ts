@@ -179,7 +179,7 @@ export class Verification {
     public static async verifyBlockAttestation(attestation: AttestationSendData | null) {
 
         if (!attestation) return 12501;
-        if (validatorsCommittee.isCurrentAttestor(attestation.publicKey)) return 12551;
+        if (validatorsCommittee.isCurrentAttester(attestation.publicKey)) return 12551;
         if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return 12508;
         if (!await Verification.verifySignature(attestation.calculateHash(), attestation.publicKey, attestation.signature)) return 12506;
 

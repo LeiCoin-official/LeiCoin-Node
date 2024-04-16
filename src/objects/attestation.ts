@@ -5,7 +5,7 @@ import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 
 export interface AttestationLike {
-    publicKey: string;
+    attester: string;
     blockHash: string;
     vote: boolean;
     nonce: string;
@@ -15,15 +15,15 @@ export interface AttestationLike {
 
 export class Attestation implements AttestationLike {
     
-    public publicKey: string;
+    public attester: string;
     public blockHash: string;
     public vote: boolean;
     public nonce: string;
     public signature: string;
     public readonly version: string;
 
-    constructor(publicKey: string, blockHash: string, vote: boolean, nonce: string, signature: string, version = "00") {
-        this.publicKey = publicKey;
+    constructor(attester: string, blockHash: string, vote: boolean, nonce: string, signature: string, version = "00") {
+        this.attester = attester;
         this.blockHash = blockHash;
         this.vote = vote;
         this.nonce = nonce;
@@ -35,7 +35,7 @@ export class Attestation implements AttestationLike {
 
         const returnData = EncodingUtils.encodeObjectToHex(this, [
             {key: "version"},
-            {key: "publicKey"},
+            {key: "attester", type: "address"},
             {key: "blockHash", type: "hash"},
             {key: "vote", type: "bool"},
             {key: "nonce"},
@@ -51,7 +51,7 @@ export class Attestation implements AttestationLike {
         try {
             const returnData = EncodingUtils.getObjectFromHex(hexData, [
                 {key: "version"},
-                {key: "publicKey", length: 64},
+                {key: "attester", type: "address"},
                 {key: "blockHash", type: "hash"},
                 {key: "vote", type: "bool"},
                 {key: "nonce"},

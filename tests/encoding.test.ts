@@ -21,7 +21,7 @@ describe('Encoding Testing', () => {
     test('Attestation Enoding And Decoding', () => {
 
         const attestation = new Attestation(
-            "0000000000000000000000000000000000000000000000000000000000000000",
+            "lc0e00000000000000000000000000000000000000",
             "0000000000000000000000000000000000000000000000000000000000000000",
             true,
             "1",
@@ -74,7 +74,12 @@ describe('Encoding Testing', () => {
     test('Test Wallet Enoding And Decoding', () => {
 
         const address = "lc0x6c6569636f696e6e65745f636f696e62617365";
-        const wallet = new Wallet(address, "10000000000000", "10000000");
+        
+        const wallet = new Wallet(
+            address,
+            "10000000000000",
+            "10000000"
+        );
 
         const decoded: any = Wallet.fromDecodedHex(address, wallet.encodeToHex());
         const decoded2 = Wallet.fromDecodedHex(address, decoded.encodeToHex());

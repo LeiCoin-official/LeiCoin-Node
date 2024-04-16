@@ -80,7 +80,7 @@ class ValidatorsCommittee {
         return this.currentSlot?.proposer === publicKey;
     }
 
-    public isCurrentAttestor(publicKey: string) {
+    public isCurrentAttester(publicKey: string) {
         return this.isMember(publicKey) && !this.isCurrentProposer(publicKey);
     }
 
