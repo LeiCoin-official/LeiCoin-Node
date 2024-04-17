@@ -62,13 +62,13 @@ export class DataUtils {
         return sortedObj;
     }
 
-    public calculateEpochAndRelativeSlot(slotIndex: string) {
+    public static calculateEpochAndRelativeSlot(slotIndex: string) {
         const currentEpoch = BigNum.divide(slotIndex, Constants.BLOCKS_PER_EPOCH);
         const relativeSlot = BigNum.mod(slotIndex, Constants.BLOCKS_PER_EPOCH);
         return { currentEpoch, relativeSlot };
     }
 
-    public replaceAtIndex(str: string, searchValue: string, replaceValue: string, index: number) {
+    public static replaceAtIndex(str: string, searchValue: string, replaceValue: string, index: number) {
         if (index < 0 || index >= str.length) {
             return str;
         }

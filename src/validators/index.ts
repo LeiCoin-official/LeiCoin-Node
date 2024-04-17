@@ -3,7 +3,7 @@ import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
 import { LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import cli from "../utils/cli.js";
 import Constants from "../utils/constants.js";
-import utils from "../utils/index.js";
+import DataUtils from "../utils/dataUtils.js";
 import Verification from "../verification/index.js";
 import validatorsCommittee from "./committee.js";
 import { ProposerJob } from "./job.js";
@@ -65,7 +65,7 @@ class Validator {
 
 		}*/
 
-		const { currentEpoch, relativeSlot } = utils.calculateEpochAndRelativeSlot(lastSlot);
+		const { currentEpoch, relativeSlot } = DataUtils.calculateEpochAndRelativeSlot(lastSlot);
 
 		if (relativeSlot === Constants.LAST_EPOCH_SLOT) {
 			await this.startNextEpoch(lastBlockHash);

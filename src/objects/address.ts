@@ -1,5 +1,6 @@
 import Crypto from "../crypto/index.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
+import DataUtils from "../utils/dataUtils.js";
 
 export class AddressHex {
 
@@ -51,8 +52,7 @@ export class Address32 {
             decimalValue = decimalValue / 32n;
         }
 
-        AddressHex.getType(addressHex).replace("0", "x");
-        return "lc" + splitetType.join("") + address32.slice(1);
+        return "lc" + DataUtils.replaceAtIndex(AddressHex.getType(addressHex), "0", "x", 1) + address32.slice(1);
     }
 
     public static fromPublicKey(addressType: string, publicKey: string) {
