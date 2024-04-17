@@ -6,7 +6,11 @@ import crypto from 'crypto';
 const ec = new EC('secp256k1');
 
 function encodeSignature(signature) {
-    return signature.r.toString("hex") + signature.s.toString("hex") + signature.recoveryParam.toString(16).padStart(2, "0");
+    return signature.r.toString("hex").padStart(64, "0") + signature.s.toString("hex").padStart(64, "0") + signature.recoveryParam.toString(16).padStart(2, "0");
+}
+
+function createHackSignature(signature) {
+    return "0000000000000000000000000000000000000000000000000000000000000001" + "0000000000000000000000000000000000000000000000000000000000000001" + signature.recoveryParam.toString(16).padStart(2, "0");
 }
 
 function decodeSignature(hexData) {
@@ -33,14 +37,14 @@ const signature = keyPair.sign(messageHash);
 
 // console.log("Signature Original:", JSON.stringify(signature));
 
-const signatureDERHex = signature.toDER("hex");
-console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
+//const signatureDERHex = signature.toDER("hex");
+//console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
 
-const signatureHex = encodeSignature(signature);
+const signatureHex = createHackSignature(signature);
+//const signatureHex = encodeSignature(signature);
 console.log("Signature Hex:", signatureHex, signatureHex.length);
 
 const decoded_signature = decodeSignature(signatureHex);
-//const decoded_signature = decodeSignature(signatureHex);
 console.log("Signature JSON:", decoded_signature);
 
 // Recover the public key from the signature and message hash
@@ -50,11 +54,12 @@ const recoverPubKeyHex = recoverPubKey.encode('hex');
 
 const recoverAddress = "lc0x" + crypto.createHash("sha256").update(recoverPubKeyHex).digest("hex").substring(0, 38);
 
-const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
+//const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
 
 console.log('Recovered Public Key:', recoverPubKeyHex, recoverPubKeyHex.length);
-console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
+//console.log("Address:", address, address.length);
+console.log('Recovered Address:', recoverAddress, recoverAddress.length);
+//console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
 console.log("Recovered Address is equal to Original Address:", address === recoverAddress);
-console.log("Signature is Valid:", isSignatureValid);
+//console.log("Signature is Valid:", isSignatureValid);
 
-console.log("Address:", address, address.length);

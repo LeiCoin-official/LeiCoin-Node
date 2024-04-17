@@ -68,7 +68,7 @@ async function asyncMain() {
 
     const startTime = startTimer();
 
-    for (let i = 0; i < 1_000; i++) {
+    for (let i = 0; i < 1_000_0; i++) {
         promises.push(gen());
     }
 
@@ -83,7 +83,7 @@ async function syncMain() {
 
     const startTime = startTimer();
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 1_000_0; i++) {
         await gen();
     }
 
@@ -166,7 +166,7 @@ async function main3() {
     let min_length = [Infinity, Infinity, Infinity];
     let max_length = [0, 0, 0];
 
-    for (let i = 1; i < 1_000_000; i++) {
+    for (let i = 1; i < 1_000; i++) {
         const length = test2(keyPair);
         for (let i2 = 0; i2 < 3; i2++) {
             average_length[i2] = (lengthAll[i2] + length[i2]) / i;
@@ -199,16 +199,16 @@ async function main4() {
 
 async function run() {
 
-    //await asyncMain();
+    await asyncMain();
 
     await syncMain();
 
-    console.log(await getSenderAddress(messageHash, encodedSignature) === address);
+    //console.log(await getSenderAddress(messageHash, encodedSignature) === address);
 
 };
 
 //main();
-//run();
+run();
 
-main3();
+//main3();
 
