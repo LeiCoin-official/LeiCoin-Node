@@ -4,7 +4,6 @@ import Block from "../src/objects/block.js";
 import Attestation from "../src/objects/attestation.js";
 import Proposition from "../src/objects/proposition.js";
 import Validator from "../src/objects/validator.js";
-import utils from "../src/utils/index.js";
 
 describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
