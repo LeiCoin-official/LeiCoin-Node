@@ -1,5 +1,5 @@
 import Crypto from "../src/crypto/index.js"
-import { Address32 } from "../src/objects/address.js";
+import { Address32, AddressHex } from "../src/objects/address.js";
 
 describe('address_testing', () => {
     test('address_enoding_and_decoding', () => {
@@ -12,13 +12,13 @@ describe('address_testing', () => {
         const signature = Crypto.sign(hashData, "00", privateKeyHex);
         const recoveredAddress = Address32.fromSignature(hashData, (signature as string));
 
-        expect((address === recoveredAddress) ? address : null).toBe("lc0x1e4dd45874ec12bad77ac350369ca819e4f12f54");
+        expect((address === recoveredAddress) ? address : null).toBe("lc0x4s7w9p4mwhacnnutre94e86948kg3ctm");
     });
     test('coinbase_address_gettting', () => {
 
         const privateKeyHex = new Array<string>(32).fill("00").join("");
-        const address = Address32.fromPrivateKey("00", privateKeyHex);
+        const address = AddressHex.fromPrivateKey("00", privateKeyHex);
 
-        expect(address).toBe("lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4");
+        expect(address).toBe("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4");
     });
 });
