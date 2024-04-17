@@ -48,7 +48,7 @@ export class Verification {
             return {cb: false, status: 400, message: "Bad Request. RecipientAddress is not a LeiCoin Address."};
         }
 
-        if (("lc0x" + cryptoHandlers.sha256(tx.senderPublicKey).slice(0, 38)) !== tx.senderAddress) {
+        if (("lc0x" + cryptoHandlers.sha256(tx.senderPublicKey).slice(0, 40)) !== tx.senderAddress) {
             return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
         }
 

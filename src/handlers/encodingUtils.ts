@@ -142,7 +142,7 @@ export default class EncodingUtils {
     }
 
     private static hexDataAdvancedTypes: HexDataTypes = {
-        address: { defaultLength: 40, encode: Address.encodeToHex, parse: Address.fromDecodedHex },
+        address: { defaultLength: 42, encode: Address.encodeToHex, parse: Address.fromDecodedHex },
         signature: { defaultLength: 132 },
         hash: { defaultLength: 64 },
         nonce: this.hexDataTemplateTypes.bigintWithLenPrefix,

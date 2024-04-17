@@ -24,7 +24,7 @@ export class Address {
     }
 
     public static fromPublicKey(addressType: string, publicKey: string) {
-        const address = this.fromDecodedHex(addressType) + Crypto.sha256(publicKey).substring(0, 38);
+        const address = this.fromDecodedHex(addressType) + Crypto.sha256(publicKey).substring(0, 40);
         return address;
     }
 

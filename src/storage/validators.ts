@@ -65,7 +65,7 @@ export class ValidatorDB {
 
     private async adjustStakeByBlock(block: Block) {
         
-        const inActive = this.getValidatorInLevel(address, "active");
+        //const inActive = this.getValidatorInLevel(address, "active");
 
     }
 

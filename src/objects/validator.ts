@@ -22,7 +22,7 @@ export class Validator {
         this.stake = BigNum.add(this.stake, amount);
     }
 
-    public 
+    //public 
 
     public encodeToHex(add_empty_bytes = true) {
     
