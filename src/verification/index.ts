@@ -5,7 +5,7 @@ import utils from "../utils/index.js";
 import cryptoHandlers from "../crypto/index.js";
 import Proposition from "../objects/proposition.js";
 import validatorsCommittee from "../validators/committee.js";
-import { AttestationSendData } from "../objects/attestation.js";
+import Attestation from "../objects/attestation.js";
 
 
 interface BlockValidationInvalidResult {
@@ -29,23 +29,15 @@ export class Verification {
         return address.startsWith("lc0x");
     }
 
-    public static async verifySignature(data: string, publicKey: string, signature: string) {
-        return await ed25519.verifyAsync(Buffer.from(signature, "hex"), Buffer.from(data, "hex"), Buffer.from(publicKey, "hex"));
-    }
-
     public static async verifyTransaction(tx: Transaction, chain = "main", coinbase = false) {
         
         // Ensure that all required fields are present
-        if (!tx.txid || !tx.senderAddress || !tx.senderPublicKey|| !tx.recipientAddress || !tx.amount || !tx.nonce || !tx.timestamp || !tx.signature || !tx.version) {
+        if (!tx.txid || !tx.senderAddress || !tx.recipientAddress || !tx.amount || !tx.nonce || !tx.timestamp || !tx.signature || !tx.version) {
             return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
         }
 
         if (tx.version !== "00") {
             return {cb: false, status: 400, message: "Bad Request. Invalid version."};
-        }
-
-        if (!this.verifySignature(tx.txid, tx.senderPublicKey, tx.signature)) {
-            return {cb: false, status: 400, message: "Bad Request. Invalid signature."};
         }
 
         if (!this.verifyAddress(tx.senderAddress)) {

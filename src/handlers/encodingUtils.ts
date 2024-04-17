@@ -3,6 +3,7 @@ import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.j
 import Address from "../objects/address.js";
 import { AnyObj, Dict } from "../utils/objects.js";
 import BigNum from "../utils/bigNum.js";
+import { parse } from "path";
 
 type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object" | "bigintWithLenPrefix";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
@@ -11,14 +12,14 @@ type DefaultDataTypes = BasicTypes | AdvancedTypes;
 interface DataFromHexArguments {
     key: string;
     length?: number;
-    lengthBefore?: boolean;
+    lengthBefore?: boolean | "unlimited";
     type?: DefaultDataTypes;
     decodeFunc?(hexData: string, returnLength: boolean): any;
 }
 
 interface DataToHexArguments {
     key: string;
-    lengthBefore?: boolean;
+    lengthBefore?: boolean | "unlimited";
     type?: DefaultDataTypes;
     encodeFunc?(add_empty_bytes: boolean, forHash: boolean): string;
 }
@@ -181,6 +182,10 @@ export default class EncodingUtils {
         }
 
         if (lengthBefore) {
+            if (lengthBefore === "unlimited") {
+                let hexValueLength = this.encodeLengthForUnlimited(hexValue.length);
+                return hexValueLength + hexValue;
+            }
             let hexValueLength = BigNum.numToHex(hexValue.length);
             return hexValueLength + hexValue;
         }
@@ -191,52 +196,74 @@ export default class EncodingUtils {
 
     private static getValueFromHex(hexDataSubstring: string, data: DataFromHexArguments) {
 
-        let hexDataType: HexDataType;
+        try {
 
-        let lengthBefore = data.lengthBefore;
-        
-        if (data.key in this.hexDataAdvancedTypes) {
+            let hexDataType: HexDataType;
 
-            hexDataType = this.hexDataTypes[data.key];
+            let lengthBefore = data.lengthBefore;
+            
+            if (data.key in this.hexDataAdvancedTypes) {
 
-        } else {
-            hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
-        }
+                hexDataType = this.hexDataTypes[data.key];
 
-        if (hexDataType.lengthBefore && !lengthBefore) {
-            lengthBefore = hexDataType.lengthBefore;
-        }
-        
-        let length: number;
+            } else {
+                hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
+            }
 
-        if (data.length) length = data.length;
-        else if (hexDataType.defaultLength) length = hexDataType.defaultLength;
-        else if (lengthBefore) length = 2;
-        else return null;
+            if (hexDataType.lengthBefore && !lengthBefore) {
+                lengthBefore = hexDataType.lengthBefore;
+            }
+            
+            let length = 0;
+            
+            if (data.length) length = data.length;
+            else if (hexDataType.defaultLength) length = hexDataType.defaultLength;
+            else if (!lengthBefore) return null;
 
-        let totalLength = length;
+            let totalLength = length;
 
-        if (lengthBefore) {
-            const tmpLength = length;
-            length = parseInt(hexDataSubstring.substring(0, tmpLength), 16);
-            totalLength += length;
-            hexDataSubstring = hexDataSubstring.substring(tmpLength);
-        }
-        
-        let hexValue = hexDataSubstring.substring(0, 0 + length);
-        if (hexValue.length !== length) {
+            if (lengthBefore) {
+                let tmpLength = length;
+                if (lengthBefore === "unlimited") {
+                    [ length, tmpLength ] = this.getLengthFromUnlimited(hexDataSubstring);
+                    totalLength = tmpLength;
+                } else {
+                    length = parseInt(hexDataSubstring.substring(0, tmpLength), 16);
+                }
+                totalLength += length;
+                hexDataSubstring = hexDataSubstring.substring(tmpLength);
+            }
+            
+            let hexValue = hexDataSubstring.substring(0, 0 + length);
+            if (hexValue.length !== length) {
+                return null;
+            }
+            
+            let value: any;
+            if (hexDataType.parse) {
+                value = hexDataType.parse(hexValue);
+            } else {
+                value = hexValue;
+            }
+
+            return { value, length: totalLength };
+
+        } catch (err: any) {
             return null;
         }
-        
-        let value: any;
-        if (hexDataType.parse) {
-            value = hexDataType.parse(hexValue);
-        } else {
-            value = hexValue;
-        }
 
-        return { value, length: totalLength };
+    }
 
+    public static encodeLengthForUnlimited(length: number) {
+        return length.toString(15) + "F";
+    }
+
+    public static getLengthFromUnlimited(hexData: string) {
+        const base15Length = this.splitWithTail(hexData.toUpperCase(), "F", 1)[0];
+        return [
+            parseInt(base15Length, 15),
+            base15Length.length + 1
+        ];
     }
 
     public static encodeObjectToHex(object: AnyObj, keys: (DataToHexArguments | null)[], add_empty_bytes: boolean) {
@@ -298,7 +325,7 @@ export default class EncodingUtils {
                 
                 if (data.type === "object" && data.decodeFunc) {
 
-                    const rawObj = hexData.substring(current_length, hexData.length);
+                    const rawObj = hexData.substring(current_length);
                     const object = data.decodeFunc(rawObj, true);
                     final_data[key] = object.data;
                     current_length += object.length;
@@ -307,17 +334,24 @@ export default class EncodingUtils {
         
                     const final_array = [];
 
-                    const lenghValueLen = data.length as number;
-                    
-                    const arrayDataWithLength = hexData.substring(current_length, hexData.length);
-                    const arrayDataHexLength = arrayDataWithLength.substring(0, lenghValueLen)
-                    const length = parseInt(`0x${arrayDataHexLength}`);
-            
+                    const arrayDataWithLength = hexData.substring(current_length);
+
+                    let lenghValueLen: number;
+                    let arrayCount: number;
+
+                    if (data.length) {
+                        lenghValueLen = data.length;
+                        arrayCount = parseInt(arrayDataWithLength.substring(0, lenghValueLen), 16)
+                    } else if (data.lengthBefore === "unlimited") {
+                        [arrayCount, lenghValueLen] = this.getLengthFromUnlimited(arrayDataWithLength);
+                    } else {
+                        return { cb: Callbacks.ERROR };
+                    }
+
                     let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
-        
-                    let total_arrayLength = arrayDataHexLength.length;
+                    let total_arrayLength = lenghValueLen;
                         
-                    for (let i = 0; i < length; i++) {
+                    for (let i = 0; i < arrayCount; i++) {
             
                         const array_item = data.decodeFunc(arrayData, true);
                         final_array.push(array_item.data);
@@ -331,7 +365,7 @@ export default class EncodingUtils {
         
                 } else {
                     
-                    const value = this.getValueFromHex(hexData.substring(current_length, hexData.length), data);
+                    const value = this.getValueFromHex(hexData.substring(current_length), data);
 
                     if (!value) {
                         return { cb: Callbacks.ERROR };

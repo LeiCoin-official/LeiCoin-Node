@@ -18,11 +18,11 @@ const raw_signature = keyPair.sign(messageHash);
 const encodedSignature = encodeSignature(raw_signature);
 
 function encodeSignature(signature) {
-    return signature.r.toString("hex") + signature.s.toString("hex") + signature.recoveryParam.toString(16).padStart(2, "0");
-}
-
-function encodeSignature2(signature) {
-    return signature.r.toString("hex").padStart(64, "0") + signature.s.toString("hex").padStart(64, "0") + signature.recoveryParam.toString(16).padStart(2, "0");
+    return (
+        signature.r.toString("hex").padStart(64, "0") +
+        signature.s.toString("hex").padStart(64, "0") +
+        signature.recoveryParam.toString(16).padStart(2, "0")
+    );
 }
 
 function decodeSignature(signatureHex) {
@@ -48,8 +48,8 @@ function test2(keyPair) {
     const messageHash = crypto.createHash("sha256").update(message).digest();
     const signature = keyPair.sign(messageHash);
     return [
-        signature.r.toString("hex").length,
-        signature.s.toString("hex").length,
+        signature.r.toString("hex").padStart(64, "0").length,
+        signature.s.toString("hex").padStart(64, "0").length,
         signature.recoveryParam.toString(16).padStart(2, "0").length
     ];
 }
@@ -57,7 +57,7 @@ function test2(keyPair) {
 function test3(keyPair, originalAddress) {
     const message = crypto.randomBytes(32);
     const messageHash = crypto.createHash("sha256").update(message).digest();
-    const signature = encodeSignature2(keyPair.sign(messageHash));
+    const signature = encodeSignature(keyPair.sign(messageHash));
     const address = getSenderAddress(messageHash, signature);
     return address === originalAddress;
 }
@@ -122,7 +122,7 @@ async function main2() {
     let max_length2 = [0, 0, 0];
 
     const run1 = (async function() {
-        for (let i = 0; i < 1_000; i++) {
+        for (let i = 1; i < 1_000; i++) {
             const length = test2(keyPair1);
             for (let i2 = 0; i2 < 3; i2++) {
                 average_length[i2] = (lengthAll[i2] + length[i2]) / i;
@@ -134,7 +134,7 @@ async function main2() {
     })();
 
     const run2 = (async function() {
-        for (let i = 0; i < 1_000; i++) {
+        for (let i = 1; i < 1_000; i++) {
             const length2 = test2(keyPair2);
             for (let i2 = 0; i2 < 3; i2++) {
                 average_length2[i2] = (lengthAll2[i2] + length2[i2]) / i;
@@ -158,6 +158,31 @@ async function main2() {
 }
 
 async function main3() {
+
+    const keyPair = ec.keyFromPrivate("0000000000000000000000000000000000000000000000000000000000000001", "hex");
+
+    let lengthAll = [0, 0, 0];
+    let average_length = [0, 0, 0];
+    let min_length = [Infinity, Infinity, Infinity];
+    let max_length = [0, 0, 0];
+
+    for (let i = 1; i < 1_000_000; i++) {
+        const length = test2(keyPair);
+        for (let i2 = 0; i2 < 3; i2++) {
+            average_length[i2] = (lengthAll[i2] + length[i2]) / i;
+            min_length[i2] = (length[i2] < min_length[i2]) ? length[i2] : min_length[i2];
+            max_length[i2] = (length[i2] > max_length[i2]) ? length[i2] : max_length[i2];
+            lengthAll[i2] += length[i2];
+        }
+    }
+
+    console.log("Average 1:", average_length);
+    console.log("Min 1:", min_length);
+    console.log("Max 1:", max_length);
+
+}
+
+async function main4() {
 
     const keyPair = ec.keyFromPrivate("0000000000000000000000000000000000000000000000000000000000000001", "hex");
     const address = "lc0xb3a373ff6d59118736ecbcc2de113504a9c4e1";

@@ -74,7 +74,7 @@ export class Transaction implements TransactionLike {
             {key: "amount", type: "bigintWithLenPrefix"},
             {key: "nonce"},
             {key: "timestamp"},
-            {key: "input", lengthBefore: true},
+            {key: "input", lengthBefore: "unlimited"},
             (forHash ? null : {key: "signature"})
         ], add_empty_bytes);
 
@@ -92,7 +92,7 @@ export class Transaction implements TransactionLike {
                 {key: "amount", type: "bigintWithLenPrefix"},
                 {key: "nonce"},
                 {key: "timestamp"},
-                {key: "input", length: 2, lengthBefore: true},
+                {key: "input", lengthBefore: "unlimited"},
                 {key: "signature"}
             ], returnLength);
 
