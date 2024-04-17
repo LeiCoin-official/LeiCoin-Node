@@ -1,10 +1,11 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
+import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 
 export class Validator {
 
     public readonly address: string;
-    public stake: string;
+    private stake: string;
     public readonly version: string;
 
     constructor(address: string, stake: string, version = "00") {
@@ -12,6 +13,16 @@ export class Validator {
         this.stake = stake;
         this.version = version;
     }
+
+    public getStake() {
+        return this.stake;
+    }
+
+    public addRewardStake(amount: string) {
+        this.stake = BigNum.add(this.stake, amount);
+    }
+
+    public 
 
     public encodeToHex(add_empty_bytes = true) {
     

@@ -2,6 +2,9 @@ import { Level } from "level";
 import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import path from "path";
 import Validator from "../objects/validator.js";
+import Block from "../objects/block.js";
+
+type DB = "active" | "inactive";
 
 export class ValidatorDB {
 
@@ -16,41 +19,53 @@ export class ValidatorDB {
         this.inactiveLevel = new Level(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
-    private async getValidatorInLevel(publicKey: string, level: Level) {
-        const raw_validator_data = await level.get(publicKey);
-        return Validator.fromDecodedHex(publicKey, raw_validator_data);
+    private getLevel(db?: DB) {
+        if (db === "inactive") {
+            return this.inactiveLevel;
+        }
+        return this.level;
     }
 
-    private async setValidatorInLevel(validator: Validator, level: Level) {
+    private async getValidatorInLevel(address: string, db?: DB) {
+        const level = this.getLevel(db);
+        const raw_validator_data = await level.get(address);
+        return Validator.fromDecodedHex(address, raw_validator_data);
+    }
+
+    private async setValidatorInLevel(validator: Validator, db?: DB) {
+        const level = this.getLevel(db);
         await level.put(validator.address, validator.encodeToHex());
     }
 
-    public async addActiveValidator(validator: Validator) {
-        
-    }
     public async addInactiveValidator(validator: Validator) {
 
     }
 
-    public async getActiveValidator(publicKey: string) {
+    public async getActiveValidator(address: string) {
         
     }
-    public async getInactiveValidator(publicKey: string) {
+    public async getInactiveValidator(address: string) {
 
     }
 
-    public async removeActiveValidator(publicKey: string) {
+    public async removeActiveValidator(address: string) {
 
     }
     public async removeInactiveValidator() {
 
     }
 
-    public async transferToInactiveValidator(publicKey: string) {
+    public async transferToInactiveValidator(address: string) {
 
     }
 
     public async getValidator() {
+
+    }
+
+    private async adjustStakeByBlock(block: Block) {
+        
+        const inActive = this.getValidatorInLevel(address, "active");
 
     }
 

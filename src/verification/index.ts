@@ -162,18 +162,16 @@ export class Verification {
         if (!proposition) return 12501;
         if (validatorsCommittee.isCurrentProposer(proposition.proposer)) return 12541;
         if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return 12508;
-        if (!await Verification.verifySignature(proposition.calculateHash(), proposition.proposer, proposition.signature)) return 12506;
 
         return 12000;
 
     }
 
-    public static async verifyBlockAttestation(attestation: AttestationSendData | null) {
+    public static async verifyBlockAttestation(attestation: Attestation | null) {
 
         if (!attestation) return 12501;
-        if (validatorsCommittee.isCurrentAttester(attestation.publicKey)) return 12551;
-        if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return 12508;
-        if (!await Verification.verifySignature(attestation.calculateHash(), attestation.publicKey, attestation.signature)) return 12506;
+        if (validatorsCommittee.isCurrentAttester(attestation.attester)) return 12551;
+        if (attestation.nonce !== validatorsCommittee.getMember(attestation.attester)?.nonce) return 12508;
 
         return 12000;
 

@@ -68,7 +68,7 @@ async function asyncMain() {
 
     const startTime = startTimer();
 
-    for (let i = 0; i < 1_000_0; i++) {
+    for (let i = 0; i < 1_000; i++) {
         promises.push(gen());
     }
 
@@ -83,7 +83,7 @@ async function syncMain() {
 
     const startTime = startTimer();
 
-    for (let i = 0; i < 1_000_0; i++) {
+    for (let i = 0; i < 1_000; i++) {
         await gen();
     }
 
@@ -199,7 +199,7 @@ async function main4() {
 
 async function run() {
 
-    await asyncMain();
+    //await asyncMain();
 
     await syncMain();
 
