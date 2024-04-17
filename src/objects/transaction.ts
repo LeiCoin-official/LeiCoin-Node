@@ -5,7 +5,8 @@ import utils from "../utils/index.js";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
 import BigNum from "../utils/bigNum.js";
-import Address from "./address.js";
+import { AddressHex } from "./address.js";
+import DataUtils from "../utils/dataUtils.js";
 
 export interface TransactionLike {
 
@@ -49,7 +50,7 @@ export class Transaction implements TransactionLike {
 
         const coinbase = new Transaction(
             "",
-            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
+            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4",
             config.staker.address,
             utils.mining_pow,
             "0",
@@ -101,11 +102,11 @@ export class Transaction implements TransactionLike {
             if (data && data.version === "00") {
 
                 data.senderAddress = "";
-                const instance = utils.createInstanceFromJSON(Transaction, data);
+                const instance = DataUtils.createInstanceFromJSON(Transaction, data);
 
                 if (withSenderAddress) {
                     const hash = EncodingUtils.hexToBuffer(data.txid);
-                    instance.senderAddress = Address.fromSignature(hash, data.signature);
+                    instance.senderAddress = AddressHex.fromSignature(hash, data.signature);
                 }
 
                 if (returnLength) {

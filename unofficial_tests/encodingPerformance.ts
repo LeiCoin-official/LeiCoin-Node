@@ -231,7 +231,7 @@ class EncodingUtils {
                 
                 if (data.type === "object" && data.decodeFunc) {
 
-                    const rawObj = hexData.substring(current_length, hexData.length);
+                    const rawObj = hexData.slice(current_length, hexData.length);
                     const object = data.decodeFunc(rawObj, true);
                     final_data[key] = object;
                     current_length += object.length;
@@ -245,10 +245,10 @@ class EncodingUtils {
                     const lenghValueLen = data.length as number;
         
                     
-                    const arrayDataWithLength = hexData.substring(current_length, hexData.length);
-                    const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
+                    const arrayDataWithLength = hexData.slice(current_length, hexData.length);
+                    const length = parseInt(arrayDataWithLength.slice(0, lenghValueLen));
             
-                    let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
+                    let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
         
                     total_arrayLength = arrayDataWithLength[0].length + 1;
                         
@@ -258,7 +258,7 @@ class EncodingUtils {
             
                         final_array.push(array_item.data);
                             
-                        arrayData = arrayData.substring(array_item.length);
+                        arrayData = arrayData.slice(array_item.length);
         
                         total_arrayLength += array_item.length;
         
@@ -279,7 +279,7 @@ class EncodingUtils {
                         length = data.length;
                     }
                     
-                    let value = hexData.substring(current_length, current_length + length);
+                    let value = hexData.slice(current_length, current_length + length);
                     if (value.length !== length) {
                         return { cb: Callbacks.NONE };
                     }

@@ -1,16 +1,16 @@
 import mempool from "../../storage/mempool.js";
 import Transaction from "../../objects/transaction.js";
 import cli from "../../utils/cli.js";
-import utils from "../../utils/index.js";
 import Verification from "../../verification/index.js"
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
+import DataUtils from "../../utils/dataUtils.js";
 
 export default class TransactionPipeline {
 
     public static async receive(type: LeiCoinNetDataPackageType, data: string) {
 
-        const transaction = utils.createInstanceFromJSON(Transaction, data);
+        const transaction = DataUtils.createInstanceFromJSON(Transaction, data);
     
         if (!(transaction.txid in mempool.transactions)) {
     

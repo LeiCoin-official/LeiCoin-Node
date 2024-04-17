@@ -74,7 +74,7 @@ async function test2(db = "stake1", seedHash = sha256(crypto.randomBytes(32).toS
 
             while (selected_validators.length !== 128) {
 
-                const keyIteratorOptions = (parseInt(nextHash.substring(0, 1), 16) % 2 === 0) ? {gte: nextHash, limit: 1} : {lte: nextHash, limit: 1, reverse: true};
+                const keyIteratorOptions = (parseInt(nextHash.slice(0, 1), 16) % 2 === 0) ? {gte: nextHash, limit: 1} : {lte: nextHash, limit: 1, reverse: true};
 
                 let winner = (await level.keys(keyIteratorOptions).all())[0];
                 if (!selected_validators.includes(winner)) {

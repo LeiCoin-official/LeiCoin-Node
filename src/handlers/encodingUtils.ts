@@ -1,9 +1,7 @@
 import { Callbacks } from "../utils/callbacks.js";
 import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
-import Address from "../objects/address.js";
 import { AnyObj, Dict } from "../utils/objects.js";
 import BigNum from "../utils/bigNum.js";
-import { parse } from "path";
 
 type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object" | "bigintWithLenPrefix";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
@@ -115,10 +113,10 @@ export default class EncodingUtils {
     
     public static decodeSignature(hexData: string): LeiCoinSignature {
         return {
-            signerType: hexData.substring(0, 2),
-            r: hexData.substring(2, 66),
-            s: hexData.substring(66, 130),
-            recoveryParam: parseInt(hexData.substring(130, 132), 16)
+            signerType: hexData.slice(0, 2),
+            r: hexData.slice(2, 66),
+            s: hexData.slice(66, 130),
+            recoveryParam: parseInt(hexData.slice(130, 132), 16)
         };
     }
 
@@ -142,7 +140,7 @@ export default class EncodingUtils {
     }
 
     private static hexDataAdvancedTypes: HexDataTypes = {
-        address: { defaultLength: 42, encode: Address.encodeToHex, parse: Address.fromDecodedHex },
+        address: { defaultLength: 42 },
         signature: { defaultLength: 132 },
         hash: { defaultLength: 64 },
         nonce: this.hexDataTemplateTypes.bigintWithLenPrefix,
@@ -228,13 +226,13 @@ export default class EncodingUtils {
                     [ length, tmpLength ] = this.getLengthFromUnlimited(hexDataSubstring);
                     totalLength = tmpLength;
                 } else {
-                    length = parseInt(hexDataSubstring.substring(0, tmpLength), 16);
+                    length = parseInt(hexDataSubstring.slice(0, tmpLength), 16);
                 }
                 totalLength += length;
-                hexDataSubstring = hexDataSubstring.substring(tmpLength);
+                hexDataSubstring = hexDataSubstring.slice(tmpLength);
             }
             
-            let hexValue = hexDataSubstring.substring(0, 0 + length);
+            let hexValue = hexDataSubstring.slice(0, 0 + length);
             if (hexValue.length !== length) {
                 return null;
             }
@@ -325,7 +323,7 @@ export default class EncodingUtils {
                 
                 if (data.type === "object" && data.decodeFunc) {
 
-                    const rawObj = hexData.substring(current_length);
+                    const rawObj = hexData.slice(current_length);
                     const object = data.decodeFunc(rawObj, true);
                     final_data[key] = object.data;
                     current_length += object.length;
@@ -334,28 +332,28 @@ export default class EncodingUtils {
         
                     const final_array = [];
 
-                    const arrayDataWithLength = hexData.substring(current_length);
+                    const arrayDataWithLength = hexData.slice(current_length);
 
                     let lenghValueLen: number;
                     let arrayCount: number;
 
                     if (data.length) {
                         lenghValueLen = data.length;
-                        arrayCount = parseInt(arrayDataWithLength.substring(0, lenghValueLen), 16)
+                        arrayCount = parseInt(arrayDataWithLength.slice(0, lenghValueLen), 16)
                     } else if (data.lengthBefore === "unlimited") {
                         [arrayCount, lenghValueLen] = this.getLengthFromUnlimited(arrayDataWithLength);
                     } else {
                         return { cb: Callbacks.ERROR };
                     }
 
-                    let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
+                    let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
                     let total_arrayLength = lenghValueLen;
                         
                     for (let i = 0; i < arrayCount; i++) {
             
                         const array_item = data.decodeFunc(arrayData, true);
                         final_array.push(array_item.data);
-                        arrayData = arrayData.substring(array_item.length);
+                        arrayData = arrayData.slice(array_item.length);
                         total_arrayLength += array_item.length;
         
                     }
@@ -365,7 +363,7 @@ export default class EncodingUtils {
         
                 } else {
                     
-                    const value = this.getValueFromHex(hexData.substring(current_length), data);
+                    const value = this.getValueFromHex(hexData.slice(current_length), data);
 
                     if (!value) {
                         return { cb: Callbacks.ERROR };

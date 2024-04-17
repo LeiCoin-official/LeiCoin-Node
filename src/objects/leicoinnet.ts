@@ -61,8 +61,8 @@ export class LeiCoinNetDataPackage {
 
     public static extract(data: Buffer): LeiCoinNetDataPackageLike {
         const decoded = EncodingUtils.bufferToHex(data);
-        const type = decoded.substring(0, 4) as LeiCoinNetDataPackageType;
-        const content = decoded.substring(4, decoded.length);
+        const type = decoded.slice(0, 4) as LeiCoinNetDataPackageType;
+        const content = decoded.slice(4, decoded.length);
 
         return { type, content };
     }

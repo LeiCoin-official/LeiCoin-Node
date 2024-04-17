@@ -1,4 +1,3 @@
-import utils from "../utils/index.js";
 import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
 import blockchain from "../storage/blockchain.js";
@@ -8,6 +7,7 @@ import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
+import DataUtils from "../utils/dataUtils.js";
 
 export interface BlockLike {
     readonly index: string;
@@ -120,7 +120,7 @@ export class Block implements BlockLike {
             const data = returnData.data;
         
             if (data && data.version === "00") {
-                const block = utils.createInstanceFromJSON(Block, data);
+                const block = DataUtils.createInstanceFromJSON(Block, data);
 
                 if (returnLength) {
                     return {data: block, length: returnData.length};

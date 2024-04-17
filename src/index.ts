@@ -1,7 +1,7 @@
 async function main() {
 
     await import("./utils/index.js");
-    const a = await (await import("./utils/cli.js")).default.setup();
+    await (await import("./utils/cli.js")).default.setup();
 
     await import("./handlers/configHandler.js");
     await import("./storage/blockchain.js");

@@ -14,7 +14,7 @@ function createHackSignature(signature) {
 }
 
 function decodeSignature(hexData) {
-    return { r: hexData.substring(0, 64), s: hexData.substring(64, 128), recoveryParam: parseInt(hexData.substring(128, 130), 16)};
+    return { r: hexData.slice(0, 64), s: hexData.slice(64, 128), recoveryParam: parseInt(hexData.slice(128, 130), 16)};
 }
 
 const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa";
@@ -23,7 +23,7 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 const keyPair = ec.keyFromPrivate(privateKeyHex, "hex");
 const publicKeyHex = keyPair.getPublic("hex");
 
-const address = "lc0x" + crypto.createHash("sha256").update(publicKeyHex).digest("hex").substring(0, 40);
+const address = "lc0x" + crypto.createHash("sha256").update(publicKeyHex).digest("hex").slice(0, 40);
 
 // console.log("Public Key:", publicKeyHex, publicKeyHex.length);
 // console.log("Private Key:", privateKeyHex, privateKeyHex.length);
@@ -52,7 +52,7 @@ const recoverPubKey = ec.recoverPubKey(messageHash, decoded_signature, decoded_s
 
 const recoverPubKeyHex = recoverPubKey.encode('hex');
 
-const recoverAddress = "lc0x" + crypto.createHash("sha256").update(recoverPubKeyHex).digest("hex").substring(0, 40);
+const recoverAddress = "lc0x" + crypto.createHash("sha256").update(recoverPubKeyHex).digest("hex").slice(0, 40);
 
 //const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
 

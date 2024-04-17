@@ -5,6 +5,7 @@ import fs from "fs";
 import { dirname } from "path";
 import utils from "./index.js";
 import { Dict } from "./objects.js";
+import DataUtils from "./dataUtils.js";
 
 interface LogMessageLike {
     info(message: string): void;
@@ -98,8 +99,8 @@ class CLI {
 
     private constructor() {
         // Generate a timestamp for the log file name
-        const current_timestamp = utils.getCurrentTimestamp();
-        const logFilePath = utils.processRootDirectory + `/logs/log-${current_timestamp}.log`;
+        const current_time = DataUtils.getCurrentLogTime();
+        const logFilePath = utils.processRootDirectory + `/logs/log-${current_time}.log`;
 
         const logFilePathdir = dirname(logFilePath);
         if (!fs.existsSync(logFilePathdir)) {

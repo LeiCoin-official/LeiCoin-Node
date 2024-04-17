@@ -1,9 +1,8 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
-import utils from "../utils/index.js";
-import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
-import Address from "./address.js";
+import { AddressHex } from "./address.js";
+import DataUtils from "../utils/dataUtils.js";
 
 export interface AttestationLike {
     attester: string;
@@ -62,11 +61,11 @@ export class Attestation implements AttestationLike {
             if (data && data.version === "00") {
 
                 data.attester = "";
-                const instance = utils.createInstanceFromJSON(Attestation, data);
+                const instance = DataUtils.createInstanceFromJSON(Attestation, data);
 
                 if (withAttesterAddress) {
                     const hash = Crypto.sha256(instance.encodeToHex(false, true), [], "buffer");
-                    instance.attester = Address.fromSignature(hash, data.signature);
+                    instance.attester = AddressHex.fromSignature(hash, data.signature);
                 }
 
                 return instance;

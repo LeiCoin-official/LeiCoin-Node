@@ -1,17 +1,17 @@
 import mempool from "../../storage/mempool.js";
 import cli from "../../utils/cli.js";
-import utils from "../../utils/index.js";
 import Verification from "../../verification/index.js"
 import blockchain from "../../storage/blockchain.js";
 import Block from "../../objects/block.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
+import DataUtils from "../../utils/dataUtils.js";
 
 export default class BlockPipeline {
 
     public static async receive(type: LeiCoinNetDataPackageType, data: string) {
         
-        const block = utils.createInstanceFromJSON(Block, data);
+        const block = DataUtils.createInstanceFromJSON(Block, data);
 
         if (!blockchain.chainstate.isBlockChainStateMatching(block).valid) {
     

@@ -21,7 +21,7 @@ describe('encoding_testing', () => {
     test('attestation_enoding_and_decoding', () => {
 
         const attestation = new Attestation(
-            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
+            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4",
             "0000000000000000000000000000000000000000000000000000000000000000",
             true,
             "1",
@@ -36,7 +36,7 @@ describe('encoding_testing', () => {
     test('proposition_enoding_and_decoding', () => {
 
         const proposition = new Proposition(
-            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41",
+            "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4",
             "1",
             "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
             Block.createNewBlock()
@@ -58,7 +58,7 @@ describe('encoding_testing', () => {
     });
     test('validator_enoding_and_decoding', () => {
 
-        const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41";
+        const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4";
 
         const validator = new Validator(
             address,
@@ -73,7 +73,7 @@ describe('encoding_testing', () => {
     });
     test('wallet_enoding_and_decoding', () => {
 
-        const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41";
+        const address = "lc0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4";
         
         const wallet = new Wallet(
             address,

@@ -9,7 +9,7 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 
 const keyPair = ec.keyFromPrivate(privateKeyHex, 'hex');
 const publicKeyHex = keyPair.getPublic("hex");
-const address = `lc0x${crypto.createHash("sha256").update(publicKeyHex).digest("hex").substring(0, 40)}`;
+const address = `lc0x${crypto.createHash("sha256").update(publicKeyHex).digest("hex").slice(0, 40)}`;
 
 const message = "Hello, world!";
 const messageHash = crypto.createHash("sha256").update(message).digest();
@@ -26,14 +26,14 @@ function encodeSignature(signature) {
 }
 
 function decodeSignature(signatureHex) {
-    return { r: signatureHex.substring(0, 64), s: signatureHex.substring(64, 128), recoveryParam: parseInt(signatureHex.substring(128, 130), 16)};
+    return { r: signatureHex.slice(0, 64), s: signatureHex.slice(64, 128), recoveryParam: parseInt(signatureHex.slice(128, 130), 16)};
 }
 
 function getSenderAddress(data, signatureHex) {
     try {
         const signature = decodeSignature(signatureHex);
         const publicKey = ec.recoverPubKey(data, signature, signature.recoveryParam).encode('hex');
-        return `lc0x${crypto.createHash("sha256").update(publicKey).digest("hex").substring(0, 40)}`;
+        return `lc0x${crypto.createHash("sha256").update(publicKey).digest("hex").slice(0, 40)}`;
     } catch (error) {
         return;
     }

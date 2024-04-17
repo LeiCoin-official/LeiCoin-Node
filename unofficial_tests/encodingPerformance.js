@@ -176,7 +176,7 @@ class EncodingUtils {
             for (const data of values) {
                 const key = data.key;
                 if (data.type === "object" && data.decodeFunc) {
-                    const rawObj = hexData.substring(current_length, hexData.length);
+                    const rawObj = hexData.slice(current_length, hexData.length);
                     const object = data.decodeFunc(rawObj, true);
                     final_data[key] = object;
                     current_length += object.length;
@@ -185,14 +185,14 @@ class EncodingUtils {
                     const final_array = [];
                     let total_arrayLength = 0;
                     const lenghValueLen = data.length;
-                    const arrayDataWithLength = hexData.substring(current_length, hexData.length);
-                    const length = parseInt(arrayDataWithLength.substring(0, lenghValueLen));
-                    let arrayData = arrayDataWithLength.substring(lenghValueLen, arrayDataWithLength.length);
+                    const arrayDataWithLength = hexData.slice(current_length, hexData.length);
+                    const length = parseInt(arrayDataWithLength.slice(0, lenghValueLen));
+                    let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
                     total_arrayLength = arrayDataWithLength[0].length + 1;
                     for (let i = 0; i < length; i++) {
                         const array_item = data.decodeFunc(arrayData, true);
                         final_array.push(array_item.data);
-                        arrayData = arrayData.substring(array_item.length);
+                        arrayData = arrayData.slice(array_item.length);
                         total_arrayLength += array_item.length;
                     }
                     current_length += total_arrayLength;
@@ -207,7 +207,7 @@ class EncodingUtils {
                     else {
                         length = data.length;
                     }
-                    let value = hexData.substring(current_length, current_length + length);
+                    let value = hexData.slice(current_length, current_length + length);
                     if (value.length !== length) {
                         return { cb: Callbacks.NONE };
                     }

@@ -14,7 +14,7 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 const privateKey = Buffer.from(privateKeyHex.slice(0, 64), "hex");
 
 const publicKeyHex = Buffer.from(ec.getPublicKey(privateKey, false)).toString("hex");
-const address = `lc1${crypto.createHash("sha256").update(publicKeyHex).digest("hex").substring(0, 40)}`;
+const address = `lc1${crypto.createHash("sha256").update(publicKeyHex).digest("hex").slice(0, 40)}`;
 const message = "Hello, world!";
 const messageHash = crypto.createHash("sha256").update(message).digest();
 const signature = (await ec.signAsync(messageHash, privateKey, {lowS: false})).normalizeS();
@@ -31,20 +31,20 @@ function encodeSignature(signature) {
 
 function decodeSignature(hexData) {
     /*return {
-        r: hexData.substring(0, 64),
-        s: hexData.substring(64, 128),
-        recovery: parseInt(hexData.substring(128, 130), 16)
+        r: hexData.slice(0, 64),
+        s: hexData.slice(64, 128),
+        recovery: parseInt(hexData.slice(128, 130), 16)
     };*/
     return new ec.Signature(
-        BigInt(`0x${hexData.substring(0, 64)}`),
-        BigInt(`0x${hexData.substring(64, 128)}`),
-        parseInt(hexData.substring(128, 130))
+        BigInt(`0x${hexData.slice(0, 64)}`),
+        BigInt(`0x${hexData.slice(64, 128)}`),
+        parseInt(hexData.slice(128, 130))
     )
 }
 
 async function getSenderAddress(data, signatureHex) {
     const publicKey = decodeSignature(signatureHex).recoverPublicKey(data).toHex(false);
-    return `lc1${crypto.createHash("sha256").update(publicKey).digest("hex").substring(0, 40)}`;;
+    return `lc1${crypto.createHash("sha256").update(publicKey).digest("hex").slice(0, 40)}`;;
 }
 
 async function gen() {

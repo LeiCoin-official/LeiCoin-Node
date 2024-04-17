@@ -12,7 +12,7 @@ function hexToAddress32(hexString) {
         address32 = leiCoinAddress32Chars[Number(decimalValue % 32n)] + address32;
         decimalValue = decimalValue / 32n;
     }
-    return address32.substring(1);
+    return address32.slice(1);
 }
 
 function address32ToHex(address32) {
@@ -21,7 +21,7 @@ function address32ToHex(address32) {
     for (let i = 0; i < address32.length; i++) {
         decimalValue = (decimalValue * 32n) + BigInt(leiCoinAddress32Chars.indexOf(address32[i]));
     }
-    return decimalValue.toString(16).substring(1);
+    return decimalValue.toString(16).slice(1);
 }
 
 function test1() {

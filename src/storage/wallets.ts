@@ -7,7 +7,7 @@ import EncodingUtils from "../handlers/encodingUtils.js";
 import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
-import Address from "../objects/address.js";
+import { AddressHex } from "../objects/address.js";
 
 export class WalletDB {
 
@@ -21,20 +21,17 @@ export class WalletDB {
     }
 
     public async getWallet(address: string) {
-        const encodeAddress = Address.encodeToHex(address);
-        const raw_wallet = await this.level.get(encodeAddress);
+        const raw_wallet = await this.level.get(address);
         return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
     }
 
     public async setWallet(wallet: Wallet) {
-        const encodeAddress = Address.encodeToHex(wallet.owner);
         const encodedWallet = wallet.encodeToHex();
-        await this.level.put(encodeAddress, encodedWallet);
+        await this.level.put(wallet.owner, encodedWallet);
     }
 
     public async existsWallet(address: string): Promise<boolean> {
-        const encodeAddress = Address.encodeToHex(address);
-        const raw_wallet = await this.level.get(encodeAddress);
+        const raw_wallet = await this.level.get(address);
         return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
     }
 

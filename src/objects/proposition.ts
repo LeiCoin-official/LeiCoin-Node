@@ -1,9 +1,9 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
-import utils from "../utils/index.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
-import Address from "./address.js";
+import { AddressHex } from "./address.js";
+import DataUtils from "../utils/dataUtils.js";
 
 export interface PropositionLike {
     proposer: string;
@@ -57,11 +57,11 @@ export class Proposition implements PropositionLike {
             if (data && data.version === "00") {
 
                 data.proposer = "";
-                const instance = utils.createInstanceFromJSON(Proposition, data);
+                const instance = DataUtils.createInstanceFromJSON(Proposition, data);
 
                 if (withProposerAddress) {
                     const hash = Crypto.sha256(instance.encodeToHex(false, true), [], "buffer");
-                    instance.proposer = Address.fromSignature(hash, data.signature);
+                    instance.proposer = AddressHex.fromSignature(hash, data.signature);
                 }
 
                 return instance;
