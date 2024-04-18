@@ -18,6 +18,7 @@
 		"caslb": "node scripts/build && node build/bin/leicoin-node.cjs",
 
 		"build": "node scripts/build",
+		"wep-build": "node scripts/build/withEntryPoint",
 		"start": "node leicoin-node.cjs"
 	},
 	"repository": {
