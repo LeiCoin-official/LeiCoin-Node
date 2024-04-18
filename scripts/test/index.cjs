@@ -1,7 +1,9 @@
+/** @type {import('jest').Config} */
 module.exports = {
+    rootDir: "../",
     transform: {'^.+\\.ts?$': 'ts-jest'},
     testEnvironment: 'node',
-    testRegex: '/tests/.*\\.(test|spec)?\\.(ts|tsx)$',
+    testRegex: './tests/.*\\.(test|spec)?\\.(ts|tsx)$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     transform: {
         '\\.[jt]sx?$': [
@@ -18,5 +20,5 @@ module.exports = {
         '(.+)\\.js': '$1'
     },
     extensionsToTreatAsEsm: ['.ts'],
-    setupFiles: ['./tests/setupTestEnv.cjs'],
+    setupFiles: ['./scripts/test/setupTestEnv.cjs'],
 };

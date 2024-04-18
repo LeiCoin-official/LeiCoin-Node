@@ -1,6 +1,6 @@
 import * as esbuild from 'esbuild';
-import fs from 'fs';
-const { dependencies } = JSON.parse(fs.readFileSync("./package.json"));
+//import fs from 'fs';
+//const { dependencies } = JSON.parse(fs.readFileSync("./package.json"));
 
 await esbuild.build({
     entryPoints: ['src/index.ts'],

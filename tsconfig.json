@@ -110,9 +110,7 @@
     "unofficial_tests/**/*",
     "localtests/**/*",
     "scripts/**/*",
-    "tests/**/*",
-    "jest.config.cjs",
-    "jest.config.mjs"
+    "tests/**/*"
   ],
   "ts-node": {
     "esm": true,
