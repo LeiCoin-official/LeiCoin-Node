@@ -12,9 +12,9 @@
         },
         {
             "type": "node-terminal",
-            "name": "CASLB",
+            "name": "Debug",
             "request": "launch",
-            "command": "npm run caslb",
+            "command": "npm run debug",
             "cwd": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"
@@ -22,9 +22,9 @@
         },
         {
             "type": "node-terminal",
-            "name": "SLB",
+            "name": "Debug new Build",
             "request": "launch",
-            "command": "npm run slb",
+            "command": "npm run debug:newbuild",
             "cwd": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"

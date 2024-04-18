@@ -14,11 +14,12 @@
 		"setup": "node scripts/setup",
 
 		"test": "npx jest --config=scripts/test",
-		"slb": "node build/bin/leicoin-node.cjs",
-		"caslb": "node scripts/build && node build/bin/leicoin-node.cjs",
+		"debug": "node build/bin/leicoin-node.cjs",
+		"debug:newbuild": "node scripts/build && node build/bin/leicoin-node.cjs",
 
 		"build": "node scripts/build",
-		"wep-build": "node scripts/build/withEntryPoint",
+		"release": "node scripts/build/withEntryPoint",
+
 		"start": "node leicoin-node.cjs"
 	},
 	"repository": {
