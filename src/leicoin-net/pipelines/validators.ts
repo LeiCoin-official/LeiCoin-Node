@@ -1,4 +1,4 @@
-import { AttestationSendData } from "../../objects/attestation.js";
+import Attestation from "../../objects/attestation.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
 import validatorsCommittee from "../../validators/committee.js";
 import Proposition from "../../objects/proposition.js";
@@ -21,10 +21,10 @@ export default class ValidatorPipeline {
 
     private static async receiveAttestation(type: LeiCoinNetDataPackageType, data: string) {
 
-        const attestation = AttestationSendData.fromDecodedHex(data);
+        const attestation = Attestation.fromDecodedHex(data);
 
         if (!attestation) return;
-        if (attestation.nonce !== validatorsCommittee.getMember(attestation.publicKey)?.nonce) return;
+        if (attestation.nonce !== validatorsCommittee.getMember(attestation.attester)?.nonce) return;
 
         ProposerJob.processAttestation(attestation);
 

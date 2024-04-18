@@ -5,13 +5,18 @@
 	"exports": "./src/index.ts",
 	"type": "module",
 	"scripts": {
+		"old-caslb": "npx tsc && cd build && node src/index.js",
+		"old-slb": "cd build && node src/index.js",
+		"old-dev": "npx ts-node --esm src/index.ts",
+		"old-build": "npx tsc",
+		"old-start": "node src/index.js",
+
 		"setup-dev-env": "node scripts/setup-dev-env.mjs",
 		"test": "npx jest",
-		"caslb": "npx tsc && cd build && node src/index.js",
-		"slb": "cd build && node src/index.js",
-		"dev": "npx ts-node --esm src/index.ts",
-		"build": "npx tsc",
-		"start": "node src/index.js"
+		"caslb": "node esbuild.config.mjs && node build/bin/leicoin-node.cjs",
+		"slb": "node build/bin/leicoin-node.cjs",
+		"build": "node esbuild.config.mjs",
+		"start": "node leicoin-node.cjs"
 	},
 	"repository": {
 		"type": "git",
@@ -34,6 +39,7 @@
 		"cors": "^2.8.5",
 		"dotenv": "^16.3.1",
 		"elliptic": "^6.5.5",
+		"esbuild": "^0.20.2",
 		"express": "^4.18.2",
 		"level": "^8.0.1",
 		"ws": "^8.14.2"

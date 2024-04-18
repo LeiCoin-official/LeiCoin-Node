@@ -111,7 +111,8 @@
     "localtests/**/*",
     "scripts/**/*",
     "tests/**/*",
-    "jest.config.cjs"
+    "jest.config.cjs",
+    "jest.config.mjs"
   ],
   "ts-node": {
     "esm": true,
