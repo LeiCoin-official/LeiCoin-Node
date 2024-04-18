@@ -1,6 +1,7 @@
 import { endTimer, startTimer } from "./testUtils.js";
+import { sha256 } from "./cryptoUtils.js"
 
-async function binary() {
+async function testbinaryMath1() {
 
     let myNum = Buffer.from(Math.floor(Math.random() * 1_000_000).toString(16), "hex");
 
@@ -20,7 +21,7 @@ async function binary() {
 
 }
 
-async function normal() {
+async function testbinaryMath2() {
 
     let myNum = Math.floor(Math.random() * 1_000_000);
 
@@ -38,10 +39,9 @@ async function normal() {
 
 }
 
-(async function (){
 
+async function testbinaryMath() {
     binary();
     normal();
-
-})();
+}
 
