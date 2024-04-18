@@ -30,7 +30,6 @@ interface ENVConfigInterface extends Dict<any> {}
 interface ConfigInterface extends DefaultConfigInterface, ENVConfigInterface {
     peers: string[];
 }
-  
 
 class Config {
 
