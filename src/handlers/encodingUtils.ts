@@ -105,8 +105,8 @@ export default class EncodingUtils {
     public static encodeSignature(signerType = "00", signature: LeiCoinBinarySignature) {
         return (
             signerType +
-            signature.r.toString("hex").padStart(64, "0") +
-            signature.s.toString("hex").padStart(64, "0") +
+            signature.r.toString("hex", 64) +
+            signature.s.toString("hex", 64) +
             signature.recoveryParam.toString(16).padStart(2, "0")
         );
     }

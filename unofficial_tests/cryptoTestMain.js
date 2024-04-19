@@ -19,8 +19,8 @@ const encodedSignature = encodeSignature(raw_signature);
 
 function encodeSignature(signature) {
     return (
-        signature.r.toString("hex").padStart(64, "0") +
-        signature.s.toString("hex").padStart(64, "0") +
+        signature.r.toString("hex", 64) +
+        signature.s.toString("hex", 64) +
         signature.recoveryParam.toString(16).padStart(2, "0")
     );
 }
@@ -208,7 +208,7 @@ async function run() {
 };
 
 //main();
-run();
+//run();
 
-//main3();
+main3();
 

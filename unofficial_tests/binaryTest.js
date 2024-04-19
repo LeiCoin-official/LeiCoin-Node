@@ -1,5 +1,6 @@
 import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
+import BN from "bn.js"
 
 async function testbinaryMath1() {
 
@@ -45,3 +46,9 @@ async function testbinaryMath() {
     normal();
 }
 
+//console.log(sha256(new BN("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex").toBuffer()));
+//console.log(sha256(Buffer.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex")));
+
+console.log(new BN("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex").toString());
+
+console.log(new Uint8Array([0x10, 0x10]))

@@ -1,4 +1,3 @@
-
 export class Bytes32 extends Buffer {
 
     static hasCorrectByteLength(buffer: Buffer) {
