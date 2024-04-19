@@ -46,9 +46,21 @@ async function testbinaryMath() {
     normal();
 }
 
+class Bytes32 extends Uint8Array {
+
+    constructor() {
+
+    }
+
+}
+
 //console.log(sha256(new BN("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex").toBuffer()));
 //console.log(sha256(Buffer.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex")));
 
 console.log(new BN("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex").toString());
 
 console.log(new Uint8Array([0x10, 0x10]))
+
+const array = new Uint8Array(4);
+array.set([0x11, 0x11], 1)
+console.log(array)

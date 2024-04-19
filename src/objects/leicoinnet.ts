@@ -35,27 +35,41 @@ interface LeiCoinNetDataPackageContentContructor {
 export class LeiCoinNetDataPackage {
 
     public static create(type: LeiCoinNetDataPackageType, hexData: string): Buffer;
-    public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content: T): Buffer;
     public static create<T extends LeiCoinNetDataPackageContentObject>(content: T): Buffer;
-    public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content?: T, hexData?: string) {
+    public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content: T): Buffer;
+    public static create<T extends LeiCoinNetDataPackageContentObject>(typeORcontent: T | string, contentORhexData?: T | string) {
 
-        if (content) {
+        let type: string;
 
-            if (!type) {
-                var type = LeiCoinNetDataPackageType.MESSAGE;
-
+        switch (typeof typeORcontent) {
+            case "string": {
+                // is type
+                type = typeORcontent;
+                break;
+            }
+            case "object": {
+                // is content T
+                type = LeiCoinNetDataPackageType.MESSAGE;
                 for (const objType of objectTypesTransaltionIndex) {
-                    if (content instanceof objType[0]) {
+                    if (typeORcontent instanceof objType[0]) {
                         type = objType[1];
+                        break;
                     }
                 }
+                return EncodingUtils.hexToBuffer(type + typeORcontent.encodeToHex(true));
             }
-
-            return EncodingUtils.hexToBuffer(type + content.encodeToHex(true));
-        } else if (hexData) {
-            return EncodingUtils.hexToBuffer(type + hexData);
         }
 
+        switch (typeof contentORhexData) {
+            case "string": {
+                // is hexData
+                return EncodingUtils.hexToBuffer(type + contentORhexData);
+            }
+            case "object": {
+                // is content T
+                return EncodingUtils.hexToBuffer(type + contentORhexData.encodeToHex(true));
+            }
+        }
 
     }
 
