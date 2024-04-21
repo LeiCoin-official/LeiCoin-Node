@@ -4,6 +4,7 @@ import Block from "../src/objects/block.js";
 import Attestation from "../src/objects/attestation.js";
 import Proposition from "../src/objects/proposition.js";
 import Validator from "../src/objects/validator.js";
+import fs from "fs";
 
 describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
@@ -18,6 +19,19 @@ describe('encoding_testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(block));
     });
+    /*test('block_enoding_and_decoding_with_file', () => {
+
+        const block = Block.createNewBlock();
+
+        const location = "./blockchain_data/tests/blocks/0.lcb";
+        
+        fs.writeFileSync(location, block.encodeToHex(), {encoding: "hex"});
+        const decoded = Block.fromDecodedHex(fs.readFileSync(location, "hex"));
+
+        fs.writeFileSync("./blockchain_data/tests/blocks/0.json", JSON.stringify(block));
+
+        expect(JSON.stringify(decoded)).toBe(JSON.stringify(block));
+    });*/
     test('attestation_enoding_and_decoding', () => {
 
         const attestation = new Attestation(

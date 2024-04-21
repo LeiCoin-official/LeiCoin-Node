@@ -13,7 +13,7 @@
 
 		"setup": "node scripts/setup",
 
-		"test": "npx jest --config=scripts/test",
+		"test": "npx jest --config=scripts/test/index.cjs",
 		"debug": "node build/bin/leicoin-node.cjs",
 		"debug:newbuild": "node scripts/build && node build/bin/leicoin-node.cjs",
 

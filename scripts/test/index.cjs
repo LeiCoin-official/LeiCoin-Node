@@ -1,6 +1,6 @@
 /** @type {import('jest').Config} */
 module.exports = {
-    rootDir: "../",
+    rootDir: "../../",
     transform: {'^.+\\.ts?$': 'ts-jest'},
     testEnvironment: 'node',
     testRegex: './tests/.*\\.(test|spec)?\\.(ts|tsx)$',
