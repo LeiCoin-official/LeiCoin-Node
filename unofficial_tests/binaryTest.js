@@ -181,4 +181,6 @@ async function testMain() {
     test2_2();
 }
 
-testMain();
+//testMain();
+
+console.log(Buffer.from("01", "hex"));

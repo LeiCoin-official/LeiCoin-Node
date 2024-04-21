@@ -9,27 +9,16 @@ import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
 import DataUtils from "../utils/dataUtils.js";
 
-export interface BlockLike {
-    readonly index: string;
-    hash: string;
-    readonly previousHash: string;
-    readonly timestamp: string;
-    readonly proposer: string;
-    readonly attestations: Attestation[];
-    readonly transactions: Transaction[];
-    readonly version: string;
-}
+export class Block {
 
-export class Block implements BlockLike {
-
-    public readonly index: string;
+    public index: string;
     public hash: string;
-    public readonly previousHash: string;
-    public readonly timestamp: string;
-    public readonly proposer: string;
-    public readonly attestations: Attestation[];
-    public readonly transactions: Transaction[];
-    public readonly version: string;
+    public previousHash: string;
+    public timestamp: string;
+    public proposer: string;
+    public attestations: Attestation[];
+    public transactions: Transaction[];
+    public version: string;
 
     constructor(
         index: string,

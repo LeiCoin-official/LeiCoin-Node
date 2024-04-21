@@ -1,28 +1,12 @@
 import config from "../handlers/configHandler.js";
-import cryptoHandlers, { Crypto } from "../crypto/index.js";
+import Crypto from "../crypto/index.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
 import utils from "../utils/index.js";
-import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
-import BigNum from "../utils/bigNum.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
 
-export interface TransactionLike {
-
-    txid: string;
-    senderAddress: string;
-    recipientAddress: string;
-    amount: string;
-    nonce: string;
-    timestamp: string
-    input: string;
-    signature: string;
-    readonly version: string;
-
-}
-
-export class Transaction implements TransactionLike {
+export class Transaction {
 
     public txid: string;
     public senderAddress: string;
@@ -59,7 +43,7 @@ export class Transaction implements TransactionLike {
             "",
         );
 
-        const hash = Crypto.sha256(coinbase.encodeToHex(false, true), [], "buffer");
+        const hash = Crypto.sha256(coinbase.encodeToHex(false, true), "buffer");
         coinbase.txid = EncodingUtils.bufferToHex(hash);
         coinbase.signature = Crypto.sign(hash, "00", "0000000000000000000000000000000000000000000000000000000000000000");
 

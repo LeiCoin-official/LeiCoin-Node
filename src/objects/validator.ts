@@ -4,9 +4,9 @@ import cli from "../utils/cli.js";
 
 export class Validator {
 
-    public readonly address: string;
+    public address: string;
     private stake: string;
-    public readonly version: string;
+    public version: string;
 
     constructor(address: string, stake: string, version = "00") {
         this.address = address;

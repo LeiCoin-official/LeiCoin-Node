@@ -15,21 +15,16 @@ export class Crypto {
 
     public static readonly ec = new elliptic.ec("secp256k1");
 
-    public static sha256(rawData: string | Dict<any>, excludedKeys?: string[], outputType?: "string"): string;
-    public static sha256(rawData: string | Dict<any>, excludedKeys?: string[], outputType?: "buffer"): Buffer;
-    public static sha256(rawData: string | Dict<any>, excludedKeys: string[] = [], outputType: "string" | "buffer" = "string") {
-        let data = "";
-
-        if (typeof(rawData) === "object") {
-            data = JSON.stringify(this.getPreparedObjectForHashing(rawData, excludedKeys))
-        } else {
-            data = rawData;
+    public static sha256(input: string | Buffer, outputType?: "string"): string;
+    public static sha256(input: string | Buffer, outputType?: "buffer"): Buffer;
+    public static sha256(input: string | Buffer, outputType: "string" | "buffer" = "string") {
+        if (typeof input === "string") {
+            input = Buffer.from(input, "hex");
         }
-
         if (outputType === "string") {
-            return crypto.createHash('sha256').update(data).digest("hex");
+            return crypto.createHash('sha256').update(input).digest("hex");
         }
-        return crypto.createHash('sha256').update(data).digest();
+        return crypto.createHash('sha256').update(input).digest();
     }
 
     public static sign(hashData: Buffer, signerType: string, privateKey: string) {

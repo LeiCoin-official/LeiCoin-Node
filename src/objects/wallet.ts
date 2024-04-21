@@ -4,10 +4,10 @@ import cli from "../utils/cli.js";
 
 export class Wallet {
 
-    public readonly owner: string;
+    public owner: string;
     private balance: string;
     private nonce: string;
-    public readonly version: string;
+    public version: string;
 
     constructor(owner: string, balance: string, nonce: string, version = "00") {
         this.owner = owner;

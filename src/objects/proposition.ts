@@ -9,17 +9,17 @@ export interface PropositionLike {
     proposer: string;
     readonly nonce: string;
     signature: string;
-    readonly block: Block;
-    readonly version: string;
+    block: Block;
+    version: string;
 }
 
 export class Proposition implements PropositionLike {
     
     public proposer: string;
-    public readonly nonce: string;
+    public nonce: string;
     public signature: string;
-    public readonly block: Block;
-    public readonly version: string;
+    public block: Block;
+    public version: string;
 
     constructor(proposer: string, nonce: string, signature: string, block: Block, version = "00") {
         this.proposer = proposer;
