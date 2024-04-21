@@ -74,6 +74,29 @@ class Bytes32 extends Bytes {
     }
 }
 
+class Int64 {
+
+    constructor(buffer) {
+        this.buffer = buffer;
+    }
+
+    static fromNumber(input) {
+        const int64 = new Int64(Buffer.alloc(8));
+        int64.add(input);
+        return int64;
+    }
+
+    add(value) {
+        let carry = value;
+        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+            const sum = this.buffer[i] + carry;
+            this.buffer[i] = sum % 256;
+            carry = Math.floor(sum / 256);
+        }
+    }
+
+}
+
 
 async function testbinaryMath1() {
 
@@ -171,16 +194,66 @@ async function test2_2() {
 
     console.log(bytes);
     const elapsedTime = endTimer(startTime);
-    console.log("Elapsed time 2_1:", elapsedTime / 1000, "seconds");
+    console.log("Elapsed time 2_2:", elapsedTime / 1000, "seconds");
+
+}
+
+async function test3_1() {
+
+    const number = new Int64(Buffer.alloc(8));
+
+    const startTime = startTimer();
+
+    for (let i = 0; i < 1_000_000; i++) {
+        number.add(100_000_000_000);
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(number.buffer.toString("hex"));
+    console.log("Elapsed time 3_1:", elapsedTime / 1000, "seconds");
+
+}
+
+async function test3_2() {
+
+    let number = "0";
+
+    const startTime = startTimer();
+
+    for (let i = 0; i < 1_000_000; i++) {
+        number = (BigInt(number) + BigInt(100_000_000_000)).toString();
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(BigInt(number).toString(16).padStart(16, "0"));
+    console.log("Elapsed time 3_2:", elapsedTime / 1000, "seconds");
+
+}
+
+async function test3_3() {
+
+    let number = 0n;
+
+    const startTime = startTimer();
+
+    for (let i = 0; i < 1_000_000; i++) {
+        number += BigInt(100_000_000_000);
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(number.toString(16).padStart(16, "0"));
+    console.log("Elapsed time 3_3:", elapsedTime / 1000, "seconds");
 
 }
 
 async function testMain() {
     //test1();
-    test2_1();
-    test2_2();
+    //test2_1();
+    //test2_2();
+    test3_1();
+    test3_2();
+    test3_3();
 }
 
-//testMain();
+testMain();
 
-console.log(Buffer.from("01", "hex"));

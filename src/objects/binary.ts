@@ -16,7 +16,7 @@ interface BytesConstructable<T> {
     alloc(length?: number): T;
 }
 
-type Uint8ArrayLikes = Iterable<number> | ArrayLike<number>;
+type BufferConstructorLikes = ArrayLike<number> | WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer | ArrayLike<number> | string> | { [Symbol.toPrimitive](hint: "string"): string; };
 
 type HexArray = string[];
 type IntArray = bigint[] | number[] | ArrayLike<number>;
@@ -24,11 +24,11 @@ type IOLikes = string | bigint | number | HexArray | IntArray;
 type InputLikes = IOLikes;
 type IOEncodings = "hex" | "bigint" | "number" | "hexarray" | "intarray";
 
-export type ByteArray = ArrayLike<number>;
+export type ByteArray = ArrayLike<number> ;
 
 class BytesUtils {
 
-    static fromHexArray<T extends Bytes>(input: HexArray, CLS: BytesConstructable<T>) {
+    static fromHexArray<T extends Unit>(input: HexArray, CLS: BytesConstructable<T>) {
         const bytes = CLS.alloc(input.length);
         for (const [i, item] of input.entries()) {
             bytes[i] = parseInt(item, 16);
@@ -36,7 +36,7 @@ class BytesUtils {
         return bytes;
     }
 
-    static fromHex<T extends Bytes>(input: string, CLS: BytesConstructable<T>) {
+    static fromHex<T extends Unit>(input: string, CLS: BytesConstructable<T>) {
         const bytes = CLS.alloc(input.length / 2);
         for (let i = 0; i < input.length / 2; i++) {
             bytes[i] = parseInt(input.substring(i * 2, (i * 2) + 2), 16);
@@ -71,43 +71,59 @@ class BytesUtils {
 
 
 
-export class Bytes extends Uint8Array {
+export class Unit {
     
-    constructor(arrayORlength: ByteArray | number) {
-        super(arrayORlength as any);
-    }
+    readonly buffer: Buffer;
 
-    static new(arrayORlength: number | ByteArray) {
-        return new Bytes(arrayORlength);
+    protected constructor(buffer: Buffer) {
+        this.buffer = buffer;
     }
 
     public static alloc(length: number) {
-        return new Bytes(length);
+        return new Unit(Buffer.alloc(length));
     }
 
-    public static from(arrayLike: InputLikes, enc: string): Bytes;
-    public static from(base: Uint8ArrayLikes, enc?: any): Bytes;
-    public static from(arrayLike: Uint8ArrayLikes | InputLikes, enc?: string) {
-        //return new Bytes(base);
-        return new Uint8Array(1);
+    public static from(array: BufferConstructorLikes) {
+        Buffer.from(array)
     }
 
 }
 
-export class Bytes32 extends Bytes {
+export class Unit256 extends Unit {
 
-    constructor(array?: ByteArray) {
-        if (array) {
-            super(array)
-        } else {
-            super(32);
+    public static alloc() {
+        return new Unit256(Buffer.alloc(32));
+    }
+
+}
+
+
+class Int64 {
+    readonly buffer: Buffer;
+
+    constructor(buffer: Buffer) {
+        this.buffer = buffer;
+    }
+
+    public static fromNumber(input: number) {
+        const int64 = new Int64(Buffer.alloc(8));
+        int64.add(input);
+        return int64;
+    }
+
+    public add(value: number) {
+        let carry = value;
+        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+            const sum = this.buffer[i] + carry;
+            this.buffer[i] = sum % 256;
+            carry = Math.floor(sum / 256);
         }
     }
 
-    public static alloc() {
-        return new Bytes32();
-    }
+}
+
+function b(a: ArrayLike<number>) {
 
 }
 
-BytesUtils.fromHexArray([], Bytes32)
+b(new Uint8Array())
