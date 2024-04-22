@@ -246,14 +246,36 @@ async function test3_3() {
 
 }
 
-async function testMain() {
-    //test1();
-    //test2_1();
-    //test2_2();
-    test3_1();
-    test3_2();
-    test3_3();
+async function test4() {
+
+    let bool = true;
+
+    let number1 = new Int64(Buffer.alloc(8));
+    let number2 = 0n;
+
+    for (let i = 0; i < 1_000_000; i++) {
+        number1.add(100_000_000_000);
+        number2 += 100_000_000_000n;
+        bool = bool && (number1.buffer.toString("hex") === number2.toString(16).padStart(16, "0"));
+    }
+
+    console.log(bool);
+
 }
 
-testMain();
+async function test3() {
+    test3_1();
+    test3_2();
+    //test3_3();
+}
+
+async function test2() {
+    test2_1();
+    test2_2();
+}
+
+//test1();
+//test2();
+test3();
+//test4();
 

@@ -12,89 +12,74 @@
 
 // }
 
-interface UnitConstructable<T> {
+type New<T> = new(buffer: Buffer) => T;
+interface UintConstructable<T> extends New<T> {
     alloc(length?: number): T;
 }
 
+interface FixedUintConstructable<T> extends New<T> {
+    byteLength: number;
+    alloc(): T;
+}
 
-type HexArray = string[];
-type NumberArray = bigint[] | number[] | Uint8Array;
-type IOLikes = string | bigint | number | HexArray | NumberArray;
-type InputLikes = IOLikes;
-type IOEncodings = "hex" | "bigint" | "number" | "hexarray" | "intarray";
+type ByteArray = readonly number[] | Uint8Array;
 
-type ObjWithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
+type WithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
+type WithArrayBuffer = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>;
 
-type BufferConstructorLikes = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer | ArrayLike<number> | string> | { [Symbol.toPrimitive](hint: "string"): string; };
-
-Buffer.from(new ArrayBuffer(1))
-
-class BinaryUtils {
-
-    static from<T extends Unit>(input: string, CLS: UnitConstructable<T>) {
-
-    }
+class BaseUint {
     
-    static encodingsOperations = {
-        hex: {
-
-        },
-        bigint: {
-
-        },
-        number: {
-
-        },
-        array: {
-
-        }
-    }
-
-}
-
-interface UnitConstructorFrom {
-    (arrayBuffer: WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>, byteOffset?: number, length?: number): Unit;
-    (data: Uint8Array | readonly number[]): Unit;
-    (data: WithImplicitCoercion<Uint8Array | readonly number[] | string>): Unit;
-    (str: WithImplicitCoercion<string> | {[Symbol.toPrimitive](hint: "string"): string}, encoding?: BufferEncoding): Unit;
-}
-
-export class Unit {
-    
-    readonly buffer: Buffer;
-
-    protected constructor(buffer: Buffer) {
-        this.buffer = buffer;
-    }
-
-    public static alloc(length: number) {
-        return new Unit(Buffer.alloc(length));
-    }
-
-    public static from: UnitConstructorFrom = (arg1: , arg2?: any, arg3?: any) => {
-        return new Unit(Buffer.from(arg1, arg2, arg3));
-    };
-
-}
-
-export class Unit256 extends Unit {
-
-    public static alloc() {
-        return new Unit256(Buffer.alloc(32));
-    }
-
-}
-
-
-class Int64 {
-    readonly buffer: Buffer;
+    protected readonly buffer: Buffer;
 
     constructor(buffer: Buffer) {
         this.buffer = buffer;
     }
 
+    public static alloc<T>(this: New<T>, length: number): T;
+    public static alloc(length: number) {
+        return new this(Buffer.alloc(length));
+    }
+
+    public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
+    public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
+    public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
+    public static from<T>(this: New<T>, number: bigint | string | Uint64): T;
+    public static from(arg1: any, arg2?: any, arg3?: any) { return this._from(arg1, arg2, arg3); };
+
+    protected static _from(input: any, arg2?: any, arg3?: any) {
+        return new this(Buffer.from(input, arg2, arg3));
+    }
+
+}
+
+class FixedBaseUint extends BaseUint {
+
+    public static readonly byteLength: number;
+
+    public static alloc<T>(this: New<T>): T;
+    public static alloc() {
+        return new this(Buffer.alloc(this.byteLength));
+    }
+
+    protected static _from(input: any, arg2?: any, arg3?: any) {
+        return new this(Buffer.from(input, arg2, arg3));
+    }
+
+}
+
+export class Uint extends BaseUint {}
+
+export class Uint256 extends FixedBaseUint {
+
+}
+
+
+class Uint64 extends FixedBaseUint {
+
+    public static readonly byteLength = 8;
+
     public static fromNumber(input: number) {
-        const int64 = new Int64(Buffer.alloc(8));
+        const int64 = new this(Buffer.alloc(8));
         int64.add(input);
         return int64;
     }
@@ -109,3 +94,8 @@ class Int64 {
     }
 
 }
+
+const myVar = Uint64.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+console.log(myVar);
+// @ts-ignore
+console.log(BigInt("0x" + myVar.buffer.toString("hex")));

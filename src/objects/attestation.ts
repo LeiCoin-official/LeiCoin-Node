@@ -64,7 +64,7 @@ export class Attestation implements AttestationLike {
                 const instance = DataUtils.createInstanceFromJSON(Attestation, data);
 
                 if (withAttesterAddress) {
-                    const hash = Crypto.sha256(instance.encodeToHex(false, true), [], "buffer");
+                    const hash = Crypto.sha256(instance.encodeToHex(false, true), "buffer");
                     instance.attester = AddressHex.fromSignature(hash, data.signature);
                 }
 
