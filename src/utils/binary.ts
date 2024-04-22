@@ -12,36 +12,27 @@
 
 // }
 
-interface BytesConstructable<T> {
+interface UnitConstructable<T> {
     alloc(length?: number): T;
 }
 
-type BufferConstructorLikes = ArrayLike<number> | WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer | ArrayLike<number> | string> | { [Symbol.toPrimitive](hint: "string"): string; };
 
 type HexArray = string[];
-type IntArray = bigint[] | number[] | ArrayLike<number>;
-type IOLikes = string | bigint | number | HexArray | IntArray;
+type NumberArray = bigint[] | number[] | Uint8Array;
+type IOLikes = string | bigint | number | HexArray | NumberArray;
 type InputLikes = IOLikes;
 type IOEncodings = "hex" | "bigint" | "number" | "hexarray" | "intarray";
 
-export type ByteArray = ArrayLike<number> ;
+type ObjWithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
 
-class BytesUtils {
+type BufferConstructorLikes = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer | ArrayLike<number> | string> | { [Symbol.toPrimitive](hint: "string"): string; };
 
-    static fromHexArray<T extends Unit>(input: HexArray, CLS: BytesConstructable<T>) {
-        const bytes = CLS.alloc(input.length);
-        for (const [i, item] of input.entries()) {
-            bytes[i] = parseInt(item, 16);
-        }
-        return bytes;
-    }
+Buffer.from(new ArrayBuffer(1))
 
-    static fromHex<T extends Unit>(input: string, CLS: BytesConstructable<T>) {
-        const bytes = CLS.alloc(input.length / 2);
-        for (let i = 0; i < input.length / 2; i++) {
-            bytes[i] = parseInt(input.substring(i * 2, (i * 2) + 2), 16);
-        }
-        return bytes;
+class BinaryUtils {
+
+    static from<T extends Unit>(input: string, CLS: UnitConstructable<T>) {
+
     }
     
     static encodingsOperations = {
@@ -59,17 +50,14 @@ class BytesUtils {
         }
     }
 
-    static from(input: IOLikes, enc?: IOEncodings) {
-
-        switch (enc) {
-            
-        }
-
-    }
-
 }
 
-
+interface UnitConstructorFrom {
+    (arrayBuffer: WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>, byteOffset?: number, length?: number): Unit;
+    (data: Uint8Array | readonly number[]): Unit;
+    (data: WithImplicitCoercion<Uint8Array | readonly number[] | string>): Unit;
+    (str: WithImplicitCoercion<string> | {[Symbol.toPrimitive](hint: "string"): string}, encoding?: BufferEncoding): Unit;
+}
 
 export class Unit {
     
@@ -83,9 +71,9 @@ export class Unit {
         return new Unit(Buffer.alloc(length));
     }
 
-    public static from(array: BufferConstructorLikes) {
-        Buffer.from(array)
-    }
+    public static from: UnitConstructorFrom = (arg1: , arg2?: any, arg3?: any) => {
+        return new Unit(Buffer.from(arg1, arg2, arg3));
+    };
 
 }
 
@@ -121,9 +109,3 @@ class Int64 {
     }
 
 }
-
-function b(a: ArrayLike<number>) {
-
-}
-
-b(new Uint8Array())
