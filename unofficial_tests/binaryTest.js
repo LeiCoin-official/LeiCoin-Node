@@ -74,24 +74,40 @@ class Bytes32 extends Bytes {
     }
 }
 
-class Int64 {
+class UInt64 {
 
     constructor(buffer) {
+        /** @type {Buffer} */
         this.buffer = buffer;
     }
 
     static fromNumber(input) {
-        const int64 = new Int64(Buffer.alloc(8));
+        const int64 = new UInt64(Buffer.alloc(8));
         int64.add(input);
         return int64;
     }
 
     add(value) {
-        let carry = value;
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum = this.buffer[i] + carry;
-            this.buffer[i] = sum % 256;
-            carry = Math.floor(sum / 256);
+        if (typeof value === "object") {
+            let carry = 0;
+            for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+                const sum = this.buffer[i] + value.buffer[i] + carry;
+                this.buffer[i] = sum % 256;
+                carry = Math.floor(sum / 256);
+            }
+        }
+        else if (typeof value === "number") {
+            for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+                const sum = this.buffer.readUint32BE(i) + value;
+                this.buffer.writeUInt32BE(sum % 4294967296, i);
+                value = Math.floor(sum / 4294967296);
+            }
+        } else if (typeof value === "bigint") {
+            for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+                const sum = BigInt(this.buffer.readUint32BE(i)) + value;
+                this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
+                value = sum / 4294967296n;
+            }
         }
     }
 
@@ -165,84 +181,109 @@ async function test1() {
 
 }
 
-async function test2_1() {
+async function test2() {
 
-    let bytes = "";
+    (async() => {
 
-    const startTime = startTimer();
-
-    for (let i = 0; i < 1_000_000; i++) {
-        bytes = BytesUtils.fromHex("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", Buffer);
-    }
-
-    console.log(bytes);
-
-    const elapsedTime = endTimer(startTime);
-    console.log("Elapsed time 2_1:", elapsedTime / 1000, "seconds");
-
+        let bytes = "";
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            bytes = BytesUtils.fromHex("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", Buffer);
+        }
+    
+        console.log(bytes);
+    
+        const elapsedTime = endTimer(startTime);
+        console.log("Elapsed time 2_1:", elapsedTime / 1000, "seconds");
+    
+    })();
+    
+    (async() => {
+    
+        let bytes = "";
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            bytes = Buffer.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex")
+        }
+    
+        console.log(bytes);
+        const elapsedTime = endTimer(startTime);
+        console.log("Elapsed time 2_2:", elapsedTime / 1000, "seconds");
+    
+    })();
 }
 
-async function test2_2() {
+async function test3() {
 
-    let bytes = "";
+    (async() => {
 
-    const startTime = startTimer();
+        const number = new UInt64(Buffer.alloc(8));
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            number.add(100_000_000_000);
+        }
+    
+        const elapsedTime = endTimer(startTime);
+        console.log(number.buffer.toString("hex"));
+        console.log("Elapsed time 3_1:", elapsedTime / 1000, "seconds");
 
-    for (let i = 0; i < 1_000_000; i++) {
-        bytes = Buffer.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa", "hex")
-    }
-
-    console.log(bytes);
-    const elapsedTime = endTimer(startTime);
-    console.log("Elapsed time 2_2:", elapsedTime / 1000, "seconds");
-
-}
-
-async function test3_1() {
-
-    const number = new Int64(Buffer.alloc(8));
-
-    const startTime = startTimer();
-
-    for (let i = 0; i < 1_000_000; i++) {
-        number.add(100_000_000_000);
-    }
-
-    const elapsedTime = endTimer(startTime);
-    console.log(number.buffer.toString("hex"));
-    console.log("Elapsed time 3_1:", elapsedTime / 1000, "seconds");
-
-}
-
-async function test3_2() {
-
-    let number = "0";
-
-    const startTime = startTimer();
-
-    for (let i = 0; i < 1_000_000; i++) {
-        number = (BigInt(number) + BigInt(100_000_000_000)).toString();
-    }
-
-    const elapsedTime = endTimer(startTime);
-    console.log(BigInt(number).toString(16).padStart(16, "0"));
-    console.log("Elapsed time 3_2:", elapsedTime / 1000, "seconds");
-
-}
-
-async function test3_3() {
-
-    let number = 0n;
-
-    const startTime = startTimer();
-
-    for (let i = 0; i < 1_000_000; i++) {
-        number += BigInt(100_000_000_000);
-    }
-
-    const elapsedTime = endTimer(startTime);
-    console.log(number.toString(16).padStart(16, "0"));
-    console.log("Elapsed time 3_3:", elapsedTime / 1000, "seconds");
+    })();
+    
+    (async() => {
+    
+        let number = "0";
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            number = (BigInt(number) + BigInt(100_000_000_000)).toString();
+        }
+    
+        const elapsedTime = endTimer(startTime);
+        console.log(BigInt(number).toString(16).padStart(16, "0"));
+        console.log("Elapsed time 3_2:", elapsedTime / 1000, "seconds");
+    
+    })();
+    
+    (async() => {
+    
+        let number = 0n;
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            number += BigInt(100_000_000_000);
+        }
+    
+        const elapsedTime = endTimer(startTime);
+        console.log(number.toString(16).padStart(16, "0"));
+        console.log("Elapsed time 3_3:", elapsedTime / 1000, "seconds");
+    
+    })();
+    
+    (async() => {
+    
+        const number = new UInt64(Buffer.alloc(8));
+        const number2 = new UInt64(Buffer.alloc(8));
+        number2.buffer.writeBigUint64BE(100_000_000_000n);
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            number.add(number2);
+        }
+    
+        const elapsedTime = endTimer(startTime);
+        console.log(number.buffer.toString("hex"));
+        console.log("Elapsed time 3_4:", elapsedTime / 1000, "seconds");
+    
+    })();
 
 }
 
@@ -250,7 +291,7 @@ async function test4() {
 
     let bool = true;
 
-    let number1 = new Int64(Buffer.alloc(8));
+    let number1 = new UInt64(Buffer.alloc(8));
     let number2 = 0n;
 
     for (let i = 0; i < 1_000_000; i++) {
@@ -263,16 +304,6 @@ async function test4() {
 
 }
 
-async function test3() {
-    test3_1();
-    test3_2();
-    //test3_3();
-}
-
-async function test2() {
-    test2_1();
-    test2_2();
-}
 
 //test1();
 //test2();
