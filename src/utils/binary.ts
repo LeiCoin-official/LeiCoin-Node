@@ -99,3 +99,4 @@ const myVar = Uint64.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
 console.log(myVar);
 // @ts-ignore
 console.log(BigInt("0x" + myVar.buffer.toString("hex")));
+
