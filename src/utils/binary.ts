@@ -1,3 +1,25 @@
+
+type New<T> = new(buffer: Buffer) => T;
+
+interface BasicUintConstructable<T> extends New<T> {
+    alloc(length: number): T;
+}
+
+interface FixedUintConstructable<T> extends BasicUintConstructable<T> {
+    byteLength: number;
+    alloc(): T;
+}
+
+interface UintConstructable<T> extends BasicUintConstructable<T> {
+    alloc(length?: number): T;
+    byteLength?: number;
+}
+
+type ByteArray = readonly number[] | Uint8Array;
+
+type WithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
+type WithArrayBuffer = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>;
+
 // export class Bytes32 extends Buffer {
 
 //     static hasCorrectByteLength(buffer: Buffer) {
@@ -12,36 +34,7 @@
 
 // }
 
-type New<T> = new(buffer: Buffer) => T;
-
-interface UintConstructable<T> extends New<T> {
-    alloc(length?: number): T;
-}
-
-interface FixedUintConstructable<T> extends New<T> {
-    byteLength: number;
-    alloc(): T;
-}
-
-type ByteArray = readonly number[] | Uint8Array;
-
-type WithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
-type WithArrayBuffer = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>;
-
-class UintUtils {
-
-    public static from(input: any, arg2?: any, arg3?: any) {
-        let buffer: Buffer;
-        if (typeof input === "number" || typeof input === "bigint") {
-            buffer = Buffer.alloc(arg2);
-            //buffer.wr
-        } else {
-            buffer = Buffer.from(input, arg2, arg3);
-        }
-        return buffer;
-    }
-
-}
+class UintUtils {}
 
 class BaseUint {
     
@@ -59,31 +52,50 @@ class BaseUint {
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
-    public static from<T>(this: New<T>, number: BaseUint | number | bigint, length: number): T;
-    public static from(input: any, arg2?: any, arg3?: any) {
-        return new this(UintUtils.from(input, arg2, arg3));
+    public static from<T>(this: New<T>, number: BaseUint | number | bigint): T;
+    public static from(this: UintConstructable<BaseUint>, input: any, arg2?: any, arg3?: any) {
+        let unit: BaseUint;
+        if (typeof input === "number" || typeof input === "bigint") {
+            unit = this.alloc(this.byteLength || (Math.floor(input.toString(16).length / 2) + 1));
+            unit.add(input);
+            return unit;
+        } else {
+            unit = new this(Buffer.from(input, arg2, arg3));
+        }
+    }
+
+    protected addUint(value: BaseUint) {
+        let carry = 0;
+        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+            const sum = this.buffer[i] + value.buffer[i] + carry;
+            this.buffer[i] = sum % 256;
+            carry = Math.floor(sum / 256);
+        }
+    }
+
+    protected addNumber(value: number) {
+        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+            const sum = this.buffer[i] + value;
+            this.buffer[i] = sum % 256;
+            value = Math.floor(sum / 256);
+        }
+    }
+
+    protected addBigInt(value: bigint) {
+        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+            const sum: bigint = BigInt(this.buffer[i]) + value;
+            this.buffer[i] = Number(sum % 256n);
+            value = sum / 256n;
+        }
     }
 
     public add(value: BaseUint | number | bigint) {
         if (typeof value === "object") {
-            let carry = 0;
-            for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-                const sum = this.buffer[i] + value.buffer[i] + carry;
-                this.buffer[i] = sum % 256;
-                carry = Math.floor(sum / 256);
-            }
+            this.addUint(value);
         } else if (typeof value === "number") {
-            for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-                const sum = this.buffer.readUint32BE(i) + value;
-                this.buffer.writeUInt32BE(sum % 4294967296, i);
-                value = Math.floor(sum / 4294967296);
-            }
+            this.addNumber(value);
         } else if (typeof value === "bigint") {
-            for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-                const sum: bigint = BigInt(this.buffer.readUint32BE(i)) + value;
-                this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
-                value = sum / 4294967296n;
-            }
+            this.addBigInt(value);
         }
     }
 
@@ -102,14 +114,6 @@ class FixedBaseUint extends BaseUint {
         return new this(Buffer.alloc(this.byteLength));
     }
 
-    public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number): T;
-    public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
-    public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
-    public static from<T>(this: New<T>, number: BaseUint | number | bigint): T;
-    public static from(input: any, arg2?: any, arg3?: any) {
-        return new this(UintUtils.from(input, arg2, arg3));
-    }
-
 }
 
 export class Uint extends BaseUint {}
@@ -123,10 +127,20 @@ class Uint64 extends FixedBaseUint {
 
     public static readonly byteLength = 8;
 
-    public static fromNumber(input: number) {
-        const int64 = new this(Buffer.alloc(8));
-        int64.add(input);
-        return int64;
+    protected addNumber(value: number) {
+        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+            const sum = this.buffer.readUint32BE(i) + value;
+            this.buffer.writeUInt32BE(sum % 4294967296, i);
+            value = Math.floor(sum / 4294967296);
+        }
+    }
+
+    protected addBigInt(value: bigint) {
+        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+            const sum: bigint = BigInt(this.buffer.readUint32BE(i)) + value;
+            this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
+            value = sum / 4294967296n;
+        }
     }
 
 }
@@ -136,4 +150,3 @@ const myVar = Uint64.from(1, 8);
 console.log(myVar);
 // @ts-ignore
 console.log(BigInt("0x" + myVar.buffer.toString("hex")));
-

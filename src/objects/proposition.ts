@@ -60,7 +60,7 @@ export class Proposition implements PropositionLike {
                 const instance = DataUtils.createInstanceFromJSON(Proposition, data);
 
                 if (withProposerAddress) {
-                    const hash = Crypto.sha256(instance.encodeToHex(false, true), [], "buffer");
+                    const hash = Crypto.sha256(instance.encodeToHex(false, true), "buffer");
                     instance.proposer = AddressHex.fromSignature(hash, data.signature);
                 }
 

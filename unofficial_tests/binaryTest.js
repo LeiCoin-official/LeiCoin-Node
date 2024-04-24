@@ -2,6 +2,7 @@ import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
 import BN from "bn.js"
 import crypto from "crypto";
+import { types } from "util";
 
 //console.log(process.memoryUsage().heapUsed)
 
@@ -87,32 +88,45 @@ class UInt64 {
         return int64;
     }
 
+    /** @private */
+    addUnit(value) {
+        let carry = 0;
+        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+            const sum = this.buffer[i] + value.buffer[i] + carry;
+            this.buffer[i] = sum % 256;
+            carry = Math.floor(sum / 256);
+        }
+    }
+
+    /** @private */
+    addNumber(value) {
+        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+            const sum = this.buffer.readUint32BE(i) + value;
+            this.buffer.writeUInt32BE(sum % 4294967296, i);
+            value = Math.floor(sum / 4294967296);
+        }
+    }
+
+    /** @private */
+    addBigInt(value) {
+        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+            const sum = BigInt(this.buffer.readUint32BE(i)) + value;
+            this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
+            value = sum / 4294967296n;
+        }
+    }
+
     add(value) {
         if (typeof value === "object") {
-            let carry = 0;
-            for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-                const sum = this.buffer[i] + value.buffer[i] + carry;
-                this.buffer[i] = sum % 256;
-                carry = Math.floor(sum / 256);
-            }
-        }
-        else if (typeof value === "number") {
-            for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-                const sum = this.buffer.readUint32BE(i) + value;
-                this.buffer.writeUInt32BE(sum % 4294967296, i);
-                value = Math.floor(sum / 4294967296);
-            }
+            this.addUnit(value);
+        } else if (typeof value === "number") {
+            this.addNumber(value);
         } else if (typeof value === "bigint") {
-            for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-                const sum = BigInt(this.buffer.readUint32BE(i)) + value;
-                this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
-                value = sum / 4294967296n;
-            }
+            this.addBigInt(value);
         }
     }
 
 }
-
 
 async function testbinaryMath1() {
 
