@@ -20,7 +20,7 @@ type ByteArray = readonly number[] | Uint8Array;
 type WithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
 type WithArrayBuffer = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>;
 
-type NumberLike = BaseUint | number | bigint;
+type NumberLike = BaseUint | number;
 
 // export class Bytes32 extends Buffer {
 
@@ -52,10 +52,10 @@ class BaseUint {
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
-    public static from<T>(this: New<T>, number: BaseUint | number | bigint, length?: number): T;
+    public static from<T>(this: New<T>, number: BaseUint | number, length?: number): T;
     public static from(this: UintConstructable<BaseUint>, input: any, arg2?: any, arg3?: any) {
         let unit: BaseUint;
-        if (typeof input === "number" || typeof input === "bigint") {
+        if (typeof input === "number") {
             unit = this.alloc(this.byteLength || arg2 || (Math.floor(input.toString(16).length / 2) + 1));
             unit.add(input);
             return unit;
@@ -70,8 +70,6 @@ class BaseUint {
             this.addUint(value);
         } else if (typeof value === "number") {
             this.addNumber(value);
-        } else if (typeof value === "bigint") {
-            this.addBigInt(value);
         }
         return true;
     }
@@ -81,8 +79,6 @@ class BaseUint {
             this.subUint(value);
         } else if (typeof value === "number") {
             this.addNumber(value * -1);
-        } else if (typeof value === "bigint") {
-            this.subBigInt(value * -1n);
         }
     }
 
@@ -108,42 +104,22 @@ class BaseUint {
         }
     }
 
-    protected addBigInt(value: bigint) {
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum: bigint = BigInt(this.buffer[i]) + value;
-            if (sum >= 0) {
-                this.buffer[i] = Number(sum % 256n);
-            } else {
-                this.buffer[i] = Number(sum % 256n) + 256;
-            }
-            value = sum / 256n;
-        }
-    }
-
 
     protected subUint(value: BaseUint) {
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum = this.buffer[i] - value.buffer[i] - carry;
-            this.buffer[i] = sum % 256;
+            const sum = this.buffer[i] - value.buffer[i] + carry;
+            if (sum >= 0) {
+                this.buffer[i] = sum % 256;
+            } else {
+                this.buffer[i] = (sum % 256) + 256;
+            }
             carry = Math.floor(sum / 256);
         }
     }
 
-    protected subBigInt(value: bigint) {
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum: bigint = BigInt(this.buffer[i]) - value;
-            if (sum >= 0) {
-                this.buffer[i] = Number(sum % 256n);
-            } else {
-                this.buffer[i] = Number(sum % 256n) + 256;
-            }
-            value = sum / 256n;
-        }
-    }
-    
-
-    /*protected gtUint(value: BaseUint) {
+    /*
+    protected gtUint(value: BaseUint) {
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
             const sum = this.buffer[i] + value.buffer[i] + carry;
@@ -159,15 +135,7 @@ class BaseUint {
             value = Math.floor(sum / 256);
         }
     }
-
-    protected gtBigInt(value: bigint) {
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum: bigint = BigInt(this.buffer[i]) + value;
-            this.buffer[i] = Number(sum % 256n);
-            value = sum / 256n;
-        }
-    }*/
-
+    */
 }
 
 class FixedBaseUint extends BaseUint {
@@ -195,38 +163,16 @@ export class Uint256 extends FixedBaseUint {
 export class Uint64 extends FixedBaseUint {
 
     public static readonly byteLength = 8;
-
     
     protected addNumber(value: number) {
         for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
             const sum = this.buffer.readUint32BE(i) + value;
-            this.buffer.writeUInt32BE(sum % 4294967296, i);
+            if (sum >= 0) {
+                this.buffer.writeUInt32BE(sum % 4294967296, i);
+            } else {
+                this.buffer.writeUInt32BE((sum % 4294967296) + 4294967296, i)
+            }
             value = Math.floor(sum / 4294967296);
-        }
-    }
-
-    protected addBigInt(value: bigint) {
-        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-            const sum: bigint = BigInt(this.buffer.readUint32BE(i)) + value;
-            this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
-            value = sum / 4294967296n;
-        }
-    }
-
-
-    protected subNumber(value: number) {
-        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-            const sum = this.buffer.readUint32BE(i) - value;
-            this.buffer.writeUInt32BE(sum % 4294967296, i);
-            value = Math.floor(sum / 4294967296);
-        }
-    }
-
-    protected subBigInt(value: bigint) {
-        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-            const sum: bigint = BigInt(this.buffer.readUint32BE(i)) - value;
-            this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
-            value = sum / 4294967296n;
         }
     }
 

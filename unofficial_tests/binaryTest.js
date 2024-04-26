@@ -1,8 +1,7 @@
 import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
-import BN from "bn.js"
+import { Uint, Uint64} from "../build/bin/leicoin-node-test.cjs"
 import crypto from "crypto";
-import { types } from "util";
 
 //console.log(process.memoryUsage().heapUsed)
 
@@ -24,110 +23,111 @@ console.log(process.memoryUsage().heapUsed - 6495880);
 setTimeout(() => {console.log(a)}, 1000000)
 */
 
-class BytesUtils {
-    static fromHexArray(input, CLS) {
-        const bytes = new CLS(input.length);
-        for (const [i, item] of input.entries()) {
-            bytes[i] = parseInt(item, 16);
-        }
-        return bytes;
-    }
-    static fromHex(input, CLS) {
-        return Buffer.from(input, "hex");
-    }
-    static from(input, enc) {
-        switch (enc) {
-        }
-    }
-}
-BytesUtils.encodingsOperations = {
-    hex: {},
-    bigint: {},
-    number: {},
-    array: {}
-};
-class Bytes extends Uint8Array {
-    constructor(arrayORlength) {
-        super(arrayORlength);
-    }
-    static new(arrayORlength) {
-        return new Bytes(arrayORlength);
-    }
-    static alloc(length) {
-        return new Bytes(length);
-    }
-    static from(arrayLike, enc) {
-        //return new Bytes(base);
-        return new Uint8Array(1);
-    }
-}
-class Bytes32 extends Bytes {
-    constructor(array) {
-        if (array) {
-            super(array);
-        }
-        else {
-            super(32);
-        }
-    }
-    static alloc() {
-        return new Bytes32();
-    }
-}
+// class BytesUtils {
+//     static fromHexArray(input, CLS) {
+//         const bytes = new CLS(input.length);
+//         for (const [i, item] of input.entries()) {
+//             bytes[i] = parseInt(item, 16);
+//         }
+//         return bytes;
+//     }
+//     static fromHex(input, CLS) {
+//         return Buffer.from(input, "hex");
+//     }
+//     static from(input, enc) {
+//         switch (enc) {
+//         }
+//     }
+// }
+// BytesUtils.encodingsOperations = {
+//     hex: {},
+//     bigint: {},
+//     number: {},
+//     array: {}
+// };
+// class Bytes extends Uint8Array {
+//     constructor(arrayORlength) {
+//         super(arrayORlength);
+//     }
+//     static new(arrayORlength) {
+//         return new Bytes(arrayORlength);
+//     }
+//     static alloc(length) {
+//         return new Bytes(length);
+//     }
+//     static from(arrayLike, enc) {
+//         //return new Bytes(base);
+//         return new Uint8Array(1);
+//     }
+// }
+// class Bytes32 extends Bytes {
+//     constructor(array) {
+//         if (array) {
+//             super(array);
+//         }
+//         else {
+//             super(32);
+//         }
+//     }
+//     static alloc() {
+//         return new Bytes32();
+//     }
+// }
 
-class UInt64 {
+// class UInt64 {
 
-    constructor(buffer) {
-        /** @type {Buffer} */
-        this.buffer = buffer;
-    }
+//     constructor(buffer) {
+//         /** @type {Buffer} */
+//         this.buffer = buffer;
+//     }
 
-    static fromNumber(input) {
-        const int64 = new UInt64(Buffer.alloc(8));
-        int64.add(input);
-        return int64;
-    }
+//     static fromNumber(input) {
+//         const int64 = new UInt64(Buffer.alloc(8));
+//         int64.add(input);
+//         return int64;
+//     }
 
-    /** @private */
-    addUnit(value) {
-        let carry = 0;
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum = this.buffer[i] + value.buffer[i] + carry;
-            this.buffer[i] = sum % 256;
-            carry = Math.floor(sum / 256);
-        }
-    }
+//     /** @private */
+//     addUnit(value) {
+//         let carry = 0;
+//         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
+//             const sum = this.buffer[i] + value.buffer[i] + carry;
+//             this.buffer[i] = sum % 256;
+//             carry = Math.floor(sum / 256);
+//         }
+//     }
 
-    /** @private */
-    addNumber(value) {
-        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-            const sum = this.buffer.readUint32BE(i) + value;
-            this.buffer.writeUInt32BE(sum % 4294967296, i);
-            value = Math.floor(sum / 4294967296);
-        }
-    }
+//     /** @private */
+//     addNumber(value) {
+//         for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+//             const sum = this.buffer.readUint32BE(i) + value;
+//             this.buffer.writeUInt32BE(sum % 4294967296, i);
+//             value = Math.floor(sum / 4294967296);
+//         }
+//     }
 
-    /** @private */
-    addBigInt(value) {
-        for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
-            const sum = BigInt(this.buffer.readUint32BE(i)) + value;
-            this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
-            value = sum / 4294967296n;
-        }
-    }
+//     /** @private */
+//     addBigInt(value) {
+//         for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
+//             const sum = BigInt(this.buffer.readUint32BE(i)) + value;
+//             this.buffer.writeUInt32BE(Number(sum % 4294967296n), i);
+//             value = sum / 4294967296n;
+//         }
+//     }
 
-    add(value) {
-        if (typeof value === "object") {
-            if (this.buffer.byteLength !== value.buffer.byteLength) return false;
-            this.addUnit(value);
-        } else if (typeof value === "number") {
-            this.addNumber(value);
-        } else if (typeof value === "bigint") {
-            this.addBigInt(value);
-        }
-    }
+//     add(value) {
+//         if (typeof value === "object") {
+//             if (this.buffer.byteLength !== value.buffer.byteLength) return false;
+//             this.addUnit(value);
+//         } else if (typeof value === "number") {
+//             this.addNumber(value);
+//         } else if (typeof value === "bigint") {
+//             this.addBigInt(value);
+//         }
+//     }
 
-}
+// }
+
 
 async function testbinaryMath1() {
 
@@ -236,7 +236,7 @@ async function test3() {
 
     (async() => {
 
-        const number = new UInt64(Buffer.alloc(8));
+        const number = new Uint64(Buffer.alloc(8));
     
         const startTime = startTimer();
     
@@ -284,8 +284,8 @@ async function test3() {
     
     (async() => {
     
-        const number = new UInt64(Buffer.alloc(8));
-        const number2 = new UInt64(Buffer.alloc(8));
+        const number = new Uint64(Buffer.alloc(8));
+        const number2 = new Uint64(Buffer.alloc(8));
         number2.buffer.writeBigUint64BE(100_000_000_000n);
     
         const startTime = startTimer();
@@ -306,7 +306,7 @@ async function test4() {
 
     let bool = true;
 
-    let number1 = new UInt64(Buffer.alloc(8));
+    let number1 = new Uint64(Buffer.alloc(8));
     let number2 = 0n;
 
     for (let i = 0; i < 1_000_000; i++) {
