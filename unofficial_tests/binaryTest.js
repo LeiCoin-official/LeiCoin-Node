@@ -88,7 +88,7 @@ setTimeout(() => {console.log(a)}, 1000000)
 //     }
 
 //     /** @private */
-//     addUnit(value) {
+//     addUint(value) {
 //         let carry = 0;
 //         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
 //             const sum = this.buffer[i] + value.buffer[i] + carry;
@@ -118,7 +118,7 @@ setTimeout(() => {console.log(a)}, 1000000)
 //     add(value) {
 //         if (typeof value === "object") {
 //             if (this.buffer.byteLength !== value.buffer.byteLength) return false;
-//             this.addUnit(value);
+//             this.addUint(value);
 //         } else if (typeof value === "number") {
 //             this.addNumber(value);
 //         } else if (typeof value === "bigint") {
@@ -285,8 +285,7 @@ async function test3() {
     (async() => {
     
         const number = new Uint64(Buffer.alloc(8));
-        const number2 = new Uint64(Buffer.alloc(8));
-        number2.buffer.writeBigUint64BE(100_000_000_000n);
+        const number2 = Uint64.from(100_000_000_000);
     
         const startTime = startTimer();
     
@@ -324,3 +323,15 @@ async function test4() {
 //test2();
 test3();
 //test4();
+
+
+const buf1 = Buffer.from("ab12ff", "hex");
+const buf2 = Buffer.from("ab1300", "hex");
+const buf3 = Buffer.from("ab12fe", "hex");
+
+console.log(buf1.compare(buf1));
+console.log(buf1.compare(buf2));
+console.log(buf1.compare(buf3));
+
+buf1.set([0, 0], 1)
+console.log(buf1)

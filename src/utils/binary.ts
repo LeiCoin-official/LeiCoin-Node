@@ -36,6 +36,23 @@ type NumberLike = BaseUint | number;
 
 // }
 
+class UintUtils {
+
+    static correctByteLengthBuffer(buffer: Buffer, correctByteLength: number) {
+        if (buffer.byteLength === correctByteLength) {
+            return buffer;
+        }
+        const newBuffer = Buffer.alloc(correctByteLength);
+        newBuffer.set(buffer, correctByteLength - buffer.byteLength);
+        return newBuffer;
+    }
+
+    static correctByteLengthUint<T>(CLS: New<T>, unit: BaseUint, correctByteLength: number) {
+        return new CLS(this.correctByteLengthBuffer(unit.buffer, correctByteLength));
+    }
+
+}
+
 class BaseUint {
     
     readonly buffer: Buffer;
@@ -53,12 +70,12 @@ class BaseUint {
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
     public static from<T>(this: New<T>, number: BaseUint | number, length?: number): T;
-    public static from(this: UintConstructable<BaseUint>, input: any, arg2?: any, arg3?: any) {
-        let unit: BaseUint;
+    public static from(this: BasicUintConstructable<BaseUint>, input: any, arg2?: any, arg3?: any) {
+        let uint: BaseUint;
         if (typeof input === "number") {
-            unit = this.alloc(this.byteLength || arg2 || (Math.floor(input.toString(16).length / 2) + 1));
-            unit.add(input);
-            return unit;
+            uint = this.alloc(arg2 || (Math.floor(input.toString(16).length / 2) + 1));
+            uint.add(input);
+            return uint;
         }
         return new this(Buffer.from(input, arg2, arg3));
     }
@@ -66,7 +83,6 @@ class BaseUint {
 
     public add(value: NumberLike) {
         if (typeof value === "object") {
-            if (this.buffer.byteLength !== value.buffer.byteLength) return false;
             this.addUint(value);
         } else if (typeof value === "number") {
             this.addNumber(value);
@@ -84,6 +100,10 @@ class BaseUint {
 
 
     protected addUint(value: BaseUint) {
+        if (this.buffer.byteLength !== value.buffer.byteLength) {
+            // @ts-ignore
+            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
+        }
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
             const sum = this.buffer[i] + value.buffer[i] + carry;
@@ -106,6 +126,10 @@ class BaseUint {
 
 
     protected subUint(value: BaseUint) {
+        if (this.buffer.byteLength !== value.buffer.byteLength) {
+            // @ts-ignore
+            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
+        }
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
             const sum = this.buffer[i] - value.buffer[i] + carry;
@@ -118,14 +142,25 @@ class BaseUint {
         }
     }
 
-    /*
-    protected gtUint(value: BaseUint) {
+
+    protected compare(value: NumberLike) {
+        if (typeof value === "number") {
+            value = BaseUint.from(value, this.buffer.byteLength);
+        } else if (this.buffer.byteLength !== value.buffer.byteLength) {
+            value = UintUtils.correctByteLengthUint(BaseUint, value, this.buffer.byteLength)
+        }
+        return this.buffer.compare(value.buffer)
+    }
+
+    
+    /*protected gtUint(value: BaseUint) {
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
             const sum = this.buffer[i] + value.buffer[i] + carry;
             this.buffer[i] = sum % 256;
             carry = Math.floor(sum / 256);
         }
+        this.buffer.compare
     }
 
     protected gtNumber(value: number) {
@@ -134,8 +169,9 @@ class BaseUint {
             this.buffer[i] = sum % 256;
             value = Math.floor(sum / 256);
         }
-    }
-    */
+    }*/
+    
+
 }
 
 class FixedBaseUint extends BaseUint {
@@ -149,6 +185,21 @@ class FixedBaseUint extends BaseUint {
     public static alloc<T>(this: New<T>): T;
     public static alloc() {
         return new this(Buffer.alloc(this.byteLength));
+    }
+
+    public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
+    public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
+    public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
+    public static from<T>(this: New<T>, number: BaseUint | number): T;
+    public static from(this: FixedUintConstructable<FixedBaseUint>, input: any, arg2?: any, arg3?: any) {
+        let uint: FixedBaseUint;
+        if (typeof input === "number") {
+            uint = this.alloc();
+            uint.add(input);
+            return uint;
+        }
+        const buffer = Buffer.from(input, arg2, arg3);
+        return new this(UintUtils.correctByteLengthBuffer(buffer, this.byteLength))
     }
 
 }
