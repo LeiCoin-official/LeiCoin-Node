@@ -118,6 +118,7 @@ class UInt64 {
 
     add(value) {
         if (typeof value === "object") {
+            if (this.buffer.byteLength !== value.buffer.byteLength) return false;
             this.addUnit(value);
         } else if (typeof value === "number") {
             this.addNumber(value);

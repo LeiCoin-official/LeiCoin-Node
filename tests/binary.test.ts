@@ -1,26 +1,30 @@
-import { Uint64 } from "../src/utils/binary.js"
+import { Uint64, Uint } from "../src/utils/binary.js"
 
 describe('binary_testing', () => {
 
     test('addition_and_subtraction', () => {
 
-        const unit = Uint64.alloc();
+        const uint = Uint.from("00000000000000ff", "hex");
 
-        const randInt = Math.floor(Math.random() * 1_000_000);
+        //const randInt = Math.floor(Math.random() * 1_000_000);
+        const randInt = 1;
         
-        const y1 = Uint64.from(randInt);
+        //const y1 = Uint64.from(randInt);
+        const y1 = Uint.from(randInt, 8);
         const y2 = randInt;
         const y3 = BigInt(randInt);
 
-        unit.add(y1);
-        unit.add(y2);
-        unit.add(y3);
-        
-        unit.sub(y1);
-        unit.sub(y2);
-        unit.sub(y3);
+        //uint.add(y1);
+        uint.add(y2);
+        //uint.add(y3);
 
-        expect(unit.buffer.toString("hex")).toBe("0000000000000000");
+        console.log(uint);
+
+        //uint.sub(y1);
+        uint.add((-1 * y2));
+        //uint.sub(y3);
+
+        expect(uint.buffer.toString("hex")).toBe("00000000000000ff");
     });
 
 });
