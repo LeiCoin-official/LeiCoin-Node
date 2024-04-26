@@ -1,6 +1,7 @@
 import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
-import { Uint, Uint64} from "../build/bin/leicoin-node-test.cjs"
+import { Uint, Uint64 } from "../build/bin/leicoin-node-test.cjs"
+import BN from "bn.js"
 import crypto from "crypto";
 
 //console.log(process.memoryUsage().heapUsed)
@@ -324,14 +325,3 @@ async function test4() {
 test3();
 //test4();
 
-
-const buf1 = Buffer.from("ab12ff", "hex");
-const buf2 = Buffer.from("ab1300", "hex");
-const buf3 = Buffer.from("ab12fe", "hex");
-
-console.log(buf1.compare(buf1));
-console.log(buf1.compare(buf2));
-console.log(buf1.compare(buf3));
-
-buf1.set([0, 0], 1)
-console.log(buf1)

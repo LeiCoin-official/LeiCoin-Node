@@ -79,6 +79,11 @@ class BaseUint {
         }
         return new this(Buffer.from(input, arg2, arg3));
     }
+    
+
+    public toHex() {
+        return this.buffer.toString("hex")
+    }
 
 
     public add(value: NumberLike) {
@@ -98,6 +103,29 @@ class BaseUint {
         }
     }
 
+    public gt(value: NumberLike) {
+        return this.compare(value) === 1;
+    }
+
+    public gte(value: NumberLike) {
+        return this.compare(value) !== -1;
+    }
+
+    public lt(value: NumberLike) {
+        return this.compare(value) === -1;
+    }
+
+    public lte(value: NumberLike) {
+        return this.compare(value) !== 1;
+    }
+
+    public eq(value: NumberLike) {
+        return this.compare(value) === 0;
+    }
+
+    public eqn(value: NumberLike) {
+        return this.compare(value) !== 0;
+    }
 
     protected addUint(value: BaseUint) {
         if (this.buffer.byteLength !== value.buffer.byteLength) {
@@ -152,26 +180,6 @@ class BaseUint {
         return this.buffer.compare(value.buffer)
     }
 
-    
-    /*protected gtUint(value: BaseUint) {
-        let carry = 0;
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum = this.buffer[i] + value.buffer[i] + carry;
-            this.buffer[i] = sum % 256;
-            carry = Math.floor(sum / 256);
-        }
-        this.buffer.compare
-    }
-
-    protected gtNumber(value: number) {
-        for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
-            const sum = this.buffer[i] + value;
-            this.buffer[i] = sum % 256;
-            value = Math.floor(sum / 256);
-        }
-    }*/
-    
-
 }
 
 class FixedBaseUint extends BaseUint {
@@ -206,14 +214,9 @@ class FixedBaseUint extends BaseUint {
 
 export class Uint extends BaseUint {}
 
-export class Uint256 extends FixedBaseUint {
-
-}
-
-
 export class Uint64 extends FixedBaseUint {
 
-    public static readonly byteLength = 8;
+    public static readonly byteLength: number = 8;
     
     protected addNumber(value: number) {
         for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
@@ -228,4 +231,11 @@ export class Uint64 extends FixedBaseUint {
     }
 
 }
+
+export class Uint256 extends Uint64 {
+
+    public static readonly byteLength: number = 32;
+
+}
+
 
