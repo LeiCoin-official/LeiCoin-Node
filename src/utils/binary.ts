@@ -207,7 +207,7 @@ class FixedBaseUint extends BaseUint {
             return uint;
         }
         const buffer = Buffer.from(input, arg2, arg3);
-        return new this(UintUtils.correctByteLengthBuffer(buffer, this.byteLength))
+        return new this(UintUtils.correctByteLengthBuffer(buffer, this.byteLength));
     }
 
 }
