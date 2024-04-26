@@ -2,6 +2,8 @@ import crypto from "crypto";
 import elliptic from 'elliptic';
 import EncodingUtils from "../handlers/encodingUtils.js";
 import { Dict } from "../utils/objects.js";
+import { Uint, Uint256 } from "../utils/binary.js";
+import Signature from "../objects/signature.js";
 
 export interface LeiCoinBinarySignature extends elliptic.ec.Signature { recoveryParam: number; }
 export interface LeiCoinSignature {
@@ -15,43 +17,43 @@ export class Crypto {
 
     public static readonly ec = new elliptic.ec("secp256k1");
 
-    public static sha256(input: string | Buffer, outputType?: "string"): string;
-    public static sha256(input: string | Buffer, outputType?: "buffer"): Buffer;
-    public static sha256(input: string | Buffer, outputType: "string" | "buffer" = "string") {
+    public static sha256(input: string | Uint, outputType?: "binary"): Uint256;
+    public static sha256(input: string | Uint, outputType?: "string"): string;
+    public static sha256(input: string | Uint, outputType: "string" | "binary" = "binary") {
         if (typeof input === "string") {
-            input = Buffer.from(input, "hex");
+            input = Uint256.from(input);
         }
         if (outputType === "string") {
-            return crypto.createHash('sha256').update(input).digest("hex");
+            return crypto.createHash('sha256').update(input.getRaw()).digest("hex");
         }
-        return crypto.createHash('sha256').update(input).digest();
+        return Uint256.from(crypto.createHash('sha256').update(input.getRaw()).digest());
     }
 
-    public static sign(hashData: Buffer, signerType: string, privateKey: string) {
+    public static sign(hash: Uint256, signerType: string, privateKey: Uint256) {
         try {
-            const keyPair = this.ec.keyFromPrivate(privateKey, "hex");
-            const signature = keyPair.sign(hashData);
+            const keyPair = this.ec.keyFromPrivate(privateKey.getRaw(), "hex");
+            const signature = keyPair.sign(hash.getRaw());
             //return EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
             const encoded = EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
-            return encoded;
+            return Signature.fromHex(encoded);
         } catch (error: any) {
-            return "";
+            return Uint.alloc(0);
         }
     }
 
-    public static getPublicKeyFromPrivateKey(privateKey: string) {
+    public static getPublicKeyFromPrivateKey(privateKey: Uint256) {
         try {
-            return this.ec.keyFromPrivate(privateKey, "hex").getPublic("hex");
+            return Uint.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic("array"));
         } catch (error: any) {
-            return "";
+            return Uint.alloc(0);
         }
     }
 
-    public static getPublicKeyFromSignature(hashData: Buffer, signature: LeiCoinSignature){
+    public static getPublicKeyFromSignature(hash: Uint256, signature: LeiCoinSignature): Uint {
         try {
-            return this.ec.recoverPubKey(hashData, signature, signature.recoveryParam).encode("hex") as string;
+            return this.ec.recoverPubKey(hash.getRaw(), signature, signature.recoveryParam).encode("array");
         } catch (error: any) {
-            return "";
+            return Uint.alloc(0);
         }
     }
 

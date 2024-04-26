@@ -5,20 +5,21 @@ import utils from "../utils/index.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
+import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 
 export class Transaction {
 
-    public txid: string;
-    public senderAddress: string;
-    public recipientAddress: string;
-    public amount: string;
-    public nonce: string;
-    public timestamp: string
-    public input: string;
-    public signature: string;
-    public readonly version: string;
+    public txid: Uint256;
+    public senderAddress: AddressHex;
+    public recipientAddress: AddressHex;
+    public amount: Uint64;
+    public nonce: Uint64;
+    public timestamp: Uint64;
+    public input: Uint;
+    public signature: Uint;
+    public readonly version: Uint;
 
-    constructor(txid: string, senderAddress: string, recipientAddress: string, amount: string, nonce: string, timestamp: string, input: string, signature: string, version = "00") {
+    constructor(txid: Uint256, senderAddress: AddressHex, recipientAddress: AddressHex, amount: Uint64, nonce: Uint64, timestamp: Uint64, input: Uint, signature: Uint, version = Uint.from("00")) {
         this.txid = txid;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
@@ -33,19 +34,19 @@ export class Transaction {
     public static createCoinbaseTransaction() {
 
         const coinbase = new Transaction(
-            "",
-            "00e3b0c44298fc1c149afbf4c8996fb92427ae41e4",
-            config.staker.address,
-            utils.mining_pow,
-            "0",
-            new Date().getTime().toString(),
-            "",
-            "",
+            Uint256.alloc(),
+            AddressHex.fromHex("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4"),
+            AddressHex.fromHex(config.staker.address),
+            Uint64.from(utils.mining_pow),
+            Uint64.from(0),
+            Uint64.from(new Date().getTime()),
+            Uint.alloc(0),
+            Uint.alloc(0),
         );
 
-        const hash = Crypto.sha256(coinbase.encodeToHex(false, true), "buffer");
-        coinbase.txid = EncodingUtils.bufferToHex(hash);
-        coinbase.signature = Crypto.sign(hash, "00", "0000000000000000000000000000000000000000000000000000000000000000");
+        const hash = Crypto.sha256(coinbase.encodeToHex(false, true), "binary");
+        coinbase.txid = hash;
+        coinbase.signature = Crypto.sign(hash, "00", Uint256.alloc());
 
         return coinbase;
     }

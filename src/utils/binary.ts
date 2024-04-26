@@ -20,7 +20,7 @@ type ByteArray = readonly number[] | Uint8Array;
 type WithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
 type WithArrayBuffer = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>;
 
-type NumberLike = BaseUint | number;
+type NumberLike = Uint | number;
 
 // export class Bytes32 extends Buffer {
 
@@ -47,15 +47,15 @@ class UintUtils {
         return newBuffer;
     }
 
-    static correctByteLengthUint<T>(CLS: New<T>, unit: BaseUint, correctByteLength: number) {
-        return new CLS(this.correctByteLengthBuffer(unit.buffer, correctByteLength));
+    static correctByteLengthUint<T>(CLS: New<T>, unit: Uint, correctByteLength: number) {
+        return new CLS(this.correctByteLengthBuffer(unit.getRaw(), correctByteLength));
     }
 
 }
 
-class BaseUint {
+export class Uint {
     
-    readonly buffer: Buffer;
+    protected readonly buffer: Buffer;
 
     constructor(buffer: Buffer) {
         this.buffer = buffer;
@@ -69,20 +69,52 @@ class BaseUint {
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
-    public static from<T>(this: New<T>, number: BaseUint | number, length?: number): T;
-    public static from(this: BasicUintConstructable<BaseUint>, input: any, arg2?: any, arg3?: any) {
-        let uint: BaseUint;
+    public static from<T>(this: New<T>, number: number, length?: number): T;
+    public static from(this: BasicUintConstructable<Uint>, input: any, arg2?: any, arg3?: any) {
+        let uint: Uint;
+        let buffer: Buffer;
         if (typeof input === "number") {
             uint = this.alloc(arg2 || (Math.floor(input.toString(16).length / 2) + 1));
             uint.add(input);
             return uint;
+        } else if (typeof input === "string" && arg2 === undefined) {
+            buffer = Buffer.from(input, "hex");
+        } else {
+            buffer = Buffer.from(input, arg2, arg3);
         }
-        return new this(Buffer.from(input, arg2, arg3));
+        return new this(buffer);
     }
-    
+
+    public static fromHex<T>(this: New<T>, hex: string): T;
+    public static fromHex(hex: string) {
+        return this.from(hex, "hex");
+    }
+
+    public static concat<T>(this: New<T>, list: readonly Uint[], totalLength?: number): T;
+    public static concat<T>(list: Uint[], totalLength?: number) {
+        return new this(Buffer.concat(
+            list.map((item) => {
+                return item.getRaw();
+            }), totalLength
+        ));
+    }
+
 
     public toHex() {
         return this.buffer.toString("hex")
+    }
+
+    public getRaw() {
+        return this.buffer;
+    }
+
+
+    public set(array: ArrayLike<number>, offset?: number) {
+        this.buffer.set(array, offset);
+    }
+
+    public slice(start?: number, end?: number) {
+        return new Uint(this.buffer.subarray());
     }
 
 
@@ -127,7 +159,7 @@ class BaseUint {
         return this.compare(value) !== 0;
     }
 
-    protected addUint(value: BaseUint) {
+    protected addUint(value: Uint) {
         if (this.buffer.byteLength !== value.buffer.byteLength) {
             // @ts-ignore
             value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
@@ -153,7 +185,7 @@ class BaseUint {
     }
 
 
-    protected subUint(value: BaseUint) {
+    protected subUint(value: Uint) {
         if (this.buffer.byteLength !== value.buffer.byteLength) {
             // @ts-ignore
             value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
@@ -173,16 +205,16 @@ class BaseUint {
 
     protected compare(value: NumberLike) {
         if (typeof value === "number") {
-            value = BaseUint.from(value, this.buffer.byteLength);
+            value = Uint.from(value, this.buffer.byteLength);
         } else if (this.buffer.byteLength !== value.buffer.byteLength) {
-            value = UintUtils.correctByteLengthUint(BaseUint, value, this.buffer.byteLength)
+            value = UintUtils.correctByteLengthUint(Uint, value, this.buffer.byteLength)
         }
         return this.buffer.compare(value.buffer)
     }
 
 }
 
-class FixedBaseUint extends BaseUint {
+export class FixedUint extends Uint {
 
     public static readonly byteLength: number;
 
@@ -198,23 +230,25 @@ class FixedBaseUint extends BaseUint {
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
-    public static from<T>(this: New<T>, number: BaseUint | number): T;
-    public static from(this: FixedUintConstructable<FixedBaseUint>, input: any, arg2?: any, arg3?: any) {
-        let uint: FixedBaseUint;
+    public static from<T>(this: New<T>, number: number): T;
+    public static from(this: FixedUintConstructable<FixedUint>, input: any, arg2?: any, arg3?: any) {
+        let uint: FixedUint;
+        let buffer: Buffer;
         if (typeof input === "number") {
             uint = this.alloc();
             uint.add(input);
             return uint;
+        } else if (typeof input === "string" && arg2 === undefined) {
+            buffer = Buffer.from(input, "hex");
+        } else {
+            buffer = Buffer.from(input, arg2, arg3);
         }
-        const buffer = Buffer.from(input, arg2, arg3);
         return new this(UintUtils.correctByteLengthBuffer(buffer, this.byteLength));
     }
 
 }
 
-export class Uint extends BaseUint {}
-
-export class Uint64 extends FixedBaseUint {
+export class Uint64 extends FixedUint {
 
     public static readonly byteLength: number = 8;
     
@@ -233,9 +267,7 @@ export class Uint64 extends FixedBaseUint {
 }
 
 export class Uint256 extends Uint64 {
-
     public static readonly byteLength: number = 32;
-
 }
 
 

@@ -20,7 +20,7 @@ class Utils {
     public readonly processRootDirectory = process.cwd();
 
     public readonly mining_difficulty = 6;
-    public readonly mining_pow = "10";
+    public readonly mining_pow = 10;
 
 
     private constructor() {
