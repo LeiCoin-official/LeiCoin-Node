@@ -5,15 +5,7 @@ import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
 
-export interface PropositionLike {
-    proposer: string;
-    readonly nonce: string;
-    signature: string;
-    block: Block;
-    version: string;
-}
-
-export class Proposition implements PropositionLike {
+export class Proposition {
     
     public proposer: string;
     public nonce: string;

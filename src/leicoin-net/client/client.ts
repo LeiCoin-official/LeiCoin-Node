@@ -2,8 +2,6 @@ import WebSocket from "ws";
 import cli from "../../utils/cli.js";
 import { Callbacks } from "../../utils/callbacks.js";
 
-// export interface LeiCoinNetClientLike {}
-
 export class LeiCoinNetClient {
 
     private readonly host: string;

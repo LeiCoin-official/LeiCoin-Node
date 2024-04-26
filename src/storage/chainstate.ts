@@ -3,7 +3,7 @@ import fs from "fs";
 import cli from "../utils/cli.js";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
-import Block, { BlockLike } from "../objects/block.js"
+import Block from "../objects/block.js"
 
 export interface SingleChainstateData {
     parent: {
@@ -17,7 +17,7 @@ export interface SingleChainstateData {
         index: string;
         hash: string;
     };
-    latestBlockInfo: BlockLike;
+    latestBlockInfo: Block;
 }
 
 
@@ -106,7 +106,7 @@ export class Chainstate {
         return this.chainStateData.chains[chain].latestBlockInfo;
     }
 
-    public updateLatestBlockInfo(latestBlockInfo: BlockLike, chain = "main", parentChain = "main") {
+    public updateLatestBlockInfo(latestBlockInfo: Block, chain = "main", parentChain = "main") {
 
         try {
             
@@ -153,7 +153,7 @@ export class Chainstate {
         return { isGenesisBlock: true, isForkOFGenesisBlock: false };
     }
 
-    public isBlockChainStateMatching(block: BlockLike): {
+    public isBlockChainStateMatching(block: Block): {
         valid: false;
         status: 400;
         message: string;

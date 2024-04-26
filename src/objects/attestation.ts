@@ -4,16 +4,7 @@ import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
 
-export interface AttestationLike {
-    attester: string;
-    blockHash: string;
-    vote: boolean;
-    nonce: string;
-    signature: string;
-    version: string;
-}
-
-export class Attestation implements AttestationLike {
+export class Attestation {
     
     public attester: string;
     public blockHash: string;

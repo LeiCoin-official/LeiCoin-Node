@@ -10,13 +10,7 @@ interface SlotEmptyBlock {
     data: null;
 }
 
-interface SlotLike {
-    index: string;
-    block: SlotProposedBlock | SlotEmptyBlock;
-    slashings: string[];
-}
-
-export class Slot implements SlotLike {
+export class Slot {
 
     index: string;
     block: SlotProposedBlock | SlotEmptyBlock;
