@@ -1,17 +1,9 @@
 import crypto from "crypto";
 import elliptic from 'elliptic';
-import EncodingUtils from "../handlers/encodingUtils.js";
 import { Dict } from "../utils/objects.js";
-import { Uint, Uint256 } from "../utils/binary.js";
-import Signature from "../objects/signature.js";
-
-export interface LeiCoinBinarySignature extends elliptic.ec.Signature { recoveryParam: number; }
-export interface LeiCoinSignature {
-    signerType: string;
-    r: string;
-    s: string;
-    recoveryParam: number;
-}
+import { Uint, Uint256, Uint8 } from "../utils/binary.js";
+import { EllipticBinarySignature, RawSignature } from "../objects/signature.js";
+import { PrivateKey, PublicKey } from "../objects/cryptoKeys.js";
 
 export class Crypto {
 
@@ -29,31 +21,29 @@ export class Crypto {
         return Uint256.from(crypto.createHash('sha256').update(input.getRaw()).digest());
     }
 
-    public static sign(hash: Uint256, signerType: string, privateKey: Uint256) {
+    public static sign(hash: Uint256, signerType: Uint8, privateKey: PrivateKey) {
         try {
             const keyPair = this.ec.keyFromPrivate(privateKey.getRaw(), "hex");
             const signature = keyPair.sign(hash.getRaw());
-            //return EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
-            const encoded = EncodingUtils.encodeSignature(signerType, (signature as LeiCoinBinarySignature));
-            return Signature.fromHex(encoded);
+            return RawSignature.fromElliptic(signerType, (signature as EllipticBinarySignature));
         } catch (error: any) {
-            return Uint.alloc(0);
+            return RawSignature.alloc();
         }
     }
 
-    public static getPublicKeyFromPrivateKey(privateKey: Uint256) {
+    public static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
         try {
-            return Uint.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic("array"));
+            return PrivateKey.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic("array"));
         } catch (error: any) {
-            return Uint.alloc(0);
+            return PrivateKey.alloc();
         }
     }
 
-    public static getPublicKeyFromSignature(hash: Uint256, signature: LeiCoinSignature): Uint {
+    public static getPublicKeyFromSignature(hash: Uint256, signature: RawSignature): Uint {
         try {
-            return this.ec.recoverPubKey(hash.getRaw(), signature, signature.recoveryParam).encode("array");
+            return PublicKey.from(this.ec.recoverPubKey(hash.getRaw(), signature.getElliptic(), signature.getRecoveryParam()).encode("array"));
         } catch (error: any) {
-            return Uint.alloc(0);
+            return PublicKey.alloc(0);
         }
     }
 

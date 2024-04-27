@@ -1,25 +1,26 @@
 import Crypto from "../crypto/index.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
-import { FixedUint, Uint, Uint256 } from "../utils/binary.js";
+import { FixedUint, Uint, Uint256, Uint8 } from "../utils/binary.js";
 import DataUtils from "../utils/dataUtils.js";
+import RawSignature from "./signature.js";
 
 export class AddressHex extends FixedUint {
 
     public static byteLength: number = 21;
 
     public getType() {
-        return this.slice(0, 2);
+        return new Uint8(this.slice(0, 1).getRaw());
     }
 
     public static fromPublicKey(addressType: Uint, publicKey: Uint) {
-        return this.concat([addressType, Crypto.sha256(publicKey).slice(0, 40)]);
+        return this.concat([addressType, Crypto.sha256(publicKey).slice(0, 20)]);
     }
 
     public static fromPrivateKey(addressType: Uint, privateKey: Uint256) {
         return this.fromPublicKey(addressType, Crypto.getPublicKeyFromPrivateKey(privateKey));
     }
 
-    public static fromSignature(hash: Uint256, signatureHex: string) {
+    public static fromSignature(hash: Uint256, signatureHex: RawSignature) {
         const signature = EncodingUtils.decodeSignature(signatureHex);
         const publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
         return this.fromPublicKey(signature.signerType, publicKey);

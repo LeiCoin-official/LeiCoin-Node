@@ -270,4 +270,7 @@ export class Uint256 extends Uint64 {
     public static readonly byteLength: number = 32;
 }
 
+export class Uint8 extends FixedUint {
+    public static readonly byteLength: number = 1;
+}
 

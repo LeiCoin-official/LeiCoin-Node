@@ -19,7 +19,7 @@ describe('binary_testing', () => {
         uint.sub(y1);
         uint.sub(y2);
 
-        expect(uint.buffer.toString("hex")).toBe("00000000000000ff");
+        expect(uint.getRaw().toString("hex")).toBe("00000000000000ff");
     });
 
     test('comparing', () => {
@@ -39,7 +39,7 @@ describe('binary_testing', () => {
         uint.sub(y1);
         uint.sub(y2);
 
-        expect(uint.buffer.toString("hex")).toBe("00000000000000ff");
+        expect(uint.getRaw().toString("hex")).toBe("00000000000000ff");
     });
 
 });

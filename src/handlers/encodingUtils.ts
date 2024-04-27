@@ -2,6 +2,7 @@ import { Callbacks } from "../utils/callbacks.js";
 import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
 import { AnyObj, Dict } from "../utils/objects.js";
 import BigNum from "../utils/bigNum.js";
+import { RawSignature } from "../objects/signature.js";
 
 type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object" | "bigintWithLenPrefix";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
@@ -111,7 +112,7 @@ export default class EncodingUtils {
         );
     }
     
-    public static decodeSignature(hexData: string): LeiCoinSignature {
+    public static decodeSignature(hexData: RawSignature): LeiCoinSignature {
         return {
             signerType: hexData.slice(0, 2),
             r: hexData.slice(2, 66),
