@@ -23,7 +23,7 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 const keyPair = ec.keyFromPrivate(privateKeyHex, "hex");
 const publicKeyHex = keyPair.getPublic("hex");
 
-const address = "lc0x" + crypto.createHash("sha256").update(publicKeyHex).digest("hex").slice(0, 40);
+const address = "lc0x" + crypto.createHash("sha256").update(Buffer.from(publicKeyHex)).digest("hex").slice(0, 40);
 
 // console.log("Public Key:", publicKeyHex, publicKeyHex.length);
 // console.log("Private Key:", privateKeyHex, privateKeyHex.length);
@@ -40,8 +40,8 @@ const signature = keyPair.sign(messageHash);
 //const signatureDERHex = signature.toDER("hex");
 //console.log("Signature DER Hex:", signatureDERHex, signatureDERHex.length);
 
-const signatureHex = createHackSignature(signature);
-//const signatureHex = encodeSignature(signature);
+//const signatureHex = createHackSignature(signature);
+const signatureHex = encodeSignature(signature);
 console.log("Signature Hex:", signatureHex, signatureHex.length);
 
 const decoded_signature = decodeSignature(signatureHex);
@@ -52,7 +52,7 @@ const recoverPubKey = ec.recoverPubKey(messageHash, decoded_signature, decoded_s
 
 const recoverPubKeyHex = recoverPubKey.encode('hex');
 
-const recoverAddress = "lc0x" + crypto.createHash("sha256").update(recoverPubKeyHex).digest("hex").slice(0, 40);
+const recoverAddress = "lc0x" + crypto.createHash("sha256").update(Buffer.from(recoverPubKeyHex)).digest("hex").slice(0, 40);
 
 //const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
 

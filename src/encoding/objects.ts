@@ -1,4 +1,5 @@
 import { AddressHex } from "../objects/address.js";
+import { Prefix } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";
@@ -51,8 +52,8 @@ export class ObjectEncoding {
         this.types.bigint = {
             defaultLength: 1,
             lengthBefore: true,
-            encode: Uint64.prototype.toShortUint.call,
-            parse: Uint64.create
+            encode: (v: any) => Uint64.prototype.toShortUint.call(v),
+            parse: (v: any) => Uint64.create(v)
         };
 
         this.types.bool = {
@@ -63,46 +64,57 @@ export class ObjectEncoding {
 
         this.types.default = {};
 
-        this.types.address = { parse: AddressHex.create };
-        this.types.signature = { parse: Signature.create };
-        this.types.hash = { parse: Uint256.create };
-        this.types.version = { parse: Uint8.create };
+        // this.types.address = { parse: (v: any) => new AddressHex(v), defaultLength: AddressHex.byteLength };
+        // this.types.signature = { parse: (v: any) => new Signature(v), defaultLength: Signature.byteLength };
+        // this.types.hash = { parse: (v: any) => new Uint256(v), defaultLength: Uint256.byteLength };
+        // this.types.version = { parse: (v: any) => new Uint8(v), defaultLength: Uint8.byteLength };
+
+        this.types.address = { parse: (v: any) => AddressHex.create(v), defaultLength: AddressHex.byteLength };
+        this.types.signature = { parse: (v: any) => Signature.create(v), defaultLength: Signature.byteLength };
+        this.types.hash = { parse: (v: any) => Uint256.create(v), defaultLength: Uint256.byteLength };
+        this.types.version = { parse: (v: any) => Uint8.create(v), defaultLength: Uint8.byteLength };
 
     }
 
 
     private static encodeValue(value: any, data: DataToHexArguments) {
 
-        let hexDataType: HexDataType;
-        let lengthBefore = data.lengthBefore;
+        try {
 
-        if (data.key in this.types) {
-            hexDataType = this.types[data.key];
-        } else {
-            hexDataType = this.types[data.type || "default"] || this.types.default;
-        }
-        
-        if (hexDataType.lengthBefore && !lengthBefore) {
-            lengthBefore = hexDataType.lengthBefore;
-        }
+            let hexDataType: HexDataType;
+            let lengthBefore = data.lengthBefore;
 
-        let hexValue: Uint;
-        if (hexDataType.encode) {
-            hexValue = hexDataType.encode(value);
-        } else {
-            hexValue = value;
-        }
+            if (data.key in this.types) {
+                hexDataType = this.types[data.key];
+            } else {
+                hexDataType = this.types[data.type || "default"] || this.types.default;
+            }
+            
+            if (hexDataType.lengthBefore && !lengthBefore) {
+                lengthBefore = hexDataType.lengthBefore;
+            }
 
-        if (lengthBefore) {
-            if (lengthBefore === "unlimited") {
-                let hexValueLength = this.encodeLengthForUnlimited(hexValue.getLen());
+            let hexValue: Uint;
+            if (hexDataType.encode) {
+                hexValue = hexDataType.encode(value);
+            } else {
+                hexValue = value;
+            }
+
+            if (lengthBefore) {
+                if (lengthBefore === "unlimited") {
+                    let hexValueLength = this.encodeLengthForUnlimited(hexValue.getLen());
+                    return [hexValueLength, hexValue];
+                }
+                let hexValueLength = hexValue.getLen("uint");
                 return [hexValueLength, hexValue];
             }
-            let hexValueLength = hexValue.getLen("uint");
-            return [hexValueLength, hexValue];
-        }
 
-        return [hexValue];
+            return [hexValue];
+
+        } catch (err: any) {
+            return null;
+        }
 
     }
 
@@ -165,14 +177,15 @@ export class ObjectEncoding {
     }
 
     private static encodeLengthForUnlimited(length: number) {
-        return Uint.from(length.toString(15) + "F");
+        const lenStr = length.toString(15) + "F";
+        return Uint.from((lenStr.length % 2 === 0) ? lenStr : ("0" + lenStr));
     }
 
     private static decodeLengthFromUnlimited(hexData: Uint) {
         const base15Length = EncodingUtils.splitWithTail(hexData.toHex().toUpperCase(), "F", 1)[0];
         return [
             parseInt(base15Length, 15),
-            base15Length.length + 1
+            Math.ceil((base15Length.length + 1) / 2)
         ];
     }
 

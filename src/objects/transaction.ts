@@ -30,7 +30,7 @@ export class Transaction {
         timestamp: Uint64,
         input: Uint,
         signature: Signature,
-        version = Prefix.from("00")
+        version = Prefix.from(0)
     ) {
         this.txid = txid;
         this.senderAddress = senderAddress;
@@ -56,9 +56,9 @@ export class Transaction {
             Signature.alloc(),
         );
 
-        const hash = Crypto.sha256(coinbase.encodeToHex(true), "binary");
+        const hash = Crypto.sha256(coinbase.encodeToHex(true));
         coinbase.txid = hash;
-        coinbase.signature = new Signature(Crypto.sign(hash, Prefix.from("00"), Uint256.alloc()).getRaw());
+        coinbase.signature = Crypto.sign(hash, Prefix.from(0), Uint256.alloc());
 
         return coinbase;
     }
@@ -96,7 +96,7 @@ export class Transaction {
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
 
                 data.senderAddress = "";
                 const instance = DataUtils.createInstanceFromJSON(Transaction, data);

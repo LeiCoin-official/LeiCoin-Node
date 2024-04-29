@@ -10,7 +10,7 @@ export class Validator {
     private stake: Uint64;
     public version: Prefix;
 
-    constructor(address: AddressHex, stake: Uint64, version = Prefix.from("00")) {
+    constructor(address: AddressHex, stake: Uint64, version = Prefix.from(0)) {
         this.address = address;
         this.stake = stake;
         this.version = version;
@@ -48,7 +48,7 @@ export class Validator {
 
             const data = resultData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 return new Validator(address, data.stake, data.version);
             }
 

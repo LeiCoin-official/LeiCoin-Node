@@ -34,9 +34,9 @@ export class Crypto {
 
     public static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
         try {
-            return PrivateKey.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic("array"));
+            return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic("array"));
         } catch (error: any) {
-            return PrivateKey.alloc();
+            return PublicKey.empty();
         }
     }
 

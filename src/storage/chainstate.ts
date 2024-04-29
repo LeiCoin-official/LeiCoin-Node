@@ -4,18 +4,19 @@ import cli from "../utils/cli.js";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
 import EncodingUtils from "../encoding/index.js";
 import Block from "../objects/block.js"
+import { Uint256, Uint64 } from "../utils/binary.js";
 
 export interface SingleChainstateData {
     parent: {
         name: string;
     };
     base: {
-        index: string;
-        hash: string;
+        index: Uint64;
+        hash: Uint256;
     };
     previousBlockInfo: {
-        index: string;
-        hash: string;
+        index: Uint64;
+        hash: Uint256;
     };
     latestBlockInfo: Block;
 }
@@ -125,7 +126,7 @@ export class Chainstate {
 
     }
 
-    public isValidGenesisBlock(hash: string) {
+    public isValidGenesisBlock(hash: Uint256) {
     
         const latestANDPreviousForkBlockInfo = this.chainStateData.chains.main;
 
@@ -173,13 +174,13 @@ export class Chainstate {
 
                 return { valid: false, status: 400, message: 'Bad Request. Block aleady exists.' };
 
-            } else if ((latestBlockInfo.hash === block.previousHash) && ((latestBlockInfo.index + 1) === block.index)) {
+            } else if ((latestBlockInfo.hash === block.previousHash) && latestBlockInfo.index.add(1, true).eq(block.index)) {
 
                 return { valid: true, name: chainName, type: "child", parent: chainName };
 
-            } else if ((previousBlockInfo.hash === block.previousHash) && ((previousBlockInfo.index + 1) === block.index)) {
+            } else if ((previousBlockInfo.hash === block.previousHash) && previousBlockInfo.index.add(1, true).eq(block.index)) {
 
-                return { valid: true, name: block.hash, type: "newfork", parent: chainName };
+                return { valid: true, name: block.hash.toHex(), type: "newfork", parent: chainName };
 
             }
         }

@@ -130,8 +130,13 @@ export class Uint {
         return new Uint(this.buffer.subarray(start, end));
     }
 
-
-    public add(value: NumberLike) {
+    public add(value: NumberLike): void;
+    public add(value: NumberLike, returnOnly: true): this;
+    public add(value: NumberLike, returnOnly = false) {
+        if (returnOnly) { // @ts-ignore
+            const uint = new this.constructor(this.getRaw()); uint.add(value);
+            return uint;
+        }
         if (typeof value === "object") {
             this.addUint(value);
         } else if (typeof value === "number") {
@@ -139,7 +144,13 @@ export class Uint {
         }
     }
 
-    public sub(value: NumberLike) {
+    public sub(value: NumberLike): void;
+    public sub(value: NumberLike, returnOnly: true): this;
+    public sub(value: NumberLike, returnOnly = false) {
+        if (returnOnly) { // @ts-ignore
+            const uint = new this.constructor(this.getRaw()); uint.sub(value);
+            return uint;
+        }
         if (typeof value === "object") {
             this.subUint(value);
         } else if (typeof value === "number") {
@@ -230,13 +241,18 @@ export class FixedUint extends Uint {
 
     public static readonly byteLength: number;
 
-    constructor(buffer: Buffer) {
+    constructor(buffer: Uint | Buffer) {
         super(buffer);
     }
 
     public static alloc<T>(this: New<T>): T;
     public static alloc() {
         return new this(Buffer.alloc(this.byteLength));
+    }
+
+    public static create<T>(this: New<T>, input: Uint | Buffer): T;
+    public static create(input: Uint & Buffer) {
+        return new this(UintUtils.correctByteLengthBuffer((input.getRaw ? input.getRaw() : input), this.byteLength));
     }
 
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;

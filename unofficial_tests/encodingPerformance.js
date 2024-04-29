@@ -314,7 +314,7 @@ class Transaction {
                 { key: "signature", length: 128 }
             ], returnLength);
             const data = returnData.data;
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 data.senderAddress = EncodingUtils.decodeHexToAddress(data.senderAddress);
                 data.recipientAddress = EncodingUtils.decodeHexToAddress(data.recipientAddress);
                 const tx = createInstanceFromJSON(Transaction, data);
@@ -354,7 +354,7 @@ class AttestationInBlock {
                 { key: "signature", length: 128 }
             ], returnLength);
             const data = returnData.data;
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 const attestation = createInstanceFromJSON(AttestationInBlock, data);
                 if (returnLength) {
                     return { data: attestation, length: returnData.length };
@@ -437,7 +437,7 @@ class Block {
                 { key: "transactions", length: 2, type: "array", decodeFunc: Transaction.fromDecodedHex }
             ], returnLength);
             const data = returnData.data;
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 const block = createInstanceFromJSON(Block, data);
                 if (returnLength) {
                     return { data: block, length: returnData.length };

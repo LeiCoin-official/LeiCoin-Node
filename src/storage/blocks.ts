@@ -3,6 +3,7 @@ import cli from "../utils/cli.js";
 import Block from "../objects/block.js";
 import fs from "fs";
 import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
+import { Uint } from "../utils/binary.js";
 
 export class BlockDB {
     
@@ -21,7 +22,7 @@ export class BlockDB {
             // Check if the block file already exists.
             if (!fs.existsSync(blockFilePath) || overwrite) {
                 // Write the block data to the block file.
-                fs.writeFileSync(blockFilePath, block.encodeToHex(), "hex");                
+                fs.writeFileSync(blockFilePath, block.encodeToHex().getRaw(), "hex");                
 
                 return { cb: Callbacks.SUCCESS };
             } else {
@@ -40,7 +41,7 @@ export class BlockDB {
             const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
             if (fs.existsSync(blockFilePath)) {
                 const hexData = fs.readFileSync(blockFilePath, "hex");
-                return {cb: Callbacks.SUCCESS, data: Block.fromDecodedHex(hexData)};
+                return {cb: Callbacks.SUCCESS, data: Block.fromDecodedHex(Uint.from(hexData))};
             } else {
                 //cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
                 return {cb: Callbacks.NONE};

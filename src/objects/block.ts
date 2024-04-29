@@ -30,7 +30,7 @@ export class Block {
         proposer: AddressHex,
         attestations: Attestation[],
         transactions: Transaction[],
-        version = Prefix.from("00")
+        version = Prefix.from(0)
     ) {
 
         this.index = index;
@@ -59,7 +59,7 @@ export class Block {
 
         const coinbase = Transaction.createCoinbaseTransaction();
 
-        const transactions = Object.values(mempool.transactions);
+        const transactions = Array.from(mempool.transactions.values());
         transactions.unshift(coinbase);
     
         const newBlock = new Block(
@@ -104,13 +104,13 @@ export class Block {
                 {key: "previousHash", type: "hash"},
                 {key: "timestamp"},
                 {key: "proposer", type: "address"},
-                {key: "attestations", length: 2, type: "array", decodeFunc: Attestation.fromDecodedHex},
-                {key: "transactions", length: 2, type: "array", decodeFunc: Transaction.fromDecodedHex}
+                {key: "attestations", length: 1, type: "array", decodeFunc: Attestation.fromDecodedHex},
+                {key: "transactions", length: 1, type: "array", decodeFunc: Transaction.fromDecodedHex}
             ], returnLength);
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 const block = DataUtils.createInstanceFromJSON(Block, data);
 
                 if (returnLength) {

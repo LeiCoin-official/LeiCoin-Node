@@ -11,7 +11,7 @@ export class Wallet {
     private nonce: Uint64;
     public version: Prefix;
 
-    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = Prefix.from("00")) {
+    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = Prefix.from(0)) {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;
@@ -46,7 +46,7 @@ export class Wallet {
 
             const data = resultData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }
 

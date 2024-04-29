@@ -16,7 +16,7 @@ export class Proposition {
     public block: Block;
     public version: Prefix;
 
-    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = Prefix.from("00")) {
+    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = Prefix.from(0)) {
         this.proposer = proposer;
         this.nonce = nonce;
         this.signature = signature;
@@ -49,7 +49,7 @@ export class Proposition {
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
 
                 data.proposer = "";
                 const instance = DataUtils.createInstanceFromJSON(Proposition, data);

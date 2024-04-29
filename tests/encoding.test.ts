@@ -79,7 +79,7 @@ describe('encoding_testing', () => {
 
         const validator = new Validator(
             address,
-            Uint256.from(32_0000_0000)
+            Uint64.from(32_0000_0000)
         );
 
         const decoded: any = Validator.fromDecodedHex(address, validator.encodeToHex());

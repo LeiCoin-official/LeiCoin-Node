@@ -55,7 +55,7 @@ class Blockchain extends Chain {
                 hash: latestBlock.hash,
             },
             previousBlockInfo: {
-                index: BigNum.subtract(latestBlock.index, "1"),
+                index: latestBlock.index.sub(1, true),
                 hash: latestBlock.previousHash
             },
             latestBlockInfo: latestBlock

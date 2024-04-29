@@ -420,7 +420,7 @@ class Transaction {
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 data.senderAddress = EncodingUtils.decodeHexToAddress(data.senderAddress);
                 data.recipientAddress = EncodingUtils.decodeHexToAddress(data.recipientAddress);
 
@@ -476,7 +476,7 @@ class AttestationInBlock {
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
 
                 const attestation = createInstanceFromJSON(AttestationInBlock, data);
 
@@ -603,7 +603,7 @@ class Block {
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
                 const block = createInstanceFromJSON(Block, data);
 
                 if (returnLength) {

@@ -16,7 +16,7 @@ export class Attestation {
     public signature: Signature;
     public readonly version: Prefix;
 
-    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = Prefix.from("00")) {
+    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = Prefix.from(0)) {
         this.attester = attester;
         this.blockHash = blockHash;
         this.vote = vote;
@@ -52,7 +52,7 @@ export class Attestation {
 
             const data = returnData.data;
         
-            if (data && data.version === "00") {
+            if (data && data.version.eq(0)) {
 
                 data.attester = "";
                 const instance = DataUtils.createInstanceFromJSON(Attestation, data);

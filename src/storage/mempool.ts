@@ -1,17 +1,16 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
 import { Callbacks } from "../utils/callbacks.js";
+import { Uint256 } from "../utils/binary.js";
 
 class Mempool {                                                                                                                                                                                                         
 
     private static instance: Mempool;
 
-    public transactions: {
-        [txid: string]: Transaction
-    };
+    public transactions: Map<Uint256, Transaction>
   
     private constructor() {
-        this.transactions = {};
+        this.transactions = new Map();
     }
     
     public static getInstance() {
@@ -34,20 +33,20 @@ class Mempool {
     public addTransactionToMempool(transaction: Transaction) {
         const txid = transaction.txid;
     
-        if (txid in this.transactions) {
+        if (this.transactions.has(txid)) {
             //cli.data_message.error(`Transaction ${transactionHash} already exists in the Mempool.`);
             return { cb: 'exists' };
         }
     
-        this.transactions[txid] = transaction;
+        this.transactions.set(txid, transaction);
         return { cb: Callbacks.SUCCESS };
     }
     
     // Function to remove a transaction from the Mempool
-    public removeTransactionFromMempool(txid: string) {
+    public removeTransactionFromMempool(txid: Uint256) {
     
-        if (txid in this.transactions) {
-            delete this.transactions[txid];
+        if (this.transactions.has(txid)) {
+            this.transactions.delete(txid);
             return { cb: Callbacks.SUCCESS };
         }
     
