@@ -5,7 +5,8 @@ import utils from "../utils/index.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
-import { Uint, Uint256, Uint64 } from "../utils/binary.js";
+import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import Signature from "./signature.js";
 
 export class Transaction {
 
@@ -16,10 +17,20 @@ export class Transaction {
     public nonce: Uint64;
     public timestamp: Uint64;
     public input: Uint;
-    public signature: Uint;
-    public readonly version: Uint;
+    public signature: Signature;
+    public readonly version: Uint8;
 
-    constructor(txid: Uint256, senderAddress: AddressHex, recipientAddress: AddressHex, amount: Uint64, nonce: Uint64, timestamp: Uint64, input: Uint, signature: Uint, version = Uint.from("00")) {
+    constructor(
+        txid: Uint256,
+        senderAddress: AddressHex,
+        recipientAddress: AddressHex,
+        amount: Uint64,
+        nonce: Uint64,
+        timestamp: Uint64,
+        input: Uint,
+        signature: Signature,
+        version = Uint8.alloc()
+    ) {
         this.txid = txid;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
@@ -35,18 +46,18 @@ export class Transaction {
 
         const coinbase = new Transaction(
             Uint256.alloc(),
-            AddressHex.fromHex("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4"),
-            AddressHex.fromHex(config.staker.address),
+            AddressHex.from("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4"),
+            AddressHex.from(config.staker.address),
             Uint64.from(utils.mining_pow),
             Uint64.from(0),
             Uint64.from(new Date().getTime()),
             Uint.alloc(0),
-            Uint.alloc(0),
+            Signature.alloc(),
         );
 
         const hash = Crypto.sha256(coinbase.encodeToHex(false, true), "binary");
         coinbase.txid = hash;
-        coinbase.signature = Crypto.sign(hash, "00", Uint256.alloc());
+        coinbase.signature = new Signature(Crypto.sign(hash, Uint8.from("00"), Uint256.alloc()).getRaw());
 
         return coinbase;
     }
@@ -90,8 +101,7 @@ export class Transaction {
                 const instance = DataUtils.createInstanceFromJSON(Transaction, data);
 
                 if (withSenderAddress) {
-                    const hash = EncodingUtils.hexToBuffer(data.txid);
-                    instance.senderAddress = AddressHex.fromSignature(hash, data.signature);
+                    instance.senderAddress = AddressHex.fromSignature(data.txid, data.signature);
                 }
 
                 if (returnLength) {

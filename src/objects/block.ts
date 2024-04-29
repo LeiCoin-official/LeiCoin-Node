@@ -2,33 +2,34 @@ import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
 import blockchain from "../storage/blockchain.js";
 import EncodingUtils from "../handlers/encodingUtils.js";
-import BigNum from "../utils/bigNum.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
 import DataUtils from "../utils/dataUtils.js";
+import { Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import { AddressHex } from "./address.js";
 
 export class Block {
 
-    public index: string;
-    public hash: string;
-    public previousHash: string;
-    public timestamp: string;
-    public proposer: string;
+    public index: Uint64;
+    public hash: Uint256;
+    public previousHash: Uint256;
+    public timestamp: Uint64;
+    public proposer: AddressHex;
     public attestations: Attestation[];
     public transactions: Transaction[];
-    public version: string;
+    public version: Uint8;
 
     constructor(
-        index: string,
-        hash: string,
-        previousHash: string,
-        timestamp: string,
-        proposer: string,
+        index: Uint64,
+        hash: Uint256,
+        previousHash: Uint256,
+        timestamp: Uint64,
+        proposer: AddressHex,
         attestations: Attestation[],
         transactions: Transaction[],
-        version = "00"
+        version = Uint8.alloc()
     ) {
 
         this.index = index;
@@ -47,12 +48,12 @@ export class Block {
         const previousBlock = blockchain.chainstate.getLatestBlockInfo();
     
         let newIndex;
-        let previousHash;
+        let previousHash: Uint256;
     
-        if (!previousBlock || (typeof(previousBlock.index) !== 'number')) newIndex = "0";
-        else newIndex = BigNum.add(previousBlock.index, "1");
+        if (!previousBlock || (typeof(previousBlock.index) !== 'number')) newIndex = Uint64.alloc();
+        else newIndex = previousBlock.index, "1";
     
-        if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = '0000000000000000000000000000000000000000000000000000000000000000';
+        if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = Uint256.alloc();
         else previousHash = previousBlock.hash;
 
         const coinbase = Transaction.createCoinbaseTransaction();
@@ -62,15 +63,15 @@ export class Block {
     
         const newBlock = new Block(
             newIndex,
-            '',
+            Uint256.alloc(),
             previousHash,
-            new Date().getTime().toString(),
-            config.staker.address,
+            Uint64.from(new Date().getTime()),
+            AddressHex.from(config.staker.address),
             [],
             transactions
         );
         
-        newBlock.hash = newBlock.calculateHash();
+        newBlock.hash.set(newBlock.calculateHash());
 
         return newBlock;
     }

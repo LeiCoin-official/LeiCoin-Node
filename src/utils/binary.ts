@@ -1,40 +1,25 @@
 
 type New<T> = new(buffer: Buffer) => T;
 
-interface BasicUintConstructable<T> extends New<T> {
-    alloc(length: number): T;
-}
-
-interface FixedUintConstructable<T> extends BasicUintConstructable<T> {
+interface FixedUintConstructable<T> extends New<T>  {
     byteLength: number;
     alloc(): T;
 }
 
-interface UintConstructable<T> extends BasicUintConstructable<T> {
+interface UintConstructable<T> extends New<T> {
     alloc(length?: number): T;
     byteLength?: number;
 }
 
-type ByteArray = readonly number[] | Uint8Array;
 
 type WithString = {[Symbol.toPrimitive](hint: "string"): string} | WithImplicitCoercion<string>;
 type WithArrayBuffer = WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>;
 
-type NumberLike = Uint | number;
+type ByteArray = readonly number[] | Uint8Array;
 
-// export class Bytes32 extends Buffer {
+export type NumberLike = Uint | number;
+export type BinLike = Uint | Buffer;
 
-//     static hasCorrectByteLength(buffer: Buffer) {
-//         return buffer.byteLength === 32;
-//     }
-
-//     static getWithOffset(buffer: Buffer) {
-//         const offsetNeeded = 32 - buffer.byteLength;
-//         if (offsetNeeded <= 0) return buffer;
-//         return Buffer.concat([Buffer.alloc(2), buffer])
-//     }
-
-// }
 
 class UintUtils {
 
@@ -47,8 +32,8 @@ class UintUtils {
         return newBuffer;
     }
 
-    static correctByteLengthUint<T>(CLS: New<T>, unit: Uint, correctByteLength: number) {
-        return new CLS(this.correctByteLengthBuffer(unit.getRaw(), correctByteLength));
+    static correctByteLengthUint<T>(CLS: New<T>, uint: Uint, correctByteLength: number) {
+        return new CLS(this.correctByteLengthBuffer(uint.getRaw(), correctByteLength));
     }
 
 }
@@ -70,7 +55,7 @@ export class Uint {
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
     public static from<T>(this: New<T>, number: number, length?: number): T;
-    public static from(this: BasicUintConstructable<Uint>, input: any, arg2?: any, arg3?: any) {
+    public static from(this: UintConstructable<Uint>, input: any, arg2?: any, arg3?: any) {
         let uint: Uint;
         let buffer: Buffer;
         if (typeof input === "number") {
@@ -85,16 +70,18 @@ export class Uint {
         return new this(buffer);
     }
 
+    /** @deprecated Use {@link Uint.from}(string) instead */
     public static fromHex<T>(this: New<T>, hex: string): T;
+    /** @deprecated Use {@link Uint.from}(string) instead */
     public static fromHex(hex: string) {
         return this.from(hex, "hex");
     }
 
-    public static concat<T>(this: New<T>, list: readonly Uint[], totalLength?: number): T;
-    public static concat<T>(list: Uint[], totalLength?: number) {
+    public static concat<T>(this: New<T>, list: (Uint | Buffer)[], totalLength?: number): T;
+    public static concat(list: (Uint & Buffer)[], totalLength?: number) {
         return new this(Buffer.concat(
             list.map((item) => {
-                return item.getRaw();
+                return item.getRaw ? item.getRaw() : item;
             }), totalLength
         ));
     }
@@ -104,17 +91,30 @@ export class Uint {
         return this.buffer.toString("hex")
     }
 
+    public toInt() {
+        try {
+            return this.buffer.readUintBE(0, this.buffer.byteLength);
+        } catch {
+            return 0;
+        }
+    }
+
     public getRaw() {
         return this.buffer;
     }
 
 
-    public set(array: ArrayLike<number>, offset?: number) {
-        this.buffer.set(array, offset);
+    public getLen() {
+        return this.buffer.byteLength;
+    }
+
+    public set(list: ArrayLike<number> | Uint, offset?: number): void;
+    public set(list: ArrayLike<number> & Uint, offset?: number) {
+        this.buffer.set((list.getRaw ? list.getRaw() : list), offset);
     }
 
     public slice(start?: number, end?: number) {
-        return new Uint(this.buffer.subarray());
+        return new Uint(this.buffer.subarray(start, end));
     }
 
 
@@ -124,7 +124,6 @@ export class Uint {
         } else if (typeof value === "number") {
             this.addNumber(value);
         }
-        return true;
     }
 
     public sub(value: NumberLike) {
@@ -256,12 +255,16 @@ export class Uint64 extends FixedUint {
         for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
             const sum = this.buffer.readUint32BE(i) + value;
             if (sum >= 0) {
-                this.buffer.writeUInt32BE(sum % 4294967296, i);
+                this.buffer.writeUint32BE(sum % 4294967296, i);
             } else {
-                this.buffer.writeUInt32BE((sum % 4294967296) + 4294967296, i)
+                this.buffer.writeUint32BE((sum % 4294967296) + 4294967296, i)
             }
             value = Math.floor(sum / 4294967296);
         }
+    }
+
+    public toBigInt() {
+        return this.buffer.readBigInt64BE();
     }
 
 }

@@ -1,22 +1,24 @@
 import elliptic from 'elliptic';
-import { FixedUint, Uint64, Uint8, Uint } from "../utils/binary.js";
+import { FixedUint, Uint64, Uint8 } from "../utils/binary.js";
 
 export interface EllipticBinarySignature extends elliptic.ec.Signature {
     recoveryParam: number;
 }
 
-export class RawSignature extends FixedUint {
+export class Signature extends FixedUint {
     public static byteLength: number = 66;
 
     public static fromElliptic(signerType: Uint8, signature: EllipticBinarySignature) {
         return this.concat([
             signerType,
-            new Uint(Buffer.concat([
-                signature.r.toArrayLike(Buffer),
-                signature.s.toArrayLike(Buffer)
-            ])),
+            signature.r.toArrayLike(Buffer),
+            signature.s.toArrayLike(Buffer),
             Uint8.from(signature.recoveryParam)
         ]);
+    }
+
+    public getSignerType() {
+        return this.slice(0, 1);
     }
 
     public getElliptic() {
@@ -32,7 +34,7 @@ export class RawSignature extends FixedUint {
     }
 }
 
-export class Signature {
+export class FullSignature {
     public signerType: Uint8;
     public r: Uint64;
     public s: Uint64;
@@ -45,8 +47,8 @@ export class Signature {
         this.recoveryParam = recoveryParam;
     }
 
-    public static fromRaw(raw: RawSignature) {
-        return new Signature(
+    public static fromRaw(raw: Signature) {
+        return new this(
             raw.slice(0, 1),
             new Uint64(raw.slice(1, 33).getRaw()),
             new Uint64(raw.slice(33, 65).getRaw()),
@@ -55,7 +57,7 @@ export class Signature {
     }
 
     public getRaw() {
-        return RawSignature.concat([this.signerType, this.r, this.s, Uint8.from(this.recoveryParam)]);
+        return Signature.concat([this.signerType, this.r, this.s, Uint8.from(this.recoveryParam)]);
     }
 
     public getElliptic() {
@@ -66,4 +68,6 @@ export class Signature {
         }
     }
 }
+
+export default Signature;
 

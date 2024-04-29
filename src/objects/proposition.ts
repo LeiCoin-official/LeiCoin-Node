@@ -4,16 +4,18 @@ import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
+import { Uint64, Uint, Uint8 } from "../utils/binary.js";
+import Signature from "./signature.js";
 
 export class Proposition {
     
-    public proposer: string;
-    public nonce: string;
-    public signature: string;
+    public proposer: AddressHex;
+    public nonce: Uint64;
+    public signature: Signature;
     public block: Block;
-    public version: string;
+    public version: Uint8;
 
-    constructor(proposer: string, nonce: string, signature: string, block: Block, version = "00") {
+    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = Uint8.alloc()) {
         this.proposer = proposer;
         this.nonce = nonce;
         this.signature = signature;
@@ -52,8 +54,7 @@ export class Proposition {
                 const instance = DataUtils.createInstanceFromJSON(Proposition, data);
 
                 if (withProposerAddress) {
-                    const hash = Crypto.sha256(instance.encodeToHex(false, true), "buffer");
-                    instance.proposer = AddressHex.fromSignature(hash, data.signature);
+                    instance.proposer = AddressHex.fromSignature(instance.calculateHash(), data.signature);
                 }
 
                 return instance;

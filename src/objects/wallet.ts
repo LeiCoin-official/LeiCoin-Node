@@ -1,23 +1,24 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
-import BigNum from "../utils/bigNum.js";
+import { NumberLike, Uint64, Uint8 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
+import { AddressHex } from "./address.js";
 
 export class Wallet {
 
-    public owner: string;
-    private balance: string;
-    private nonce: string;
-    public version: string;
+    public owner: AddressHex;
+    private balance: Uint64;
+    private nonce: Uint64;
+    public version: Uint8;
 
-    constructor(owner: string, balance: string, nonce: string, version = "00") {
+    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = Uint8.alloc()) {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;
         this.version = version;
     }
 
-    public static createEmptyWallet(owner: string) {
-        return new Wallet(owner, "0", "0");
+    public static createEmptyWallet(owner: AddressHex) {
+        return new Wallet(owner, Uint64.alloc(), Uint64.alloc());
     }
 
     public encodeToHex(add_empty_bytes = true) {
@@ -32,7 +33,7 @@ export class Wallet {
 
     }
     
-    public static fromDecodedHex(ownerAddress: string, hexData: string) {
+    public static fromDecodedHex(ownerAddress: AddressHex, hexData: string) {
 
         try {
 
@@ -55,25 +56,21 @@ export class Wallet {
         return null;
     }
 
-    public addMoney(amount: string) {
-        this.balance = BigNum.add(this.balance, amount);
+    public addMoney(amount: NumberLike) {
+        this.balance.add(amount);
     }
 
     public getBalance() {
         return this.balance;
     }
 
-    public isSubtractMoneyPossible(amount: string) {
-        if (BigNum.lessOrEqual(amount, this.balance)) {
-            return true;
-        }
-        return false;
+    public isSubtractMoneyPossible(amount: NumberLike) {
+        return this.balance.gte(amount);
     }
 
-    public subtractMoneyIFPossible(amount: string) {
-
+    public subtractMoneyIFPossible(amount: NumberLike) {
         if (this.isSubtractMoneyPossible(amount)) {
-            this.balance = BigNum.subtract(this.balance, amount);
+            this.balance.sub(amount);
         }
     }
 
@@ -81,8 +78,8 @@ export class Wallet {
         return this.nonce;
     }
 
-    public adjustNonce(add = "1") {
-        this.nonce = BigNum.add(this.nonce, add);
+    public adjustNonce(height = 1) {
+        this.nonce.add(height);
     }
 
 }

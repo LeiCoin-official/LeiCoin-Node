@@ -1,6 +1,6 @@
 import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
-import { Uint, Uint64 } from "../build/bin/leicoin-node-test.cjs"
+import { Uint, Uint256, Uint64 } from "../build/test/binary.cjs"
 import BN from "bn.js"
 import crypto from "crypto";
 

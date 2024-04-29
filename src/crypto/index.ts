@@ -2,8 +2,8 @@ import crypto from "crypto";
 import elliptic from 'elliptic';
 import { Dict } from "../utils/objects.js";
 import { Uint, Uint256, Uint8 } from "../utils/binary.js";
-import { EllipticBinarySignature, RawSignature } from "../objects/signature.js";
-import { PrivateKey, PublicKey } from "../objects/cryptoKeys.js";
+import { EllipticBinarySignature, Signature } from "../objects/signature.js";
+import { PrivateKey, PublicKey } from "./cryptoKeys.js";
 
 export class Crypto {
 
@@ -25,9 +25,9 @@ export class Crypto {
         try {
             const keyPair = this.ec.keyFromPrivate(privateKey.getRaw(), "hex");
             const signature = keyPair.sign(hash.getRaw());
-            return RawSignature.fromElliptic(signerType, (signature as EllipticBinarySignature));
+            return Signature.fromElliptic(signerType, (signature as EllipticBinarySignature));
         } catch (error: any) {
-            return RawSignature.alloc();
+            return Signature.alloc();
         }
     }
 
@@ -39,9 +39,13 @@ export class Crypto {
         }
     }
 
-    public static getPublicKeyFromSignature(hash: Uint256, signature: RawSignature): Uint {
+    public static getPublicKeyFromSignature(hash: Uint256, signature: Signature): Uint {
         try {
-            return PublicKey.from(this.ec.recoverPubKey(hash.getRaw(), signature.getElliptic(), signature.getRecoveryParam()).encode("array"));
+            return PublicKey.from(this.ec.recoverPubKey(
+                hash.getRaw(),
+                signature.getElliptic(),
+                signature.getRecoveryParam()
+            ).encode("array"));
         } catch (error: any) {
             return PublicKey.alloc(0);
         }

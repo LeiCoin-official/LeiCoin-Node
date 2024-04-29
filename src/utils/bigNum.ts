@@ -1,4 +1,5 @@
-export class BigNum {
+
+/*export class BigNum {
 
     static add(v1: any, v2: any) {
         return (BigInt(v1) + BigInt(v2)).toString();
@@ -57,3 +58,4 @@ export class BigNum {
 }
 
 export default BigNum;
+*/

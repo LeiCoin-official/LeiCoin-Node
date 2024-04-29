@@ -1,8 +1,6 @@
+import { Uint, Uint64 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";
-import type { LeiCoinBinarySignature, LeiCoinSignature } from "../crypto/index.js";
 import { AnyObj, Dict } from "../utils/objects.js";
-import BigNum from "../utils/bigNum.js";
-import { RawSignature } from "../objects/signature.js";
 
 type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object" | "bigintWithLenPrefix";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
@@ -13,21 +11,21 @@ interface DataFromHexArguments {
     length?: number;
     lengthBefore?: boolean | "unlimited";
     type?: DefaultDataTypes;
-    decodeFunc?(hexData: string, returnLength: boolean): any;
+    decodeFunc?(hexData: Uint, returnLength: boolean): any;
 }
 
 interface DataToHexArguments {
     key: string;
     lengthBefore?: boolean | "unlimited";
     type?: DefaultDataTypes;
-    encodeFunc?(add_empty_bytes: boolean, forHash: boolean): string;
+    encodeFunc?(add_empty_bytes: boolean, forHash: boolean): Uint;
 }
 
 interface HexDataType {
     defaultLength?: number;
     lengthBefore?: boolean;
-    encode?(value: any): string;
-    parse?(value: string): any;
+    encode?(v: any): Uint;
+    parse?(v: Uint): any;
 }
 
 type HexDataTypes = Dict<HexDataType>;
@@ -103,7 +101,7 @@ export default class EncodingUtils {
         return decompressedStr;
     }*/
 
-    public static encodeSignature(signerType = "00", signature: LeiCoinBinarySignature) {
+    /*public static encodeSignature(signerType = "00", signature: LeiCoinBinarySignature) {
         return (
             signerType +
             signature.r.toString("hex", 64) +
@@ -119,35 +117,36 @@ export default class EncodingUtils {
             s: hexData.slice(66, 130),
             recoveryParam: parseInt(hexData.slice(130, 132), 16)
         };
-    }
+    }*/
 
     private static hexDataBasicTypes: Dict<HexDataType> = {
         bigint: {
-            encode: BigNum.numToHex, parse: BigNum.hexToNum
+            //encode: Uint64.from,
+            parse: Uint64.from
         },
         bool: {
             defaultLength: 1,
-            encode: (value: any) => (value ? "1" : "0"),
-            parse: (value: string) => (value === "1")
+            encode: (v: any) => (v ? Uint.from(1) : Uint.from(0)),
+            parse: (v: Uint) => (v.toInt() === 1)
         },
         default: {}
     }
 
     private static hexDataTemplateTypes: HexDataTypes = {
         bigintWithLenPrefix: {
-            defaultLength: 2, lengthBefore: true,
+            defaultLength: 1, lengthBefore: true,
             ...this.hexDataBasicTypes.bigint
         }
     }
 
     private static hexDataAdvancedTypes: HexDataTypes = {
-        address: { defaultLength: 42 },
-        signature: { defaultLength: 132 },
-        hash: { defaultLength: 64 },
+        address: { defaultLength: 21 },
+        signature: { defaultLength: 66 },
+        hash: { defaultLength: 32 },
         nonce: this.hexDataTemplateTypes.bigintWithLenPrefix,
         index: this.hexDataTemplateTypes.bigintWithLenPrefix,
         timestamp: this.hexDataTemplateTypes.bigintWithLenPrefix,
-        version: { defaultLength: 2 }
+        version: { defaultLength: 1 }
     }
 
     private static hexDataTypes: HexDataTypes = {
@@ -193,7 +192,7 @@ export default class EncodingUtils {
 
     }
 
-    private static getValueFromHex(hexDataSubstring: string, data: DataFromHexArguments) {
+    private static getValueFromHex(hexDataSubstring: Uint, data: DataFromHexArguments) {
 
         try {
 
@@ -254,11 +253,11 @@ export default class EncodingUtils {
     }
 
     public static encodeLengthForUnlimited(length: number) {
-        return length.toString(15) + "F";
+        return Uint.from(length.toString(15) + "F");
     }
 
-    public static getLengthFromUnlimited(hexData: string) {
-        const base15Length = this.splitWithTail(hexData.toUpperCase(), "F", 1)[0];
+    public static getLengthFromUnlimited(hexData: Uint) {
+        const base15Length = this.splitWithTail(hexData.toHex().toUpperCase(), "F", 1)[0];
         return [
             parseInt(base15Length, 15),
             base15Length.length + 1
@@ -311,7 +310,7 @@ export default class EncodingUtils {
 
     }
     
-    public static getObjectFromHex(hexData: string, values: DataFromHexArguments[], returnLength = false) {
+    public static getObjectFromHex(hexData: Uint, values: DataFromHexArguments[], returnLength = false) {
         
         try {
 
@@ -340,14 +339,15 @@ export default class EncodingUtils {
 
                     if (data.length) {
                         lenghValueLen = data.length;
-                        arrayCount = parseInt(arrayDataWithLength.slice(0, lenghValueLen), 16)
+                        arrayCount = arrayDataWithLength.slice(0, lenghValueLen).toInt();
                     } else if (data.lengthBefore === "unlimited") {
                         [arrayCount, lenghValueLen] = this.getLengthFromUnlimited(arrayDataWithLength);
                     } else {
                         return { cb: Callbacks.ERROR };
                     }
 
-                    let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
+                    //let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
+                    let arrayData = arrayDataWithLength.slice(lenghValueLen);
                     let total_arrayLength = lenghValueLen;
                         
                     for (let i = 0; i < arrayCount; i++) {

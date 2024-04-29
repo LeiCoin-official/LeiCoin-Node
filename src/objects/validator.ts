@@ -1,14 +1,15 @@
 import EncodingUtils from "../handlers/encodingUtils.js";
-import BigNum from "../utils/bigNum.js";
+import { NumberLike, Uint, Uint64, Uint8 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
+import { AddressHex } from "./address.js";
 
 export class Validator {
 
-    public address: string;
-    private stake: string;
-    public version: string;
+    public address: AddressHex;
+    private stake: Uint64;
+    public version: Uint8;
 
-    constructor(address: string, stake: string, version = "00") {
+    constructor(address: AddressHex, stake: Uint64, version = Uint8.alloc()) {
         this.address = address;
         this.stake = stake;
         this.version = version;
@@ -18,8 +19,8 @@ export class Validator {
         return this.stake;
     }
 
-    public addRewardStake(amount: string) {
-        this.stake = BigNum.add(this.stake, amount);
+    public addRewardStake(amount: NumberLike) {
+        this.stake.add(amount);
     }
 
     //public 
@@ -35,7 +36,7 @@ export class Validator {
     
     }
 
-    public static fromDecodedHex(address: string, hexData: string) {
+    public static fromDecodedHex(address: AddressHex, hexData: string) {
 
         try {
 

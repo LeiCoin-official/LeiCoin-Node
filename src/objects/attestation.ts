@@ -3,17 +3,19 @@ import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
+import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import Signature from "./signature.js";
 
 export class Attestation {
     
-    public attester: string;
-    public blockHash: string;
+    public attester: AddressHex;
+    public blockHash: Uint256;
     public vote: boolean;
-    public nonce: string;
-    public signature: string;
-    public readonly version: string;
+    public nonce: Uint64;
+    public signature: Signature;
+    public readonly version: Uint8;
 
-    constructor(attester: string, blockHash: string, vote: boolean, nonce: string, signature: string, version = "00") {
+    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = Uint8.alloc()) {
         this.attester = attester;
         this.blockHash = blockHash;
         this.vote = vote;
@@ -36,7 +38,7 @@ export class Attestation {
 
     }
 
-    public static fromDecodedHex(hexData: string, withAttesterAddress = true) {
+    public static fromDecodedHex(hexData: Uint, withAttesterAddress = true) {
 
         try {
             const returnData = EncodingUtils.getObjectFromHex(hexData, [
@@ -55,8 +57,7 @@ export class Attestation {
                 const instance = DataUtils.createInstanceFromJSON(Attestation, data);
 
                 if (withAttesterAddress) {
-                    const hash = Crypto.sha256(instance.encodeToHex(false, true), "buffer");
-                    instance.attester = AddressHex.fromSignature(hash, data.signature);
+                    instance.attester = AddressHex.fromSignature(instance.calculateHash(), data.signature);
                 }
 
                 return instance;
