@@ -1,6 +1,5 @@
 import Block from "../objects/block.js";
 import BigNum from "../utils/bigNum.js";
-import utils from "../utils/index.js";
 import stakerpool from "./stakepool.js";
 
 interface CurrentSlot {
