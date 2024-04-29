@@ -3,7 +3,7 @@ import path from "path";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
 import Wallet from "../objects/wallet.js";
-import EncodingUtils from "../handlers/encodingUtils.js";
+import EncodingUtils from "../encoding/index.js";
 import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";

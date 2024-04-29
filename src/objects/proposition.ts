@@ -1,4 +1,4 @@
-import EncodingUtils from "../handlers/encodingUtils.js";
+import ObjectEncoding from "../encoding/objects.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
@@ -23,23 +23,23 @@ export class Proposition {
         this.version = version;
     }
 
-    public encodeToHex(add_empty_bytes = true, forHash = false) {
+    public encodeToHex(forHash = false) {
 
-        const returnData = EncodingUtils.encodeObjectToHex(this, [
+        const returnData = ObjectEncoding.encode(this, [
             {key: "version"},
             {key: "nonce"},
             (forHash ? null : {key: "signature"}),
             {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex}
-        ], add_empty_bytes);
+        ]);
         
         return returnData.data;
 
     }
 
-    public static fromDecodedHex(hexData: string, withProposerAddress = true) {
+    public static fromDecodedHex(hexData: Uint, withProposerAddress = true) {
 
         try {
-            const returnData = EncodingUtils.getObjectFromHex(hexData, [
+            const returnData = ObjectEncoding.decode(hexData, [
                 {key: "version"},
                 {key: "nonce"},
                 {key: "signature"},
@@ -68,7 +68,7 @@ export class Proposition {
     }
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(false, true));
+        return Crypto.sha256(this.encodeToHex(true));
     }
 
 }

@@ -364,7 +364,7 @@ class Transaction {
         return coinbase;
     }
 
-    public encodeToHex(add_empty_bytes = false) {      
+    public encodeToHex() {      
     
         const encoded_amount = BigNum.numToHex(this.amount);
         const amount_length = BigNum.numToHex(encoded_amount.length);
@@ -453,7 +453,7 @@ class AttestationInBlock {
         this.signature = signature;
     }
 
-    public encodeToHex(add_empty_bytes = false) {
+    public encodeToHex() {
 
         const hexData = this.publicKey +
                         this.vote +
@@ -550,7 +550,7 @@ class Block {
         return newBlock;
     }
 
-    public encodeToHex(add_empty_bytes = true) {   
+    public encodeToHex() {   
     
         const encoded_index = BigNum.numToHex(this.index);
         const index_length = BigNum.numToHex(encoded_index.length);

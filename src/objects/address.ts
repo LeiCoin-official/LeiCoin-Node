@@ -1,6 +1,6 @@
 import { PrivateKey, PublicKey } from "../crypto/cryptoKeys.js";
 import Crypto from "../crypto/index.js";
-import EncodingUtils from "../handlers/encodingUtils.js";
+import ObjectEncoding from "../encoding/objects.js";
 import { FixedUint, Uint, Uint256, Uint8 } from "../utils/binary.js";
 import DataUtils from "../utils/dataUtils.js";
 import Signature from "./signature.js";

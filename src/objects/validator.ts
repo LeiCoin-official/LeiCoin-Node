@@ -1,4 +1,4 @@
-import EncodingUtils from "../handlers/encodingUtils.js";
+import ObjectEncoding from "../encoding/objects.js";
 import { NumberLike, Uint, Uint64, Uint8 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
@@ -25,24 +25,24 @@ export class Validator {
 
     //public 
 
-    public encodeToHex(add_empty_bytes = true) {
+    public encodeToHex() {
     
-        const resultData = EncodingUtils.encodeObjectToHex(this, [
+        const resultData = ObjectEncoding.encode(this, [
             {key: "version"},
-            {key: "stake", type: "bigintWithLenPrefix"},
-        ], add_empty_bytes);
+            {key: "stake", type: "bigint"},
+        ]);
 
         return resultData.data;
     
     }
 
-    public static fromDecodedHex(address: AddressHex, hexData: string) {
+    public static fromDecodedHex(address: AddressHex, hexData: Uint) {
 
         try {
 
-            const resultData = EncodingUtils.getObjectFromHex(hexData, [
+            const resultData = ObjectEncoding.decode(hexData, [
                 {key: "version"},
-                {key: "stake", type: "bigintWithLenPrefix"},
+                {key: "stake", type: "bigint"},
             ]);
 
             const data = resultData.data;

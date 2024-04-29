@@ -1,14 +1,14 @@
 import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
 import blockchain from "../storage/blockchain.js";
-import EncodingUtils from "../handlers/encodingUtils.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
 import DataUtils from "../utils/dataUtils.js";
-import { Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
+import ObjectEncoding from "../encoding/objects.js";
 
 export class Block {
 
@@ -76,9 +76,9 @@ export class Block {
         return newBlock;
     }
 
-    public encodeToHex(add_empty_bytes = true, forHash = false) {
+    public encodeToHex(forHash = false) {
 
-        const returnData = EncodingUtils.encodeObjectToHex(this, [
+        const returnData = ObjectEncoding.encode(this, [
             {key: "version"},
             {key: "index"},
             (forHash ? null : {key: "hash"}),
@@ -87,16 +87,16 @@ export class Block {
             {key: "proposer", type: "address"},
             {key: "attestations", type: "array", encodeFunc: Attestation.prototype.encodeToHex},
             {key: "transactions", type: "array", encodeFunc: Transaction.prototype.encodeToHex}
-        ], add_empty_bytes);
+        ]);
 
         return returnData.data;
 
     }
 
-    public static fromDecodedHex(hexData: string, returnLength = false) {
+    public static fromDecodedHex(hexData: Uint, returnLength = false) {
 
         try {
-            const returnData = EncodingUtils.getObjectFromHex(hexData, [
+            const returnData = ObjectEncoding.decode(hexData, [
                 {key: "version"},
                 {key: "index"},
                 {key: "hash"},
@@ -125,7 +125,7 @@ export class Block {
     }
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(false, true));
+        return Crypto.sha256(this.encodeToHex(true));
     }
 
     public addAttestation(attestation: Attestation) {

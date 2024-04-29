@@ -1,4 +1,4 @@
-import EncodingUtils from "../handlers/encodingUtils.js";
+import EncodingUtils from "../encoding/index.js";
 import Block from "./block.js";
 import Transaction from "./transaction.js";
 

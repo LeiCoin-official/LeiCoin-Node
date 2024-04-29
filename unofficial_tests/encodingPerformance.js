@@ -270,7 +270,7 @@ class Transaction {
         coinbase.txid = sha256(coinbase, ["txid", "version"]);
         return coinbase;
     }
-    encodeToHex(add_empty_bytes = false) {
+    encodeToHex() {
         const encoded_amount = BigNum.numToHex(this.amount);
         const amount_length = BigNum.numToHex(encoded_amount.length);
         const encoded_nonce = BigNum.numToHex(this.nonce);
@@ -339,7 +339,7 @@ class AttestationInBlock {
         this.vote = vote;
         this.signature = signature;
     }
-    encodeToHex(add_empty_bytes = false) {
+    encodeToHex() {
         const hexData = this.publicKey +
             this.vote +
             this.signature;
@@ -396,7 +396,7 @@ class Block {
         newBlock.calculateHash();
         return newBlock;
     }
-    encodeToHex(add_empty_bytes = true) {
+    encodeToHex() {
         const encoded_index = BigNum.numToHex(this.index);
         const index_length = BigNum.numToHex(encoded_index.length);
         const encoded_timestamp = BigNum.numToHex(this.timestamp);

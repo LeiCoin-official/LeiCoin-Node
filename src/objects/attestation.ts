@@ -1,4 +1,4 @@
-import EncodingUtils from "../handlers/encodingUtils.js";
+import ObjectEncoding from "../encoding/objects.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
@@ -24,15 +24,15 @@ export class Attestation {
         this.version = version;
     }
 
-    public encodeToHex(add_empty_bytes = true, forHash = false) {
+    public encodeToHex(forHash = false) {
 
-        const returnData = EncodingUtils.encodeObjectToHex(this, [
+        const returnData = ObjectEncoding.encode(this, [
             {key: "version"},
             {key: "blockHash", type: "hash"},
             {key: "vote", type: "bool"},
             {key: "nonce"},
             (forHash ? null : {key: "signature"})
-        ], add_empty_bytes);
+        ]);
 
         return returnData.data;
 
@@ -41,7 +41,7 @@ export class Attestation {
     public static fromDecodedHex(hexData: Uint, withAttesterAddress = true) {
 
         try {
-            const returnData = EncodingUtils.getObjectFromHex(hexData, [
+            const returnData = ObjectEncoding.decode(hexData, [
                 {key: "version"},
                 {key: "blockHash", type: "hash"},
                 {key: "vote", type: "bool"},
@@ -71,7 +71,7 @@ export class Attestation {
     }
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(false, true));
+        return Crypto.sha256(this.encodeToHex(true));
     }
 
 }

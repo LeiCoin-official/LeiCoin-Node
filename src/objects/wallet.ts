@@ -1,4 +1,4 @@
-import EncodingUtils from "../handlers/encodingUtils.js";
+import ObjectEncoding from "../encoding/objects.js";
 import { NumberLike, Uint64, Uint8 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
@@ -21,25 +21,25 @@ export class Wallet {
         return new Wallet(owner, Uint64.alloc(), Uint64.alloc());
     }
 
-    public encodeToHex(add_empty_bytes = true) {
+    public encodeToHex() {
     
-        const resultData = EncodingUtils.encodeObjectToHex(this, [
+        const resultData = ObjectEncoding.encode(this, [
             {key: "version"},
-            {key: "balance", type: "bigintWithLenPrefix"},
+            {key: "balance", type: "bigint"},
             {key: "nonce"},
-        ], add_empty_bytes);
+        ]);
 
         return resultData.data;
 
     }
     
-    public static fromDecodedHex(ownerAddress: AddressHex, hexData: string) {
+    public static fromDecodedHex(ownerAddress: AddressHex, hexData: Uint64) {
 
         try {
 
-            const resultData = EncodingUtils.getObjectFromHex(hexData, [
+            const resultData = ObjectEncoding.decode(hexData, [
                 {key: "version"},
-                {key: "balance", type: "bigintWithLenPrefix"},
+                {key: "balance", type: "bigint"},
                 {key: "nonce"},
             ]);
 

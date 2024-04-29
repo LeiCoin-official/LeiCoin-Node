@@ -1,6 +1,6 @@
 import config from "../handlers/configHandler.js";
 import Crypto from "../crypto/index.js";
-import EncodingUtils from "../handlers/encodingUtils.js";
+import ObjectEncoding from "../encoding/objects.js";
 import utils from "../utils/index.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
@@ -55,38 +55,38 @@ export class Transaction {
             Signature.alloc(),
         );
 
-        const hash = Crypto.sha256(coinbase.encodeToHex(false, true), "binary");
+        const hash = Crypto.sha256(coinbase.encodeToHex(true), "binary");
         coinbase.txid = hash;
         coinbase.signature = new Signature(Crypto.sign(hash, Uint8.from("00"), Uint256.alloc()).getRaw());
 
         return coinbase;
     }
 
-    public encodeToHex(add_empty_bytes = false, forHash = false) {
+    public encodeToHex(forHash = false) {
     
-        const returnData = EncodingUtils.encodeObjectToHex(this, [
+        const returnData = ObjectEncoding.encode(this, [
             {key: "version"},
             (forHash ? null : {key: "txid", type: "hash"}),
             {key: "recipientAddress", type: "address"},
-            {key: "amount", type: "bigintWithLenPrefix"},
+            {key: "amount", type: "bigint"},
             {key: "nonce"},
             {key: "timestamp"},
             {key: "input", lengthBefore: "unlimited"},
             (forHash ? null : {key: "signature"})
-        ], add_empty_bytes);
+        ]);
 
         return returnData.data;
 
     }
 
-    public static fromDecodedHex(hexData: string, returnLength = false, withSenderAddress = true) {
+    public static fromDecodedHex(hexData: Uint, returnLength = false, withSenderAddress = true) {
 
         try {
-            const returnData = EncodingUtils.getObjectFromHex(hexData, [
+            const returnData = ObjectEncoding.decode(hexData, [
                 {key: "version"},
                 {key: "txid", type: "hash"},
                 {key: "recipientAddress", type: "address"},
-                {key: "amount", type: "bigintWithLenPrefix"},
+                {key: "amount", type: "bigint"},
                 {key: "nonce"},
                 {key: "timestamp"},
                 {key: "input", lengthBefore: "unlimited"},
@@ -118,7 +118,7 @@ export class Transaction {
     }
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(false, true));
+        return Crypto.sha256(this.encodeToHex(true));
     }
 
 }

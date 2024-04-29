@@ -1,13 +1,14 @@
 
 type New<T> = new(buffer: Buffer) => T;
-
-interface FixedUintConstructable<T> extends New<T>  {
+ 
+interface FixedUintConstructable<T> extends UintConstructable<T> {
     byteLength: number;
     alloc(): T;
 }
 
 interface UintConstructable<T> extends New<T> {
     alloc(length?: number): T;
+    create(input: Buffer | Uint): T;
     byteLength?: number;
 }
 
