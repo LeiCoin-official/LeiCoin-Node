@@ -1,34 +1,7 @@
-import { Uint, Uint64 } from "../utils/binary.js";
+import { Uint, Uint64, Uint8 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/objects.js";
 
-type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object" | "bigintWithLenPrefix";
-type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
-type DefaultDataTypes = BasicTypes | AdvancedTypes;
-
-interface DataFromHexArguments {
-    key: string;
-    length?: number;
-    lengthBefore?: boolean | "unlimited";
-    type?: DefaultDataTypes;
-    decodeFunc?(hexData: Uint, returnLength: boolean): any;
-}
-
-interface DataToHexArguments {
-    key: string;
-    lengthBefore?: boolean | "unlimited";
-    type?: DefaultDataTypes;
-    encodeFunc?(add_empty_bytes: boolean, forHash: boolean): Uint;
-}
-
-interface HexDataType {
-    defaultLength?: number;
-    lengthBefore?: boolean;
-    encode?(v: any): Uint;
-    parse?(v: Uint): any;
-}
-
-type HexDataTypes = Dict<HexDataType>;
 
 export default class EncodingUtils {
 
@@ -119,41 +92,6 @@ export default class EncodingUtils {
         };
     }*/
 
-    private static hexDataBasicTypes: Dict<HexDataType> = {
-        bigint: {
-            //encode: Uint64.from,
-            parse: Uint64.from
-        },
-        bool: {
-            defaultLength: 1,
-            encode: (v: any) => (v ? Uint.from(1) : Uint.from(0)),
-            parse: (v: Uint) => (v.toInt() === 1)
-        },
-        default: {}
-    }
-
-    private static hexDataTemplateTypes: HexDataTypes = {
-        bigintWithLenPrefix: {
-            defaultLength: 1, lengthBefore: true,
-            ...this.hexDataBasicTypes.bigint
-        }
-    }
-
-    private static hexDataAdvancedTypes: HexDataTypes = {
-        address: { defaultLength: 21 },
-        signature: { defaultLength: 66 },
-        hash: { defaultLength: 32 },
-        nonce: this.hexDataTemplateTypes.bigintWithLenPrefix,
-        index: this.hexDataTemplateTypes.bigintWithLenPrefix,
-        timestamp: this.hexDataTemplateTypes.bigintWithLenPrefix,
-        version: { defaultLength: 1 }
-    }
-
-    private static hexDataTypes: HexDataTypes = {
-        ...this.hexDataBasicTypes,
-        ...this.hexDataTemplateTypes,
-        ...this.hexDataAdvancedTypes
-    }
 
     private static encodeValueToHex(value: any, data: DataToHexArguments) {
 
@@ -161,9 +99,7 @@ export default class EncodingUtils {
         let lengthBefore = data.lengthBefore;
 
         if (data.key in this.hexDataTypes) {
-
             hexDataType = this.hexDataTypes[data.key];
-
         } else {
             hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
         }
@@ -172,7 +108,7 @@ export default class EncodingUtils {
             lengthBefore = hexDataType.lengthBefore;
         }
 
-        let hexValue: string;
+        let hexValue: Uint;
         if (hexDataType.encode) {
             hexValue = hexDataType.encode(value);
         } else {
@@ -181,14 +117,14 @@ export default class EncodingUtils {
 
         if (lengthBefore) {
             if (lengthBefore === "unlimited") {
-                let hexValueLength = this.encodeLengthForUnlimited(hexValue.length);
-                return hexValueLength + hexValue;
+                let hexValueLength = this.encodeLengthForUnlimited(hexValue.getLen());
+                return [hexValueLength, hexValue];
             }
-            let hexValueLength = BigNum.numToHex(hexValue.length);
-            return hexValueLength + hexValue;
+            let hexValueLength = hexValue.getLen("uint");
+            return [hexValueLength, hexValue];
         }
 
-        return hexValue;
+        return [hexValue];
 
     }
 
@@ -201,9 +137,7 @@ export default class EncodingUtils {
             let lengthBefore = data.lengthBefore;
             
             if (data.key in this.hexDataAdvancedTypes) {
-
                 hexDataType = this.hexDataTypes[data.key];
-
             } else {
                 hexDataType = this.hexDataTypes[data.type || "default"] || this.hexDataTypes.default;
             }
@@ -226,7 +160,7 @@ export default class EncodingUtils {
                     [ length, tmpLength ] = this.getLengthFromUnlimited(hexDataSubstring);
                     totalLength = tmpLength;
                 } else {
-                    length = parseInt(hexDataSubstring.slice(0, tmpLength), 16);
+                    length = hexDataSubstring.slice(0, tmpLength).toInt();
                 }
                 totalLength += length;
                 hexDataSubstring = hexDataSubstring.slice(tmpLength);
@@ -264,11 +198,11 @@ export default class EncodingUtils {
         ];
     }
 
-    public static encodeObjectToHex(object: AnyObj, keys: (DataToHexArguments | null)[], add_empty_bytes: boolean) {
+    public static encodeObjectToHex(object: AnyObj, keys: (DataToHexArguments | null)[]) {
 
         try {
 
-            let hexData = "";
+            let hexData: Uint[] = [];
 
             for (const data of keys) {
 
@@ -278,34 +212,31 @@ export default class EncodingUtils {
 
                 if (data.type === "object" && data.encodeFunc) {
 
-                    hexData += data.encodeFunc.call(value, false, false);
+                    hexData.push(data.encodeFunc.call(value, false, false));
 
                 } else if (data.type === "array" && data.encodeFunc) {
 
                     hexData += BigNum.numToHex(value.length);
 
                     for (let item of value) {
-                        hexData += data.encodeFunc.call(item, false, false);
+                        hexData.push(data.encodeFunc.call(item, false, false));
                     }
 
                 } else {
                     const hexValue = this.encodeValueToHex(value, data);
 
                     if (!hexValue) {
-                        return { cb: Callbacks.ERROR, data: "" };
+                        return { cb: Callbacks.ERROR, data: Uint.empty() };
                     }
 
-                    hexData += hexValue;
+                    hexData.push(...hexValue);
                 }
             }
 
-            const empty_bytes = (add_empty_bytes && (hexData.length % 2 !== 0)) ? "0" : "";
-            const finalHexData = hexData + empty_bytes;
-
-            return { cb: Callbacks.SUCCESS, data: finalHexData };
+            return { cb: Callbacks.SUCCESS, data: Uint.concat(hexData) };
 
         } catch (err: any) {
-            return { cb: Callbacks.ERROR, data: "" };
+            return { cb: Callbacks.ERROR, data: Uint.empty() };
         }
 
     }

@@ -51,7 +51,7 @@ export class Transaction {
             Uint64.from(utils.mining_pow),
             Uint64.from(0),
             Uint64.from(new Date().getTime()),
-            Uint.alloc(0),
+            Uint.empty(),
             Signature.alloc(),
         );
 

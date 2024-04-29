@@ -47,7 +47,7 @@ export class Crypto {
                 signature.getRecoveryParam()
             ).encode("array"));
         } catch (error: any) {
-            return PublicKey.alloc(0);
+            return PublicKey.empty();
         }
     }
 

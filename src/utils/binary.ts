@@ -42,13 +42,24 @@ export class Uint {
     
     protected readonly buffer: Buffer;
 
-    constructor(buffer: Buffer) {
-        this.buffer = buffer;
+    constructor(input: Uint | Buffer);
+    constructor(input: Uint & Buffer) {
+        this.buffer = input.getRaw ? input.getRaw() : input;
+    }
+
+    public static create<T>(this: New<T>, input: Uint | Buffer): T;
+    public static create(input: Uint & Buffer) {
+        return new this(input);
     }
 
     public static alloc<T>(this: New<T>, length: number): T;
     public static alloc(length: number) {
         return new this(Buffer.alloc(length));
+    }
+
+    public static empty<T>(this: New<T>): T;
+    public static empty(this: UintConstructable<Uint>) {
+        return this.alloc(this.byteLength || 0);
     }
 
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
@@ -103,9 +114,10 @@ export class Uint {
         return this.buffer;
     }
 
-
-    public getLen() {
-        return this.buffer.byteLength;
+    public getLen(): number;
+    public getLen(enc: "uint"): Uint;
+    public getLen(enc?: "number" | "uint") {
+        return enc === "uint" ? Uint.from(this.buffer.byteLength) : this.buffer.byteLength;
     }
 
     public set(list: ArrayLike<number> | Uint, offset?: number): void;
@@ -261,6 +273,15 @@ export class Uint64 extends FixedUint {
             }
             value = Math.floor(sum / 4294967296);
         }
+    }
+
+    public toShortUint() {
+        for (let i = 0; i < this.buffer.byteLength; i++) {
+            if (this.buffer[i] !== 0) {
+                return this.slice(i);
+            }
+        }
+        return Uint.empty();
     }
 
     public toBigInt() {

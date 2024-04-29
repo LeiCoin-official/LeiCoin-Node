@@ -1,6 +1,6 @@
 import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
-import { Uint, Uint256, Uint64 } from "../build/test/binary.cjs"
+import { Uint, Uint256, Uint64, Uint8 } from "../build/test/binary.cjs"
 import BN from "bn.js"
 import crypto from "crypto";
 
@@ -319,9 +319,47 @@ async function test4() {
 
 }
 
+async function test5() {
+
+    (async() => {
+    
+        const buffer = Buffer.alloc(8);
+        let number = Uint64.create(buffer);
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            number = Uint64.create(buffer);
+        }
+    
+        const elapsedTime = endTimer(startTime);
+        console.log(number.buffer.toString("hex"));
+        console.log("Elapsed time 5_1:", elapsedTime / 1000, "seconds");
+    
+    })();
+    
+    (async() => {
+    
+        const buffer = Buffer.alloc(8);
+        let number = new Uint64(buffer);
+    
+        const startTime = startTimer();
+    
+        for (let i = 0; i < 1_000_000; i++) {
+            number = new Uint64(buffer);
+        }
+    
+        const elapsedTime = endTimer(startTime);
+        console.log(number.buffer.toString("hex"));
+        console.log("Elapsed time 5_2:", elapsedTime / 1000, "seconds");
+    
+    })();
+
+}
+
 
 //test1();
 //test2();
-test3();
+//test3();
 //test4();
-
+//test5();
