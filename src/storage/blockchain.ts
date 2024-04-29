@@ -65,7 +65,7 @@ class Blockchain extends Chain {
             const senderWallet = await this.chains[parentChain].wallets.getWallet(transactionData.senderAddress);
             const recipientWallet = await this.chains[parentChain].wallets.getWallet(transactionData.recipientAddress);
 
-            senderWallet.adjustNonce("-1");
+            senderWallet.adjustNonce(-1);
             senderWallet.addMoney(transactionData.amount);
             recipientWallet.subtractMoneyIFPossible(transactionData.amount);
 

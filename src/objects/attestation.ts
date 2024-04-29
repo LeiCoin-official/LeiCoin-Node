@@ -3,8 +3,9 @@ import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
-import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Signature from "./signature.js";
+import { Prefix } from "./prefix.js";
 
 export class Attestation {
     
@@ -13,9 +14,9 @@ export class Attestation {
     public vote: boolean;
     public nonce: Uint64;
     public signature: Signature;
-    public readonly version: Uint8;
+    public readonly version: Prefix;
 
-    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = Uint8.alloc()) {
+    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = Prefix.from("00")) {
         this.attester = attester;
         this.blockHash = blockHash;
         this.vote = vote;

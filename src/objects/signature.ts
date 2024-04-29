@@ -1,5 +1,6 @@
 import elliptic from 'elliptic';
 import { FixedUint, Uint64, Uint8 } from "../utils/binary.js";
+import { Prefix } from './prefix.js';
 
 export interface EllipticBinarySignature extends elliptic.ec.Signature {
     recoveryParam: number;
@@ -8,7 +9,7 @@ export interface EllipticBinarySignature extends elliptic.ec.Signature {
 export class Signature extends FixedUint {
     public static byteLength: number = 66;
 
-    public static fromElliptic(signerType: Uint8, signature: EllipticBinarySignature) {
+    public static fromElliptic(signerType: Prefix, signature: EllipticBinarySignature) {
         return this.concat([
             signerType,
             signature.r.toArrayLike(Buffer),
@@ -35,12 +36,12 @@ export class Signature extends FixedUint {
 }
 
 export class FullSignature {
-    public signerType: Uint8;
+    public signerType: Prefix;
     public r: Uint64;
     public s: Uint64;
     public recoveryParam: number;
 
-    constructor(signerType: Uint8, r: Uint64, s: Uint64, recoveryParam: number) {
+    constructor(signerType: Prefix, r: Uint64, s: Uint64, recoveryParam: number) {
         this.signerType = signerType;
         this.r = r;
         this.s = s;

@@ -4,8 +4,9 @@ import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
-import { Uint64, Uint, Uint8 } from "../utils/binary.js";
+import { Uint64, Uint } from "../utils/binary.js";
 import Signature from "./signature.js";
+import { Prefix } from "./prefix.js";
 
 export class Proposition {
     
@@ -13,9 +14,9 @@ export class Proposition {
     public nonce: Uint64;
     public signature: Signature;
     public block: Block;
-    public version: Uint8;
+    public version: Prefix;
 
-    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = Uint8.alloc()) {
+    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = Prefix.from("00")) {
         this.proposer = proposer;
         this.nonce = nonce;
         this.signature = signature;

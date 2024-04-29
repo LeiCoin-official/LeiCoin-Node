@@ -1,16 +1,17 @@
 import ObjectEncoding from "../encoding/objects.js";
-import { NumberLike, Uint64, Uint8 } from "../utils/binary.js";
+import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
+import { Prefix } from "./prefix.js";
 
 export class Wallet {
 
     public owner: AddressHex;
     private balance: Uint64;
     private nonce: Uint64;
-    public version: Uint8;
+    public version: Prefix;
 
-    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = Uint8.alloc()) {
+    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = Prefix.from("00")) {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;
@@ -33,7 +34,7 @@ export class Wallet {
 
     }
     
-    public static fromDecodedHex(ownerAddress: AddressHex, hexData: Uint64) {
+    public static fromDecodedHex(ownerAddress: AddressHex, hexData: Uint) {
 
         try {
 

@@ -6,9 +6,10 @@ import Crypto from "../crypto/index.js";
 import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
 import DataUtils from "../utils/dataUtils.js";
-import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding from "../encoding/objects.js";
+import { Prefix } from "./prefix.js";
 
 export class Block {
 
@@ -19,7 +20,7 @@ export class Block {
     public proposer: AddressHex;
     public attestations: Attestation[];
     public transactions: Transaction[];
-    public version: Uint8;
+    public version: Prefix;
 
     constructor(
         index: Uint64,
@@ -29,7 +30,7 @@ export class Block {
         proposer: AddressHex,
         attestations: Attestation[],
         transactions: Transaction[],
-        version = Uint8.alloc()
+        version = Prefix.from("00")
     ) {
 
         this.index = index;

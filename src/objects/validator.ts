@@ -1,15 +1,16 @@
 import ObjectEncoding from "../encoding/objects.js";
-import { NumberLike, Uint, Uint64, Uint8 } from "../utils/binary.js";
+import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
+import { Prefix } from "./prefix.js";
 
 export class Validator {
 
     public address: AddressHex;
     private stake: Uint64;
-    public version: Uint8;
+    public version: Prefix;
 
-    constructor(address: AddressHex, stake: Uint64, version = Uint8.alloc()) {
+    constructor(address: AddressHex, stake: Uint64, version = Prefix.from("00")) {
         this.address = address;
         this.stake = stake;
         this.version = version;

@@ -8,6 +8,7 @@ import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
+import { Uint, Uint64 } from "../utils/binary.js";
 
 export class WalletDB {
 
@@ -20,22 +21,22 @@ export class WalletDB {
         this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/wallets", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
-    public async getWallet(address: string) {
-        const raw_wallet = await this.level.get(address);
-        return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
+    public async getWallet(address: AddressHex) {
+        const raw_wallet = await this.level.get(address.toHex());
+        return Wallet.fromDecodedHex(address, Uint.from(raw_wallet)) || Wallet.createEmptyWallet(address);
     }
 
     public async setWallet(wallet: Wallet) {
         const encodedWallet = wallet.encodeToHex();
-        await this.level.put(wallet.owner, encodedWallet);
+        await this.level.put(wallet.owner.toHex(), encodedWallet.toHex());
     }
 
-    public async existsWallet(address: string): Promise<boolean> {
-        const raw_wallet = await this.level.get(address);
-        return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
+    public async existsWallet(address: AddressHex): Promise<boolean> {
+        const raw_wallet = await this.level.get(address.toHex());
+        return Wallet.fromDecodedHex(address, Uint.from(raw_wallet)) ? true : false;
     }
 
-    public async addMoneyToWallet(address: string, amount: string) {
+    public async addMoneyToWallet(address: AddressHex, amount: Uint64) {
         const wallet = await this.getWallet(address);
         if (this.chain === "main") {
             for (const [chainName, chain] of Object.entries(blockchain.chains)) {
@@ -49,7 +50,7 @@ export class WalletDB {
         await this.setWallet(wallet);
     }
 
-    public async subtractMoneyFromWallet(address: string, amount: string, adjustNonce = true) {
+    public async subtractMoneyFromWallet(address: AddressHex, amount: Uint64, adjustNonce = true) {
         const wallet = await this.getWallet(address);
         if (this.chain === "main") {
             for (const [chainName, chain] of Object.entries(blockchain.chains)) {
