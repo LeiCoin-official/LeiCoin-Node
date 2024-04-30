@@ -3,7 +3,6 @@ import path from "path";
 import Validator from "../objects/validator.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
-import { Uint } from "../utils/binary.js";
 import LevelDB from "./leveldb.js";
 
 type DB = "active" | "inactive";
