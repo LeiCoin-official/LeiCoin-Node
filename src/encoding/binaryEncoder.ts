@@ -10,9 +10,15 @@ export class BinaryEncoder {
         return Uint.from(val);
     }
 
-    static readonly type = "uint";
+    static readonly name = "uint";
+    
+    static readonly format = "buffer"; 
 
-    static readonly buffer = true;    
+    /*
+    static createViewTranscoder() {}
+    static createBufferTranscoder() {}
+    static createUTF8Transcoder() {}
+    */
     
 }
 

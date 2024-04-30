@@ -1,24 +1,24 @@
-import { Level } from "level";
 import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
 import path from "path";
 import Validator from "../objects/validator.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint } from "../utils/binary.js";
+import LevelDB from "./leveldb.js";
 
 type DB = "active" | "inactive";
 
 export class ValidatorDB {
 
-    private readonly level: Level;
-    private readonly inactiveLevel: Level;
+    private readonly level: LevelDB;
+    private readonly inactiveLevel: LevelDB;
     private readonly chain: string;
 
     constructor(chain = "main") {
         BCUtils.ensureDirectoryExists('/validators', chain);
         this.chain = chain;
-        this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
-        this.inactiveLevel = new Level(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
+        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
+        this.inactiveLevel = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
     private getLevel(db?: DB) {
@@ -30,13 +30,13 @@ export class ValidatorDB {
 
     private async getValidatorInLevel(address: AddressHex, db?: DB) {
         const level = this.getLevel(db);
-        const raw_validator_data = await level.get(address.toHex());
-        return Validator.fromDecodedHex(address, Uint.from(raw_validator_data));
+        const raw_validator_data = await level.get(address);
+        return Validator.fromDecodedHex(address, raw_validator_data);
     }
 
     private async setValidatorInLevel(validator: Validator, db?: DB) {
         const level = this.getLevel(db);
-        await level.put(validator.address.toHex(), validator.encodeToHex().toHex());
+        await level.put(validator.address, validator.encodeToHex());
     }
 
     public async addInactiveValidator(validator: Validator) {

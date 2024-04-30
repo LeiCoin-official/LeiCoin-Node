@@ -1,4 +1,3 @@
-import { Level } from "level";
 import path from "path";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
@@ -9,31 +8,31 @@ import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "../utils/binary.js";
+import LevelDB from "./leveldb.js";
 
 export class WalletDB {
 
-    private readonly level: Level;
+    private readonly level: LevelDB;
     private readonly chain: string;
 
     constructor(chain = "main") {
         BCUtils.ensureDirectoryExists('/wallets', chain);
         this.chain = chain;
-        this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/wallets", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
+        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/wallets", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
     public async getWallet(address: AddressHex) {
-        const raw_wallet = await this.level.get(address.toHex());
-        return Wallet.fromDecodedHex(address, Uint.from(raw_wallet)) || Wallet.createEmptyWallet(address);
+        const raw_wallet = await this.level.get(address);
+        return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
     }
 
     public async setWallet(wallet: Wallet) {
-        const encodedWallet = wallet.encodeToHex();
-        await this.level.put(wallet.owner.toHex(), encodedWallet.toHex());
+        await this.level.put(wallet.owner, wallet.encodeToHex());
     }
 
     public async existsWallet(address: AddressHex): Promise<boolean> {
-        const raw_wallet = await this.level.get(address.toHex());
-        return Wallet.fromDecodedHex(address, Uint.from(raw_wallet)) ? true : false;
+        const raw_wallet = await this.level.get(address);
+        return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
     }
 
     public async addMoneyToWallet(address: AddressHex, amount: Uint64) {
