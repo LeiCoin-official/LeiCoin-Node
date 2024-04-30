@@ -1,13 +1,17 @@
 import { Level } from "level";
+import LevelDB from "../build/src/storage/leveldb.js";
 import crypto from 'crypto';
 import path from "path";
-import { sha256, shuffleArray } from './randtest.js';
+import { sha256, shuffleArray } from './cryptoUtils.js';
 import { startTimer, endTimer } from "./testUtils.js";
 
-async function gen(size = 1_000_000) {
+async function gen(size = 100_000) {
 
     const level1 = new Level(path.join(process.cwd(), "/blockchain_data", "/tests/stake1"), {keyEncoding: "hex", valueEncoding: "hex"});
     const level2 = new Level(path.join(process.cwd(), "/blockchain_data", "/tests/stake2"), {keyEncoding: "hex", valueEncoding: "hex"});
+
+    await level1.open();
+    await level2.open();
 
     const hashes = [];
 
@@ -104,6 +108,7 @@ async function test2(db = "stake1", seedHash = sha256(crypto.randomBytes(32).toS
 async function test3(db = "stake1") {
 
     const level = new Level(path.join(process.cwd(), "/blockchain_data", `/tests/${db}`), {keyEncoding: "hex", valueEncoding: "hex"});
+    await level.open()
 
     const startTime = startTimer();
 
@@ -111,7 +116,25 @@ async function test3(db = "stake1") {
 
     const elapsedTime = endTimer(startTime);
 
-    console.log(first_validators);
+    //console.log(first_validators);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+
+    return first_validators;
+
+}
+
+async function test3_2(db = "stake2") {
+
+    const level = new LevelDB(path.join(process.cwd(), "/blockchain_data", `/tests/${db}`));
+    await level.open()
+
+    const startTime = startTimer();
+
+    const first_validators = await level.keys().all();
+
+    const elapsedTime = endTimer(startTime);
+
+    //console.log(first_validators);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
     return first_validators;
@@ -121,13 +144,14 @@ async function test3(db = "stake1") {
 async function main() {
 
     //gen(128);
-    //gen(129);
+    //gen();
 
     //await gen();
 
-    console.log((await test2("stake1", "3f33455e1f6746f821d730a55cee7e0054c318ae9f6b151d257bac1a9f6c5470")).toString() === (await test2("stake2", "3f33455e1f6746f821d730a55cee7e0054c318ae9f6b151d257bac1a9f6c5470")).toString());
+    //console.log((await test2("stake1", "3f33455e1f6746f821d730a55cee7e0054c318ae9f6b151d257bac1a9f6c5470")).toString() === (await test2("stake2", "3f33455e1f6746f821d730a55cee7e0054c318ae9f6b151d257bac1a9f6c5470")).toString());
 
-    //test3();
+    test3();
+    test3_2();
 
 }
 
