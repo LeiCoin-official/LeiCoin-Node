@@ -1,14 +1,10 @@
-import levelup from "levelup";
-import leveldown from "leveldown";
-import levelencode from "encoding-down";
+import { Level } from "level"
 import type { CodecOptions } from "level-codec";
 import { BinaryEncoder } from "../encoding/binaryEncoder.js";
 
 
-export class LevelDB {
-
-    private readonly db: levelup.LevelUp;
-
+export class LevelDB extends Level<Buffer, Buffer> {
+    
     constructor(
         path: string,
         options: CodecOptions = {
@@ -16,7 +12,7 @@ export class LevelDB {
             valueEncoding: BinaryEncoder
         }
     ) {
-        this.db = levelup(levelencode(leveldown(path), options));
+        super((path), {keyEncoding: "binary", valueEncoding: "binary"});
     }
 
 }
