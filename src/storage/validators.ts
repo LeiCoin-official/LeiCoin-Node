@@ -10,15 +10,15 @@ type DB = "active" | "inactive";
 
 export class ValidatorDB {
 
-    private readonly level: Level;
-    private readonly inactiveLevel: Level;
+    private readonly level: Level<Buffer, Buffer>;
+    private readonly inactiveLevel: Level<Buffer, Buffer>;
     private readonly chain: string;
 
     constructor(chain = "main") {
         BCUtils.ensureDirectoryExists('/validators', chain);
         this.chain = chain;
         this.level = new Level(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
-        this.inactiveLevel = new Level(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
+        this.inactiveLevel = new Level<Buffer, Buffer>(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
     }
 
     private getLevel(db?: DB) {
