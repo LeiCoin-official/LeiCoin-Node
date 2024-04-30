@@ -1,4 +1,4 @@
-import { Uint } from "../utils/binary";
+import { Uint } from "../utils/binary.js";
 
 export class BinaryEncoder {
 

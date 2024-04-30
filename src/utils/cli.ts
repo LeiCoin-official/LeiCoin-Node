@@ -1,5 +1,5 @@
 import { createInterface } from "readline";
-import type { ChalkInstance } from "chalk";
+import type { Chalk } from "chalk";
 import process from "process";
 import fs from "fs";
 import { dirname } from "path";
@@ -70,15 +70,15 @@ class CLI {
     public readonly data_message: LogMessageLike = new CLI.LogMessage('Data', '#1711df');
     public readonly leicoin_net_message: LeiCoinNetLogMessageLike = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
 
-    private ctx: ChalkInstance | null = null;
+    private ctx: Chalk | null = null;
 
-    private readonly message_styles: Dict<ChalkInstance> = {};
+    private readonly message_styles: Dict<Chalk> = {};
 
     private ansiEscapes: any = null;
 
     public async setup() {
         if (!this.ctx) {
-            this.ctx = new (await import("chalk")).Chalk({level: 3});
+            this.ctx = new (await import("chalk")).default.Instance({level: 3});
             this.message_styles.reset = this.ctx.reset;
             this.message_styles.success = this.ctx.green;
             this.message_styles.error = this.ctx.red;
@@ -221,10 +221,10 @@ class NoCLI implements CLILike {
 }
 
 let cli: CLILike;
-if (process.env.nocli === "true") {
-    cli = NoCLI.getInstance();
-} else {
+//if (process.env.nocli === "true") {
+//    cli = NoCLI.getInstance();
+//} else {
     cli = CLI.getInstance();
-}
+//}
 
 export default cli;
