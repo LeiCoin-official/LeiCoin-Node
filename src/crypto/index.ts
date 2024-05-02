@@ -10,16 +10,13 @@ export class Crypto {
 
     public static readonly ec = new elliptic.ec("secp256k1");
 
-    public static sha256(input: string | Uint, outputType?: "binary"): Uint256;
-    public static sha256(input: string | Uint, outputType?: "string"): string;
-    public static sha256(input: string | Uint, outputType: "string" | "binary" = "binary") {
-        if (typeof input === "string") {
-            input = Uint256.from(input);
-        }
-        if (outputType === "string") {
-            return crypto.createHash('sha256').update(input.getRaw()).digest("hex");
-        }
-        return Uint256.from(crypto.createHash('sha256').update(input.getRaw()).digest());
+    public static sha256(input: Uint | Buffer): Uint256;
+    public static sha256(input: Uint & Buffer) {
+        return new Uint256(
+            crypto.createHash('sha256').update(
+                input.getRaw ? input.getRaw() : input
+            ).digest()
+        );
     }
 
     public static sign(hash: Uint256, signerType: PX, privateKey: PrivateKey) {

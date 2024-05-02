@@ -5,7 +5,7 @@ import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import LevelDB from "./leveldb.js";
 
-type DB = "active" | "inactive";
+type DBVariant = "active" | "inactive";
 
 export class ValidatorDB {
 
@@ -16,24 +16,24 @@ export class ValidatorDB {
     constructor(chain = "main") {
         BCUtils.ensureDirectoryExists('/validators', chain);
         this.chain = chain;
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
-        this.inactiveLevel = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)), {keyEncoding: "hex", valueEncoding: "hex"});
+        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)));
+        this.inactiveLevel = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/inactive_validators", chain)));
     }
 
-    private getLevel(db?: DB) {
+    private getLevel(db?: DBVariant) {
         if (db === "inactive") {
             return this.inactiveLevel;
         }
         return this.level;
     }
 
-    private async getValidatorInLevel(address: AddressHex, db?: DB) {
+    private async getValidatorInLevel(address: AddressHex, db?: DBVariant) {
         const level = this.getLevel(db);
         const raw_validator_data = await level.get(address);
         return Validator.fromDecodedHex(address, raw_validator_data);
     }
 
-    private async setValidatorInLevel(validator: Validator, db?: DB) {
+    private async setValidatorInLevel(validator: Validator, db?: DBVariant) {
         const level = this.getLevel(db);
         await level.put(validator.address, validator.encodeToHex());
     }
