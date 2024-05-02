@@ -10,13 +10,20 @@
 		"old-dev": "npx ts-node --esm src/index.ts",
 		"old-build": "npx tsc",
 		"old-start": "node src/index.js",
+
 		"setup": "node scripts/setup",
+		"clean:win": "cmd /C \"rmdir /Q /S node_modules\" ",
+		"clean:linux": "bash rm -r node_modules",
+
 		"test": "npx jest --config=scripts/test/index.cjs",
 		"debug": "node build/bin/leicoin-node.cjs",
 		"debug:newbuild": "node scripts/build && node build/bin/leicoin-node.cjs",
+
 		"build": "node scripts/build",
 		"build:noCompact": "npx tsc",
+
 		"release": "node scripts/build/withEntryPoint",
+		
 		"start": "node leicoin-node.cjs"
 	},
 	"repository": {

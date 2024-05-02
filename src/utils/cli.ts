@@ -221,10 +221,10 @@ class NoCLI implements CLILike {
 }
 
 let cli: CLILike;
-//if (process.env.nocli === "true") {
-//    cli = NoCLI.getInstance();
-//} else {
+if (process.env.nocli === "true") {
+    cli = NoCLI.getInstance();
+} else {
     cli = CLI.getInstance();
-//}
+}
 
 export default cli;
