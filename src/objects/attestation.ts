@@ -16,7 +16,7 @@ export class Attestation {
     public signature: Signature;
     public readonly version: PX;
 
-    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = PX.from(0)) {
+    constructor(attester: AddressHex, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = PX.V_00) {
         this.attester = attester;
         this.blockHash = blockHash;
         this.vote = vote;

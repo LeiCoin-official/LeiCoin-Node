@@ -10,7 +10,7 @@ export class Validator {
     private stake: Uint64;
     public version: PX;
 
-    constructor(address: AddressHex, stake: Uint64, version = PX.from(0)) {
+    constructor(address: AddressHex, stake: Uint64, version = PX.V_00) {
         this.address = address;
         this.stake = stake;
         this.version = version;

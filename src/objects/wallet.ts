@@ -11,7 +11,7 @@ export class Wallet {
     private nonce: Uint64;
     public version: PX;
 
-    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = PX.from(0)) {
+    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = PX.V_00) {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;

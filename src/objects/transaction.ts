@@ -30,7 +30,7 @@ export class Transaction {
         timestamp: Uint64,
         input: Uint,
         signature: Signature,
-        version = PX.from(0)
+        version = PX.V_00
     ) {
         this.txid = txid;
         this.senderAddress = senderAddress;
@@ -58,7 +58,7 @@ export class Transaction {
 
         const hash = Crypto.sha256(coinbase.encodeToHex(true));
         coinbase.txid = hash;
-        coinbase.signature = Crypto.sign(hash, PX.from(0), Uint256.alloc());
+        coinbase.signature = Crypto.sign(hash, PX.V_00, Uint256.alloc());
 
         return coinbase;
     }

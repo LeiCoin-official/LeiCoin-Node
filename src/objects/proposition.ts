@@ -16,7 +16,7 @@ export class Proposition {
     public block: Block;
     public version: PX;
 
-    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = PX.from(0)) {
+    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = PX.V_00) {
         this.proposer = proposer;
         this.nonce = nonce;
         this.signature = signature;
