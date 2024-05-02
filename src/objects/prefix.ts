@@ -21,7 +21,11 @@ function lockedErr(...args: any[]): any {
 
 class Prefix extends Uint8 {
 
+    // Prefix vor version 00
     public static readonly V_00 = Prefix.from("00");
+
+    // Meta Data Prefix
+    public static readonly META = Prefix.from("ff");
 
     // Standard Address Prefix: 00
     public static readonly A_00 = Prefix.from("00");

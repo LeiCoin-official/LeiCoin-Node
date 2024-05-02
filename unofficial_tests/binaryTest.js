@@ -1,7 +1,6 @@
 import { endTimer, startTimer } from "./testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
-import { Uint, Uint256, Uint64, Uint8 } from "../build/test/binary.cjs"
-import BN from "bn.js"
+import { Uint, Uint256, Uint64, Uint8 } from "../build/src/utils/binary.js"
 import crypto from "crypto";
 
 //console.log(process.memoryUsage().heapUsed)
@@ -358,8 +357,49 @@ async function test5() {
 }
 
 
+async function test6() {
+
+    let bool = true;
+    
+    let input_number = Math.floor(Math.random() * 1_000_000_000);
+    let mod_number = Math.floor(Math.random() * 100_000);
+
+    let input_uint = Uint.from(input_number, 6);
+    let mod_uint = Uint.from(mod_number, 6);
+    
+    const startTime = startTimer();
+    
+    for (let i = 0; i < 1; i++) {
+        
+        bool = (
+            bool &&
+            input_number % mod_number === input_uint.mod(mod_number).toInt() &&
+            input_number % mod_number === input_uint.mod(mod_uint).toInt()
+        )
+
+        console.log(input_number % mod_number)
+        console.log(input_uint.mod(mod_number).toInt())
+        console.log(input_uint.mod(mod_uint).toInt())
+
+        input_number = Math.floor(Math.random() * 1_000_000_000);
+        mod_number = Math.floor(Math.random() * 100_000);
+
+        input_uint = Uint.from(input_number, 6);
+        mod_uint = Uint.from(mod_number, 6);
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(bool);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+
+}
+
+
+
 //test1();
 //test2();
 //test3();
 //test4();
 //test5();
+test6()
+

@@ -70,6 +70,33 @@ export class ValidatorDB {
 
     }
 
+    public async selectNextValidators(hash: string) {
+    
+        let validators = await level.keys({limit: 129}).all();
+        if (validators.length <= 128) {
+            using_first_validators = true;
+        } else {
+            validators = [];
+            let nextHash = seedHash;
+    
+            while (validators.length !== 128) {
+    
+                let winner = (
+                    (await level.keys({gte: nextHash, limit: 1}).all())[0] ||
+                    (await level.keys({lte: nextHash, limit: 1, reverse: true}).all())[0]
+                );
+                if (!validators.some(item => item.eq(winner))) {
+                    validators.push(winner);
+                }
+                nextHash = Crypto.sha256(nextHash);
+            }
+            elapsedTime = endTimer(startTime);
+        }
+        elapsedTime = endTimer(startTime);
+        level.close();
+        return [validators, elapsedTime, using_first_validators];
+    }
+
 }
 
 export default ValidatorDB;

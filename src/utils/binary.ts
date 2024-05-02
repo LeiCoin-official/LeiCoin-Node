@@ -158,6 +158,13 @@ export class Uint {
         }
     }
 
+    public mod(value: NumberLike) {
+        if (typeof value === "object") {
+            return this.modUint(value);
+        }
+        return this.modNumber(value);
+    }
+
     public gt(value: NumberLike) {
         return this.compare(value) === 1;
     }
@@ -223,6 +230,57 @@ export class Uint {
             }
             carry = Math.floor(sum / 256);
         }
+    }
+
+    protected divUint(value: Uint) {
+
+        if (this.buffer.byteLength !== value.buffer.byteLength) {
+            // @ts-ignore
+            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength);
+        }
+
+        let carry = 0;
+        for (let i = 0; i < this.buffer.byteLength; i++) {
+            const sum = this.buffer[i] / (value.buffer[i] + carry);
+        }
+
+    }
+
+    protected divNumber(value: number) {
+        let carry = 0;
+        for (let i = 0; i < this.buffer.byteLength; i++) {
+            const sum = this.buffer[i] / (value + carry);
+            
+        }
+    }
+
+    protected modUint(value: Uint) {
+        if (this.buffer.byteLength !== value.buffer.byteLength) {
+            // @ts-ignore
+            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength);
+        }
+
+        // @ts-ignore
+        const result: this = this.constructor.alloc(this.getLen());
+        
+        for (let i = 0; i < this.buffer.byteLength; i++) {
+            // Perform modulo operation using bitwise AND operator
+            result.buffer[i] = this.buffer[i] & value.buffer[i];
+        }
+
+        return result;
+    }
+
+    protected modNumber(value: number): this {
+        // @ts-ignore
+        const result: this = this.constructor.alloc(this.getLen());
+
+        for (let i = 0; i < this.buffer.byteLength; i++) {
+            // Perform modulo operation between buffer byte and number
+            result.buffer[i] = this.buffer[i] % value;
+        }
+
+        return result;
     }
 
 
@@ -302,7 +360,7 @@ export class Uint64 extends FixedUint {
     }
 
     public toBigInt() {
-        return this.buffer.readBigInt64BE();
+        return this.buffer.readBigUInt64BE();
     }
 
 }
