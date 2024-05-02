@@ -1,12 +1,10 @@
 import { Uint8 } from "../utils/binary.js";
 
-class UintLockedErr extends Error {
-    name = "UintLockedError";
-    message = "Prefix Uints are Locked and cannot be modified";
-}
-
 function lockedErr(...args: any[]): any {
-    return new UintLockedErr();
+    throw new class extends Error {
+        name = "PrefixLockedError";
+        message = "Prefix Uints are Locked and cannot be modified";
+    }();
 }
 
 class Prefix extends Uint8 {
@@ -20,10 +18,23 @@ class Prefix extends Uint8 {
     // Validator Address Prefix: 0e
     public static readonly A_0e = Prefix.from("0e");
 
-    public set = lockedErr;
-    public slice = lockedErr;
-    public add = lockedErr;
-    public sub = lockedErr;
+    public static from(hexType: string): Prefix;
+    /** @deprecated If you don't use {@link Prefix.from}(hexType: string) instead, an error will occur! */
+    public static from(...args: any[]): any;
+    public static from(input: string) {
+        if (typeof input === "string" && input.length === 2) {
+            return new Prefix(Buffer.from(input, "hex"));
+        }
+        throw new class extends Error {
+            name = "PrefixConstructError";
+            message = "Prefix Uints can only be constructed from two digit Strings";
+        }();
+    }
+
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public set = lockedErr;
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public slice = lockedErr;
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public add = lockedErr;
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public sub = lockedErr;
 
 }
 

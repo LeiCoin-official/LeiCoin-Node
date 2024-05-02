@@ -111,7 +111,8 @@
     "unofficial_tests/**/*",
     "localtests/**/*",
     "scripts/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "build/**/*"
   ],
   "ts-node": {
     "esm": true,
