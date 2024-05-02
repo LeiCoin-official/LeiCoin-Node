@@ -2,16 +2,16 @@ import ObjectEncoding from "../encoding/objects.js";
 import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
-import { Prefix } from "./prefix.js";
+import { PX } from "./prefix.js";
 
 export class Wallet {
 
     public owner: AddressHex;
     private balance: Uint64;
     private nonce: Uint64;
-    public version: Prefix;
+    public version: PX;
 
-    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = Prefix.from(0)) {
+    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = PX.from(0)) {
         this.owner = owner;
         this.balance = balance;
         this.nonce = nonce;

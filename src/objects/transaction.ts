@@ -7,7 +7,7 @@ import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Signature from "./signature.js";
-import { Prefix } from "./prefix.js";
+import { PX } from "./prefix.js";
 
 export class Transaction {
 
@@ -19,7 +19,7 @@ export class Transaction {
     public timestamp: Uint64;
     public input: Uint;
     public signature: Signature;
-    public readonly version: Prefix;
+    public readonly version: PX;
 
     constructor(
         txid: Uint256,
@@ -30,7 +30,7 @@ export class Transaction {
         timestamp: Uint64,
         input: Uint,
         signature: Signature,
-        version = Prefix.from(0)
+        version = PX.from(0)
     ) {
         this.txid = txid;
         this.senderAddress = senderAddress;
@@ -58,7 +58,7 @@ export class Transaction {
 
         const hash = Crypto.sha256(coinbase.encodeToHex(true));
         coinbase.txid = hash;
-        coinbase.signature = Crypto.sign(hash, Prefix.from(0), Uint256.alloc());
+        coinbase.signature = Crypto.sign(hash, PX.from(0), Uint256.alloc());
 
         return coinbase;
     }

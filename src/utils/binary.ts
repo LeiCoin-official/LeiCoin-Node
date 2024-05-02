@@ -286,7 +286,7 @@ export class Uint64 extends FixedUint {
             if (sum >= 0) {
                 this.buffer.writeUint32BE(sum % 4294967296, i);
             } else {
-                this.buffer.writeUint32BE((sum % 4294967296) + 4294967296, i)
+                this.buffer.writeUint32BE((sum % 4294967296) + 4294967296, i);
             }
             value = Math.floor(sum / 4294967296);
         }
@@ -305,6 +305,10 @@ export class Uint64 extends FixedUint {
         return this.buffer.readBigInt64BE();
     }
 
+}
+
+export class Uint96 extends Uint64 {
+    public static readonly byteLength: number = 12;
 }
 
 export class Uint256 extends Uint64 {

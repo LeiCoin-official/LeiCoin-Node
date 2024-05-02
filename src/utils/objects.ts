@@ -1,9 +1,9 @@
 
-export interface Dictionary<T> {
+interface Dictionary<T> {
     [key: string]: T;
 }
-export interface Dict<T> extends Dictionary<T> {}
 
+interface AnyObject extends Dictionary<any> {}
 
-export interface AnyObject extends Dictionary<any> {}
-export interface AnyObj extends AnyObject {}
+export { Dictionary as Dict }
+export { AnyObject as AnyObj }

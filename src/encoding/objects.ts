@@ -1,5 +1,4 @@
 import { AddressHex } from "../objects/address.js";
-import { Prefix } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";

@@ -9,7 +9,7 @@ import DataUtils from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding from "../encoding/objects.js";
-import { Prefix } from "./prefix.js";
+import { PX } from "./prefix.js";
 
 export class Block {
 
@@ -20,7 +20,7 @@ export class Block {
     public proposer: AddressHex;
     public attestations: Attestation[];
     public transactions: Transaction[];
-    public version: Prefix;
+    public version: PX;
 
     constructor(
         index: Uint64,
@@ -30,7 +30,7 @@ export class Block {
         proposer: AddressHex,
         attestations: Attestation[],
         transactions: Transaction[],
-        version = Prefix.from(0)
+        version = PX.A_00
     ) {
 
         this.index = index;

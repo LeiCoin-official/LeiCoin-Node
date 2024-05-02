@@ -6,7 +6,7 @@ import { AddressHex } from "./address.js";
 import DataUtils from "../utils/dataUtils.js";
 import { Uint64, Uint } from "../utils/binary.js";
 import Signature from "./signature.js";
-import { Prefix } from "./prefix.js";
+import { PX } from "./prefix.js";
 
 export class Proposition {
     
@@ -14,9 +14,9 @@ export class Proposition {
     public nonce: Uint64;
     public signature: Signature;
     public block: Block;
-    public version: Prefix;
+    public version: PX;
 
-    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = Prefix.from(0)) {
+    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = PX.from(0)) {
         this.proposer = proposer;
         this.nonce = nonce;
         this.signature = signature;

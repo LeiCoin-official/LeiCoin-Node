@@ -4,7 +4,7 @@ import { Dict } from "../utils/objects.js";
 import { Uint, Uint256 } from "../utils/binary.js";
 import { EllipticBinarySignature, Signature } from "../objects/signature.js";
 import { PrivateKey, PublicKey } from "./cryptoKeys.js";
-import { Prefix } from "../objects/prefix.js";
+import { PX } from "../objects/prefix.js";
 
 export class Crypto {
 
@@ -22,7 +22,7 @@ export class Crypto {
         return Uint256.from(crypto.createHash('sha256').update(input.getRaw()).digest());
     }
 
-    public static sign(hash: Uint256, signerType: Prefix, privateKey: PrivateKey) {
+    public static sign(hash: Uint256, signerType: PX, privateKey: PrivateKey) {
         try {
             const keyPair = this.ec.keyFromPrivate(privateKey.getRaw(), "hex");
             const signature = keyPair.sign(hash.getRaw());

@@ -2,7 +2,7 @@ import { PrivateKey, PublicKey } from "../crypto/cryptoKeys.js";
 import Crypto from "../crypto/index.js";
 import { FixedUint, Uint, Uint256 } from "../utils/binary.js";
 import DataUtils from "../utils/dataUtils.js";
-import { Prefix } from "./prefix.js";
+import { PX } from "./prefix.js";
 import Signature from "./signature.js";
 
 export class AddressHex extends FixedUint {
@@ -13,11 +13,11 @@ export class AddressHex extends FixedUint {
         return this.slice(0, 1);
     }
 
-    public static fromPublicKey(addressType: Prefix, publicKey: Uint) {
+    public static fromPublicKey(addressType: PX, publicKey: Uint) {
         return this.concat([addressType, Crypto.sha256(publicKey).slice(0, 20)]);
     }
 
-    public static fromPrivateKey(addressType: Prefix, privateKey: Uint256) {
+    public static fromPrivateKey(addressType: PX, privateKey: Uint256) {
         return this.fromPublicKey(addressType, Crypto.getPublicKeyFromPrivateKey(privateKey));
     }
 
@@ -59,11 +59,11 @@ export class Address32 {
         return "lc" + DataUtils.replaceAtIndex(addressHex.getType().toHex(), "0", "x", 1) + address32.slice(1);
     }
 
-    public static fromPublicKey(addressType: Prefix, publicKey: PublicKey) {
+    public static fromPublicKey(addressType: PX, publicKey: PublicKey) {
         return this.fromAddressHex(AddressHex.fromPublicKey(addressType, publicKey));
     }
 
-    public static fromPrivateKey(addressType: Prefix, privateKey: PrivateKey) {
+    public static fromPrivateKey(addressType: PX, privateKey: PrivateKey) {
         return this.fromPublicKey(addressType, Crypto.getPublicKeyFromPrivateKey(privateKey));
     }
 
