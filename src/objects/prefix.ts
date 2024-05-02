@@ -1,11 +1,23 @@
-import { Uint8 } from "../utils/binary.js";
+import { Uint, Uint8 } from "../utils/binary.js";
+
+class PrefixConstructError extends Error {
+    name = "PrefixConstructError";
+    message = "Prefix Uints can only be constructed from two digit Strings";
+}
+
+class PrefixLockedError extends Error {
+    name = "PrefixLockedError";
+    message = "Prefix Uints are Locked and cannot be modified";
+};
+
+function constructErr(): any {
+    throw new PrefixConstructError();
+}
 
 function lockedErr(...args: any[]): any {
-    throw new class extends Error {
-        name = "PrefixLockedError";
-        message = "Prefix Uints are Locked and cannot be modified";
-    }();
+    throw new PrefixLockedError();
 }
+
 
 class Prefix extends Uint8 {
 
@@ -25,14 +37,13 @@ class Prefix extends Uint8 {
         if (typeof input === "string" && input.length === 2) {
             return new Prefix(Buffer.from(input, "hex"));
         }
-        throw new class extends Error {
-            name = "PrefixConstructError";
-            message = "Prefix Uints can only be constructed from two digit Strings";
-        }();
+        constructErr();
     }
 
+    /** @deprecated Don't try to construct a Prefix with alloc(), an error will occur! */ public static alloc = constructErr;
+    /** @deprecated Don't try to construct a Prefix with empty(), an error will occur! */ public static empty = constructErr;
+
     /** @deprecated Don't try to modify a Prefix, an error will occur! */ public set = lockedErr;
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public slice = lockedErr;
     /** @deprecated Don't try to modify a Prefix, an error will occur! */ public add = lockedErr;
     /** @deprecated Don't try to modify a Prefix, an error will occur! */ public sub = lockedErr;
 
