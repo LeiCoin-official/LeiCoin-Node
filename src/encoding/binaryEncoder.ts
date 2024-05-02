@@ -1,24 +1,25 @@
 import { Uint } from "../utils/binary.js";
 
-export class BinaryEncoder {
+interface BinaryEncoder {
+    readonly encode: (val: Uint) => Buffer;
+    readonly decode: (val: Buffer) => Uint;
+    readonly name: "uint";
+    readonly format: "buffer";
+}
 
-    static encode(val: Uint) {
+export const BinaryEncoder: BinaryEncoder = {
+    encode: (val: Uint) => {
         return val.getRaw();
-    }
-
-    static decode(val: Buffer) {
-        return Uint.from(val);
-    }
-
-    static readonly name = "uint";
-    
-    static readonly format = "buffer"; 
-
+    },
+    decode: (val: Buffer) => {
+        return new Uint(val);
+    },
+    name: "uint",
+    format: "buffer",
     /*
-    static createViewTranscoder() {}
-    static createBufferTranscoder() {}
-    static createUTF8Transcoder() {}
+    createViewTranscoder: () => {}
+    createBufferTranscoder: () => {}
+    createUTF8Transcoder: () => {}
     */
-    
 }
 

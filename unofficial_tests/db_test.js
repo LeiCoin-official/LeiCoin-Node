@@ -105,7 +105,7 @@ async function test2(db = "stake1", seedHash = sha256(crypto.randomBytes(32).toS
 
 }
 
-async function test3(db = "stake1") {
+async function test3_1(db = "stake1", returnOnlyTime = false) {
 
     const level = new Level(path.join(process.cwd(), "/blockchain_data", `/tests/${db}`), {keyEncoding: "hex", valueEncoding: "hex"});
     await level.open()
@@ -116,14 +116,18 @@ async function test3(db = "stake1") {
 
     const elapsedTime = endTimer(startTime);
 
+    if (returnOnlyTime) {
+        return elapsedTime;
+    }
+
     //console.log(first_validators);
-    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+    console.log("Elapsed time 1:", elapsedTime / 1000, "seconds");
 
     return first_validators;
 
 }
 
-async function test3_2(db = "stake2") {
+async function test3_2(db = "stake2", returnOnlyTime = false) {
 
     const level = new LevelDB(path.join(process.cwd(), "/blockchain_data", `/tests/${db}`));
     await level.open()
@@ -134,11 +138,24 @@ async function test3_2(db = "stake2") {
 
     const elapsedTime = endTimer(startTime);
 
+    if (returnOnlyTime) {
+        return elapsedTime;
+    }
+
     //console.log(first_validators);
-    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+    console.log("Elapsed time 2:", elapsedTime / 1000, "seconds");
 
     return first_validators;
 
+}
+
+async function test3() {
+    const time1 = await test3_1("stake1", true);
+    const time2 = await test3_2("stake2", true);
+
+    console.log("Elapsed time 1:", time1 / 1000, "seconds");
+    console.log("Elapsed time 2:", time2 / 1000, "seconds");
+    console.log("DB working with Uint is", (time1 - time2) / 1000, "seconds faster then with strings");
 }
 
 async function main() {
@@ -151,7 +168,6 @@ async function main() {
     //console.log((await test2("stake1", "3f33455e1f6746f821d730a55cee7e0054c318ae9f6b151d257bac1a9f6c5470")).toString() === (await test2("stake2", "3f33455e1f6746f821d730a55cee7e0054c318ae9f6b151d257bac1a9f6c5470")).toString());
 
     test3();
-    test3_2();
 
 }
 
