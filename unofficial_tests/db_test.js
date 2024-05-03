@@ -18,6 +18,7 @@ function getDBPath(db) {
 /** @type {(db: DBs) => Promise<LevelDB<Uint, Uint>>} */
 async function openDB(db) {
     const level = new LevelDB(getDBPath(db));
+    //const level = new LevelDB(getDBPath(db), {keyEncoding: "bu", valueEncoding: "binary"});
     await level.open();
     return level;
 }

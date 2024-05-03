@@ -1,8 +1,8 @@
 import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../utils/binary.js";
 
 interface BinaryEncoderLike<T extends Uint> {
-    readonly encode: (val: T | Buffer) => Buffer;
-    readonly decode: (val: Buffer) => T;
+    readonly encode: (val: T | Uint8Array) => Uint8Array;
+    readonly decode: (val: Uint8Array) => T;
     readonly name: string;
     readonly format: "buffer";
 }
@@ -18,12 +18,12 @@ class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
         this.CLS = CLS;
     }
 
-    public encode = (val: T | Buffer) => {
-        return (val as T).getRaw ? (val as T).getRaw() : (val as Buffer);
+    public encode = (val: T | Uint8Array) => {
+        return (val as T).getRaw ? (val as T).getRaw() : (val as Uint8Array);
     }
 
-    public decode = (val: Buffer) => {
-        return new this.CLS(val);
+    public decode = (val: Uint8Array) => {
+        return new this.CLS(Buffer.from(val));
     }
 
     /*
