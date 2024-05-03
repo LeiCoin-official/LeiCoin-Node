@@ -187,14 +187,12 @@ async function test1(db = "stake1", func = selectNextValidators, returnTime = fa
 
 async function fastestSelectNextValidators() {
 
-    const time1 = test1("stake1", selectNextValidators_old);
-    const time2 = test1("stake3", selectNextValidators);
+    const time1 = await test1("stake1", selectNextValidators_old, true);
+    const time2 = await test1("stake3", selectNextValidators, true);
 
-    await Promise.all([time1, time2]);
-
-    console.log("Elapsed average time:", time1 / 1000 / 10, "seconds");
-    console.log("Elapsed average time:", time2 / 1000 / 10, "seconds");
-    console.log("New Selecting is", time1 / time2, "times faster then DB 2");
+    console.log("Elapsed average time 1:", time1 / 1000 / 10, "seconds");
+    console.log("Elapsed average time 2:", time2 / 1000 / 10, "seconds");
+    console.log("New Selecting is", time1 / time2, "times faster then the old method");
 
 }
 
@@ -229,4 +227,5 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 //test2("stake3", "stake4");
 
 //test1("stake3");
-selectNextValidators("stake3", new Uint256(crypto.randomBytes(32)))
+
+fastestSelectNextValidators();
