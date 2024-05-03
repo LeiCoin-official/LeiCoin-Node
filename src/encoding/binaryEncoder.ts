@@ -23,7 +23,7 @@ class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
     }
 
     public decode = (val: Uint8Array) => {
-        return new this.CLS(Buffer.from(val));
+        return new this.CLS(Buffer.copyBytesFrom(val));
     }
 
     /*
