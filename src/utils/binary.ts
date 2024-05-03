@@ -1,15 +1,15 @@
 
 type New<T> = new(buffer: Buffer) => T;
- 
-interface FixedUintConstructable<T> extends UintConstructable<T> {
-    byteLength: number;
-    alloc(): T;
-}
 
-interface UintConstructable<T> extends New<T> {
+export interface BasicUintConstructable<T> extends New<T> {
     alloc(length?: number): T;
     create(input: Buffer | Uint): T;
     byteLength?: number;
+}
+
+export interface FixedUintConstructable<T> extends BasicUintConstructable<T> {
+    byteLength: number;
+    alloc(): T;
 }
 
 
@@ -59,7 +59,7 @@ export class Uint {
     }
 
     public static empty<T>(this: New<T>): T;
-    public static empty(this: UintConstructable<Uint>) {
+    public static empty(this: BasicUintConstructable<Uint>) {
         return this.alloc(this.byteLength || 0);
     }
 
@@ -67,7 +67,7 @@ export class Uint {
     public static from<T>(this: New<T>, data: WithImplicitCoercion<ByteArray | string>): T;
     public static from<T>(this: New<T>, str: WithString, encoding?: BufferEncoding): T;
     public static from<T>(this: New<T>, number: number, length?: number): T;
-    public static from(this: UintConstructable<Uint>, input: any, arg2?: any, arg3?: any) {
+    public static from(this: BasicUintConstructable<Uint>, input: any, arg2?: any, arg3?: any) {
         let uint: Uint;
         let buffer: Buffer;
         if (typeof input === "number") {
@@ -312,6 +312,16 @@ export class Uint64 extends FixedUint {
             }
             value = Math.floor(sum / 4294967296);
         }
+    }
+
+    protected divNumber(value: number, returnRest: boolean) {
+        let carry = 0;
+        for (let i = 0; i < this.buffer.byteLength; i += 4) {
+            const dividend = this.buffer.readUint32BE(i) + carry;
+            this.buffer.writeUint32BE(Math.floor(dividend / value));
+            carry = (dividend % value) * 4294967296;
+        }
+        if (returnRest) return (carry / 4294967296);
     }
 
     public toShortUint() {

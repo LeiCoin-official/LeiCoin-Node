@@ -8,12 +8,14 @@ import { Uint, Uint256, Uint64 } from "../build/src/utils/binary.js";
 import Crypto from "../build/src/crypto/index.js";
 import { PX } from "../build/src/objects/prefix.js";
 
-/** @type {(db: "stake1" | "stake2") => string} */
+/** @typedef {"stake1" | "stake2" | "stake3" | "stake4"} DBs */
+
+/** @type {(db: DBs) => string} */
 function getDBPath(db) {
     return path.join(process.cwd(), "/blockchain_data", `/tests/${db}`);
 }
 
-/** @type {(db: "stake1" | "stake2") => Promise<LevelDB<Uint, Uint>>} */
+/** @type {(db: DBs) => Promise<LevelDB<Uint, Uint>>} */
 async function openDB(db) {
     const level = new LevelDB(getDBPath(db));
     await level.open();
@@ -72,25 +74,25 @@ async function gen(size, db = "stake1") {
 
     const level = await openDB(db);
     
-    const preifx = PX.A_0e;
+    const validator_preifx = PX.A_0e;
     const metaDataPrefix = PX.META;
 
     const promises = [];
 
     for (let i = 0; i < size; i++) {
         promises.push(
-            level.put(Uint.concat(preifx, Uint.from(i)), Uint.create(crypto.randomBytes(32)))
+            level.put(Uint.concat([validator_preifx, Uint.from(i)]), Uint.create(crypto.randomBytes(32)))
         );
     }
 
     //& length
-    level.put(Uint.concat(metaDataPrefix, Uint.from("00ed")), Uint.from(size));
+    level.put(Uint.concat([metaDataPrefix, Uint.from("00ed")]), Uint.from(size));
 
     await Promise.all(promises);
 
 }
 
-/** @type {(db: "stake1" | "stake2", seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
+/** @type {(db: DBs, seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
 async function selectNextValidators_old(db, seedHash) {
     const level = await openDB(db);
 
@@ -123,7 +125,7 @@ async function selectNextValidators_old(db, seedHash) {
     return [validators, elapsedTime, using_first_validators];
 }
 
-/** @type {(db: "stake1" | "stake2", seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
+/** @type {(db: DBs, seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
 async function selectNextValidators(db, seedHash) {
     const level = await openDB(db);
 
@@ -132,26 +134,32 @@ async function selectNextValidators(db, seedHash) {
     let elapsedTime;
     const startTime = startTimer();
 
-    let validators = {};
-    let validators_count = await level.get(Uint.from("ff00ed"));
+    const validators = {};
+    const validators_count = await level.get(Uint.from("ff00ed"));
+    const validator_preifx = PX.A_0e;
 
-    if (validators_count.lte(128)) {
+    if (validators_count.lte(129)) {
         using_first_validators = true;
         for await (const [index, data] of level.iterator()) {
             if (index.slice(0, 1).eq(PX.META)) continue;
-            validators[index.slice(1)] = data;
+            validators[index.slice(1).toInt()] = data;
         }
     } else {
-        let nextIndex = BigInt(seedHash.toHex()) % BigInt();
-        let takenIndexes = []
+        let nextHash = seedHash;
+        const takenIndexes = [];
 
-        while (validators.length !== 128) {
+        while (takenIndexes.length !== 128) {
+            let nextIndex = nextHash.mod(validators_count);
 
-            let winner = await level.get()
-            if (!validators.some(item => item.eq(winner))) {
-                validators.push(winner);
+            if (!takenIndexes.includes(nextIndex)) {
+                takenIndexes.push(nextIndex);
+
+                const validator_index = Uint.from(nextIndex);
+
+                const validator_data = await level.get(Uint.concat([validator_preifx, validator_index]));
+                validators[nextIndex] = validator_data;
             }
-            nextHash = Crypto.sha256(nextHash);
+            nextHash = Crypto.sha256(Uint.concat([nextHash, seedHash]));
         }
         elapsedTime = endTimer(startTime);
     }
@@ -160,18 +168,34 @@ async function selectNextValidators(db, seedHash) {
     return [validators, elapsedTime, using_first_validators];
 }
 
-async function test1(db = "stake1") {
+async function test1(db = "stake1", func = selectNextValidators, returnTime = false) {
     let nextHash = Crypto.sha256(crypto.randomBytes(32));
     
     const startTime = startTimer();
 
     for (let i = 0; i < 10; i++) {
-        await selectNextValidators(db, nextHash);
+        await func(db, nextHash);
         nextHash = Crypto.sha256(crypto.randomBytes(32));
     }
 
     const elapsedTime = endTimer(startTime);
-    console.log("Elapsed time:", elapsedTime / 1000 / 10, "seconds");
+    if (returnTime) {
+        return elapsedTime;
+    }
+    console.log("Elapsed average time:", elapsedTime / 1000 / 10, "seconds");
+}
+
+async function fastestSelectNextValidators() {
+
+    const time1 = test1("stake1", selectNextValidators_old);
+    const time2 = test1("stake3", selectNextValidators);
+
+    await Promise.all([time1, time2]);
+
+    console.log("Elapsed average time:", time1 / 1000 / 10, "seconds");
+    console.log("Elapsed average time:", time2 / 1000 / 10, "seconds");
+    console.log("New Selecting is", time1 / time2, "times faster then DB 2");
+
 }
 
 async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "stake1", db2 = "stake2") {
@@ -193,7 +217,7 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 }
 
 
-//gen(129);
+//gen_old(129);
 //gen(129, "stake3");
 //gen(100_000, "stake3", "stake4");
 
@@ -204,4 +228,5 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 //test2("stake1", "stake2");
 //test2("stake3", "stake4");
 
-test1("stake3");
+//test1("stake3");
+selectNextValidators("stake3", new Uint256(crypto.randomBytes(32)))
