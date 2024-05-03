@@ -21,7 +21,7 @@ export class Validator {
     }
 
     public addRewardStake(amount: NumberLike) {
-        this.stake.add(amount);
+        this.stake.iadd(amount);
     }
 
     //public 

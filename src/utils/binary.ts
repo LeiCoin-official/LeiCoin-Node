@@ -72,7 +72,7 @@ export class Uint {
         let buffer: Buffer;
         if (typeof input === "number") {
             uint = this.alloc(arg2 || (Math.floor(input.toString(16).length / 2) + 1));
-            uint.add(input);
+            uint.iadd(input);
             return uint;
         } else if (typeof input === "string" && arg2 === undefined) {
             buffer = Buffer.from(input, "hex");
@@ -99,8 +99,13 @@ export class Uint {
     }
 
 
+    public clone(): this {
+        // @ts-ignore
+        return new this.constructor(Buffer.copyBytesFrom(this.buffer));
+    }
+
     public toHex() {
-        return this.buffer.toString("hex")
+        return this.buffer.toString("hex");
     }
 
     public toInt() {
@@ -130,39 +135,40 @@ export class Uint {
         return new Uint(this.buffer.subarray(start, end));
     }
 
-    public add(value: NumberLike): void;
-    public add(value: NumberLike, returnOnly: true): this;
-    public add(value: NumberLike, returnOnly = false) {
-        if (returnOnly) { // @ts-ignore
-            const uint = new this.constructor(this.getRaw()); uint.add(value);
-            return uint;
-        }
+
+    public iadd(value: NumberLike) {
         if (typeof value === "object") {
-            this.addUint(value);
-        } else if (typeof value === "number") {
-            this.addNumber(value);
+            return this.addUint(value);
         }
+        return this.addNumber(value);
+    }
+    public add(value: NumberLike) {
+        const clone = this.clone(); clone.iadd(value); return clone;
     }
 
-    public sub(value: NumberLike): void;
-    public sub(value: NumberLike, returnOnly: true): this;
-    public sub(value: NumberLike, returnOnly = false) {
-        if (returnOnly) { // @ts-ignore
-            const uint = new this.constructor(this.getRaw()); uint.sub(value);
-            return uint;
-        }
+    public isub(value: NumberLike) {
         if (typeof value === "object") {
-            this.subUint(value);
-        } else if (typeof value === "number") {
-            this.addNumber(value * -1);
+            return this.subUint(value);
         }
+        return this.addNumber(value * -1);
+    }
+    public sub(value: NumberLike) {
+        const clone = this.clone(); clone.isub(value); return clone;
+    }
+
+    public idiv(value: NumberLike, returnRest = false) {
+        if (typeof value === "object") {
+            return this.divUint(value, returnRest);
+        }
+        return this.divNumber(value, returnRest);
+    }
+    public div(value: NumberLike) {
+        const clone = this.clone(); clone.idiv(value); return clone;
     }
 
     public mod(value: NumberLike) {
-        if (typeof value === "object") {
-            return this.modUint(value);
-        }
-        return this.modNumber(value);
+        const clone = this.clone();
+        return clone.idiv(value, true) as number;
     }
 
     public gt(value: NumberLike) {
@@ -190,8 +196,7 @@ export class Uint {
     }
 
     protected addUint(value: Uint) {
-        if (this.buffer.byteLength !== value.buffer.byteLength) {
-            // @ts-ignore
+        if (this.buffer.byteLength !== value.buffer.byteLength) { // @ts-ignore
             value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
         }
         let carry = 0;
@@ -201,7 +206,6 @@ export class Uint {
             carry = Math.floor(sum / 256);
         }
     }
-
     protected addNumber(value: number) {
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
             const sum = this.buffer[i] + value;
@@ -214,10 +218,8 @@ export class Uint {
         }
     }
 
-
     protected subUint(value: Uint) {
-        if (this.buffer.byteLength !== value.buffer.byteLength) {
-            // @ts-ignore
+        if (this.buffer.byteLength !== value.buffer.byteLength) { // @ts-ignore
             value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
         }
         let carry = 0;
@@ -232,55 +234,17 @@ export class Uint {
         }
     }
 
-    protected divUint(value: Uint) {
-
-        if (this.buffer.byteLength !== value.buffer.byteLength) {
-            // @ts-ignore
-            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength);
-        }
-
+    protected divUint(value: Uint, returnRest: boolean) {
+        return this.divNumber(value.toInt(), returnRest);
+    }
+    protected divNumber(value: number, returnRest: boolean) {
         let carry = 0;
         for (let i = 0; i < this.buffer.byteLength; i++) {
-            const sum = this.buffer[i] / (value.buffer[i] + carry);
+            const dividend = this.buffer[i] + carry;
+            this.buffer[i] = Math.floor(dividend / value);
+            carry = (dividend % value) * 256;
         }
-
-    }
-
-    protected divNumber(value: number) {
-        let carry = 0;
-        for (let i = 0; i < this.buffer.byteLength; i++) {
-            const sum = this.buffer[i] / (value + carry);
-            
-        }
-    }
-
-    protected modUint(value: Uint) {
-        if (this.buffer.byteLength !== value.buffer.byteLength) {
-            // @ts-ignore
-            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength);
-        }
-
-        // @ts-ignore
-        const result: this = this.constructor.alloc(this.getLen());
-        
-        for (let i = 0; i < this.buffer.byteLength; i++) {
-            // Perform modulo operation using bitwise AND operator
-            result.buffer[i] = this.buffer[i] & value.buffer[i];
-        }
-
-        return result;
-    }
-
-    protected modNumber(value: number): this {
-        // @ts-ignore
-        const result: this = this.constructor.alloc(this.getLen());
-
-        for (let i = 0; i < this.buffer.byteLength; i++) {
-            // Perform modulo operation between buffer byte and number
-            result.buffer[i] = this.buffer[i] % value;
-        }
-
-        return result;
+        if (returnRest) return (carry / 256);
     }
 
 
@@ -322,7 +286,7 @@ export class FixedUint extends Uint {
         let buffer: Buffer;
         if (typeof input === "number") {
             uint = this.alloc();
-            uint.add(input);
+            uint.iadd(input);
             return uint;
         } else if (typeof input === "string" && arg2 === undefined) {
             buffer = Buffer.from(input, "hex");

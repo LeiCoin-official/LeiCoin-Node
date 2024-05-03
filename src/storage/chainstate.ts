@@ -174,11 +174,11 @@ export class Chainstate {
 
                 return { valid: false, status: 400, message: 'Bad Request. Block aleady exists.' };
 
-            } else if ((latestBlockInfo.hash === block.previousHash) && latestBlockInfo.index.add(1, true).eq(block.index)) {
+            } else if ((latestBlockInfo.hash === block.previousHash) && latestBlockInfo.index.add(1).eq(block.index)) {
 
                 return { valid: true, name: chainName, type: "child", parent: chainName };
 
-            } else if ((previousBlockInfo.hash === block.previousHash) && previousBlockInfo.index.add(1, true).eq(block.index)) {
+            } else if ((previousBlockInfo.hash === block.previousHash) && previousBlockInfo.index.add(1).eq(block.index)) {
 
                 return { valid: true, name: block.hash.toHex(), type: "newfork", parent: chainName };
 

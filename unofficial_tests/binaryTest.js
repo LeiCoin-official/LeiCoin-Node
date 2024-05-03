@@ -361,31 +361,22 @@ async function test6() {
 
     let bool = true;
     
-    let input_number = Math.floor(Math.random() * 1_000_000_000);
-    let mod_number = Math.floor(Math.random() * 100_000);
-
-    let input_uint = Uint.from(input_number, 6);
-    let mod_uint = Uint.from(mod_number, 6);
-    
     const startTime = startTimer();
-    
-    for (let i = 0; i < 1; i++) {
+
+    for (let i = 0; i < 1_000_000; i++) {
         
+        const input_number = Math.floor(Math.random() * 1_000_000_000) + 1;
+        const mod_number = Math.floor(Math.random() * 100_000) + 1;
+    
+        const input_uint = Uint.from(input_number, 6);
+        const mod_uint = Uint.from(mod_number, 6);    
+
         bool = (
             bool &&
-            input_number % mod_number === input_uint.mod(mod_number).toInt() &&
-            input_number % mod_number === input_uint.mod(mod_uint).toInt()
+            input_number % mod_number === input_uint.mod(mod_number) &&
+            input_number % mod_number === input_uint.mod(mod_uint)
         )
 
-        console.log(input_number % mod_number)
-        console.log(input_uint.mod(mod_number).toInt())
-        console.log(input_uint.mod(mod_uint).toInt())
-
-        input_number = Math.floor(Math.random() * 1_000_000_000);
-        mod_number = Math.floor(Math.random() * 100_000);
-
-        input_uint = Uint.from(input_number, 6);
-        mod_uint = Uint.from(mod_number, 6);
     }
 
     const elapsedTime = endTimer(startTime);
@@ -394,7 +385,33 @@ async function test6() {
 
 }
 
+async function test7() {
 
+    let bool = true;
+    
+    const startTime = startTimer();
+    
+    for (let i = 0; i < 1_000_000; i++) {
+        
+        const input_number = Math.floor(Math.random() * 1_000_000_000) + 1;
+        const div_number = Math.floor(Math.random() * 100_000) + 1;
+    
+        const input_uint = Uint.from(input_number, 6);
+        const div_uint = Uint.from(div_number, 6);    
+
+        bool = (
+            bool &&
+            Math.floor(input_number / div_number) === input_uint.div(div_number).toInt() &&
+            Math.floor(input_number / div_number) === input_uint.div(div_uint).toInt()
+        )
+
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(bool);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+
+}
 
 //test1();
 //test2();
@@ -402,4 +419,5 @@ async function test6() {
 //test4();
 //test5();
 test6()
+//test7()
 

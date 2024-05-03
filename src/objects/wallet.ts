@@ -58,7 +58,7 @@ export class Wallet {
     }
 
     public addMoney(amount: NumberLike) {
-        this.balance.add(amount);
+        this.balance.iadd(amount);
     }
 
     public getBalance() {
@@ -71,7 +71,7 @@ export class Wallet {
 
     public subtractMoneyIFPossible(amount: NumberLike) {
         if (this.isSubtractMoneyPossible(amount)) {
-            this.balance.sub(amount);
+            this.balance.isub(amount);
         }
     }
 
@@ -80,7 +80,7 @@ export class Wallet {
     }
 
     public adjustNonce(height = 1) {
-        this.nonce.add(height);
+        this.nonce.iadd(height);
     }
 
 }

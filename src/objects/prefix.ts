@@ -48,8 +48,16 @@ class Prefix extends Uint8 {
     /** @deprecated Don't try to construct a Prefix with empty(), an error will occur! */ public static empty = constructErr;
 
     /** @deprecated Don't try to modify a Prefix, an error will occur! */ public set = lockedErr;
+
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public iadd = lockedErr;
     /** @deprecated Don't try to modify a Prefix, an error will occur! */ public add = lockedErr;
+
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public isub = lockedErr;
     /** @deprecated Don't try to modify a Prefix, an error will occur! */ public sub = lockedErr;
+
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public idiv = lockedErr;
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public div = lockedErr;
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */ public mod = lockedErr;
 
 }
 
