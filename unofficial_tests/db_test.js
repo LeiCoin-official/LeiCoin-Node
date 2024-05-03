@@ -18,7 +18,6 @@ function getDBPath(db) {
 /** @type {(db: DBs) => Promise<LevelDB<Uint, Uint>>} */
 async function openDB(db) {
     const level = new LevelDB(getDBPath(db));
-    //const level = new LevelDB(getDBPath(db), {keyEncoding: "bu", valueEncoding: "binary"});
     await level.open();
     return level;
 }
@@ -139,7 +138,7 @@ async function selectNextValidators(db, seedHash) {
     const validators_count = await level.get(Uint.from("ff00ed"));
     const validator_preifx = PX.A_0e;
 
-    if (validators_count.lte(129)) {
+    if (validators_count.lte(128)) {
         using_first_validators = true;
         for await (const [index, data] of level.iterator()) {
             if (index.slice(0, 1).eq(PX.META)) continue;
