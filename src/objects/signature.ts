@@ -19,7 +19,7 @@ export class Signature extends FixedUint {
     }
 
     public getSignerType() {
-        return this.slice(0, 1);
+        return new PX(this.slice(0, 1));
     }
 
     public getElliptic() {
@@ -50,7 +50,7 @@ export class FullSignature {
 
     public static fromRaw(raw: Signature) {
         return new this(
-            raw.slice(0, 1),
+            new PX(raw.slice(0, 1)),
             new Uint64(raw.slice(1, 33).getRaw()),
             new Uint64(raw.slice(33, 65).getRaw()),
             raw.slice(65, 66).getRaw().readUint8(0)

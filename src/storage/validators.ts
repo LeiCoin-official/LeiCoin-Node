@@ -4,6 +4,10 @@ import Validator from "../objects/validator.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import LevelDB from "./leveldb.js";
+import { Uint, Uint256 } from "../utils/binary.js";
+import { PX } from "../objects/prefix.js";
+import { Dict } from "../utils/objects.js";
+import Crypto from "../crypto/index.js";
 
 type DBVariant = "active" | "inactive";
 
@@ -70,31 +74,36 @@ export class ValidatorDB {
 
     }
 
-    public async selectNextValidators(hash: string) {
+    public async selectNextValidators(seedHash: Uint256) {
     
-        let validators = await level.keys({limit: 129}).all();
-        if (validators.length <= 128) {
-            using_first_validators = true;
-        } else {
-            validators = [];
-            let nextHash = seedHash;
+        const validators: Dict<Uint> = {};
+        const validators_count = await this.level.get(Uint.from("ff00ed"));
+        const validator_preifx = PX.A_0e;
     
-            while (validators.length !== 128) {
-    
-                let winner = (
-                    (await level.keys({gte: nextHash, limit: 1}).all())[0] ||
-                    (await level.keys({lte: nextHash, limit: 1, reverse: true}).all())[0]
-                );
-                if (!validators.some(item => item.eq(winner))) {
-                    validators.push(winner);
-                }
-                nextHash = Crypto.sha256(nextHash);
+        if (validators_count.lte(128)) {
+            for await (const [index, data] of this.level.iterator()) {
+                if (index.slice(0, 1).eq(PX.META)) continue;
+                validators[index.slice(1).toInt()] = data;
             }
-            elapsedTime = endTimer(startTime);
+        } else {
+            let nextHash = seedHash;
+            const takenIndexes: number[] = [];
+    
+            while (takenIndexes.length !== 128) {
+                let nextIndex = nextHash.mod(validators_count);
+    
+                if (!takenIndexes.includes(nextIndex)) {
+                    takenIndexes.push(nextIndex);
+    
+                    const validator_index = Uint.from(nextIndex);
+    
+                    const validator_data = await this.level.get(Uint.concat([validator_preifx, validator_index]));
+                    validators[nextIndex] = validator_data;
+                }
+                nextHash = Crypto.sha256(Uint.concat([nextHash, seedHash]));
+            }
         }
-        elapsedTime = endTimer(startTime);
-        level.close();
-        return [validators, elapsedTime, using_first_validators];
+        return validators;
     }
 
 }

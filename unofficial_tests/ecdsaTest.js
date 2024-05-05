@@ -21,7 +21,7 @@ const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff0
 //const privateKeyHex = "0000000000000000000000000000000000000000000000000000000000000001";
 
 const keyPair = ec.keyFromPrivate(privateKeyHex, "hex");
-const publicKeyHex = keyPair.getPublic("hex");
+const publicKeyHex = keyPair.getPublic(true, "array");
 
 const address = "lc0x" + crypto.createHash("sha256").update(Buffer.from(publicKeyHex)).digest("hex").slice(0, 40);
 
@@ -50,16 +50,16 @@ console.log("Signature JSON:", decoded_signature);
 // Recover the public key from the signature and message hash
 const recoverPubKey = ec.recoverPubKey(messageHash, decoded_signature, decoded_signature.recoveryParam);
 
-const recoverPubKeyHex = recoverPubKey.encode('hex');
+const recoverPubKeyHex = recoverPubKey.encode('array', true);
 
-const recoverAddress = "lc0x" + crypto.createHash("sha256").update(Buffer.from(recoverPubKeyHex)).digest("hex").slice(0, 40);
+const recoverAddress = "lc0x" + crypto.createHash("sha256").update(Buffer.from(publicKeyHex)).digest("hex").slice(0, 40);
 
 //const isSignatureValid = ec.verify(messageHash, decoded_signature, recoverPubKey, "hex");
 
 console.log('Recovered Public Key:', recoverPubKeyHex, recoverPubKeyHex.length);
 //console.log("Address:", address, address.length);
 console.log('Recovered Address:', recoverAddress, recoverAddress.length);
-//console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex === publicKeyHex);
+console.log("Recovered Public Key is equal to Original Public Key:", recoverPubKeyHex, publicKeyHex);
 console.log("Recovered Address is equal to Original Address:", address === recoverAddress);
 //console.log("Signature is Valid:", isSignatureValid);
 

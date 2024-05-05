@@ -31,19 +31,19 @@ export class Crypto {
 
     public static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
         try {
-            return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic("array"));
+            return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic(true, "array"));
         } catch (error: any) {
             return PublicKey.empty();
         }
     }
 
-    public static getPublicKeyFromSignature(hash: Uint256, signature: Signature): Uint {
+    public static getPublicKeyFromSignature(hash: Uint256, signature: Signature) {
         try {
-            return PublicKey.from(this.ec.recoverPubKey(
+            return PublicKey.from((this.ec.recoverPubKey(
                 hash.getRaw(),
                 signature.getElliptic(),
                 signature.getRecoveryParam()
-            ).encode("array"));
+            ) as elliptic.curve.base.BasePoint).encode("array", true));
         } catch (error: any) {
             return PublicKey.empty();
         }

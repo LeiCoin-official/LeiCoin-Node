@@ -13,6 +13,10 @@ export class AddressHex extends FixedUint {
         return this.slice(0, 1);
     }
 
+    public getBody() {
+        return this.slice(1);
+    }
+
     public static fromPublicKey(addressType: PX, publicKey: Uint) {
         return this.concat([addressType, Crypto.sha256(publicKey).slice(0, 20)]);
     }

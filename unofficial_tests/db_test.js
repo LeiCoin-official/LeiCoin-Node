@@ -81,7 +81,22 @@ async function gen(size, db = "stake1") {
 
     for (let i = 0; i < size; i++) {
         promises.push(
-            level.put(Uint.concat([validator_preifx, Uint.from(i)]), Uint.create(crypto.randomBytes(32)))
+            level.put(
+                Uint.concat([
+                    validator_preifx,
+                    Uint.from(i)
+                ]),
+                Uint.concat([
+                    // Validator Public Key
+                    new PublicKey(crypto.randomBytes(33)),
+
+                    // Withdraw Address
+                    new AddressHex(crypto.randomBytes(21)).getBody(),
+
+                    // Stake Amount
+                    new Uint64.from(32_0000_0000)
+                ])
+            )
         );
     }
 
