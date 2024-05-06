@@ -1,4 +1,4 @@
-import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
+import { BlockchainUtils as BCUtils } from "./blockchainUtils.js";
 import path from "path";
 import Validator from "../objects/validator.js";
 import Block from "../objects/block.js";
@@ -17,7 +17,7 @@ export class ValidatorDB {
     private readonly inactiveLevel: LevelDB;
     private readonly chain: string;
 
-    constructor(chain = "main") {
+    constructor(chain: string) {
         BCUtils.ensureDirectoryExists('/validators', chain);
         this.chain = chain;
         this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)));

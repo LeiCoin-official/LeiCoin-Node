@@ -2,14 +2,18 @@ import { startTimer, endTimer } from './testUtils.js';
 import elliptic from 'elliptic';
 const { ec: EC } = elliptic;
 import crypto from 'crypto';
+import Crypto from '../build/src/crypto/index.js';
+import { PX } from '../build/src/objects/prefix.js';
+import { PrivateKey } from '../build/src/crypto/cryptoKeys.js';
+import { AddressHex } from '../build/src/objects/address.js';
 
 const ec = new EC('secp256k1');
 
 const privateKeyHex = "c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa";
 
 const keyPair = ec.keyFromPrivate(privateKeyHex, 'hex');
-const publicKeyHex = keyPair.getPublic("hex");
-const address = `lc0x${crypto.createHash("sha256").update(publicKeyHex).digest("hex").slice(0, 40)}`;
+const publicKeyHex = keyPair.getPublic(true, "array");
+const address = `lc0x${crypto.createHash("sha256").update(Buffer.from(publicKeyHex)).digest("hex").slice(0, 40)}`;
 
 const message = "Hello, world!";
 const messageHash = crypto.createHash("sha256").update(message).digest();
@@ -197,11 +201,54 @@ async function main4() {
 
 }
 
+async function test5(amount = 1_000) {
+    
+    const hash = Crypto.sha256(crypto.randomBytes(32));
+    const signature = Crypto.sign(
+        hash,
+        PX.A_00,
+        PrivateKey.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa")
+    );
+
+    let address;
+    let publicKey;
+
+    (async () => {
+
+        const startTime = startTimer();
+
+        for (let i = 0; i < amount; i++) {
+            address = AddressHex.fromSignature(hash, signature);
+        }
+
+        const elapsedTime = endTimer(startTime);
+        console.log("Address", address);
+        console.log("Elapsed time 1:", elapsedTime / 1000, "seconds");
+
+    })();
+
+    (async () => {
+
+        const startTime = startTimer();
+
+        for (let i = 0; i < amount; i++) {
+            publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
+        }
+
+        const elapsedTime = endTimer(startTime);
+        console.log("Public Key", publicKey);
+        console.log("Elapsed time 2:", elapsedTime / 1000, "seconds");
+
+    })();
+
+
+}
+
 async function run() {
 
     //await asyncMain();
 
-    await syncMain();
+    //await syncMain();
 
     //console.log(await getSenderAddress(messageHash, encodedSignature) === address);
 
@@ -210,5 +257,6 @@ async function run() {
 //main();
 //run();
 
-main3();
+//main3();
 
+test5();

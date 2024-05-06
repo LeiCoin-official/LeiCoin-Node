@@ -7,7 +7,7 @@ import Signature from "./signature.js";
 
 export class AddressHex extends FixedUint {
 
-    public static byteLength: number = 21;
+    public static byteLength = 21;
 
     public getType() {
         return this.slice(0, 1);
@@ -15,6 +15,13 @@ export class AddressHex extends FixedUint {
 
     public getBody() {
         return this.slice(1);
+    }
+
+    public static fromTypeAndBody(addressType: PX, addressBody: Uint) {
+        return new this(Uint.concat([
+            addressType,
+            addressBody
+        ]));
     }
 
     public static fromPublicKey(addressType: PX, publicKey: Uint) {

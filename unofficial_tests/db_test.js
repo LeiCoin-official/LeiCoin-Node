@@ -1,26 +1,14 @@
 import { Level } from "level";
 import LevelDB from "../build/src/storage/leveldb.js";
 import crypto from 'crypto';
-import path from "path";
 import { shuffleArray } from './cryptoUtils.js';
 import { startTimer, endTimer } from "./testUtils.js";
 import { Uint, Uint256, Uint64 } from "../build/src/utils/binary.js";
 import Crypto from "../build/src/crypto/index.js";
 import { PX } from "../build/src/objects/prefix.js";
+import * as levelDBUtils from "./leveldb_utils.js";
 
 /** @typedef {"stake1" | "stake2" | "stake3" | "stake4"} DBs */
-
-/** @type {(db: DBs) => string} */
-function getDBPath(db) {
-    return path.join(process.cwd(), "/blockchain_data", `/tests/${db}`);
-}
-
-/** @type {(db: DBs) => Promise<LevelDB<Uint, Uint>>} */
-async function openDB(db) {
-    const level = new LevelDB(getDBPath(db));
-    await level.open();
-    return level;
-}
 
 async function speedTest() {
 
@@ -47,8 +35,8 @@ async function speedTest() {
 
 async function gen_old(size, db1 = "stake1", db2 = "stake2") {
 
-    const level1 = await openDB(db1);
-    const level2 = await openDB(db2);
+    const level1 = await levelDBUtils.openDB(db1);
+    const level2 = await levelDBUtils.openDB(db2);
 
     const hashes = [];
 
@@ -68,11 +56,11 @@ async function gen_old(size, db1 = "stake1", db2 = "stake2") {
     }
 
     await Promise.all(promises);
-
+    await level.close();
 }
 async function gen(size, db = "stake1") {
 
-    const level = await openDB(db);
+    const level = await LevelDBUtils.openDB(db);
     
     const validator_preifx = PX.A_0e;
     const metaDataPrefix = PX.META;
@@ -104,12 +92,12 @@ async function gen(size, db = "stake1") {
     level.put(Uint.concat([metaDataPrefix, Uint.from("00ed")]), Uint.from(size));
 
     await Promise.all(promises);
-
+    await level.close();
 }
 
 /** @type {(db: DBs, seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
 async function selectNextValidators_old(db, seedHash) {
-    const level = await openDB(db);
+    const level = await levelDBUtils.openDB(db);
 
     let using_first_validators = false;
 
@@ -136,13 +124,13 @@ async function selectNextValidators_old(db, seedHash) {
         elapsedTime = endTimer(startTime);
     }
     elapsedTime = endTimer(startTime);
-    level.close();
+    await level.close();
     return [validators, elapsedTime, using_first_validators];
 }
 
-/** @type {(db: DBs, seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
+/** @type {(db: DBs, seedHash: Uint256) => Promise<[import('../build/src/utils/objects.js').Dict<Uint>, number, boolean]>} */
 async function selectNextValidators(db, seedHash) {
-    const level = await openDB(db);
+    const level = await levelDBUtils.openDB(db);
 
     let using_first_validators = false;
 
@@ -179,7 +167,7 @@ async function selectNextValidators(db, seedHash) {
         elapsedTime = endTimer(startTime);
     }
     elapsedTime = endTimer(startTime);
-    level.close();
+    await level.close();
     return [validators, elapsedTime, using_first_validators];
 }
 
@@ -243,4 +231,4 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 
 //test1("stake3");
 
-fastestSelectNextValidators();
+//fastestSelectNextValidators();

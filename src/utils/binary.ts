@@ -135,6 +135,14 @@ export class Uint {
         return new Uint(this.buffer.subarray(start, end));
     }
 
+    public split(afterBytes: number) {
+        const list: Uint[] = [];
+        for (let i = 0; i < this.buffer.byteLength; i += afterBytes) {
+            list.push(this.slice(i, i + afterBytes));
+        }
+        return list;
+    }
+
 
     public iadd(value: NumberLike) {
         if (typeof value === "object") {
@@ -300,7 +308,7 @@ export class FixedUint extends Uint {
 
 export class Uint64 extends FixedUint {
 
-    public static readonly byteLength: number = 8;
+    public static readonly byteLength = 8;
     
     protected addNumber(value: number) {
         for (let i = this.buffer.byteLength - 4; i >= 0; i -= 4) {
@@ -339,15 +347,17 @@ export class Uint64 extends FixedUint {
 
 }
 
+// @ts-ignore
 export class Uint96 extends Uint64 {
-    public static readonly byteLength: number = 12;
+    public static readonly byteLength = 12;
 }
 
+// @ts-ignore
 export class Uint256 extends Uint64 {
-    public static readonly byteLength: number = 32;
+    public static readonly byteLength = 32;
 }
 
 export class Uint8 extends FixedUint {
-    public static readonly byteLength: number = 1;
+    public static readonly byteLength = 1;
 }
 

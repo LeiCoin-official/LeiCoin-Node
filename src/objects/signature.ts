@@ -7,7 +7,7 @@ export interface EllipticBinarySignature extends elliptic.ec.Signature {
 }
 
 export class Signature extends FixedUint {
-    public static byteLength: number = 66;
+    public static byteLength = 66;
 
     public static fromElliptic(signerType: PX, signature: EllipticBinarySignature) {
         return this.concat([
