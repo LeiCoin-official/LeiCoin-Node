@@ -1,6 +1,5 @@
 import { AddressHex } from "../objects/address.js";
-import { PX } from "../objects/prefix.js";
-import Validator from "../objects/validator.js";
+import Validator, { ValidatorAddress } from "../objects/validator.js";
 import blockchain from "../storage/blockchain.js";
 import { Uint } from "../utils/binary.js";
 
@@ -30,17 +29,15 @@ export class DepositContract {
         return blockchain.cstates.setState(this.address, Uint.concat(this.data));
     }
 
-    private static getDataByAddress(address: AddressHex) {
-        const addressBody = address.getBody();
-        return this.data.find((item) => item.slice(1, 21).eq(addressBody));
+    private static getDataByAddress(address: ValidatorAddress) {
+        return this.data.find((item) => item.slice(1, 21).eq(address));
     }
 
-    private static getIndexByAddress(address: AddressHex) {
-        const addressBody = address.getBody();
-        return this.data.findIndex((item) => item.slice(1, 21).eq(addressBody));
+    private static getIndexByAddress(address: ValidatorAddress) {
+        return this.data.findIndex((item) => item.slice(1, 21).eq(address));
     }
 
-    public static getValidator(address: AddressHex) {
+    public static getValidator(address: ValidatorAddress) {
         const data = this.getDataByAddress(address);
         if (data) return Validator.fromDecodedHex(data);
         return null;
@@ -50,7 +47,8 @@ export class DepositContract {
         const index = this.getIndexByAddress(validator.address);
         if (index === -1)
             this.data.push(validator.encodeToHex());
-        //else
+        else
+            this.data[index] = validator.encodeToHex();
     }
 
 }
