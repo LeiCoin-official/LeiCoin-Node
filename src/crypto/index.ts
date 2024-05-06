@@ -21,7 +21,7 @@ export class Crypto {
 
     public static sign(hash: Uint256, signerType: PX, privateKey: PrivateKey) {
         try {
-            const keyPair = this.ec.keyFromPrivate(privateKey.getRaw(), "hex");
+            const keyPair = this.ec.keyFromPrivate(privateKey.getRaw());
             const signature = keyPair.sign(hash.getRaw());
             return Signature.fromElliptic(signerType, (signature as EllipticBinarySignature));
         } catch (error: any) {
@@ -31,7 +31,7 @@ export class Crypto {
 
     public static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
         try {
-            return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw(), "hex").getPublic(true, "array"));
+            return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw()).getPublic(true, "array"));
         } catch (error: any) {
             return PublicKey.empty();
         }

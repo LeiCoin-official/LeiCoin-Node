@@ -34,7 +34,7 @@ export class ValidatorDB {
     private async getValidatorInLevel(address: AddressHex, db?: DBVariant) {
         const level = this.getLevel(db);
         const raw_validator_data = await level.get(address);
-        return Validator.fromDecodedHex(address, raw_validator_data);
+        return Validator.fromDecodedHex(raw_validator_data);
     }
 
     private async setValidatorInLevel(validator: Validator, db?: DBVariant) {

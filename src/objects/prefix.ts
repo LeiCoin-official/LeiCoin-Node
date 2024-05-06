@@ -1,4 +1,4 @@
-import { Uint, Uint8 } from "../utils/binary.js";
+import { Uint8 } from "../utils/binary.js";
 
 class PrefixConstructError extends Error {
     name = "PrefixConstructError";

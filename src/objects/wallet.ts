@@ -1,4 +1,4 @@
-import ObjectEncoding from "../encoding/objects.js";
+import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
@@ -23,39 +23,28 @@ export class Wallet {
     }
 
     public encodeToHex() {
-    
-        const resultData = ObjectEncoding.encode(this, [
-            {key: "version"},
-            {key: "balance", type: "bigint"},
-            {key: "nonce"},
-        ]);
-
-        return resultData.data;
-
+        return ObjectEncoding.encode(this, Wallet.encodingSettings, false).data;
     }
     
     public static fromDecodedHex(ownerAddress: AddressHex, hexData: Uint) {
-
         try {
-
-            const resultData = ObjectEncoding.decode(hexData, [
-                {key: "version"},
-                {key: "balance", type: "bigint"},
-                {key: "nonce"},
-            ]);
-
+            const resultData = ObjectEncoding.decode(hexData, Wallet.encodingSettings);
             const data = resultData.data;
-        
+
             if (data && data.version.eq(0)) {
                 return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }
-
         } catch (err: any) {
             cli.data_message.error(`Error loading Wallet from Decoded Hex: ${err.message}`);
         }
-        
         return null;
     }
+
+    private static encodingSettings: EncodingSettings[] = [
+        {key: "version"},
+        {key: "balance", type: "bigint"},
+        {key: "nonce"},
+    ]
 
     public addMoney(amount: NumberLike) {
         this.balance.iadd(amount);

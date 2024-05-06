@@ -1,4 +1,4 @@
-import ObjectEncoding from "../encoding/objects.js";
+import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
@@ -26,35 +26,17 @@ export class Attestation {
     }
 
     public encodeToHex(forHash = false) {
-
-        const returnData = ObjectEncoding.encode(this, [
-            {key: "version"},
-            {key: "blockHash", type: "hash"},
-            {key: "vote", type: "bool"},
-            {key: "nonce"},
-            (forHash ? null : {key: "signature"})
-        ]);
-
-        return returnData.data;
-
+        return ObjectEncoding.encode(this, Attestation.encodingSettings, forHash).data;
     }
 
     public static fromDecodedHex(hexData: Uint, withAttesterAddress = true) {
-
         try {
-            const returnData = ObjectEncoding.decode(hexData, [
-                {key: "version"},
-                {key: "blockHash", type: "hash"},
-                {key: "vote", type: "bool"},
-                {key: "nonce"},
-                {key: "signature"}
-            ]);
-
+            const returnData = ObjectEncoding.decode(hexData, Attestation.encodingSettings);
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
 
-                data.attester = "";
+                data.attester = null;
                 const instance = DataUtils.createInstanceFromJSON(Attestation, data);
 
                 if (withAttesterAddress) {
@@ -66,14 +48,20 @@ export class Attestation {
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
         }
-
         return null;
-
     }
 
     public calculateHash() {
         return Crypto.sha256(this.encodeToHex(true));
     }
+
+    private static encodingSettings: EncodingSettings[] =[
+        {key: "version"},
+        {key: "blockHash", type: "hash"},
+        {key: "vote", type: "bool"},
+        {key: "nonce"},
+        {key: "signature", hashRemove: true}
+    ]
 
 }
 

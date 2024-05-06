@@ -8,7 +8,7 @@ import config from "../handlers/configHandler.js";
 import DataUtils from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
-import ObjectEncoding from "../encoding/objects.js";
+import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { PX } from "./prefix.js";
 
 export class Block {
@@ -78,35 +78,13 @@ export class Block {
     }
 
     public encodeToHex(forHash = false) {
-
-        const returnData = ObjectEncoding.encode(this, [
-            {key: "version"},
-            {key: "index"},
-            (forHash ? null : {key: "hash"}),
-            {key: "previousHash", type: "hash"},
-            {key: "timestamp"},
-            {key: "proposer", type: "address"},
-            {key: "attestations", type: "array", encodeFunc: Attestation.prototype.encodeToHex},
-            {key: "transactions", type: "array", encodeFunc: Transaction.prototype.encodeToHex}
-        ]);
-
-        return returnData.data;
-
+        return ObjectEncoding.encode(this, Block.encodingSettings, forHash).data;
     }
 
     public static fromDecodedHex(hexData: Uint, returnLength = false) {
 
         try {
-            const returnData = ObjectEncoding.decode(hexData, [
-                {key: "version"},
-                {key: "index"},
-                {key: "hash"},
-                {key: "previousHash", type: "hash"},
-                {key: "timestamp"},
-                {key: "proposer", type: "address"},
-                {key: "attestations", length: 1, type: "array", decodeFunc: Attestation.fromDecodedHex},
-                {key: "transactions", length: 1, type: "array", decodeFunc: Transaction.fromDecodedHex}
-            ], returnLength);
+            const returnData = ObjectEncoding.decode(hexData, Block.encodingSettings, returnLength);
 
             const data = returnData.data;
         
@@ -124,6 +102,17 @@ export class Block {
 
         return null;
     }
+
+    private static encodingSettings: EncodingSettings[] = [
+        {key: "version"},
+        {key: "index"},
+        {key: "hash", hashRemove: true},
+        {key: "previousHash", type: "hash"},
+        {key: "timestamp"},
+        {key: "proposer", type: "address"},
+        {key: "attestations", type: "array", length: 1, encodeFunc: Attestation.prototype.encodeToHex, decodeFunc: Attestation.fromDecodedHex},
+        {key: "transactions", type: "array", length: 1, encodeFunc: Transaction.prototype.encodeToHex, decodeFunc: Transaction.fromDecodedHex}
+    ]
 
     public calculateHash() {
         return Crypto.sha256(this.encodeToHex(true));

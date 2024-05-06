@@ -1,9 +1,58 @@
+import { AddressHex } from "../objects/address.js";
+import { PX } from "../objects/prefix.js";
+import Validator from "../objects/validator.js";
+import blockchain from "../storage/blockchain.js";
+import { Uint } from "../utils/binary.js";
 
 
 export class DepositContract {
 
-    
+    private static loaded = false;
+
+    private static readonly address = AddressHex.from("0c0000000000000000000000000000000000000001");
+
+    private static rawDataLength = 29;
+    private static data: Uint[];
+
+    public static async load() {
+        if (this.loaded) return;
+
+        
+
+        this.loaded = true;
+    }
+
+    private static async readDB() {
+        this.data = (await blockchain.cstates.getState(this.address)).split(this.rawDataLength);
+    }
+
+    private static async saveDB() {
+        return blockchain.cstates.setState(this.address, Uint.concat(this.data));
+    }
+
+    private static getDataByAddress(address: AddressHex) {
+        const addressBody = address.getBody();
+        return this.data.find((item) => item.slice(1, 21).eq(addressBody));
+    }
+
+    private static getIndexByAddress(address: AddressHex) {
+        const addressBody = address.getBody();
+        return this.data.findIndex((item) => item.slice(1, 21).eq(addressBody));
+    }
+
+    public static getValidator(address: AddressHex) {
+        const data = this.getDataByAddress(address);
+        if (data) return Validator.fromDecodedHex(data);
+        return null;
+    }
+
+    public static setValidator(validator: Validator) {
+        const index = this.getIndexByAddress(validator.address);
+        if (index === -1)
+            this.data.push(validator.encodeToHex());
+        //else
+    }
 
 }
 
-
+export default DepositContract;

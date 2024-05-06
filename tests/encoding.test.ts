@@ -3,7 +3,7 @@ import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
 import Attestation from "../src/objects/attestation.js";
 import Proposition from "../src/objects/proposition.js";
-import Validator from "../src/objects/validator.js";
+import Validator, { ValidatorAddress } from "../src/objects/validator.js";
 import fs from "fs";
 import Signature from "../src/objects/signature.js";
 import { Uint256, Uint64 } from "../src/utils/binary.js";
@@ -38,7 +38,7 @@ describe('encoding_testing', () => {
     test('attestation_enoding_and_decoding', () => {
 
         const attestation = new Attestation(
-            AddressHex.from("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4"),
+            AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
             Uint256.empty(),
             true,
             Uint64.from(1),
@@ -53,7 +53,7 @@ describe('encoding_testing', () => {
     test('proposition_enoding_and_decoding', () => {
 
         const proposition = new Proposition(
-            AddressHex.from("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4"),
+            AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
             Uint64.from(1),
             Signature.empty(),
             Block.createNewBlock()
@@ -75,22 +75,22 @@ describe('encoding_testing', () => {
     });
     test('validator_enoding_and_decoding', () => {
 
-        const address = AddressHex.from("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4");
+        const address = ValidatorAddress.from("7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
         const validator = new Validator(
             address,
             Uint64.from(32_0000_0000)
         );
 
-        const decoded: any = Validator.fromDecodedHex(address, validator.encodeToHex());
-        const decoded2 = Validator.fromDecodedHex(address, decoded.encodeToHex());
+        const decoded: any = Validator.fromDecodedHex(validator.encodeToHex());
+        const decoded2 = Validator.fromDecodedHex(decoded.encodeToHex());
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(validator));
 
     });
     test('wallet_enoding_and_decoding', () => {
 
-        const address = AddressHex.from("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4");
+        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
         
         const wallet = new Wallet(
             address,

@@ -9,18 +9,18 @@ describe('address_testing', () => {
         const privateKeyHex = PrivateKey.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa");
         const address = Address32.fromPrivateKey(PX.A_00, privateKeyHex);
 
-        const hashData = Crypto.sha256("0123456789abcdef");
+        const hashData = Crypto.sha256(Buffer.from("0123456789abcdef"));
 
         const signature = Crypto.sign(hashData, PX.A_00, privateKeyHex);
         const recoveredAddress = Address32.fromSignature(hashData, signature);
 
-        expect((address === recoveredAddress) ? address : null).toBe("lc0xtul58zuvq45away823ypr4qr4bafbpz6");
+        expect((address === recoveredAddress) ? address : null).toBe("lc0x91s7cb3gengt3fjud8f8zcev35f4jy23");
     });
     test('coinbase_address_gettting', () => {
 
         const privateKeyHex = PrivateKey.empty();
         const address = AddressHex.fromPrivateKey(PX.A_00, privateKeyHex);
 
-        expect(address.toHex()).toBe("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4");
+        expect(address.toHex()).toBe("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
     });
 });

@@ -16,11 +16,11 @@ class SmartContractStateDB {
     }
 
     public async getState(address: AddressHex) {
-        return this.level.get(address);
+        return this.level.get(address.getBody());
     }
 
     public async setState(address: AddressHex, state: Uint) {
-        return this.level.put(address, state);
+        return this.level.put(address.getBody(), state);
     }
 
 }

@@ -1,4 +1,4 @@
-import ObjectEncoding from "../encoding/objects.js";
+import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import Block from "./block.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
@@ -25,48 +25,36 @@ export class Proposition {
     }
 
     public encodeToHex(forHash = false) {
-
-        const returnData = ObjectEncoding.encode(this, [
-            {key: "version"},
-            {key: "nonce"},
-            (forHash ? null : {key: "signature"}),
-            {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex}
-        ]);
-        
-        return returnData.data;
-
+        return ObjectEncoding.encode(this, Proposition.encodingSettings, forHash).data;
     }
 
     public static fromDecodedHex(hexData: Uint, withProposerAddress = true) {
-
         try {
-            const returnData = ObjectEncoding.decode(hexData, [
-                {key: "version"},
-                {key: "nonce"},
-                {key: "signature"},
-                {key: "block", type: "object", decodeFunc: Block.fromDecodedHex}
-            ]);
-
+            const returnData = ObjectEncoding.decode(hexData, Proposition.encodingSettings);
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
 
-                data.proposer = "";
+                data.proposer = null;
                 const instance = DataUtils.createInstanceFromJSON(Proposition, data);
 
                 if (withProposerAddress) {
                     instance.proposer = AddressHex.fromSignature(instance.calculateHash(), data.signature);
                 }
-
                 return instance;
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Proposition from Decoded Hex: ${err.message}`);
         }
-
         return null;
-
     }
+
+    private static encodingSettings: EncodingSettings[] = [
+        {key: "version"},
+        {key: "nonce"},
+        {key: "signature", hashRemove: true},
+        {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex}
+    ]
 
     public calculateHash() {
         return Crypto.sha256(this.encodeToHex(true));

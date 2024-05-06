@@ -1,6 +1,6 @@
 import config from "../handlers/configHandler.js";
 import Crypto from "../crypto/index.js";
-import ObjectEncoding from "../encoding/objects.js";
+import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import utils from "../utils/index.js";
 import cli from "../utils/cli.js";
 import { AddressHex } from "./address.js";
@@ -47,7 +47,7 @@ export class Transaction {
 
         const coinbase = new Transaction(
             Uint256.alloc(),
-            AddressHex.from("00e3b0c44298fc1c149afbf4c8996fb92427ae41e4"),
+            AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
             AddressHex.from(config.staker.address),
             Uint64.from(utils.mining_pow),
             Uint64.from(0),
@@ -64,41 +64,17 @@ export class Transaction {
     }
 
     public encodeToHex(forHash = false) {
-    
-        const returnData = ObjectEncoding.encode(this, [
-            {key: "version"},
-            (forHash ? null : {key: "txid", type: "hash"}),
-            {key: "recipientAddress", type: "address"},
-            {key: "amount", type: "bigint"},
-            {key: "nonce"},
-            {key: "timestamp"},
-            {key: "input", lengthBefore: "unlimited"},
-            (forHash ? null : {key: "signature"})
-        ]);
-
-        return returnData.data;
-
+        return ObjectEncoding.encode(this, Transaction.encodingSettings, forHash).data;
     }
 
     public static fromDecodedHex(hexData: Uint, returnLength = false, withSenderAddress = true) {
-
         try {
-            const returnData = ObjectEncoding.decode(hexData, [
-                {key: "version"},
-                {key: "txid", type: "hash"},
-                {key: "recipientAddress", type: "address"},
-                {key: "amount", type: "bigint"},
-                {key: "nonce"},
-                {key: "timestamp"},
-                {key: "input", lengthBefore: "unlimited"},
-                {key: "signature"}
-            ], returnLength);
-
+            const returnData = ObjectEncoding.decode(hexData, Transaction.encodingSettings, returnLength);
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
 
-                data.senderAddress = "";
+                data.senderAddress = null
                 const instance = DataUtils.createInstanceFromJSON(Transaction, data);
 
                 if (withSenderAddress) {
@@ -113,10 +89,19 @@ export class Transaction {
         } catch (err: any) {
             cli.data_message.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
         }
-
         return null;
-
     }
+
+    private static encodingSettings: EncodingSettings[] = [
+        {key: "version"},
+        {key: "txid", type: "hash", hashRemove: true},
+        {key: "recipientAddress", type: "address"},
+        {key: "amount", type: "bigint"},
+        {key: "nonce"},
+        {key: "timestamp"},
+        {key: "input", lengthBefore: "unlimited"},
+        {key: "signature", hashRemove: true}
+    ]
 
     public calculateHash() {
         return Crypto.sha256(this.encodeToHex(true));

@@ -1,3 +1,4 @@
+import { AddressHex } from "../objects/address.js";
 import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../utils/binary.js";
 
 interface BinaryEncoderLike<T extends Uint> {
@@ -7,7 +8,7 @@ interface BinaryEncoderLike<T extends Uint> {
     readonly format: "buffer";
 }
 
-class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
+export class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
 
     public readonly name: string;
     public readonly format = "buffer";
@@ -38,3 +39,4 @@ class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
 export const UintEncoder = new BinaryEncoder("uint", Uint);
 export const Uint64Encoder = new BinaryEncoder("uint64", Uint64);
 export const Uint256Encoder = new BinaryEncoder("uint256", Uint256);
+export const AddressEncoder = new BinaryEncoder("address", AddressHex);

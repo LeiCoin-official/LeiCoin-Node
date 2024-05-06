@@ -1,27 +1,23 @@
-import { AddressHex } from "../objects/address.js";
+import { AddressHex, SpecificAddress } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
+import { ValidatorAddress } from "../objects/validator.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/objects.js";
 import EncodingUtils from "./index.js";
 
 type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object";
-type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
+type AdvancedTypes = "address" | "validator_address" | "hash" | "signature" | "nonce" | "version";
 type DefaultDataTypes = BasicTypes | AdvancedTypes;
 
-export interface DataFromHexArguments {
+export interface EncodingSettings {
     key: string;
     length?: number;
     lengthBefore?: boolean | "unlimited";
     type?: DefaultDataTypes;
+    hashRemove?: boolean,
     decodeFunc?(hexData: Uint, returnLength: boolean): any;
-}
-
-export interface DataToHexArguments {
-    key: string;
-    lengthBefore?: boolean | "unlimited";
-    type?: DefaultDataTypes;
     encodeFunc?(add_empty_bytes: boolean, forHash: boolean): Uint;
 }
 
@@ -65,6 +61,7 @@ export class ObjectEncoding {
         this.types.default = {};
 
         this.types.address = { parse: (v: any) => AddressHex.create(v), defaultLength: AddressHex.byteLength };
+        this.types.validator_address = { parse: (v: any) => ValidatorAddress.create(v), defaultLength: SpecificAddress.byteLength };
         this.types.signature = { parse: (v: any) => Signature.create(v), defaultLength: Signature.byteLength };
         this.types.hash = { parse: (v: any) => Uint256.create(v), defaultLength: Uint256.byteLength };
         this.types.version = { parse: (v: any) => PX.create(v), defaultLength: Uint8.byteLength };
@@ -72,14 +69,14 @@ export class ObjectEncoding {
     }
 
 
-    private static encodeValue(value: any, data: DataToHexArguments) {
+    private static encodeValue(value: any, data: EncodingSettings) {
 
         try {
 
             let hexDataType: HexDataType;
             let lengthBefore = data.lengthBefore;
 
-            if (data.key in this.types) {
+            if (!data.type && data.key in this.types) {
                 hexDataType = this.types[data.key];
             } else {
                 hexDataType = this.types[data.type || "default"] || this.types.default;
@@ -113,7 +110,7 @@ export class ObjectEncoding {
 
     }
 
-    private static decodeValue(hexDataSubstring: Uint, data: DataFromHexArguments) {
+    private static decodeValue(hexDataSubstring: Uint, data: EncodingSettings) {
 
         try {
 
@@ -121,7 +118,7 @@ export class ObjectEncoding {
 
             let lengthBefore = data.lengthBefore;
             
-            if (data.key in this.types) {
+            if (!data.type && data.key in this.types) {
                 hexDataType = this.types[data.key];
             } else {
                 hexDataType = this.types[data.type || "default"] || this.types.default;
@@ -184,7 +181,7 @@ export class ObjectEncoding {
         ];
     }
 
-    public static encode(object: AnyObj, keys: (DataToHexArguments | null)[]) {
+    public static encode(object: AnyObj, keys: EncodingSettings[], forHash: boolean) {
 
         try {
 
@@ -192,7 +189,7 @@ export class ObjectEncoding {
 
             for (const data of keys) {
 
-                if (!data) continue;
+                if (forHash && data.hashRemove) continue;
 
                 const value = object[data.key];
 
@@ -232,7 +229,7 @@ export class ObjectEncoding {
 
     }
     
-    public static decode(hexData: Uint, values: DataFromHexArguments[], returnLength = false) {
+    public static decode(hexData: Uint, values: EncodingSettings[], returnLength = false) {
         
         try {
 

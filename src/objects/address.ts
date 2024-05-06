@@ -5,9 +5,37 @@ import DataUtils from "../utils/dataUtils.js";
 import { PX } from "./prefix.js";
 import Signature from "./signature.js";
 
+export class SpecificAddress extends FixedUint {
+    
+    public static readonly byteLength = 20;
+    public static readonly addressType: PX;
+
+    public getType() {
+        return PX.A_00;
+    };
+
+    public static fromTypeAndBody(addressBody: Uint) {
+        return new this(addressBody);
+    }
+
+    public static fromPublicKey(publicKey: PublicKey) {
+        return this.concat([this.addressType, Crypto.sha256(publicKey).slice(0, 20)]);
+    }
+
+    public static fromPrivateKey(privateKey: Uint256) {
+        return this.fromPublicKey(Crypto.getPublicKeyFromPrivateKey(privateKey));
+    }
+
+    public static fromSignature(hash: Uint256, signature: Signature) {
+        const publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
+        return this.fromPublicKey(publicKey);
+    }
+
+}
+
 export class AddressHex extends FixedUint {
 
-    public static byteLength = 21;
+    public static readonly byteLength = 21;
 
     public getType() {
         return this.slice(0, 1);
@@ -24,7 +52,7 @@ export class AddressHex extends FixedUint {
         ]));
     }
 
-    public static fromPublicKey(addressType: PX, publicKey: Uint) {
+    public static fromPublicKey(addressType: PX, publicKey: PublicKey) {
         return this.concat([addressType, Crypto.sha256(publicKey).slice(0, 20)]);
     }
 
@@ -38,6 +66,7 @@ export class AddressHex extends FixedUint {
     }
 
 }
+
 
 export class Address32 {
 
