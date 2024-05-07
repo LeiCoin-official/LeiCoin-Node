@@ -11,7 +11,9 @@ import Crypto from "../crypto/index.js";
 
 export class ValidatorDB {
 
-    private readonly active: Uint64[] = [];
+    private active: Uint64[] = [];
+    private readonly active_key = Uint.concat([PX.META, Uint.from("00ed")]);
+
     private readonly level: LevelDB;
     private readonly chain: string;
 
@@ -21,8 +23,16 @@ export class ValidatorDB {
         this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)));
     }
 
+    private getWithVPX(data: Uint) {
+        return Uint.concat([PX.A_0c, data]);
+    }
+
+    private getWithMetaPX(data: Uint) {
+        return Uint.concat([PX.META, data]);
+    }
+
     public async loadActive() {
-        this.level.get()
+        this.active = (await this.level.get(this.active_key)).nci_split(Uint64, 8);
     }
 
     public async setActive() {
@@ -30,7 +40,7 @@ export class ValidatorDB {
     }
 
     private async getValidator(index: Uint64) {
-        const raw_validator_data = await this.level.get(address);
+        const raw_validator_data = await this.level.get(this.getWithVPX(index));
         return Validator.fromDecodedHex(raw_validator_data);
     }
 
@@ -39,8 +49,8 @@ export class ValidatorDB {
         return Validator.fromDecodedHex(raw_validator_data);
     }
 
-    private async setValidator(validator: Validator) {
-        return this.level.put(validator.address, validator.encodeToHex());
+    private async setValidator(index: Uint64, validator: Validator) {
+        return this.level.put(this.getWithVPX(index), validator.encodeToHex());
     }
 
     public async addInactiveValidator(validator: Validator) {

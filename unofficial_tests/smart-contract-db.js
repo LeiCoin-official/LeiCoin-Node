@@ -14,7 +14,7 @@ const validator_length = 20 + Uint64.byteLength;
 const deposit_address = AddressHex.from("0c0000000000000000000000000000000000000001");
 
 
-class Validator {
+export class Validator {
 
     /** @public @type {AddressHex} */ address;
     /** @public @type {Uint64} */ amount;
@@ -144,4 +144,4 @@ async function testGetValidators(func = getValidators) {
 //genDeposit(1_000_000)
 //genActive(1_000_000)
 
-testGetValidators(getActiveValidators);
+//testGetValidators(getActiveValidators);

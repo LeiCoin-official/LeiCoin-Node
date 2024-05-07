@@ -8,6 +8,7 @@ import { AddressHex } from "../build/src/objects/address.js";
 import Crypto from "../build/src/crypto/index.js";
 import { PX } from "../build/src/objects/prefix.js";
 import * as levelDBUtils from "./leveldb_utils.js";
+import { Validator } from "./smart-contract-db.js"
 
 /** @typedef {"stake1" | "stake2" | "stake3" | "stake4"} DBs */
 
@@ -15,14 +16,21 @@ async function speedTest(db1 = "stake1", db2) {
 
     const level1 = new LevelDB(levelDBUtils.getDBPath(db1));
 
-    /** @type {(level: LevelDB) => number} */
+    /** @type {(level: LevelDB) => Promise<number>} */
     async function doTest(level) {
         await level.open();
         const startTime = startTimer();
         const keys = await level.keys().all();
         const elapsedTime = endTimer(startTime);
+
+        //console.log(await level.get(keys[2]));
+        //console.log(Validator.fromDecodedHex(await level.get(keys[2])));
+
+        //const address = "9a19f035c1862f331fb2b0ed8e418818f9dfa16e";
+        //const validator = Validator.fromDecodedHex((await level.values({gte: Uint.from(address), limit: 1}).all())[0]);
+        //console.log(validator.address.toHex());
+        
         level.close();
-        console.log(keys[2])
         return elapsedTime;
     };
 
@@ -54,15 +62,15 @@ async function gen_old(size, db1 = "stake1", db2 = "stake2") {
 
     const shuffledHashes = shuffleArray(hashes);
 
-    const promises = [];
-
     for (let i = 0; i < size; i++) {
-        promises.push(level1.put(hashes[i], emptyUint));
-        promises.push(level2.put(shuffledHashes[i], emptyUint));
+        await Promise.all([
+            level1.put(hashes[i], emptyUint),
+            level2.put(shuffledHashes[i], emptyUint)
+        ]);
     }
 
-    await Promise.all(promises);
-    await level.close();
+    await level1.close();
+    await level2.close();
 }
 async function gen(size, db = "stake1") {
 
@@ -256,3 +264,5 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 
 })();
 */
+
+test1("stake1", selectNextValidators_old);
