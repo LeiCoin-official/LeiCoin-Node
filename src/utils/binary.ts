@@ -131,17 +131,21 @@ export class Uint {
         this.buffer.set((list.getRaw ? list.getRaw() : list), offset);
     }
 
-    public slice(start?: number, end?: number) {
-        return new Uint(this.buffer.subarray(start, end));
+
+    public nci_slice<T>(CLS: New<T>, start?: number, end?: number) {
+        return new CLS(this.buffer.subarray(start, end));   
     }
 
-    public split(afterBytes: number) {
-        const list: Uint[] = [];
+    public nci_split<T>(CLS: New<T>, afterBytes: number) {
+        const list: T[] = [];
         for (let i = 0; i < this.buffer.byteLength; i += afterBytes) {
-            list.push(this.slice(i, i + afterBytes));
+            list.push(this.nci_slice(CLS, i, i + afterBytes));
         }
         return list;
     }
+
+    public slice(start?: number, end?: number) {return this.nci_slice(Uint, start, end)}
+    public split(afterBytes: number) {return this.nci_split(Uint, afterBytes)}
 
 
     public iadd(value: NumberLike) {

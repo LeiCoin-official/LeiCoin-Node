@@ -11,7 +11,6 @@ export class DepositContract {
     private static readonly address = AddressHex.from("0c0000000000000000000000000000000000000001");
 
     private static rawDataLength = 29;
-    private static data: Uint[];
 
     public static async load() {
         if (this.loaded) return;

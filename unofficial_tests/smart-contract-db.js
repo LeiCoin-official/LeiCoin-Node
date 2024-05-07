@@ -6,6 +6,7 @@ import { AddressHex } from "../build/src/objects/address.js";
 import { PublicKey } from "../build/src/crypto/cryptoKeys.js";
 import * as levelDBUtils from "./leveldb_utils.js";
 import { PX } from '../build/src/objects/prefix.js';
+import LevelDB from '../build/src/storage/leveldb.js';
 
 
 const db = "smart-contract";
@@ -55,21 +56,27 @@ async function genDeposit(size) {
     await level.close();
 }
 
-/** @type {(uint: Uint) => Promise<Uint[]>} */
-async function getValidators2() {
+/** @type {(size: number) => Promise<void>} */
+async function genActive(size) {
     const level = await levelDBUtils.openDB(db);
 
-    const raw_validators = (await level.get(deposit_address)).split(validator_length);
     const validators = [];
 
-    for (const raw_validator of raw_validators) {
-        validators.push(Validator.fromDecodedHex(raw_validator));
+    for (let i = 0; i < size; i++) {
+        validators.push(Uint64.from(i));
     }
 
+    await level.put(deposit_address, Uint.concat(validators));
+
     await level.close();
-    return validators;
 }
 
+/** @type {(level: LevelDB) => Promise<Uint64[]>} */
+async function getActiveValidators(level) {
+    return (await level.get(deposit_address)).nci_split(Uint64, 8);
+}
+
+/** @type {(level: LevelDB) => Promise<Uint[]>} */
 async function getValidators(level) {
     return (await level.get(deposit_address)).split(validator_length);
 }
@@ -117,23 +124,24 @@ async function selectNextValidators(seedHash) {
 }
 
 
-async function testGetValidators() {
+async function testGetValidators(func = getValidators) {
 
     const level = await levelDBUtils.openDB(db);
     
     const startTime = startTimer();
 
-    const validators = await getValidators(level);
+    const validators = await func(level);
 
     const elapsedTime = endTimer(startTime);
 
     level.close();
 
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
-    console.log(Validator.fromDecodedHex(validators[0]));
+    console.log(validators[0]);
     console.log(validators.length.toLocaleString());
 }
 
 //genDeposit(1_000_000)
+//genActive(1_000_000)
 
-testGetValidators();
+testGetValidators(getActiveValidators);

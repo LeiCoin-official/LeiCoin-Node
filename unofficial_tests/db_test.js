@@ -4,32 +4,38 @@ import crypto from 'crypto';
 import { shuffleArray } from './cryptoUtils.js';
 import { startTimer, endTimer } from "./testUtils.js";
 import { Uint, Uint256, Uint64 } from "../build/src/utils/binary.js";
+import { AddressHex } from "../build/src/objects/address.js";
 import Crypto from "../build/src/crypto/index.js";
 import { PX } from "../build/src/objects/prefix.js";
 import * as levelDBUtils from "./leveldb_utils.js";
 
 /** @typedef {"stake1" | "stake2" | "stake3" | "stake4"} DBs */
 
-async function speedTest() {
+async function speedTest(db1 = "stake1", db2) {
 
-    const level1 = new Level(getDBPath("stake1"), {keyEncoding: "hex", valueEncoding: "hex"});
-    const level2 = new LevelDB(getDBPath("stake2"));
+    const level1 = new LevelDB(levelDBUtils.getDBPath(db1));
 
+    /** @type {(level: LevelDB) => number} */
     async function doTest(level) {
         await level.open();
         const startTime = startTimer();
         const keys = await level.keys().all();
         const elapsedTime = endTimer(startTime);
         level.close();
+        console.log(keys[2])
         return elapsedTime;
     };
 
     const time1 = await doTest(level1);
-    const time2 = await doTest(level2);
 
     console.log("Elapsed time 1:", time1 / 1000, "seconds");
-    console.log("Elapsed time 2:", time2 / 1000, "seconds");
-    console.log("DB working with Uint is", (time1 / time2), "times faster then with strings");
+
+    if (db2) {
+        const level2 = new Level(getDBPath(db2), {keyEncoding: "hex", valueEncoding: "hex"});
+        const time2 = await doTest(level2);
+        console.log("Elapsed time 2:", time2 / 1000, "seconds");
+        console.log("DB working with Uint is", (time1 / time2), "times faster then with strings");
+    }
 }
 
 
@@ -60,7 +66,7 @@ async function gen_old(size, db1 = "stake1", db2 = "stake2") {
 }
 async function gen(size, db = "stake1") {
 
-    const level = await LevelDBUtils.openDB(db);
+    const level = await levelDBUtils.openDB(db);
     
     const validator_preifx = PX.A_0e;
     const metaDataPrefix = PX.META;
@@ -75,21 +81,18 @@ async function gen(size, db = "stake1") {
                     Uint.from(i)
                 ]),
                 Uint.concat([
-                    // Validator Public Key
-                    new PublicKey(crypto.randomBytes(33)),
-
                     // Withdraw Address
                     new AddressHex(crypto.randomBytes(21)).getBody(),
 
                     // Stake Amount
-                    new Uint64.from(32_0000_0000)
+                    Uint64.from(32_0000_0000)
                 ])
             )
         );
     }
 
     //& length
-    level.put(Uint.concat([metaDataPrefix, Uint.from("00ed")]), Uint.from(size));
+    await level.put(Uint.concat([metaDataPrefix, Uint.from("00ed")]), Uint.from(size));
 
     await Promise.all(promises);
     await level.close();
@@ -221,10 +224,11 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 //gen_old(129);
 //gen(129, "stake3");
 //gen_old(100_000, "stake3", "stake4");
+//gen(1_000_000, "stake3")
 
 //await gen();
 
-//speedTest();
+//speedTest("stake3", null);
 
 //test2("stake1", "stake2");
 //test2("stake3", "stake4");
@@ -232,3 +236,23 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 //test1("stake3");
 
 //fastestSelectNextValidators();
+
+/*
+(async() => {
+
+    let uint;
+    let uint1 = Uint.from("abcdef");
+    let uint2 = Uint.from("012345");
+
+    const startTime = startTimer();
+
+    for (let i = 0; i < 1_000_000; i++) {
+        uint = Uint.concat([uint1, uint2]);
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(uint);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+
+})();
+*/
