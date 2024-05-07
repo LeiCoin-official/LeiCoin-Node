@@ -231,7 +231,7 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 
 //gen_old(129);
 //gen(129, "stake3");
-//gen_old(100_000, "stake3", "stake4");
+//gen_old(100_000);
 //gen(1_000_000, "stake3")
 
 //await gen();
