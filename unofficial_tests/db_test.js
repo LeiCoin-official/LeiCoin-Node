@@ -228,6 +228,21 @@ async function test2(db1 = "stake1", db2 = "stake2", func = selectNextValidators
 
 }
 
+async function test3(db = "stake1", func = selectNextValidators_old, seedHash = Crypto.sha256(crypto.randomBytes(32))) {
+    
+    const result = await func(db, seedHash);
+    const temp = [];
+    let noDuplicates = true;
+
+    for (const validator of result[0]) {
+        noDuplicates = noDuplicates && !(temp.some(item => item.eq(validator)));
+        temp.push(validator);
+    }
+
+    console.log(noDuplicates);
+
+}
+
 
 //gen_old(129);
 //gen(129, "stake3");
@@ -267,3 +282,4 @@ async function test2(db1 = "stake1", db2 = "stake2", func = selectNextValidators
 
 //test1("stake1", selectNextValidators_old);
 test2("stake1", "stake2", selectNextValidators_old);
+//test3();
