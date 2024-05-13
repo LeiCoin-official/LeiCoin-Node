@@ -210,11 +210,11 @@ async function fastestSelectNextValidators() {
 
 }
 
-async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "stake1", db2 = "stake2") {
+async function test2(db1 = "stake1", db2 = "stake2", func = selectNextValidators, seedHash = Crypto.sha256(crypto.randomBytes(32))) {
     
     const results = [
-        await selectNextValidators(db1, seedHash),
-        await selectNextValidators(db2, seedHash)
+        await func(db1, seedHash),
+        await func(db2, seedHash)
     ];
 
     for (const [index, result] of results.entries()) {
@@ -265,4 +265,5 @@ async function test2(seedHash = Crypto.sha256(crypto.randomBytes(32)), db1 = "st
 })();
 */
 
-test1("stake1", selectNextValidators_old);
+//test1("stake1", selectNextValidators_old);
+test2("stake1", "stake2", selectNextValidators_old);
