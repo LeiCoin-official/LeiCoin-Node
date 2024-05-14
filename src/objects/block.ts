@@ -48,7 +48,7 @@ export class Block {
         
         const previousBlock = blockchain.chainstate.getLatestBlockInfo();
     
-        let newIndex;
+        let newIndex: Uint64;
         let previousHash: Uint256;
     
         if (!previousBlock || (typeof(previousBlock.index) !== 'number')) newIndex = Uint64.alloc();
