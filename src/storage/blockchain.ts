@@ -1,7 +1,7 @@
 import fs from "fs";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
-import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
+import BCUtils from "./blockchainUtils.js";
 import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";
 import Block from "../objects/block.js";

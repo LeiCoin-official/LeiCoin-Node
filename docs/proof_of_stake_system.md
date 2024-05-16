@@ -27,3 +27,17 @@ Clock starts:
 Proposer propose it:
 
 
+Note: May include a system with extra Attestor / Proposer Slash Reqeusts that will be its own consens.
+
+Validator Timeline:
+
+0s:
+    Block Proposed by Proposer
+
+5s:
+    Lastests Time to Vote for a Validator.
+    If Block was not proposed or inncorrect he votes for disagree at this time.
+
+10s:
+    All Votes have to be recived.
+    Calculating next Commitee based on the 

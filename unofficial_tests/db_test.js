@@ -243,10 +243,34 @@ async function test3(db = "stake1", func = selectNextValidators_old, seedHash = 
 
 }
 
+async function test4() {
+    const target = (await selectNextValidators_old("stake1", Crypto.sha256(crypto.randomBytes(32))))[0][0];
+    console.log("Target:", target);
+
+    const startTime = startTimer();
+
+    let index = 0;
+
+    while (true) {
+        //console.log("Round:", index);
+        const proposer = (await selectNextValidators_old("stake1", Crypto.sha256(crypto.randomBytes(32))))[0][127];
+        if (proposer.eq(target)) {
+            console.log("Found:", proposer);
+            break;
+        }
+        index ++;
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log("Rounds:", index);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+}
+
 
 //gen_old(129);
 //gen(129, "stake3");
 //gen_old(100_000);
+//gen_old(1_000);
 //gen(1_000_000, "stake3")
 
 //await gen();
@@ -280,6 +304,7 @@ async function test3(db = "stake1", func = selectNextValidators_old, seedHash = 
 })();
 */
 
-test1("stake1", selectNextValidators_old);
+//test1("stake1", selectNextValidators_old);
 //test2("stake1", "stake2", selectNextValidators_old);
 //test3();
+test4()

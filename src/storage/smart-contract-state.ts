@@ -1,19 +1,13 @@
 import LevelDB from "./leveldb.js";
-import { BlockchainUtils as BCUtils } from "./blockchainUtils.js";
+import BCUtils from "./blockchainUtils.js";
 import path from "path";
 import { AddressHex } from "../objects/address.js";
 import { Uint } from "../utils/binary.js";
+import { LevelBasedStorage } from "./storageTypes.js";
 
-class SmartContractStateDB {
+class SmartContractStateDB extends LevelBasedStorage {
 
-    private readonly level: LevelDB;
-    private readonly chain: string;
-
-    constructor(chain: string) {
-        BCUtils.ensureDirectoryExists('/smart-contracts/state', chain);
-        this.chain = chain;
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/smart-contracts/state", chain)));
-    }
+    protected path = "/smart-contracts/state";
 
     public async getState(address: AddressHex) {
         return this.level.get(address.getBody());

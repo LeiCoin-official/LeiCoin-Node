@@ -2,23 +2,17 @@ import path from "path";
 import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
 import Wallet from "../objects/wallet.js";
-import { BlockchainUtils as BCUtils } from "./blockchainUtils.js"
+import BCUtils from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint64 } from "../utils/binary.js";
 import LevelDB from "./leveldb.js";
+import { LevelBasedStorage } from "./storageTypes.js";
 
-export class WalletDB {
+export class WalletDB extends LevelBasedStorage {
 
-    private readonly level: LevelDB;
-    private readonly chain: string;
-
-    constructor(chain = "main") {
-        BCUtils.ensureDirectoryExists('/wallets', chain);
-        this.chain = chain;
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/wallets", chain)));
-    }
+    protected path = "/wallets";
 
     public async getWallet(address: AddressHex) {
         const raw_wallet = await this.level.get(address);

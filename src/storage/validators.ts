@@ -1,4 +1,4 @@
-import { BlockchainUtils as BCUtils } from "./blockchainUtils.js";
+import BCUtils from "./blockchainUtils.js";
 import path from "path";
 import Validator from "../objects/validator.js";
 import Block from "../objects/block.js";
@@ -7,17 +7,11 @@ import LevelDB from "./leveldb.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Crypto from "../crypto/index.js";
 import validator from "../validators/index.js";
+import { LevelBasedStorage } from "./storageTypes.js";
 
-export class ValidatorDB {
+export class ValidatorDB extends LevelBasedStorage {
 
-    private readonly level: LevelDB;
-    private readonly chain: string;
-
-    constructor(chain: string) {
-        BCUtils.ensureDirectoryExists('/validators', chain);
-        this.chain = chain;
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)));
-    }
+    protected path = "/validators";
 
     public async getValidator(address: AddressHex) {
         const raw_validator_data = await this.level.get(address);

@@ -2,7 +2,7 @@ import { Callbacks } from "../utils/callbacks.js";
 import cli from "../utils/cli.js";
 import Block from "../objects/block.js";
 import fs from "fs";
-import { BlockchainUtils as BCUtils} from "./blockchainUtils.js";
+import BCUtils from "./blockchainUtils.js";
 import { Uint } from "../utils/binary.js";
 
 export class BlockDB {

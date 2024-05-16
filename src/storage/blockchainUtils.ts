@@ -5,7 +5,7 @@ import utils from "../utils/index.js";
 import EncodingUtils from "../encoding/index.js";
 import { Callbacks } from "../utils/callbacks.js";
 
-export class BlockchainUtils {
+class BCUtils {
 
     public static getBlockchainDataFilePath(subpath: string, fork = "main") {
 
@@ -86,4 +86,6 @@ export class BlockchainUtils {
 
 }
 
-export default BlockchainUtils;
+export { BCUtils as BlockchainUtils };
+
+export default BCUtils;

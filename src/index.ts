@@ -4,9 +4,9 @@ async function main() {
     await (await import("./utils/cli.js")).default.setup();
 
     await import("./handlers/configHandler.js");
-    await import("./storage/blockchain.js");
+    await (await import("./storage/blockchain.js")).default.waitAllinit();
     
-    (await import("./netInitialization.js")).default();
+    await (await import("./netInitialization.js")).default();
     (await import("./validators/index.js")).default.initIfActive();
 
 }
