@@ -5,14 +5,10 @@ import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import LevelDB from "./leveldb.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
-import { PX } from "../objects/prefix.js";
-import { Dict } from "../utils/objects.js";
 import Crypto from "../crypto/index.js";
+import validator from "../validators/index.js";
 
 export class ValidatorDB {
-
-    private active: Uint64[] = [];
-    private readonly active_key = Uint.concat([PX.META, Uint.from("00ed")]);
 
     private readonly level: LevelDB;
     private readonly chain: string;
@@ -23,56 +19,17 @@ export class ValidatorDB {
         this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath("/validators", chain)));
     }
 
-    private getWithVPX(data: Uint) {
-        return Uint.concat([PX.A_0c, data]);
-    }
-
-    private getWithMetaPX(data: Uint) {
-        return Uint.concat([PX.META, data]);
-    }
-
-    public async loadActive() {
-        this.active = (await this.level.get(this.active_key)).nci_split(Uint64, 8);
-    }
-
-    public async setActive() {
-
-    }
-
-    private async getValidator(index: Uint64) {
-        const raw_validator_data = await this.level.get(this.getWithVPX(index));
-        return Validator.fromDecodedHex(raw_validator_data);
-    }
-
-    private async getValidatorByAddress(address: AddressHex) {
+    public async getValidator(address: AddressHex) {
         const raw_validator_data = await this.level.get(address);
-        return Validator.fromDecodedHex(raw_validator_data);
+        return Validator.fromDecodedHex(address, raw_validator_data);
     }
 
-    private async setValidator(index: Uint64, validator: Validator) {
-        return this.level.put(this.getWithVPX(index), validator.encodeToHex());
+    public async setValidator(validator: Validator) {
+        return this.level.put(validator.address, validator.encodeToHex());
     }
 
-    public async addInactiveValidator(validator: Validator) {
-
-    }
-
-    public async getActiveValidator(address: string) {
-        
-    }
-    public async getInactiveValidator(address: string) {
-
-    }
-
-    public async removeActiveValidator(address: string) {
-
-    }
-    public async removeInactiveValidator() {
-
-    }
-
-    public async transferToInactiveValidator(address: string) {
-
+    public async removeValidator(validator: Validator) {
+        return this.level.del(validator.address);
     }
 
     private async adjustStakeByBlock(block: Block) {
@@ -82,35 +39,27 @@ export class ValidatorDB {
     }
 
     public async selectNextValidators(seedHash: Uint256) {
-    
-        const validators: Dict<Uint> = {};
-        const validators_count = await this.level.get(Uint.from("ff00ed"));
-        const validator_preifx = PX.A_0e;
-    
-        if (validators_count.lte(128)) {
-            for await (const [index, data] of this.level.iterator()) {
-                if (index.slice(0, 1).eq(PX.META)) continue;
-                validators[index.slice(1).toInt()] = data;
+
+        let validators: Uint[] = await this.level.keys({limit: 129}).all();
+        if (validators.length <= 128) {
+            return validators;
+        }
+
+        validators = [];
+        let nextHash = seedHash.split(21)[0];
+
+        while (validators.length !== 128) {
+            let winner = (
+                (await this.level.keys({gte: nextHash, limit: 1}).all())[0] ||
+                (await this.level.keys({lte: nextHash, limit: 1, reverse: true}).all())[0]
+            );
+            if (!validators.some(item => item.eq(winner))) {
+                validators.push(winner);
             }
-        } else {
-            let nextHash = seedHash;
-            const takenIndexes: number[] = [];
-    
-            while (takenIndexes.length !== 128) {
-                let nextIndex = nextHash.mod(validators_count);
-    
-                if (!takenIndexes.includes(nextIndex)) {
-                    takenIndexes.push(nextIndex);
-    
-                    const validator_index = Uint.from(nextIndex);
-    
-                    const validator_data = await this.level.get(Uint.concat([validator_preifx, validator_index]));
-                    validators[nextIndex] = validator_data;
-                }
-                nextHash = Crypto.sha256(Uint.concat([nextHash, seedHash]));
-            }
+            nextHash = Crypto.sha256(nextHash).split(21)[0];
         }
         return validators;
+
     }
 
 }

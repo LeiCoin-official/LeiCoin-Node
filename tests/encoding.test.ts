@@ -3,7 +3,7 @@ import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
 import Attestation from "../src/objects/attestation.js";
 import Proposition from "../src/objects/proposition.js";
-import Validator, { ValidatorAddress } from "../src/objects/validator.js";
+import Validator from "../src/objects/validator.js";
 import fs from "fs";
 import Signature from "../src/objects/signature.js";
 import { Uint256, Uint64 } from "../src/utils/binary.js";
@@ -75,15 +75,15 @@ describe('encoding_testing', () => {
     });
     test('validator_enoding_and_decoding', () => {
 
-        const address = ValidatorAddress.from("7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
+        const address = AddressHex.from("7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
         const validator = new Validator(
             address,
             Uint64.from(32_0000_0000)
         );
 
-        const decoded: any = Validator.fromDecodedHex(validator.encodeToHex());
-        const decoded2 = Validator.fromDecodedHex(decoded.encodeToHex());
+        const decoded: any = Validator.fromDecodedHex(address, validator.encodeToHex());
+        const decoded2 = Validator.fromDecodedHex(address, decoded.encodeToHex());
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(validator));
 

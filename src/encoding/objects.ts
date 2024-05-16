@@ -1,7 +1,6 @@
 import { AddressHex, SpecificAddress } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
-import { ValidatorAddress } from "../objects/validator.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/objects.js";
@@ -61,7 +60,6 @@ export class ObjectEncoding {
         this.types.default = {};
 
         this.types.address = { parse: (v: any) => AddressHex.create(v), defaultLength: AddressHex.byteLength };
-        this.types.validator_address = { parse: (v: any) => ValidatorAddress.create(v), defaultLength: SpecificAddress.byteLength };
         this.types.signature = { parse: (v: any) => Signature.create(v), defaultLength: Signature.byteLength };
         this.types.hash = { parse: (v: any) => Uint256.create(v), defaultLength: Uint256.byteLength };
         this.types.version = { parse: (v: any) => PX.create(v), defaultLength: Uint8.byteLength };

@@ -280,6 +280,6 @@ async function test3(db = "stake1", func = selectNextValidators_old, seedHash = 
 })();
 */
 
-//test1("stake1", selectNextValidators_old);
-test2("stake1", "stake2", selectNextValidators_old);
+test1("stake1", selectNextValidators_old);
+//test2("stake1", "stake2", selectNextValidators_old);
 //test3();
