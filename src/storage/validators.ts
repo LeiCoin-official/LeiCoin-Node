@@ -1,12 +1,8 @@
-import BCUtils from "./blockchainUtils.js";
-import path from "path";
 import Validator from "../objects/validator.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
-import LevelDB from "./leveldb.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Crypto from "../crypto/index.js";
-import validator from "../validators/index.js";
 import { LevelBasedStorage } from "./storageTypes.js";
 
 export class ValidatorDB extends LevelBasedStorage {
