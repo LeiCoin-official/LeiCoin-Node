@@ -7,7 +7,6 @@ import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint64 } from "../utils/binary.js";
-import LevelDB from "./leveldb.js";
 import { LevelBasedStorage } from "./storageTypes.js";
 
 export class WalletDB extends LevelBasedStorage {
