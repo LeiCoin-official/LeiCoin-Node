@@ -87,5 +87,4 @@ class BCUtils {
 }
 
 export { BCUtils as BlockchainUtils };
-
 export default BCUtils;

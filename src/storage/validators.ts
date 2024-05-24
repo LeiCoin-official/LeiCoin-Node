@@ -4,6 +4,7 @@ import { AddressHex } from "../objects/address.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Crypto from "../crypto/index.js";
 import { LevelBasedStorage } from "./storageTypes.js";
+import { AddressEncoder } from "../encoding/binaryEncoder.js";
 
 export class ValidatorDB extends LevelBasedStorage {
 
@@ -28,7 +29,7 @@ export class ValidatorDB extends LevelBasedStorage {
 
     }
 
-    public async selectNextValidators(seedHash: Uint256) {
+    public async selectNextValidators(slot: Uint64) {
 
         let validators: Uint[] = await this.level.keys({limit: 129}).all();
         if (validators.length <= 128) {
@@ -36,7 +37,7 @@ export class ValidatorDB extends LevelBasedStorage {
         }
 
         validators = [];
-        let nextHash = seedHash.split(21)[0];
+        let nextHash = Crypto.sha256(slot).split(21)[0];
 
         while (validators.length !== 128) {
             let winner = (
