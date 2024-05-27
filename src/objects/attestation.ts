@@ -2,7 +2,7 @@ import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
-import DataUtils from "../utils/dataUtils.js";
+import { DataUtils } from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Signature from "./signature.js";
 import { PX } from "./prefix.js";

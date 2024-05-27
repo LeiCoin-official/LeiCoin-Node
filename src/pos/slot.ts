@@ -1,4 +1,6 @@
+import Block from "../objects/block.js";
 import { Uint64 } from "../utils/binary.js";
+import { ObjORNull } from "../utils/dataUtils.js";
 import VCommittee from "./committee.js";
 
 export class Slot {
@@ -13,9 +15,19 @@ export class Slot {
     private constructor(index: Uint64, committee: VCommittee) {
         this.index = index;
         this.committee = committee;
-        this.blockSendStep = setTimeout(() => {this.onBlockSend(true)}, 5_000);
-        this.blockReceivedStep = setTimeout(() => {this.onBlockReceived(true)}, 10_000);
-        this.blockFinalizedStep = setTimeout(() => {this.onBlockFinalized(true)}, 15_000);
+
+
+        this.blockSendStep = setTimeout(() => {
+            this.onBlockSend(true)
+        }, 5_000);
+
+        this.blockReceivedStep = setTimeout(() => {
+            this.onBlockReceived(true)
+        }, 10_000);
+
+        this.blockFinalizedStep = setTimeout(() => {
+            this.onBlockFinalized(true)
+        }, 15_000);
     }
 
     public static async create(index: Uint64) {
@@ -23,15 +35,15 @@ export class Slot {
         return new Slot(index, committee);
     }
 
-    private async onBlockSend(timeout = false) {
+    private async onBlockSend(timeout: boolean) {
         clearTimeout(this.blockSendStep);
     }
 
-    private async onBlockReceived(timeout = false) {
+    private async onBlockReceived(timeout: boolean) {
         clearTimeout(this.blockReceivedStep);
     }
 
-    private async onBlockFinalized(timeout = false) {
+    private async onBlockFinalized(timeout: boolean) {
         clearTimeout(this.blockFinalizedStep);
     }
 

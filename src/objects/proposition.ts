@@ -3,7 +3,7 @@ import Block from "./block.js";
 import cli from "../utils/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
-import DataUtils from "../utils/dataUtils.js";
+import { DataUtils } from "../utils/dataUtils.js";
 import { Uint64, Uint } from "../utils/binary.js";
 import Signature from "./signature.js";
 import { PX } from "./prefix.js";

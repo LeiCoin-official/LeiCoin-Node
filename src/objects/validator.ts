@@ -1,7 +1,7 @@
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
-import DataUtils from "../utils/dataUtils.js";
+import { DataUtils } from "../utils/dataUtils.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
 

@@ -1,11 +1,12 @@
+import { PrivateKey, PublicKey } from "../crypto/cryptoKeys.js";
 import config from "../handlers/configHandler.js";
 import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
+import { AddressHex } from "../objects/address.js";
 import { LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import cli from "../utils/cli.js";
 import Constants from "../utils/constants.js";
-import DataUtils from "../utils/dataUtils.js";
+import { DataUtils } from "../utils/dataUtils.js";
 import Verification from "../verification/index.js";
-import validatorsCommittee from "./committee.js";
 import { ProposerJob } from "./job.js";
 
 class Validator {
@@ -23,9 +24,8 @@ class Validator {
 	}
 
 	public readonly active: boolean;
-	public readonly publicKey: string;
-	public readonly privateKey: string;
-	public readonly address: string;
+	public readonly privateKey: PrivateKey;
+	public readonly address: AddressHex;
 
 	public isInCurrentCommittee = false;
 
@@ -75,8 +75,6 @@ class Validator {
 
 		if (validatorsCommittee.isMember(this.publicKey)) {
 
-			this.isInCurrentCommittee = true;
-
 			if (nextProposer === this.publicKey) {
 
 				const proposition = await ProposerJob.createProposition();
@@ -90,10 +88,6 @@ class Validator {
 
 		}
 			
-	}
-
-	public async startNextEpoch(lastBlockHash: string) {
-		return validatorsCommittee.createNewCommittee(lastBlockHash);
 	}
 
 }

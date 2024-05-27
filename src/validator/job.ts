@@ -1,9 +1,12 @@
 import Crypto from "../crypto/index.js";
 import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
+import { AddressHex } from "../objects/address.js";
 import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
+import { PX } from "../objects/prefix.js";
 import Proposition from "../objects/proposition.js";
+import Signature from "../objects/signature.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 import cli from "../utils/cli.js";
@@ -18,8 +21,8 @@ export class AttesterJob {
 
 		const vote = (await Verification.verifyBlock(block)).cb;
 		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
-		const attestation = new Attestation(validator.address, block.hash, vote, nonce, "");
-		attestation.signature = await Crypto.sign(attestation.calculateHash(), validator.privateKey);
+		const attestation = new Attestation(validator.address, block.hash, vote, nonce, Signature.empty());
+		attestation.signature = await Crypto.sign(attestation.calculateHash(), PX.A_0e, validator.privateKey);
 		return attestation;
 		
 	}

@@ -7,7 +7,7 @@ async function main() {
     await (await import("./storage/blockchain.js")).default.waitAllinit();
     
     await (await import("./netInitialization.js")).default();
-    (await import("./validators/index.js")).default.initIfActive();
+    (await import("./validator/index.js")).default.initIfActive();
 
 }
 

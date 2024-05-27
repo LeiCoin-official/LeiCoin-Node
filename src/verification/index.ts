@@ -4,7 +4,7 @@ import blockchain from "../storage/blockchain.js";
 import utils from "../utils/index.js";
 import cryptoHandlers from "../crypto/index.js";
 import Proposition from "../objects/proposition.js";
-import validatorsCommittee from "../validators/committee.js";
+import validatorsCommittee from "../validator/committee.js";
 import Attestation from "../objects/attestation.js";
 
 

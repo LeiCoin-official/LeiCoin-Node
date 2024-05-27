@@ -3,7 +3,7 @@ import { PX } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
 import { Callbacks } from "../utils/callbacks.js";
-import { AnyObj, Dict } from "../utils/objects.js";
+import { AnyObj, Dict } from "../utils/dataUtils.js";
 import EncodingUtils from "./index.js";
 
 type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object";

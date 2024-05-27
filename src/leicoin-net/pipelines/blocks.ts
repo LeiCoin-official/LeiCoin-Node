@@ -5,7 +5,7 @@ import blockchain from "../../storage/blockchain.js";
 import Block from "../../objects/block.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
-import DataUtils from "../../utils/dataUtils.js";
+import { DataUtils } from "../../utils/dataUtils.js";
 
 export default class BlockPipeline {
 

@@ -1,6 +1,15 @@
 import BigNum from "./bigNum.js";
 import Constants from "./constants.js";
-import { Dict } from "./objects.js";
+
+
+export type ObjORNull<T> = T | null;
+
+export interface Dict<T> {
+    [key: string | number]: T;
+}
+
+export interface AnyObj extends Dict<any> {}
+
 
 // Define a generic interface representing the class structure
 interface Constructable<T> {
@@ -81,4 +90,3 @@ export class DataUtils {
 
 }
 
-export default DataUtils;

@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import elliptic from 'elliptic';
-import { Dict } from "../utils/objects.js";
+import { Dict } from "../utils/dataUtils.js";
 import { Uint, Uint256 } from "../utils/binary.js";
 import { EllipticBinarySignature, Signature } from "../objects/signature.js";
 import { PrivateKey, PublicKey } from "./cryptoKeys.js";
