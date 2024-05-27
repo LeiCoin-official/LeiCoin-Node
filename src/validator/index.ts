@@ -31,15 +31,14 @@ class Validator {
 
 	private constructor() {
 		this.active = config.staker.active;
-		this.publicKey = config.staker.publicKey;
-		this.privateKey = config.staker.privateKey;
-		this.address = config.staker.address;
+		this.privateKey = PrivateKey.from(config.staker.privateKey);
+		this.address = AddressHex.from(config.staker.address);
 	}
 
 	public initIfActive() {
 
 		if (this.active) {
-			if (Verification.verifyAddress(this.address)) {
+			if (Verification.verifyAddress(config.staker.address)) {
 				cli.staker_message.info("Staker started");
 			} else {
 				cli.staker_message.error("Staker could not be started: Invalid Address.");
@@ -65,15 +64,7 @@ class Validator {
 
 		}*/
 
-		const { currentEpoch, relativeSlot } = DataUtils.calculateEpochAndRelativeSlot(lastSlot);
-
-		if (relativeSlot === Constants.LAST_EPOCH_SLOT) {
-			await this.startNextEpoch(lastBlockHash);
-		}
-
-		const nextProposer = validatorsCommittee.calculateNextProposer(lastBlockHash);
-
-		if (validatorsCommittee.isMember(this.publicKey)) {
+		if (.isMember(this.publicKey)) {
 
 			if (nextProposer === this.publicKey) {
 

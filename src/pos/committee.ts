@@ -10,8 +10,8 @@ class VCommitteeMemberData {
     }
 }
 
-type VCommitteeAttesterList = Map<AddressHex, VCommitteeMemberData>;
-type VCommitteeProposer = [AddressHex, VCommitteeMemberData];
+type VCommitteeAttesterList = Map<string, VCommitteeMemberData>;
+type VCommitteeProposer = [string, VCommitteeMemberData];
 
 
 export class VCommittee {
@@ -28,10 +28,10 @@ export class VCommittee {
 
     public static async create(slotIndex: Uint64) {
         const members = await blockchain.validators.selectNextValidators(slotIndex);
-        const proposer: VCommitteeProposer = [new AddressHex(members.shift() as Uint), new VCommitteeMemberData()];
+        const proposer: VCommitteeProposer = [(members.shift() as Uint).toHex(), new VCommitteeMemberData()];
         const attesters: VCommitteeAttesterList = new Map();
         for (const [i, address] of members.entries()) {
-            attesters.set(new AddressHex(address), {hasVoted: false});
+            attesters.set(new AddressHex(address).toHex(), {hasVoted: false});
         }
         return new VCommittee(slotIndex, attesters, proposer);
     }
@@ -41,16 +41,11 @@ export class VCommittee {
     }
 
     public getAttesterData(address: AddressHex) {
-        return this.attesters.get(address);
+        return this.attesters.get(address.toHex());
     }
 
     public isAttester(address: AddressHex) {
-        for (const attester of this.attesters.keys()) {
-            if (attester.eq(address)) {
-                return true;
-            }
-        }
-        return false;
+        return this.attesters.has(address.toHex());
     }
 
     public getProposer() {
@@ -58,7 +53,7 @@ export class VCommittee {
     }
 
     public isProposer(address: AddressHex) {
-        return this.proposer[0].eq(address);
+        return this.proposer[0] === address.toHex();
     }
 }
 

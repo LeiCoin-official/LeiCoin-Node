@@ -7,7 +7,7 @@ class Mempool {
 
     private static instance: Mempool;
 
-    public transactions: Map<Uint256, Transaction>
+    public transactions: Map<string, Transaction>
   
     private constructor() {
         this.transactions = new Map();

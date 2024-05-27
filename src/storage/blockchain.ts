@@ -5,7 +5,7 @@ import BCUtils from "./blockchainUtils.js";
 import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";
 import Block from "../objects/block.js";
-import BigNum from "../utils/bigNum.js";
+
 
 class Blockchain extends Chain {
 

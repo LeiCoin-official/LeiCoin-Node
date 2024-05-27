@@ -1,17 +1,20 @@
 import { Uint64 } from "../utils/binary.js";
-import { Dict } from "../utils/dataUtils.js";
 import Slot from "./slot.js";
 
 export class POS {
 
-    public static slots: Dict<Slot>;
+    private static slots: Map<string, Slot> = new Map();
 
     public static init() {
 
     }
 
     public static async startNewSlot(slotIndex: Uint64) {
-        this.currentSlot = await Slot.create(slotIndex);
+        this.slots.set(slotIndex.toHex(), await Slot.create(slotIndex));
+    }
+
+    public static getCurrentSlot() {
+        //this.slots.get()
     }
 
 }

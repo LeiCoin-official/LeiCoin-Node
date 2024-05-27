@@ -1,4 +1,3 @@
-import BigNum from "./bigNum.js";
 import Constants from "./constants.js";
 
 
@@ -71,11 +70,11 @@ export class DataUtils {
         return sortedObj;
     }
 
-    public static calculateEpochAndRelativeSlot(slotIndex: string) {
+   /* public static calculateEpochAndRelativeSlot(slotIndex: string) {
         const currentEpoch = BigNum.divide(slotIndex, Constants.BLOCKS_PER_EPOCH);
         const relativeSlot = BigNum.mod(slotIndex, Constants.BLOCKS_PER_EPOCH);
         return { currentEpoch, relativeSlot };
-    }
+    }*/
 
     public static replaceAtIndex(str: string, searchValue: string, replaceValue: string, index: number) {
         if (index < 0 || index >= str.length) {

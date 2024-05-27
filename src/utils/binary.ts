@@ -4,6 +4,12 @@ type New<T> = new(buffer: Buffer) => T;
 export interface BasicUintConstructable<T> extends New<T> {
     alloc(length?: number): T;
     create(input: Buffer | Uint): T;
+
+    from(arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
+    from(data: WithImplicitCoercion<ByteArray | string>): T;
+    from(str: WithString, encoding?: BufferEncoding): T;
+    from(number: number, length?: number): T;
+
     byteLength?: number;
 }
 
@@ -118,6 +124,13 @@ export class Uint {
 
     public getRaw() {
         return this.buffer;
+    }
+
+    public getAB() {
+        return this.buffer.buffer.slice(
+            this.buffer.byteOffset,
+            this.buffer.byteOffset + this.buffer.byteLength
+        );
     }
 
     public getLen(): number;
