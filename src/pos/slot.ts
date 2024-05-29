@@ -1,6 +1,6 @@
 import Block from "../objects/block.js";
 import { Uint64 } from "../utils/binary.js";
-import { ObjORNull } from "../utils/dataUtils.js";
+import Schedule from "../utils/schedule.js";
 import VCommittee from "./committee.js";
 
 export class Slot {
@@ -8,26 +8,18 @@ export class Slot {
     public readonly index: Uint64;
     public readonly committee: VCommittee;
 
-    private blockSendStep: NodeJS.Timeout;
-    private blockReceivedStep: NodeJS.Timeout;
-    private blockFinalizedStep: NodeJS.Timeout;
+    public readonly blockSendStep: Schedule;
+    public readonly blockReceivedStep: Schedule;
+    public readonly blockFinalizedStep: Schedule;
 
     private constructor(index: Uint64, committee: VCommittee) {
         this.index = index;
         this.committee = committee;
 
 
-        this.blockSendStep = setTimeout(() => {
-            this.onBlockSend(true)
-        }, 5_000);
-
-        this.blockReceivedStep = setTimeout(() => {
-            this.onBlockReceived(true)
-        }, 10_000);
-
-        this.blockFinalizedStep = setTimeout(() => {
-            this.onBlockFinalized(true)
-        }, 15_000);
+        this.blockSendStep = new Schedule(async()=>{this.onBlockSend(true)}, 5_000);
+        this.blockReceivedStep = new Schedule(async()=>{this.onBlockReceived(true)}, 10_000);
+        this.blockFinalizedStep = new Schedule(async()=>{this.onBlockFinalized(true)}, 15_000);
     }
 
     public static async create(index: Uint64) {
@@ -36,15 +28,24 @@ export class Slot {
     }
 
     private async onBlockSend(timeout: boolean) {
-        clearTimeout(this.blockSendStep);
+        this.blockSendStep.cancel();
+        if (timeout) {
+            return;
+        }
     }
 
     private async onBlockReceived(timeout: boolean) {
-        clearTimeout(this.blockReceivedStep);
+        this.blockReceivedStep.cancel();       
+        if (timeout) {
+            return;
+        }
     }
 
     private async onBlockFinalized(timeout: boolean) {
-        clearTimeout(this.blockFinalizedStep);
+        this.blockFinalizedStep.cancel();
+        if (timeout) {
+            return;
+        }
     }
 
 }

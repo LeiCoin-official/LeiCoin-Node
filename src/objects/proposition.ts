@@ -11,13 +11,15 @@ import { PX } from "./prefix.js";
 export class Proposition {
     
     public proposer: AddressHex;
+    public slot: Uint64;
     public nonce: Uint64;
     public signature: Signature;
     public block: Block;
     public version: PX;
 
-    constructor(proposer: AddressHex, nonce: Uint64, signature: Signature, block: Block, version = PX.V_00) {
+    constructor(proposer: AddressHex, slot: Uint64, nonce: Uint64, signature: Signature, block: Block, version = PX.V_00) {
         this.proposer = proposer;
+        this.slot = slot;
         this.nonce = nonce;
         this.signature = signature;
         this.block = block;
@@ -51,6 +53,7 @@ export class Proposition {
 
     private static encodingSettings: EncodingSettings[] = [
         {key: "version"},
+        {key: "slot", type: "bigint"},
         {key: "nonce"},
         {key: "signature", hashRemove: true},
         {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex}

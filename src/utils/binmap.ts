@@ -1,6 +1,7 @@
 import { BasicUintConstructable, Uint } from "./binary.js";
 
 
+/** @deprecated Dont Use BMap because it Dont work */
 export class BMap<K extends Uint, V> extends Map {
 
     private readonly CLS: BasicUintConstructable<K>;
