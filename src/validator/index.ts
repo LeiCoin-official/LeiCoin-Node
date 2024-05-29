@@ -7,7 +7,7 @@ import cli from "../utils/cli.js";
 import Constants from "../utils/constants.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import Verification from "../verification/index.js";
-import { ProposerJob } from "./job.js";
+import { ProposerJob } from "./jobs.js";
 
 class Validator {
 

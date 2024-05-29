@@ -1,5 +1,5 @@
 
-export const VerificationCodes: {[key: number]: string} =  {
+export const VerificationCodes = {
 
     // 12000 - 12099: Success Codes
     12000: "OK",
@@ -45,12 +45,16 @@ export const VerificationCodes: {[key: number]: string} =  {
     12530: "Invalid Block",
     12531: "Invalid Previous Hash",
 
+    // Validators Messages
+    12540: "Invalid Slot",
+    12541: "Time Window has expired",
+
     // Proposition Only
-    12540: "Invalid Proposition",
-    12541: "Invalid Proposer for Slot",
+    12550: "Invalid Proposition",
+    12551: "Invalid Proposer for Slot",
 
     // Attestation Only
-    12550: "Invalid Attestation",
-    12551: "Invalid Attester for Slot",
+    12560: "Invalid Attestation",
+    12561: "Invalid Attester for Slot",
     
 };

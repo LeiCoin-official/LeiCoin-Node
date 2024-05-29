@@ -1,14 +1,16 @@
 import Attestation from "../../objects/attestation.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
-import validatorsCommittee from "../../validator/committee.js";
 import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import Verification from "../../verification/index.js";
-import { AttesterJob, ProposerJob } from "../../validator/job.js";
+import { AttesterJob, ProposerJob } from "../../validator/jobs.js";
+import { Uint } from "../../utils/binary.js";
+import POS from "../../pos/index.js";
+import { AddressHex } from "../../objects/address.js";
 
 export default class ValidatorPipeline {
 
-    private static async receiveProposition(type: LeiCoinNetDataPackageType, data: string) {
+    private static async receiveProposition(type: LeiCoinNetDataPackageType, data: Uint) {
 
         const proposition = Proposition.fromDecodedHex(data) as Proposition;
 
@@ -19,19 +21,19 @@ export default class ValidatorPipeline {
 
     }
 
-    private static async receiveAttestation(type: LeiCoinNetDataPackageType, data: string) {
+    private static async receiveAttestation(type: LeiCoinNetDataPackageType, data: Uint) {
 
-        const attestation = Attestation.fromDecodedHex(data);
+        const attestation = Attestation.fromDecodedHex(data) as Attestation;
 
-        if (!attestation) return;
-        if (attestation.nonce !== validatorsCommittee.getMember(attestation.attester)?.nonce) return;
+        if (await Verification.verifyBlockAttestation(attestation) !== 12000) return;
 
+        this.broadcast(type, data, attestation.attester);
         ProposerJob.processAttestation(attestation);
 
     }
 
 
-    public static async receive(type: LeiCoinNetDataPackageType, data: string) {
+    public static async receive(type: LeiCoinNetDataPackageType, data: Uint) {
         switch (type) {
             case LeiCoinNetDataPackageType.V_PROPOSE: {
                 await this.receiveProposition(type, data);
@@ -45,8 +47,8 @@ export default class ValidatorPipeline {
         }
     }
 
-    public static async broadcast(type: LeiCoinNetDataPackageType, data: string, committeeMemberPubKey: string) {
-        validatorsCommittee.getMember(committeeMemberPubKey).adjustNonce();
+    public static async broadcast(type: LeiCoinNetDataPackageType, data: Uint, address: AddressHex) {
+        POS.getCurrentSlot().committee.getMemberData(address);
         await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
     

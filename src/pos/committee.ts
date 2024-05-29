@@ -5,9 +5,9 @@ import { Dict } from "../utils/dataUtils.js";
 
 
 class VCommitteeMemberData {
-    public hasVoted: boolean;
-    constructor(hasVoted = false) {
-        this.hasVoted = hasVoted;
+    public nonce: Uint64;
+    constructor(nonce = Uint64.from(0)) {
+        this.nonce = nonce;
     }
 }
 
@@ -32,9 +32,13 @@ export class VCommittee {
         const proposer: VCommitteeProposer = [(members.shift() as Uint).toHex(), new VCommitteeMemberData()];
         const attesters: VCommitteeAttesterList = {};
         for (const [i, address] of members.entries()) {
-            attesters[new AddressHex(address).toHex()] = {hasVoted: false};
+            attesters[new AddressHex(address).toHex()] = new VCommitteeMemberData();
         }
         return new VCommittee(slotIndex, attesters, proposer);
+    }
+
+    public getMemberData(address: AddressHex) {
+        return this.attesters[address.toHex()] || this.proposer[1];
     }
 
     public getAttesters(): VCommitteeAttesterList {
@@ -51,6 +55,10 @@ export class VCommittee {
 
     public getProposer() {
         return this.proposer;
+    }
+
+    public getProposerData() {
+        return this.proposer[1];
     }
 
     public isProposer(address: AddressHex) {

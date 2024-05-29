@@ -10,16 +10,16 @@ import { PX } from "./prefix.js";
 export class Attestation {
     
     public attester: AddressHex;
-    public slot: Uint64;
+    public slotIndex: Uint64;
     public blockHash: Uint256;
     public vote: boolean;
     public nonce: Uint64;
     public signature: Signature;
     public readonly version: PX;
 
-    constructor(attester: AddressHex, slot: Uint64, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = PX.V_00) {
+    constructor(attester: AddressHex, slotIndex: Uint64, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = PX.V_00) {
         this.attester = attester;
-        this.slot = slot;
+        this.slotIndex = slotIndex;
         this.blockHash = blockHash;
         this.vote = vote;
         this.nonce = nonce;
@@ -59,7 +59,7 @@ export class Attestation {
 
     private static encodingSettings: EncodingSettings[] =[
         {key: "version"},
-        {key: "slot", type: "bigint"},
+        {key: "slotIndex", type: "bigint"},
         {key: "blockHash", type: "hash"},
         {key: "vote", type: "bool"},
         {key: "nonce"},

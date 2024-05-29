@@ -4,8 +4,8 @@ import blockchain from "../storage/blockchain.js";
 import utils from "../utils/index.js";
 import cryptoHandlers from "../crypto/index.js";
 import Proposition from "../objects/proposition.js";
-import validatorsCommittee from "../validator/committee.js";
 import Attestation from "../objects/attestation.js";
+import POS from "../pos/index.js";
 
 
 interface BlockValidationInvalidResult {
@@ -160,8 +160,15 @@ export class Verification {
     public static async verifyBlockProposition(proposition: Proposition | null) {
 
         if (!proposition) return 12501;
-        if (validatorsCommittee.isCurrentProposer(proposition.proposer)) return 12541;
-        if (proposition.nonce !== validatorsCommittee.getMember(proposition.proposer)?.nonce) return 12508;
+
+        const currentSlot = POS.getCurrentSlot();
+
+        // the following two lines do pretty much the same thing, but I keep it because we don't know if that will still be the case later
+        if (proposition.slotIndex.eqn(currentSlot.index)) return 12540;
+        if (currentSlot.blockFinalizedStep.hasFinished()) return 12541;
+
+        if (!currentSlot.committee.isProposer(proposition.proposer)) return 12551;
+        if (proposition.nonce.eqn(currentSlot.committee.getProposerData().nonce)) return 12508;
 
         return 12000;
 
@@ -170,8 +177,15 @@ export class Verification {
     public static async verifyBlockAttestation(attestation: Attestation | null) {
 
         if (!attestation) return 12501;
-        if (validatorsCommittee.isCurrentAttester(attestation.attester)) return 12551;
-        if (attestation.nonce !== validatorsCommittee.getMember(attestation.attester)?.nonce) return 12508;
+
+        const currentSlot = POS.getCurrentSlot();
+
+        // the following two lines do pretty much the same thing, but I keep it because we don't know if that will still be the case later
+        if (attestation.slotIndex.eqn(currentSlot.index)) return 12540;
+        if (currentSlot.blockReceivedStep.hasFinished()) return 12541;
+
+        if (!currentSlot.committee.isAttester(attestation.attester)) return 12561;
+        if (attestation.nonce.eqn(currentSlot.committee.getAttesterData(attestation.attester).nonce)) return 12508;
 
         return 12000;
 

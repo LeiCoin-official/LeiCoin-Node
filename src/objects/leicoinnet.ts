@@ -1,4 +1,5 @@
 import EncodingUtils from "../encoding/index.js";
+import { Uint } from "../utils/binary.js";
 import Block from "./block.js";
 import Transaction from "./transaction.js";
 
@@ -34,10 +35,10 @@ interface LeiCoinNetDataPackageContentContructor {
 
 export class LeiCoinNetDataPackage {
 
-    public static create(type: LeiCoinNetDataPackageType, hexData: string): Buffer;
+    public static create(type: LeiCoinNetDataPackageType, hexData: Uint): Buffer;
     public static create<T extends LeiCoinNetDataPackageContentObject>(content: T): Buffer;
     public static create<T extends LeiCoinNetDataPackageContentObject>(type: LeiCoinNetDataPackageType, content: T): Buffer;
-    public static create<T extends LeiCoinNetDataPackageContentObject>(typeORcontent: T | string, contentORhexData?: T | string) {
+    public static create<T extends LeiCoinNetDataPackageContentObject>(typeORcontent: T | string, contentORhexData?: T | Uint) {
 
         let type: string;
 
