@@ -1,6 +1,7 @@
 import { Uint } from "../build/src/utils/binary.js";
 import BMap from "../build/src/utils/binmap.js";
 
+/*
 const db = new BMap();
 const ddb = new Map();
 
@@ -36,4 +37,5 @@ console.log(iterator2.next());
 console.log(iterator2.next());
 console.log(iterator2.next());
 */
+
 
