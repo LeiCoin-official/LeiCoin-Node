@@ -1,14 +1,20 @@
 import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
 import Proposition from "../objects/proposition.js";
+import Validator from "../objects/validator.js";
 import { Uint64 } from "../utils/binary.js";
 import Schedule from "../utils/schedule.js";
+import validator from "../validator/index.js";
+import { AttesterJob, ProposerJob } from "../validator/jobs.js";
 import VCommittee from "./committee.js";
+import POS from "./index.js";
 
 export class Slot {
 
     public readonly index: Uint64;
     public readonly committee: VCommittee;
+
+    public block: Block | null = null;
 
     public readonly blockSendStep: Schedule;
     public readonly blockReceivedStep: Schedule;
@@ -19,7 +25,7 @@ export class Slot {
         this.committee = committee;
 
 
-        this.blockSendStep = new Schedule(async()=>{this.onBlockSend(true)}, 5_000);
+        this.blockSendStep = new Schedule(async()=>{this.onBlockSend(false)}, 5_000);
         this.blockReceivedStep = new Schedule(async()=>{this.onBlockReceived(true)}, 10_000);
         this.blockFinalizedStep = new Schedule(async()=>{this.onBlockFinalized(true)}, 15_000);
     }
@@ -35,12 +41,22 @@ export class Slot {
         if (timeout) {
             return;
         }
+
+        if (this.committee.isProposer(validator.address)) {
+            ProposerJob.propose();
+        }
     }
 
-    private async onBlockReceived(timeout: boolean) {
+    private async onBlockReceived(timeout: boolean, proposition?: Proposition) {
         this.blockReceivedStep.cancel();       
-        if (timeout) {
+        if (timeout || !proposition?.block) {
             return;
+        }
+
+        this.block = proposition.block;
+
+        if (this.committee.isAttester(validator.address)) {
+            AttesterJob.attest(proposition);
         }
     }
 
@@ -49,19 +65,29 @@ export class Slot {
         if (timeout) {
             return;
         }
+        POS.startNewSlot(this.index.add(1));
+
+        const agreeVotesCount = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree").length;
+        const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
+
+        if (agreeVotesCount >= 2/3 * 128) {
+            
+        }
     }
 
 
     public processProposition(proposition: Proposition) {
-        if (!this.blockReceivedStep.hasFinished()) {
-
+        if (this.blockReceivedStep.hasFinished()) {
+            return;
         }
+        this.onBlockReceived(false, proposition);
     }
 
     public processAttestation(attestation: Attestation) {
-
-
-
+        if (this.blockFinalizedStep.hasFinished()) {
+            return;
+        }
+        this.committee.getAttesterData(attestation.attester).vote = attestation.vote ? "agree" : "disagree";
     }
 
 }

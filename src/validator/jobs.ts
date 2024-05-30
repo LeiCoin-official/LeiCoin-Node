@@ -7,54 +7,73 @@ import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/lei
 import { PX } from "../objects/prefix.js";
 import Proposition from "../objects/proposition.js";
 import Signature from "../objects/signature.js";
+import VCommittee from "../pos/committee.js";
+import POS from "../pos/index.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
+import { Uint64 } from "../utils/binary.js";
 import cli from "../utils/cli.js";
 import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
-import validatorsCommittee from "./committee.js";
 import validator from "./index.js";
 
 export class AttesterJob {
 
-	public static async createAttestation(block: Block) {
+	private static async createAttestation(block: Block) {
 
 		const vote = (await Verification.verifyBlock(block)).cb;
-		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
-		const attestation = new Attestation(validator.address, block.hash, vote, nonce, Signature.empty());
-		attestation.signature = await Crypto.sign(attestation.calculateHash(), PX.A_0e, validator.privateKey);
+		const attestation = new Attestation(
+			validator.address,
+			block.slotIndex,
+			block.hash,
+			vote,
+			Uint64.from(0),
+			Signature.empty()
+		);
+		attestation.signature = Crypto.sign(attestation.calculateHash(), PX.A_0e, validator.privateKey);
 		return attestation;
 		
 	}
 
-	public static async processProposition(proposition: Proposition) {
-
-		validatorsCommittee.setCurrentBlock(proposition.block);
-
-		if (validatorsCommittee.isCurrentAttester(validator.publicKey)) {
-			const attestation = await this.createAttestation(proposition.block);
-			ValidatorPipeline.broadcast(LeiCoinNetDataPackageType.V_VOTE, attestation.encodeToHex(), attestation.publicKey);
-		}
-
+	public static async attest(proposition: Proposition) {
+		const attestation = await this.createAttestation(proposition.block);
+		ValidatorPipeline.broadcast(
+			LeiCoinNetDataPackageType.V_VOTE,
+			attestation.encodeToHex(),
+			attestation.attester
+		);
 	}
 
 }
 
 export class ProposerJob {
 
-    public static async createProposition() {
-		
+	private static async createProposition() {
 		const block = Block.createNewBlock();
-		const nonce = validatorsCommittee.getMember(validator.publicKey).nonce;
-		const proposition = new Proposition(validator.publicKey, nonce, "", block);
-		proposition.signature = await Crypto.sign(proposition.calculateHash(), validator.privateKey);
+		const proposition = new Proposition(
+			validator.address,
+			POS.getCurrentSlot().index,
+			Uint64.from(0),
+			Signature.empty(),
+			block
+		);
+		proposition.signature = Crypto.sign(proposition.calculateHash(), PX.A_0e, validator.privateKey);
 		return proposition;
+	}
+
+    public static async propose() {
+		const proposition = await this.createProposition();
+		ValidatorPipeline.broadcast(
+			LeiCoinNetDataPackageType.V_PROPOSE,
+			proposition.encodeToHex(),
+			proposition.proposer
+		);
 
         // Adjust the delay maybe later for faster Block times
         // await new Promise((resolve) => setTimeout(resolve, 15_000));
     }
 
-    public static async broadcastBlock(block: Block) {
+    /*public static async broadcastBlock(block: Block) {
 
 		if (!block || !(await Verification.verifyBlock(block)).cb) {
 			cli.staker_message.info(`Created block with hash ${block?.hash} is invalid.`);
@@ -72,17 +91,7 @@ export class ProposerJob {
 		cli.staker_message.success(`Created block with hash ${block.hash} has been validated. Broadcasting now.`);
 		return;
 		
-	}
-
-	public static async processAttestation(attestation: AttestationSendData) {
-
-		if (validatorsCommittee.isCurrentProposer(validator.publicKey)) {
-            
-			validatorsCommittee.getCurrentBlock()?.addAttestation(attestation.toAttestationInBlock());
-            
-		}
-
-    }
+	}*/
 
 }
 

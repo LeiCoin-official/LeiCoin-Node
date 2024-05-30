@@ -59,7 +59,7 @@ export class Attestation {
 
     private static encodingSettings: EncodingSettings[] =[
         {key: "version"},
-        {key: "slotIndex", type: "bigint"},
+        {key: "slotIndex"},
         {key: "blockHash", type: "hash"},
         {key: "vote", type: "bool"},
         {key: "nonce"},

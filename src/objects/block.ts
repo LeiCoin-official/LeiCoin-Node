@@ -10,10 +10,12 @@ import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { PX } from "./prefix.js";
+import POS from "../pos/index.js";
 
 export class Block {
 
     public index: Uint64;
+    public slotIndex: Uint64;
     public hash: Uint256;
     public previousHash: Uint256;
     public timestamp: Uint64;
@@ -24,6 +26,7 @@ export class Block {
 
     constructor(
         index: Uint64,
+        slotIndex: Uint64,
         hash: Uint256,
         previousHash: Uint256,
         timestamp: Uint64,
@@ -34,6 +37,7 @@ export class Block {
     ) {
 
         this.index = index;
+        this.slotIndex = slotIndex;
         this.hash = hash;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
@@ -59,11 +63,12 @@ export class Block {
 
         const coinbase = Transaction.createCoinbaseTransaction();
 
-        const transactions = Array.from(mempool.transactions.values());
+        const transactions = Object.values(mempool.transactions);
         transactions.unshift(coinbase);
     
         const newBlock = new Block(
             newIndex,
+            POS.getCurrentSlot().index,
             Uint256.alloc(),
             previousHash,
             Uint64.from(new Date().getTime()),
@@ -106,6 +111,7 @@ export class Block {
     private static encodingSettings: EncodingSettings[] = [
         {key: "version"},
         {key: "index"},
+        {key: "slotIndex"},
         {key: "hash", hashRemove: true},
         {key: "previousHash", type: "hash"},
         {key: "timestamp"},

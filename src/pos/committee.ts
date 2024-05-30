@@ -7,7 +7,8 @@ import { Dict } from "../utils/dataUtils.js";
 class VCommitteeMemberData {
 
     public nonce: Uint64;
-    public vote: boolean;
+    public vote: "agree" | "disagree" | "none" = "none";
+    public readonly slashVotes: string[] = [];
 
     constructor(nonce = Uint64.from(0)) {
         this.nonce = nonce;
@@ -20,12 +21,10 @@ type VCommitteeProposer = [string, VCommitteeMemberData];
 
 export class VCommittee {
 
-    private readonly slotIndex: Uint64;
     private readonly attesters: VCommitteeAttesterList;
     private readonly proposer: VCommitteeProposer;
 
-    private constructor(slotIndex: Uint64, attesters: VCommitteeAttesterList, proposer: VCommitteeProposer) {
-        this.slotIndex = slotIndex;
+    private constructor(attesters: VCommitteeAttesterList, proposer: VCommitteeProposer) {
         this.attesters = attesters;
         this.proposer = proposer;
     }
@@ -37,7 +36,7 @@ export class VCommittee {
         for (const [i, address] of members.entries()) {
             attesters[new AddressHex(address).toHex()] = new VCommitteeMemberData();
         }
-        return new VCommittee(slotIndex, attesters, proposer);
+        return new VCommittee(attesters, proposer);
     }
 
     public getMemberData(address: AddressHex) {

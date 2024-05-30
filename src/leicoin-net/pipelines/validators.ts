@@ -17,7 +17,7 @@ export default class ValidatorPipeline {
         if (await Verification.verifyBlockProposition(proposition) !== 12000) return;
 
         this.broadcast(type, data, proposition.proposer);
-        AttesterJob.processProposition(proposition);
+        POS.getCurrentSlot().processProposition(proposition);
 
     }
 
@@ -28,7 +28,7 @@ export default class ValidatorPipeline {
         if (await Verification.verifyBlockAttestation(attestation) !== 12000) return;
 
         this.broadcast(type, data, attestation.attester);
-        ProposerJob.processAttestation(attestation);
+        POS.getCurrentSlot().processAttestation(attestation);
 
     }
 

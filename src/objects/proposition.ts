@@ -53,7 +53,7 @@ export class Proposition {
 
     private static encodingSettings: EncodingSettings[] = [
         {key: "version"},
-        {key: "slotIndex", type: "bigint"},
+        {key: "slotIndex"},
         {key: "nonce"},
         {key: "signature", hashRemove: true},
         {key: "block", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex}

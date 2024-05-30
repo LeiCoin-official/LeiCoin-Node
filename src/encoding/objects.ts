@@ -42,6 +42,7 @@ export class ObjectEncoding {
     private static setupTypes() {
 
         this.types.index =
+        this.types.slotIndex =
         this.types.nonce =
         this.types.timestamp =
         this.types.bigint = {
