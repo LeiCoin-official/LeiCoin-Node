@@ -33,7 +33,7 @@ export class VCommittee {
         const members = await blockchain.validators.selectNextValidators(slotIndex);
         const proposer: VCommitteeProposer = [(members.shift() as Uint).toHex(), new VCommitteeMemberData()];
         const attesters: VCommitteeAttesterList = {};
-        for (const [i, address] of members.entries()) {
+        for (const [, address] of members.entries()) {
             attesters[new AddressHex(address).toHex()] = new VCommitteeMemberData();
         }
         return new VCommittee(attesters, proposer);
