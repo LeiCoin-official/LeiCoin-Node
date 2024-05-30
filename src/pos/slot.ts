@@ -1,4 +1,6 @@
+import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
+import Proposition from "../objects/proposition.js";
 import { Uint64 } from "../utils/binary.js";
 import Schedule from "../utils/schedule.js";
 import VCommittee from "./committee.js";
@@ -27,6 +29,7 @@ export class Slot {
         return new Slot(index, committee);
     }
 
+
     private async onBlockSend(timeout: boolean) {
         this.blockSendStep.cancel();
         if (timeout) {
@@ -46,6 +49,19 @@ export class Slot {
         if (timeout) {
             return;
         }
+    }
+
+
+    public processProposition(proposition: Proposition) {
+        if (!this.blockReceivedStep.hasFinished()) {
+
+        }
+    }
+
+    public processAttestation(attestation: Attestation) {
+
+
+
     }
 
 }

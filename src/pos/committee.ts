@@ -5,7 +5,10 @@ import { Dict } from "../utils/dataUtils.js";
 
 
 class VCommitteeMemberData {
+
     public nonce: Uint64;
+    public vote: boolean;
+
     constructor(nonce = Uint64.from(0)) {
         this.nonce = nonce;
     }
