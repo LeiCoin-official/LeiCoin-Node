@@ -6,7 +6,7 @@ import { Dict } from "../utils/dataUtils.js";
 
 class VCommitteeMemberData {
 
-    public nonce: Uint64;
+    public readonly nonce: Uint64;
     public vote: "agree" | "disagree" | "none" = "none";
     public readonly slashVotes: string[] = [];
 

@@ -67,11 +67,17 @@ export class Slot {
         }
         POS.startNewSlot(this.index.add(1));
 
-        const agreeVotesCount = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree").length;
+        const agreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree");
         const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
 
-        if (agreeVotesCount >= 2/3 * 128) {
+        if (agreeVotes.length >= 2/3 * 128) {
             
+
+
+        } else {
+
+            
+
         }
     }
 
@@ -87,7 +93,9 @@ export class Slot {
         if (this.blockFinalizedStep.hasFinished()) {
             return;
         }
-        this.committee.getAttesterData(attestation.attester).vote = attestation.vote ? "agree" : "disagree";
+        const attester = this.committee.getAttesterData(attestation.attester);
+        attester.vote = attestation.vote ? "agree" : "disagree";
+        attester.nonce.iadd(1);
     }
 
 }
