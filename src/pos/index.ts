@@ -17,10 +17,18 @@ export class POS {
         this.currentSlot = newSlot;
     }
 
+    public static async endSlot(slotIndex: Uint64) {
+        delete this.slots[slotIndex.toHex()];
+    }
+
+    public static getSlot(index: Uint64) {
+        return this.slots[index.toHex()];
+    }
+
     public static getCurrentSlot() {
         return this.currentSlot;
     }
-
+    
 }
 
 export default POS;

@@ -6,10 +6,11 @@ import Block from "../../objects/block.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
 import { DataUtils } from "../../utils/dataUtils.js";
+import { Uint } from "../../utils/binary.js";
 
 export default class BlockPipeline {
 
-    public static async receive(type: LeiCoinNetDataPackageType, data: string) {
+    public static async receive(type: LeiCoinNetDataPackageType, data: Uint) {
         
         const block = DataUtils.createInstanceFromJSON(Block, data);
 
@@ -48,7 +49,7 @@ export default class BlockPipeline {
 
     }
 
-    public static async broadcast(type: LeiCoinNetDataPackageType, data: string) {
+    public static async broadcast(type: LeiCoinNetDataPackageType, data: Uint) {
         await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
     

@@ -3,7 +3,6 @@ import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/
 import Proposition from "../../objects/proposition.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import Verification from "../../verification/index.js";
-import { AttesterJob, ProposerJob } from "../../validator/jobs.js";
 import { Uint } from "../../utils/binary.js";
 import POS from "../../pos/index.js";
 import { AddressHex } from "../../objects/address.js";
@@ -17,7 +16,7 @@ export default class ValidatorPipeline {
         if (await Verification.verifyBlockProposition(proposition) !== 12000) return;
 
         this.broadcast(type, data, proposition.proposer);
-        POS.getCurrentSlot().processProposition(proposition);
+        POS.getSlot(proposition.slotIndex).processProposition(proposition);
 
     }
 
@@ -28,7 +27,7 @@ export default class ValidatorPipeline {
         if (await Verification.verifyBlockAttestation(attestation) !== 12000) return;
 
         this.broadcast(type, data, attestation.attester);
-        POS.getCurrentSlot().processAttestation(attestation);
+        POS.getSlot(attestation.slotIndex).processAttestation(attestation);
 
     }
 

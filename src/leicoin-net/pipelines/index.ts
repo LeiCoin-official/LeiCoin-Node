@@ -1,12 +1,13 @@
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
+import { Uint } from "../../utils/binary.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
 import ValidatorPipeline from "./validators.js";
 
 export interface PipelineLike {
-    receive(type: LeiCoinNetDataPackageType, data: string): Promise<void>;
-    broadcast(type: LeiCoinNetDataPackageType, data: string, ...args: any[]): Promise<void>;
+    receive(type: LeiCoinNetDataPackageType, data: Uint): Promise<void>;
+    broadcast(type: LeiCoinNetDataPackageType, data: Uint, ...args: any[]): Promise<void>;
 }
 
 export class Pipelines {
