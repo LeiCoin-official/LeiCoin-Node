@@ -70,9 +70,9 @@ export class Slot {
         const agreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree");
         const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
 
-        if (agreeVotes.length >= 2/3 * 128) {
+        if (agreeVotes.length >= 2/3 * this.committee.getSize()) {
             
-
+            
 
         } else {
 
@@ -86,6 +86,9 @@ export class Slot {
         if (this.blockReceivedStep.hasFinished()) {
             return;
         }
+        
+        this.committee.getProposerData().proposed = true;
+
         this.onBlockReceived(false, proposition);
     }
 

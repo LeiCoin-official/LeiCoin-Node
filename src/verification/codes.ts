@@ -1,5 +1,6 @@
 
-export const VerificationCodes = {
+
+export const VCodes = {
 
     // 12000 - 12099: Success Codes
     12000: "OK",
@@ -44,6 +45,8 @@ export const VerificationCodes = {
     // Block Only
     12530: "Invalid Block",
     12531: "Invalid Previous Hash",
+    12532: "Invalid Block Index",
+    12533: "Block not matching Chainstate",
 
     // Validators Messages
     12540: "Invalid Slot",
@@ -52,9 +55,15 @@ export const VerificationCodes = {
     // Proposition Only
     12550: "Invalid Proposition",
     12551: "Invalid Proposer for Slot",
+    12552: "Proposer has already proposed",
 
     // Attestation Only
     12560: "Invalid Attestation",
     12561: "Invalid Attester for Slot",
+    12562: "Attester has already attested",
     
 };
+
+export type VCode = keyof typeof VCodes;
+export { VCodes as VerificationCodes };
+

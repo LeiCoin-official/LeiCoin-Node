@@ -6,22 +6,20 @@ import cryptoHandlers from "../crypto/index.js";
 import Proposition from "../objects/proposition.js";
 import Attestation from "../objects/attestation.js";
 import POS from "../pos/index.js";
+import { VCode } from "./codes.js";
 
-
-interface BlockValidationInvalidResult {
-    cb: false;
-    status: 400 | 500;
-    message: string;
-}
 
 interface BlockValidationValidResult {
-    cb: true;
-    status: 200;
-    message: string;
+    status: 12000;
     forkchain: string;
     forktype: "child" | "newfork";
     forkparent: string;
 }
+
+interface BlockValidationInvalidResult {
+    status: Exclude<VCode, 12000>;
+}
+
 
 export class Verification {
 
@@ -29,135 +27,65 @@ export class Verification {
         return address.startsWith("lc0x");
     }
 
-    public static async verifyTransaction(tx: Transaction, chain = "main", coinbase = false) {
+    public static async verifyTransaction(tx: Transaction, chain = "main"): Promise<VCode> {
         
-        // Ensure that all required fields are present
-        if (!tx.txid || !tx.senderAddress || !tx.recipientAddress || !tx.amount || !tx.nonce || !tx.timestamp || !tx.signature || !tx.version) {
-            return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};
-        }
-
-        if (tx.version !== "00") {
-            return {cb: false, status: 400, message: "Bad Request. Invalid version."};
-        }
-
-        if (!this.verifyAddress(tx.senderAddress)) {
-            return {cb: false, status: 400, message: "Bad Request. SenderAddress is not a LeiCoin Address."};
-        }
-
-        if (!this.verifyAddress(tx.recipientAddress)) {
-            return {cb: false, status: 400, message: "Bad Request. RecipientAddress is not a LeiCoin Address."};
-        }
-
-        if (("lc0x" + cryptoHandlers.sha256(tx.senderPublicKey).slice(0, 40)) !== tx.senderAddress) {
-            return {cb: false, status: 400, message: "Bad Request. SenderAddress does not correspond to the Public Key."};
-        }
-
-        if (cryptoHandlers.sha256(tx, ["txid"]) !== tx.txid) {
-            return {cb: false, status: 400, message: "Bad Request. Transaction hash does not correspond to its data."};
-        }
+        if (!tx) return 12501;
+        if (tx.txid.eqn(tx.calculateHash())) return 12504;
 
         const senderWallet = await blockchain.chains[chain].wallets.getWallet(tx.senderAddress);
 
-        if (senderWallet.getNonce() !== tx.nonce) {
-            
-        }
-
-        if (senderWallet.isSubtractMoneyPossible(tx.amount)) {
-
-        }
+        if (senderWallet.getNonce().eqn(tx.nonce)) return 12508;
+        if (!senderWallet.isSubtractMoneyPossible(tx.amount)) return 12524;
         
-        return {cb: true, status: 200, message: "Transaction received and added to the mempool."};
+        return 12000;
     }
 
-    private static isValidCoinbaseTransaction(tx: Transaction): {
-        cb: true;
-    } | {
-        cb: false;
-        status: 400;
-        message: string;
-    } {
+    public static async verifyBlock(block: Block): Promise<BlockValidationValidResult | BlockValidationInvalidResult> {
 
-        if (!tx.txid || !tx.senderAddress || !tx.senderPublicKey || !tx.recipientAddress || !tx.amount || !tx.nonce || !tx.timestamp || !tx.signature || !tx.version)  {
-            return {cb: false, status: 400, message: "Bad Request. Invalid Coinbase arguments."};
-        }
-
-        if (tx.version !== "00") {
-            return {cb: false, status: 400, message: "Bad Request. Invalid Coinbase version."};
-        }
-
-        if (cryptoHandlers.sha256(tx, ["txid"]) !== tx.txid) {
-            return {cb: false, status: 400, message: "Bad Request. Coinbase hash does not correspond to its data."};
-        }
-
-        if (tx.senderAddress !== "lc0x6c6569636f696e6e65745f636f696e62617365" || tx.senderPublicKey !== "6c6569636f696e6e65745f636f696e62617365") {
-            return {cb: false, status: 400, message: 'Bad Request. Coinbase Sender Data is invalid.'};
-        }
-
-        if (tx.amount !== utils.mining_pow) {
-            return {cb: false, status: 400, message: 'Bad Request. Coinbase amount is invalid.'};
-        }
-
-        if (tx.nonce !== "0") {
-            return {cb: false, status: 400, message: 'Bad Request. Coinbase nonce is invalid.'};
-        }
-
-        if (tx.signature !== "0000000000000000000000000000000000000000000000000000000000000000") {
-            return {cb: false, status: 400, message: 'Bad Request. Coinbase signature is invalid.'};
-        }
-
-        return {cb: true};
-
-    }
-
-    public static async verifyBlock(block: Block): Promise<BlockValidationInvalidResult | BlockValidationValidResult> {
-
-        if (!block.index || !block.hash || !block.previousHash || !block.timestamp || !block.transactions || !block.version) {
-            return {cb: false, status: 400, message: "Bad Request. Invalid arguments."};;
-        }
+        if (!block) return { status: 12501 };
 
         let forkchain = "main";
         let forktype: "child" | "newfork" = "child";
         let forkparent = "main";
 
-        if (block.index === "0") {
+        if (block.index.eq(0)) {
 
             const isGenesisBlockResult = blockchain.chainstate.isValidGenesisBlock(block.hash);
 
-            if (!isGenesisBlockResult.isGenesisBlock)
-                return {cb: false, status: 400, message: 'Bad Request. Block is not a valid Genesis Block.'};
+            if (!isGenesisBlockResult.isGenesisBlock) return { status: 12533 };
 
             if (isGenesisBlockResult.isForkOFGenesisBlock) {
-                forkchain = block.hash;
+                forkchain = block.hash.toHex();
                 forktype = "newfork";
             }
 
         } else {
 
-            
+            const chainstateMatch = blockchain.chainstate.isBlockChainStateMatching(block);
+
+            if (!chainstateMatch.valid) return { status: 12533 };
+
+            forkchain = chainstateMatch.name;
+            forktype = chainstateMatch.type;
+            forkparent = chainstateMatch.parent;
 
         }
         
-        if (cryptoHandlers.sha256(block, ["hash"]) !== block.hash) {
-            return {cb: false, status: 400, message: 'Bad Request. Block hash does not correspond to its data.'};
-        }
-
-        const isValidCoinbaseTransactionResult = this.isValidCoinbaseTransaction(block.transactions[0])
-
-        if (!isValidCoinbaseTransactionResult.cb) {
-            return isValidCoinbaseTransactionResult;
+        if (block.calculateHash().eqn(block.hash)) {
+            return { status: 12504 };
         }
         
         if (forkchain === "main" || forktype === "newfork") {
             for (const transactionData of block.transactions) {
                 const transactionsValid = await this.verifyTransaction(transactionData);
-                if (!transactionsValid.cb) return {cb: false, status: 400, message: 'Bad Request. Block includes invalid transactions.'};
+                if (transactionsValid !== 12000) return { status: 12520 };
             }
         }
         // Ensure that the block contains valid transactions
-        return {cb: true, status: 200, message: "Block received and added to the Blockchain.", forkchain: forkchain, forktype: forktype, forkparent: forkparent};
+        return { status: 12000, forkchain: forkchain, forktype: forktype, forkparent: forkparent };
     }
 
-    public static async verifyBlockProposition(proposition: Proposition | null) {
+    public static async verifyBlockProposition(proposition: Proposition | null): Promise<VCode> {
 
         if (!proposition) return 12501;
 
@@ -168,13 +96,17 @@ export class Verification {
         if (currentSlot.blockFinalizedStep.hasFinished()) return 12541;
 
         if (!currentSlot.committee.isProposer(proposition.proposer)) return 12551;
-        if (proposition.nonce.eqn(currentSlot.committee.getProposerData().nonce)) return 12508;
+
+        const proposerData = currentSlot.committee.getProposerData();
+
+        if (proposerData.proposed) return 12552;
+        if (proposition.nonce.eqn(proposerData.nonce)) return 12508;
 
         return 12000;
 
     }
 
-    public static async verifyBlockAttestation(attestation: Attestation | null) {
+    public static async verifyBlockAttestation(attestation: Attestation | null): Promise<VCode> {
 
         if (!attestation) return 12501;
 
@@ -185,7 +117,11 @@ export class Verification {
         if (currentSlot.blockReceivedStep.hasFinished()) return 12541;
 
         if (!currentSlot.committee.isAttester(attestation.attester)) return 12561;
-        if (attestation.nonce.eqn(currentSlot.committee.getAttesterData(attestation.attester).nonce)) return 12508;
+
+        const attesterData = currentSlot.committee.getAttesterData(attestation.attester);
+
+        if (attesterData.vote !== "none") return 12562;
+        if (attestation.nonce.eqn(attesterData.nonce)) return 12508;
 
         return 12000;
 
