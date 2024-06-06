@@ -32,10 +32,11 @@ export class DataUtils {
     // Define a function to create an instance of a class from a JSON object
     public static createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
         // Retrieve the constructor of the class
-        const constructor = cls as any;
+        //const constructor = cls as any;
     
         // Retrieve the parameter names of the constructor
-        const paramNames = constructor.toString().match(/\(([^)]+)\)/)?.[1].split(',').map((param: string) => param.trim()) || [];
+        //const paramNames = constructor.toString().match(/\(([^)]+)\)/)?.[1].split(',').map((param: string) => param.trim()) || [];
+        const paramNames = cls.toString().match(/\(([^)]+)\)/)?.[1].split(',').map((param: string) => param.trim()) || [];
     
         // Create an array of arguments for the constructor
         const args = paramNames.map((paramName: string) => json[paramName]);
