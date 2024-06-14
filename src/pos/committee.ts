@@ -53,7 +53,7 @@ export class VCommittee {
         return this.attesters[address.toHex()] || this.proposer[1];
     }
 
-    public getAttesters(): VCommitteeAttesterList {
+    public getAttesters() {
         return this.attesters;
     }
 
