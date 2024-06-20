@@ -10,6 +10,7 @@ export class POS {
     private static currentSlot: Slot;
 
     public static init() {
+
         const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
         this.startNewSlot(currentSlotIndex);
         const task = cron.schedule('0,15,30,45 * * * * *', () => {
@@ -19,7 +20,9 @@ export class POS {
                 this.startNewSlot(currentSlotIndex);
             }
         });
+
         task.start();
+        
     }
 
     public static calulateCurrentSlotIndex() {
