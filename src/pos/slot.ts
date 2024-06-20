@@ -2,6 +2,7 @@ import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
 import Proposition from "../objects/proposition.js";
 import Validator from "../objects/validator.js";
+import blockchain from "../storage/blockchain.js";
 import { Uint64 } from "../utils/binary.js";
 import Schedule from "../utils/schedule.js";
 import validator from "../validator/index.js";
@@ -27,7 +28,7 @@ export class Slot {
 
         this.blockSendStep = new Schedule(async()=>{this.onBlockSend(false)}, 5_000);
         this.blockReceivedStep = new Schedule(async()=>{this.onBlockReceived(true)}, 10_000);
-        this.blockFinalizedStep = new Schedule(async()=>{this.onBlockFinalized(true)}, 15_000);
+        this.blockFinalizedStep = new Schedule(async()=>{this.onBlockFinalized()}, 15_000);
     }
 
     public static async create(index: Uint64) {
@@ -60,19 +61,18 @@ export class Slot {
         }
     }
 
-    private async onBlockFinalized(timeout: boolean) {
+    private async onBlockFinalized() {
         this.blockFinalizedStep.cancel();
-        if (timeout) {
-            return;
-        }
+
         POS.startNewSlot(this.index.add(1));
 
         const agreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree");
         const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
+        const noneVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "none");
 
-        if (agreeVotes.length >= 2/3 * this.committee.getSize()) {
+        if ((agreeVotes.length >= 2/3 * this.committee.getSize()) && this.block) {
             
-            
+            blockchain.blocks.addBlock(this.block);
 
         } else {
 
