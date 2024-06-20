@@ -1,18 +1,23 @@
 
 export class Constants {
 
-    static readonly GENESIS = "0";
+    static readonly GENESIS = 0;
 
-    static readonly BLOCK_TIME = "15";
+    // please change this value when using in MainNet
+    static readonly GENESIS_TIME = 1718841600;
+
+    // 15000 milliseconds (= 15 seconds)
+    static readonly BLOCK_TIME = 15_000;
     
-    static readonly BLOCKS_PER_EPOCH = "32";
-    static readonly LAST_EPOCH_SLOT = "31";
+    //static readonly BLOCKS_PER_EPOCH = 32;
+    //static readonly LAST_EPOCH_SLOT = 31;
 
-    static readonly MIN_VALIDATORS_EPOCH = "8";
-    static readonly MIN_VALIDATORS_SLOT = "4";
-    static readonly MAX_VALIDATORS = "128";
+    //static readonly MIN_VALIDATORS_EPOCH = 8;
+    //static readonly MIN_VALIDATORS_SLOT = 4;
+    static readonly MAX_VALIDATORS = 128;
 
-    static readonly STAKE_REWARD = "0.01";
+    // in percentage
+    static readonly STAKE_REWARD = 1.01;
 
 }
 
