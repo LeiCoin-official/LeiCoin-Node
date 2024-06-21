@@ -1,6 +1,6 @@
 import { Callbacks } from "../utils/callbacks.js";
 import fs from "fs";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import BCUtils from "./blockchainUtils.js";
 import EncodingUtils from "../encoding/index.js";
 import Block from "../objects/block.js"

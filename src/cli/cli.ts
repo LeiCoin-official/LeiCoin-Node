@@ -3,9 +3,10 @@ import type { Chalk } from "chalk";
 import process from "process";
 import fs from "fs";
 import { dirname } from "path";
-import utils from "./index.js";
-import { Dict } from "./dataUtils.js";
-import { DataUtils } from "./dataUtils.js";
+import utils from "../utils/index.js";
+import { Dict } from "../utils/dataUtils.js";
+import { DataUtils } from "../utils/dataUtils.js";
+import { CLICMDHandler } from "./cliCMDHandler.js";
 
 interface LogMessageLike {
     info(message: string): void;
@@ -87,6 +88,9 @@ class CLI {
         if (!this.ansiEscapes) {
             this.ansiEscapes = (await import("ansi-escapes")).default;
         }
+        if (!this.cmdHandler) {
+            this.cmdHandler = (await import("./cliCMDHandler.js")).default.getInstance();
+        }
     }
 
     private readonly rl = createInterface({
@@ -96,6 +100,8 @@ class CLI {
     });
 
     private logStream: fs.WriteStream;
+
+    private cmdHandler: CLICMDHandler | null = null;
 
     private constructor() {
         // Generate a timestamp for the log file name
@@ -116,7 +122,8 @@ class CLI {
         });
 
         this.rl.on('line', (input) => {
-            this.handleCommand(input.trim().toLowerCase());
+            //this.handleCommand(input.trim().toLowerCase());
+            this.cmdHandler?.handle(input.trim().toLowerCase());
             this.rl.prompt();
         }).on('close', () => {
             //default_message.log('CLI closed.');
@@ -140,7 +147,7 @@ class CLI {
         this.rl.write(null, { ctrl: true, name: 'e' });
     }
 
-    private handleCommand(command: string) {
+    /*private handleCommand(command: string) {
         switch (command) {
             case 'help':
                 this.default_message.info('Available commands:');
@@ -154,7 +161,7 @@ class CLI {
                 this.default_message.info('Command not recognized. Type "help" for available commands.');
                 break;
         }
-    }
+    }*/
 
     public async close(): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -162,8 +169,8 @@ class CLI {
             this.rl.prompt();
             this.rl.close();
             this.logStream.on('finish', () => {
-              this.logStream.close();
-              resolve(null);
+                this.logStream.close();
+                resolve(null);
             });
         
             this.logStream.on('error', (error) => {

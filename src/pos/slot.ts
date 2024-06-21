@@ -42,8 +42,11 @@ export class Slot {
             return;
         }
 
-        if (this.committee.isProposer(validator.address)) {
-            ProposerJob.propose();
+        for (const staker of validator.stakers) {
+            if (this.committee.isProposer(staker.address)) {
+                ProposerJob.propose(staker);
+                break;
+            }
         }
     }
 
@@ -55,8 +58,10 @@ export class Slot {
 
         this.block = proposition.block;
 
-        if (this.committee.isAttester(validator.address)) {
-            AttesterJob.attest(proposition);
+        for (const staker of validator.stakers) {
+            if (this.committee.isAttester(staker.address)) {
+                AttesterJob.attest(proposition, staker);
+            }
         }
     }
 
@@ -69,7 +74,7 @@ export class Slot {
         const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
         const noneVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "none");
 
-        if ((agreeVotes.length >= 2/3 * this.committee.getSize()) && this.block) {
+        if (((agreeVotes.length + 1) >= 2/3 * this.committee.getSize()) && this.block) {
             
             blockchain.blocks.addBlock(this.block);
 

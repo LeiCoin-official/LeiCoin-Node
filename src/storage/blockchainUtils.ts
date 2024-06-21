@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 import EncodingUtils from "../encoding/index.js";
 import { Callbacks } from "../utils/callbacks.js";

@@ -1,6 +1,6 @@
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import Block from "./block.js";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import Crypto from "../crypto/index.js";
 import { AddressHex } from "./address.js";
 import { DataUtils } from "../utils/dataUtils.js";

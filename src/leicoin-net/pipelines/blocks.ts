@@ -1,5 +1,5 @@
 import mempool from "../../storage/mempool.js";
-import cli from "../../utils/cli.js";
+import cli from "../../cli/cli.js";
 import Verification from "../../verification/index.js"
 import blockchain from "../../storage/blockchain.js";
 import Block from "../../objects/block.js";

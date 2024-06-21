@@ -1,4 +1,4 @@
-import cli from "../../utils/cli.js";
+import cli from "../../cli/cli.js";
 import WebSocket, { WebSocketServer } from "ws";
 import pipelines from "../pipelines/index.js";
 

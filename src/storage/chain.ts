@@ -21,9 +21,9 @@ export class Chain {
 
     public async waitAllinit() {
         await Promise.all([
-            this.wallets.open(),
-            this.cstates.open(),
-            this.validators.open(),
+            this.wallets.init(),
+            this.cstates.init(),
+            this.validators.init(),
         ])
     }
 

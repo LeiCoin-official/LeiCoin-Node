@@ -8,11 +8,16 @@ import fs from "fs";
 import Signature from "../src/objects/signature.js";
 import { Uint256, Uint64 } from "../src/utils/binary.js";
 import { AddressHex } from "../src/objects/address.js";
+import Staker from "../src/objects/staker.js";
+import { PrivateKey } from "../src/crypto/cryptoKeys.js";
 
 describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
 
-        const block = Block.createNewBlock(Uint64.from(0));
+        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
+        const staker = new Staker(PrivateKey.empty(), address);
+
+        const block = Block.createNewBlock(Uint64.from(0), staker);
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
         const decoded2 = Block.fromDecodedHex(decoded.encodeToHex());
@@ -37,8 +42,10 @@ describe('encoding_testing', () => {
     });*/
     test('attestation_enoding_and_decoding', () => {
 
+        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
+
         const attestation = new Attestation(
-            AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
+            address,
             Uint64.from(0),
             Uint256.empty(),
             true,
@@ -53,12 +60,15 @@ describe('encoding_testing', () => {
     });
     test('proposition_enoding_and_decoding', () => {
 
+        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
+        const staker = new Staker(PrivateKey.empty(), address);
+
         const proposition = new Proposition(
-            AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
+            address,
             Uint64.from(0),
             Uint64.from(0),
             Signature.empty(),
-            Block.createNewBlock(Uint64.from(0))
+            Block.createNewBlock(Uint64.from(0), staker)
         );
 
         const decoded: any = Proposition.fromDecodedHex(proposition.encodeToHex());
@@ -68,7 +78,10 @@ describe('encoding_testing', () => {
     });
     test('transaction_enoding_and_decoding', () => {
 
-        const tx = Transaction.createCoinbaseTransaction();
+        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
+        const staker = new Staker(PrivateKey.empty(), address);
+
+        const tx = Transaction.createCoinbaseTransaction(staker);
 
         const decoded: any = Transaction.fromDecodedHex(tx.encodeToHex());
         const decoded2 = Transaction.fromDecodedHex(decoded.encodeToHex());

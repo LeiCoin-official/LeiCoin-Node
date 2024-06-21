@@ -1,6 +1,6 @@
 import process from "process";
 import { EventEmitter } from "events";
-import type { CLILike } from "./cli.js";
+import type { CLILike } from "../cli/cli.js";
 
 class Utils {
 
@@ -31,7 +31,7 @@ class Utils {
     public async gracefulShutdown(exitCode: number = 0) {
         try {
             if (!this.cli)
-            this.cli = (await import("./cli.js")).default;
+            this.cli = (await import("../cli/cli.js")).default;
             this.cli.default_message.info('Shutting down...');
             this.events.emit("stop_server");
             setTimeout(async() => {

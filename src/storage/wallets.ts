@@ -1,6 +1,6 @@
 import path from "path";
 import { Callbacks } from "../utils/callbacks.js";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import Wallet from "../objects/wallet.js";
 import BCUtils from "./blockchainUtils.js"
 import Block from "../objects/block.js";

@@ -4,7 +4,7 @@ import initAPI from "./api/index.js";
 import initLeiCoinNetServer from "./leicoin-net/server/index.js";
 import http from "http";
 import WebSocket from "ws";
-import cli from "./utils/cli.js";
+import cli from "./cli/cli.js";
 import leiCoinNetClientsHandler from "./leicoin-net/client/index.js";
 
 export default async function initNetConnections() {

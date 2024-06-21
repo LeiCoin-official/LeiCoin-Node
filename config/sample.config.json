@@ -10,9 +10,12 @@
     },
     "staker": {
         "active": true,
-        "publicKey": "",
-        "privateKey": "",
-        "address": ""
+        "stakers": [
+            {
+                "privateKey": "",
+                "address": ""
+            }
+        ]
     },
     "experimental": false
 }

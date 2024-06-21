@@ -1,6 +1,6 @@
 import fs from "fs";
 import { Callbacks } from "../utils/callbacks.js";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import BCUtils from "./blockchainUtils.js";
 import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";

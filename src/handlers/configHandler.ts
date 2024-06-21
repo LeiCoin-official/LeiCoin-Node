@@ -3,7 +3,7 @@ import path from "path";
 import process from "process";
 import utils from "../utils/index.js";
 import dotenv from "dotenv";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import { Dict } from "../utils/dataUtils.js";
 
 interface DefaultConfigInterface {
@@ -18,9 +18,10 @@ interface DefaultConfigInterface {
     };
     staker: {
         active: boolean;
-        publicKey: string;
-        privateKey: string;
-        address: string
+        stakers: Array<{
+            readonly privateKey: string;
+            readonly address: string;
+        }>;
     };
     experimental: boolean
 }

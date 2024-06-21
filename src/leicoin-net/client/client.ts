@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import cli from "../../utils/cli.js";
+import cli from "../../cli/cli.js";
 import { Callbacks } from "../../utils/callbacks.js";
 
 export class LeiCoinNetClient {

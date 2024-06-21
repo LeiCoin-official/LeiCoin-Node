@@ -1,12 +1,12 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
 import blockchain from "../storage/blockchain.js";
-import utils from "../utils/index.js";
-import cryptoHandlers from "../crypto/index.js";
 import Proposition from "../objects/proposition.js";
 import Attestation from "../objects/attestation.js";
 import POS from "../pos/index.js";
 import { VCode } from "./codes.js";
+import { AddressHex } from "../objects/address.js";
+import { PX } from "../objects/prefix.js";
 
 
 interface BlockValidationValidResult {
@@ -23,8 +23,8 @@ interface BlockValidationInvalidResult {
 
 export class Verification {
 
-    public static verifyAddress(address: string) {
-        return address.startsWith("lc0x");
+    public static verifyAddress(address: AddressHex, expectedPrefix: PX = PX.A_00): boolean {
+        return address.slice(0, 1).eq(expectedPrefix);
     }
 
     public static async verifyTransaction(tx: Transaction, chain = "main"): Promise<VCode> {

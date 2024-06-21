@@ -1,7 +1,7 @@
 import { Transaction } from "./transaction.js";
 import mempool from "../storage/mempool.js";
 import blockchain from "../storage/blockchain.js";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import Crypto from "../crypto/index.js";
 import Attestation from "./attestation.js";
 import config from "../handlers/configHandler.js";
@@ -10,6 +10,7 @@ import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { PX } from "./prefix.js";
+import Staker from "./staker.js";
 
 export class Block {
 
@@ -47,7 +48,7 @@ export class Block {
 
     }
 
-    public static createNewBlock(slotIndex: Uint64) {
+    public static createNewBlock(slotIndex: Uint64, staker: Staker) {
         
         const previousBlock = blockchain.chainstate.getLatestBlockInfo();
     
@@ -60,7 +61,7 @@ export class Block {
         if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = Uint256.alloc();
         else previousHash = previousBlock.hash;
 
-        const coinbase = Transaction.createCoinbaseTransaction();
+        const coinbase = Transaction.createCoinbaseTransaction(staker);
 
         const transactions = Object.values(mempool.transactions);
         transactions.unshift(coinbase);
@@ -71,7 +72,7 @@ export class Block {
             Uint256.alloc(),
             previousHash,
             Uint64.from(new Date().getTime()),
-            AddressHex.from(config.staker.address),
+            staker.address,
             [],
             transactions
         );

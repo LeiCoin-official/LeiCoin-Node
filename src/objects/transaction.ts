@@ -2,12 +2,13 @@ import config from "../handlers/configHandler.js";
 import Crypto from "../crypto/index.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import utils from "../utils/index.js";
-import cli from "../utils/cli.js";
+import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Signature from "./signature.js";
 import { PX } from "./prefix.js";
+import Staker from "./staker.js";
 
 export class Transaction {
 
@@ -43,12 +44,12 @@ export class Transaction {
         this.version = version;
     }
 
-    public static createCoinbaseTransaction() {
+    public static createCoinbaseTransaction(staker: Staker) {
 
         const coinbase = new Transaction(
             Uint256.alloc(),
             AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
-            AddressHex.from(config.staker.address),
+            staker.address,
             Uint64.from(utils.mining_pow),
             Uint64.from(0),
             Uint64.from(new Date().getTime()),

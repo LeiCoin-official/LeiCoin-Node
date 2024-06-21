@@ -4,16 +4,19 @@ import BCUtils from "./blockchainUtils.js";
 
 export abstract class LevelBasedStorage {
 
-    protected readonly level: LevelDB;
-    protected readonly path: string = "/";
-    protected readonly chain: string;
+    // @ts-ignore
+    protected level: LevelDB = null;
+    protected abstract path: string;
+    protected chain: string = "";
 
-    constructor(chain: string) {
-        BCUtils.ensureDirectoryExists(this.path, chain);
+    public constructor(chain: string) {
         this.chain = chain;
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath(this.path, chain)));
     }
-    public async open() {
-        return this.level.open();
+
+    public async init() {
+        BCUtils.ensureDirectoryExists(this.path, this.chain);
+        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath(this.path, this.chain)));
+        await this.level.open();
     }
+
 }
