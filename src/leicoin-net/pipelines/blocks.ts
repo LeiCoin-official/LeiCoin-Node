@@ -18,7 +18,7 @@ export default class BlockPipeline {
     
             const validationresult = await Verification.verifyBlock(block);
     
-            if (validationresult.cb) {
+            if (validationresult.status === 12000) {
     
                 if (validationresult.forktype = "newfork") {
                     blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);

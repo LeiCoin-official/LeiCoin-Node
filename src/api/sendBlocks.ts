@@ -2,6 +2,7 @@ import express from "express";
 import Verification from "../verification/index.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
+import { VCodes } from "../verification/codes.js";
 
 const router = express.Router();
 
@@ -20,9 +21,9 @@ router.use('/', async (req, res, next) => {
 	const validationresult = await Verification.verifyBlock(blockData);
 
     res.status(validationresult.status);
-	res.json({ message: validationresult.message });
+	res.json({ message: VCodes[validationresult.status] });
 
-	if (!validationresult.cb) {
+	if (validationresult.status !== 12000) {
 		return;
 	}
 

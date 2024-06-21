@@ -17,7 +17,7 @@ export default class TransactionPipeline {
     
             const validationresult = await Verification.verifyTransaction(transaction);
     
-            if (validationresult.cb) {
+            if (validationresult === 12000) {
 
                 mempool.addTransactionToMempool(transaction);
         

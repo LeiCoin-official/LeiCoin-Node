@@ -5,6 +5,7 @@ import utils from "../utils/index.js";
 import mempool from "../storage/mempool.js";
 import { Callbacks } from "../utils/callbacks.js";
 import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
+import { VCodes } from "../verification/codes.js";
 
 // Route for receiving new transactions
 router.use('/', async (req, res, next) => {
@@ -20,10 +21,11 @@ router.use('/', async (req, res, next) => {
 	// Validate the transaction (add your validation logic here)
 	const validationresult = await Verification.verifyTransaction(transactionData);
 
-	res.status(validationresult.status)
-	res.json({message: validationresult.message});
+	//res.status(validationresult.status);
+	res.status(400);
+	res.json({message: VCodes[validationresult]});
 
-	if (!validationresult.cb) {
+	if (validationresult !== 12000) {
 		return;
 	}
 
