@@ -12,7 +12,7 @@ import { AddressHex } from "../src/objects/address.js";
 describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
 
-        const block = Block.createNewBlock();
+        const block = Block.createNewBlock(Uint64.from(0));
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
         const decoded2 = Block.fromDecodedHex(decoded.encodeToHex());
@@ -39,9 +39,10 @@ describe('encoding_testing', () => {
 
         const attestation = new Attestation(
             AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
+            Uint64.from(0),
             Uint256.empty(),
             true,
-            Uint64.from(1),
+            Uint64.from(0),
             Signature.empty()
         );
 
@@ -54,9 +55,10 @@ describe('encoding_testing', () => {
 
         const proposition = new Proposition(
             AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
-            Uint64.from(1),
+            Uint64.from(0),
+            Uint64.from(0),
             Signature.empty(),
-            Block.createNewBlock()
+            Block.createNewBlock(Uint64.from(0))
         );
 
         const decoded: any = Proposition.fromDecodedHex(proposition.encodeToHex());

@@ -1,7 +1,6 @@
 import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
 import Proposition from "../objects/proposition.js";
-import Validator from "../objects/validator.js";
 import blockchain from "../storage/blockchain.js";
 import { Uint64 } from "../utils/binary.js";
 import Schedule from "../utils/schedule.js";

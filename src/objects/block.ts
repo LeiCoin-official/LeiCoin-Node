@@ -10,7 +10,6 @@ import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { PX } from "./prefix.js";
-import POS from "../pos/index.js";
 
 export class Block {
 
@@ -48,7 +47,7 @@ export class Block {
 
     }
 
-    public static createNewBlock() {
+    public static createNewBlock(slotIndex: Uint64) {
         
         const previousBlock = blockchain.chainstate.getLatestBlockInfo();
     
@@ -68,7 +67,7 @@ export class Block {
     
         const newBlock = new Block(
             newIndex,
-            POS.getCurrentSlot().index,
+            slotIndex,
             Uint256.alloc(),
             previousHash,
             Uint64.from(new Date().getTime()),

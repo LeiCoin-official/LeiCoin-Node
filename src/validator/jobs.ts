@@ -1,19 +1,13 @@
 import Crypto from "../crypto/index.js";
 import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
-import { AddressHex } from "../objects/address.js";
 import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
-import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
+import { LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import { PX } from "../objects/prefix.js";
 import Proposition from "../objects/proposition.js";
 import Signature from "../objects/signature.js";
-import VCommittee from "../pos/committee.js";
 import POS from "../pos/index.js";
-import blockchain from "../storage/blockchain.js";
-import mempool from "../storage/mempool.js";
 import { Uint64 } from "../utils/binary.js";
-import cli from "../utils/cli.js";
-import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
 import validator from "./index.js";
 
@@ -21,7 +15,7 @@ export class AttesterJob {
 
 	private static async createAttestation(block: Block) {
 
-		const vote = (await Verification.verifyBlock(block)).cb;
+		const vote = (await Verification.verifyBlock(block)).status === 12000;
 		const attestation = new Attestation(
 			validator.address,
 			block.slotIndex,
@@ -49,10 +43,11 @@ export class AttesterJob {
 export class ProposerJob {
 
 	private static async createProposition() {
-		const block = Block.createNewBlock();
+		const currentSlotIndex = POS.getCurrentSlot().index;
+		const block = Block.createNewBlock(currentSlotIndex);
 		const proposition = new Proposition(
 			validator.address,
-			POS.getCurrentSlot().index,
+			currentSlotIndex,
 			Uint64.from(0),
 			Signature.empty(),
 			block

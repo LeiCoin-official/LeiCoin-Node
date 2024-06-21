@@ -47,39 +47,6 @@ class Validator {
 
 	}
 
-	public async startNextSlot(lastSlot: string, lastBlockHash: string) {
-
-		/*const nextStaker = stakerpool.getNextStaker(hash);
-
-		if (nextStaker.address === config.staker.address) {
-
-			const block = Block.createNewBlock();
-
-			// Adjust the delay maybe later for faster Block times
-			//await new Promise((resolve) => setTimeout(resolve, 10_000));
-
-			await this.broadcastBlock(block);
-
-			this.runNextStaking(block.hash);
-
-		}*/
-
-		if (.isMember(this.publicKey)) {
-
-			if (nextProposer === this.publicKey) {
-
-				await ProposerJob.propose();
-				
-			} else {
-
-				
-
-			}
-
-		}
-			
-	}
-
 }
 
 const validator = Validator.getInstance();
