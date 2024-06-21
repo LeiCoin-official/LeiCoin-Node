@@ -123,7 +123,7 @@ class CLI {
 
         this.rl.on('line', (input) => {
             //this.handleCommand(input.trim().toLowerCase());
-            this.cmdHandler?.handle(input.trim().toLowerCase());
+            this.cmdHandler?.handle(input);
             this.rl.prompt();
         }).on('close', () => {
             //default_message.log('CLI closed.');

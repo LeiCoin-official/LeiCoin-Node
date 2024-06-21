@@ -1,39 +1,27 @@
 import { Dict } from "../utils/dataUtils.js";
-import cli from "./cli.js"; // @ts-ignore
+import cli from "./cli.js";
 import { CLICMD } from "./cliCMD.js";
-import { GenKairPairCMD } from "./commands/genKeyPairCMD.js";
-import { StopCMD } from "./commands/stopCMD.js";
 
 
-export class CLICMDHandler {
-
-    private static instance: CLICMDHandler;
-
-    public static getInstance() {
-        if (!this.instance) {
-            this.instance = new CLICMDHandler();
-        }
-        return this.instance;
-    }
+export abstract class CLISubCMDManager {
     
-    private readonly registry: Dict<CLICMD> = {};
+    protected readonly registry: Dict<CLICMD> = {};
 
-    private constructor() {
-
-        this.register(new StopCMD());
-        this.register(new GenKairPairCMD());
-
+    constructor() {
+        this.registerCommands();
         this.setupHelpCommand();
     }
 
-    private register(command: CLICMD) {
+    protected abstract registerCommands(): void;
+
+    protected register(command: CLICMD) {
         this.registry[command.name.toLowerCase()] = command;
         for (const alias of command.aliases) {
             this.registry[alias.toLowerCase()] = command;
         }
     }
 
-    private setupHelpCommand() {
+    protected setupHelpCommand() {
         let help_message = "Available commands:\n" +
                            " - help: Show available commands";
         for (const cmd of Object.values(this.registry)) {
@@ -51,7 +39,7 @@ export class CLICMDHandler {
         });
     }
 
-    public handle(input: string) {
+    public run(input: string) {
         const args = input.trim().toLowerCase().split(" ").filter(arg => arg);
         const command_name = args.shift();
         
@@ -81,6 +69,4 @@ export class CLICMDHandler {
     }
 
 }
-
-export default CLICMDHandler;
 
