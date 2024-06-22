@@ -2,12 +2,12 @@ import { Dict } from "../utils/dataUtils.js";
 import cli from "./cli.js";
 import { CLICMD } from "./cliCMD.js";
 
-
-export abstract class CLISubCMDManager {
+export abstract class CLISubCMDManager extends CLICMD {
     
     protected readonly registry: Dict<CLICMD> = {};
 
-    constructor() {
+    protected constructor() {
+        super();
         this.registerCommands();
         this.setupHelpCommand();
     }
@@ -39,21 +39,20 @@ export abstract class CLISubCMDManager {
         });
     }
 
-    public run(input: string) {
-        const args = input.trim().toLowerCase().split(" ").filter(arg => arg);
+    protected async run_empty(parent_args: string[]) {
+        cli.default_message.info('Command not recognized. Type "help" for available commands.');
+    }
+
+    protected async run_notFound(command_name: string, parent_args: string[]) {
+        cli.default_message.info(`Command '${command_name}' not found. Type "help" for available commands.`);
+    }
+
+    public async run(args: string[], parent_args: string[]) {
+        //const args = input.trim().toLowerCase().split(" ").filter(arg => arg);
         const command_name = args.shift();
-        
-        if (!command_name) {
-            cli.default_message.info('Command not recognized. Type "help" for available commands.');
-            return;
-        }
-
+        if (!command_name) { await this.run_empty(parent_args); return; }
         const cmd = this.registry[command_name];
-
-        if (!cmd) {
-            cli.default_message.info(`Command '${command_name}' not found. Type "help" for available commands.`);
-            return;
-        }
+        if (!cmd) { this.run_notFound(command_name, parent_args); return; }
 
         if (args[0] === "--help") {
             cli.default_message.info(
@@ -65,7 +64,8 @@ export abstract class CLISubCMDManager {
             return;    
         }
 
-        cmd.run(args);
+        parent_args.push(command_name);
+        await cmd.run(args, parent_args);
     }
 
 }
