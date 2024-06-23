@@ -3,12 +3,11 @@ import Crypto from "../../crypto/index.js";
 import { Address32, AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
 import cli from "../cli.js";
-import { CLICMD } from "../cliCMD.js";
+import CLICMD from "../cliCMD.js";
 
-export class GenKairPairCMD extends CLICMD {
+export default class GenKairPairCMD extends CLICMD {
     public name = "genKeyPair";
     public description = "Generate a new key pair";
-    public aliases = [];
     public usage = "genKeyPair <wallet|staker|smart-contract>";
 
     public async run(args: string[]): Promise<void> {

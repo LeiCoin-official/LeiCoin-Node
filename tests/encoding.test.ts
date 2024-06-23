@@ -90,7 +90,7 @@ describe('encoding_testing', () => {
     });
     test('validator_enoding_and_decoding', () => {
 
-        const address = AddressHex.from("7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
+        const address = AddressHex.from("0e7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
         const validator = new Validator(
             address,

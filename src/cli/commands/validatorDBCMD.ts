@@ -1,10 +1,9 @@
-import { CLICMD } from "../cliCMD.js";
+import CLICMD from "../cliCMD.js";
 
-export class ValidatorDBCMD extends CLICMD {
-    public name = "validator-db";
+export default class ValidatorDBCMD extends CLICMD {
+    public name = "vsdb";
     public description = "Manage the validator database";
-    public aliases = ["vsdb"];
-    public usage = "validator-db <command> [args]";
+    public usage = "vsdb <command> [args]";
 
     public async run(args: string[]): Promise<void> {
         

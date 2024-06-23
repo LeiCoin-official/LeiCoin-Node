@@ -6,7 +6,7 @@ import { dirname } from "path";
 import utils from "../utils/index.js";
 import { Dict } from "../utils/dataUtils.js";
 import { DataUtils } from "../utils/dataUtils.js";
-import { CLICMDHandler } from "./cliCMDHandler.js";
+import CLICMDHandler from "./cliCMDHandler.js";
 
 interface LogMessageLike {
     info(message: string): void;
