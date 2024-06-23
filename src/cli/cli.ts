@@ -125,6 +125,16 @@ class CLI {
             //this.handleCommand(input.trim().toLowerCase());
             this.cmdHandler?.handle(input);
             this.rl.prompt();
+        }).on('SIGINT', () => {
+            //this.default_message.info(`Command not recognized. Type "help" for available commands.`);
+
+            process.stdout.write(this.ansiEscapes.eraseLines(1)); // Clear the current line
+            process.stdout.write(this.ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
+
+            console.log(`> ${this.rl.line}^C`);
+            this.rl.prompt(true);
+            this.rl.write(null, { ctrl: true, name: 'u' }); // Clear the current line
+
         }).on('close', () => {
             //default_message.log('CLI closed.');
         });
@@ -143,25 +153,9 @@ class CLI {
         console.log(styledMessage);
         this.logStream.write(`[${prefix}] ${message}\n`);
     
-        this.rl.prompt();
-        this.rl.write(null, { ctrl: true, name: 'e' });
+        this.rl.prompt(true);
+        //this.rl.write(null, { ctrl: true, name: 'e' }); // Move the cursor to the end
     }
-
-    /*private handleCommand(command: string) {
-        switch (command) {
-            case 'help':
-                this.default_message.info('Available commands:');
-                this.default_message.info(' - help: Show available commands');
-                this.default_message.info(' - stop: Stops The Server and Staker');
-                break;
-            case 'stop':
-                utils.gracefulShutdown();
-                break;
-            default:
-                this.default_message.info('Command not recognized. Type "help" for available commands.');
-                break;
-        }
-    }*/
 
     public async close(): Promise<any> {
         return new Promise((resolve, reject) => {

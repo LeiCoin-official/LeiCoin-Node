@@ -24,7 +24,7 @@ class Utils {
 
 
     private constructor() {
-        process.on("SIGINT", this.gracefulShutdown);
+        //process.on("SIGINT", this.gracefulShutdown);
         process.on("SIGTERM", this.gracefulShutdown);
     }
 
