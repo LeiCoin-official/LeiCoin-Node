@@ -24,7 +24,10 @@ export class CLICMDHandler extends CLISubCMD {
         this.register(new ValidatorDBCMD());
     }
 
-    protected async run_empty(parent_args: string[]): Promise<void> {return}
+    protected async run_empty(parent_args: string[]): Promise<void> {
+        //cli.default_message.info(`Command not recognized. Type "${CLIUtils.parsePArgs(parent_args, true)}help" for available commands.`);
+        return;
+    }
 
     public async handle(input: string) {
         this.run(input.trim().toLowerCase().split(" ").filter(arg => arg), []);

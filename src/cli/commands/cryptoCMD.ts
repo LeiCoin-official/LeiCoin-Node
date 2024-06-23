@@ -4,6 +4,7 @@ import Crypto from "../../crypto/index.js";
 import { Address32, AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
 import cli from "../cli.js";
+import CLIUtils from "../cliUtils";
 
 
 export default class CryptoCMD extends CLISubCMD {
@@ -15,20 +16,16 @@ export default class CryptoCMD extends CLISubCMD {
         this.register(new GenKeyPairCMD());
     }
 
-    protected async run_empty(parent_args: string[]): Promise<void> {
-        await this.run_help(parent_args);
-    }
-
 }
 
-export class GenKeyPairCMD extends CLICMD {
+class GenKeyPairCMD extends CLICMD {
     public name = "genKeyPair";
     public description = "Generate a new key pair";
-    public usage = "genKeyPair <wallet|staker|smart-contract>";
+    public usage = "genKeyPair (wallet|staker|smart-contract)";
 
     public async run(args: string[]): Promise<void> {
         if (args.length !== 1) {
-            cli.default_message.info("Invalid number of arguments!");
+            CLIUtils.invalidNumberOfArguments();
             return;
         }
 

@@ -1,3 +1,4 @@
+import cli from "./cli.js";
 
 
 export class CLIUtils {
@@ -8,6 +9,10 @@ export class CLIUtils {
             parent_args_str += " ";
         }
         return parent_args_str;
+    }
+
+    public static invalidNumberOfArguments(): void {
+        cli.default_message.info("Invalid number of arguments!");
     }
 
 }

@@ -42,7 +42,7 @@ export abstract class CLISubCMD extends CLICMD {
     }
 
     protected async run_empty(parent_args: string[]) {
-        cli.default_message.info(`Command not recognized. Type "${CLIUtils.parsePArgs(parent_args, true)}help" for available commands.`);
+        return await this.run_help(parent_args);
     }
 
     protected async run_notFound(command_name: string, parent_args: string[]) {
