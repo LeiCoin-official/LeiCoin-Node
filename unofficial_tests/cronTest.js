@@ -2,16 +2,22 @@ import cron from "node-cron";
 
 function getCurrentSlot() {
     const GENESIS_TIME = 1718841600;
-    console.log(Date.now() / 1000)
-    console.log(Math.floor(
+    return Math.floor(
         (Math.floor(Date.now() / 1000) - GENESIS_TIME) / 15
-    ));
+    );
+}
+
+function getCurrentSlot2() {
+    const GENESIS_TIME = 1718841600_000;
+    return Math.floor(
+        (Date.now() - GENESIS_TIME) / 15_000
+    );
 }
 
 function startCronJob() {
     const task = cron.schedule('0,15,30,45 * * * * *', () => {
       	console.log(`Task executed at: ${new Date().toISOString()}`);
-        getCurrentSlot();
+        console.log(getCurrentSlot(), getCurrentSlot() === getCurrentSlot2());
     });
   
     task.start();
@@ -19,8 +25,8 @@ function startCronJob() {
 }
 
 
-//startCronJob();
+startCronJob();
 
-console.log(Math.floor(
-    (Math.floor(1718841615.9999) - 1718841600) / 15
-));
+// console.log(Math.floor(
+//     (Math.floor(1718841615.9999) - 1718841600) / 15
+// ));

@@ -10,15 +10,11 @@ export class POS {
     private static currentSlot: Slot;
 
     public static init() {
-
-        const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
-        this.startNewSlot(currentSlotIndex);
+        
         const task = cron.schedule('0,15,30,45 * * * * *', () => {
             const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
-            if (currentSlotIndex.gt(this.currentSlot.index)) {
-                //this.endSlot(this.currentSlot.index);
-                this.startNewSlot(currentSlotIndex);
-            }
+            //this.endSlot(this.currentSlot.index);
+            this.startNewSlot(currentSlotIndex);
         });
 
         task.start();
@@ -27,7 +23,7 @@ export class POS {
 
     public static calulateCurrentSlotIndex() {
         return Math.floor(
-            (Math.floor(Date.now() / 1000) - Constants.GENESIS_TIME) / Constants.BLOCK_TIME
+            (Date.now() - Constants.GENESIS_TIME) / Constants.BLOCK_TIME
         );
     }
 

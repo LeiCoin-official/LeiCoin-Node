@@ -4,7 +4,7 @@ export class Constants {
     static readonly GENESIS = 0;
 
     // please change this value when using in MainNet
-    static readonly GENESIS_TIME = 1718841600;
+    static readonly GENESIS_TIME = 1718841600_000;
 
     // 15000 milliseconds (= 15 seconds)
     static readonly BLOCK_TIME = 15_000;
