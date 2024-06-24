@@ -117,9 +117,9 @@ export class Uint {
     /** Supports only a number up to (2^48)-1 */
     public toInt() {
         if (this.buffer.byteLength > 6) {
-            return this.buffer.readUIntBE(this.buffer.byteLength - 6, 6);
+            return this.buffer.readUintBE(this.buffer.byteLength - 6, 6);
         }
-        return this.buffer.readUIntBE(0, this.buffer.byteLength);
+        return this.buffer.readUintBE(0, this.buffer.byteLength);
     }
 
     public getRaw() {
@@ -343,7 +343,7 @@ export class Uint64 extends FixedUint {
         let carry = 0;
         for (let i = 0; i < this.buffer.byteLength; i += 4) {
             const dividend = this.buffer.readUint32BE(i) + carry;
-            this.buffer.writeUint32BE(Math.floor(dividend / value));
+            this.buffer.writeUint32BE(Math.floor(dividend / value), i);
             carry = (dividend % value) * 4294967296;
         }
         if (returnRest) return (carry / 4294967296);
@@ -360,7 +360,7 @@ export class Uint64 extends FixedUint {
 
     /** Supports only a number up to (2^64)-1 */
     public toBigInt() {
-        return this.buffer.readBigUInt64BE();
+        return this.buffer.readBigUint64BE();
     }
 
 }

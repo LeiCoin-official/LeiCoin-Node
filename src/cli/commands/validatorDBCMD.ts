@@ -47,7 +47,7 @@ class ReadCMD extends CLICMD {
         if (validator) {
             cli.default_message.info(JSON.stringify(validator, (key, value) => {
                 if (value instanceof Uint64) {
-                    return value.toInt().toLocaleString();
+                    return (value.toInt() / 1_0000_0000).toFixed(8);
                 } else if (value instanceof Uint) {
                     return value.toHex();
                 }

@@ -413,11 +413,41 @@ async function test7() {
 
 }
 
+async function test8() {
+
+    let bool = true;
+    
+    const startTime = startTimer();
+    
+    for (let i = 0; i < 1_000_000; i++) {
+        
+        const input_number = Math.floor(Math.random() * 1_000_000_000) + 1;
+        const div_number = Math.floor(Math.random() * 100_000) + 1;
+    
+        const input_uint = Uint64.from(input_number, 6);
+        const div_uint = Uint.from(div_number, 6);
+
+        bool = (
+            bool &&
+            Math.floor(input_number / div_number) === input_uint.div(div_number).toInt() &&
+            Math.floor(input_number / div_number) === input_uint.div(div_uint).toInt()
+        )
+
+    }
+
+    const elapsedTime = endTimer(startTime);
+    console.log(bool);
+    console.log("Elapsed time:", elapsedTime / 1000, "seconds");
+
+}
+
+
 //test1();
 //test2();
 //test3();
 //test4();
 //test5();
-test6()
+//test6()
 //test7()
+test8()
 
