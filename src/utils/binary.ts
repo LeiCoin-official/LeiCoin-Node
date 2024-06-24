@@ -114,12 +114,12 @@ export class Uint {
         return this.buffer.toString("hex");
     }
 
+    /** Supports only a number up to (2^48)-1 */
     public toInt() {
-        try {
-            return this.buffer.readUintBE(0, this.buffer.byteLength);
-        } catch {
-            return 0;
+        if (this.buffer.byteLength > 6) {
+            return this.buffer.readUIntBE(this.buffer.byteLength - 6, 6);
         }
+        return this.buffer.readUIntBE(0, this.buffer.byteLength);
     }
 
     public getRaw() {
@@ -279,7 +279,7 @@ export class Uint {
         } else if (this.buffer.byteLength !== value.buffer.byteLength) {
             value = UintUtils.correctByteLengthUint(Uint, value, this.buffer.byteLength)
         }
-        return this.buffer.compare(value.buffer)
+        return this.buffer.compare(value.buffer);
     }
 
 }
@@ -358,6 +358,7 @@ export class Uint64 extends FixedUint {
         return Uint.empty();
     }
 
+    /** Supports only a number up to (2^64)-1 */
     public toBigInt() {
         return this.buffer.readBigUInt64BE();
     }

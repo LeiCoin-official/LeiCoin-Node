@@ -46,7 +46,7 @@ class Mempool {
     // Function to remove a transaction from the Mempool
     public removeTransactionFromMempool(txid: Uint256) {
     
-        if (txid.toInt() in this.transactions) {
+        if (txid.toHex() in this.transactions) {
             delete this.transactions[txid.toHex()];
             return { cb: Callbacks.SUCCESS };
         }

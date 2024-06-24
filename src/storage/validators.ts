@@ -4,11 +4,14 @@ import { AddressHex } from "../objects/address.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Crypto from "../crypto/index.js";
 import { LevelBasedStorage } from "./storageTypes.js";
-import { AddressEncoder } from "../encoding/binaryEncoder.js";
 
 export class ValidatorDB extends LevelBasedStorage {
 
     protected path = "/validators";
+
+    public async getAllVAddresses() {
+        return this.level.keys().all();
+    }
 
     public async getValidator(address: AddressHex) {
         const raw_validator_data = await this.level.get(address);
