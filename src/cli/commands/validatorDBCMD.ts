@@ -1,5 +1,8 @@
 import { AddressHex } from "../../objects/address.js";
+import { PX } from "../../objects/prefix.js";
+import Validator from "../../objects/validator.js";
 import blockchain from "../../storage/blockchain.js";
+import { Uint64 } from "../../utils/binary.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
@@ -11,6 +14,7 @@ export default class ValidatorDBCMD extends CLISubCMD {
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
+        this.register(new InsertCMD());
     }
 
 }
@@ -19,7 +23,7 @@ export default class ValidatorDBCMD extends CLISubCMD {
 class ReadCMD extends CLICMD {
     public name = "read";
     public description = "Read the validator database";
-    public usage = "vsdb read <validator_address>";
+    public usage = "read <validator_address>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
 
@@ -36,6 +40,24 @@ class ReadCMD extends CLICMD {
             cli.default_message.info("Validator not found!");
         }
 
+    }
+}
+
+class InsertCMD extends CLICMD {
+    public name = "insert";
+    public description = "Insert Data into the validator database";
+    public usage = "insert <validator_address> <stake> <version>";
+
+    public async run(args: string[], parent_args: string[]): Promise<void> {
+
+        if (args.length !== 3) {
+            CLIUtils.invalidNumberOfArguments();
+            return;
+        }
+
+        const validator = new Validator(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
+        await blockchain.validators.setValidator(validator);
+        cli.default_message.info("Validator inserted!");
     }
 }
 
