@@ -133,7 +133,7 @@ class CLI {
 
             console.log(`> ${this.rl.line}^C`);
             this.rl.prompt(true);
-            this.rl.write(null, { ctrl: true, name: 'u' }); // Clear the current line
+            this.rl.write(null, { ctrl: true, name: 'e' }); this.rl.write(null, { ctrl: true, name: 'u' }); // Clear the current line
 
         }).on('close', () => {
             //default_message.log('CLI closed.');
