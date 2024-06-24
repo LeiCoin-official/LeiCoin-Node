@@ -61,10 +61,10 @@ export class Block {
         if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = Uint256.alloc();
         else previousHash = previousBlock.hash;
 
-        const coinbase = Transaction.createCoinbaseTransaction(staker);
+        //const coinbase = Transaction.createCoinbaseTransaction(staker);
 
         const transactions = Object.values(mempool.transactions);
-        transactions.unshift(coinbase);
+        //transactions.unshift(coinbase);
     
         const newBlock = new Block(
             newIndex,

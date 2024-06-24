@@ -16,7 +16,7 @@ export class BlockDB {
 
     // Function to write a block
     public addBlock(block: Block, overwrite = false) {
-        const blockIndex = block.index;
+        const blockIndex = block.index.toInt().toString();
         try {
             const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
             // Check if the block file already exists.

@@ -75,12 +75,11 @@ export class Verification {
             return { status: 12504 };
         }
         
-        if (forkchain === "main" || forktype === "newfork") {
-            for (const transactionData of block.transactions) {
-                const transactionsValid = await this.verifyTransaction(transactionData);
-                if (transactionsValid !== 12000) return { status: 12520 };
-            }
+        for (const transactionData of block.transactions) {
+            const transactionsValid = await this.verifyTransaction(transactionData);
+            if (transactionsValid !== 12000) return { status: 12520 };
         }
+        
         // Ensure that the block contains valid transactions
         return { status: 12000, forkchain: forkchain, forktype: forktype, forkparent: forkparent };
     }
