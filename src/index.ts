@@ -9,7 +9,7 @@ async function main() {
     await (await import("./netInitialization.js")).default();
     (await import("./validator/index.js")).default.initIfActive();
 
-    //(await import("./pos/index.js")).default.init();
+    (await import("./pos/index.js")).default.init();
 
 }
 
