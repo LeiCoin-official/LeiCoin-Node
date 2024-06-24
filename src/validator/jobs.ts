@@ -33,11 +33,14 @@ export class AttesterJob {
 
 	public static async attest(proposition: Proposition, staker: Staker) {
 		const attestation = await this.createAttestation(proposition.block, staker);
+
 		ValidatorPipeline.broadcast(
 			LeiCoinNetDataPackageType.V_VOTE,
 			attestation.encodeToHex(),
 			attestation.attester
 		);
+
+		POS.getCurrentSlot().processAttestation(attestation);
 	}
 
 }
@@ -60,11 +63,14 @@ export class ProposerJob {
 
     public static async propose(staker: Staker) {
 		const proposition = await this.createProposition(staker);
+
 		ValidatorPipeline.broadcast(
 			LeiCoinNetDataPackageType.V_PROPOSE,
 			proposition.encodeToHex(),
 			proposition.proposer
 		);
+
+		POS.getCurrentSlot().processProposition(proposition);
 
         // Adjust the delay maybe later for faster Block times
         // await new Promise((resolve) => setTimeout(resolve, 15_000));

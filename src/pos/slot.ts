@@ -24,8 +24,7 @@ export class Slot {
         this.index = index;
         this.committee = committee;
 
-
-        this.blockSendStep = new Schedule(async()=>{this.onBlockSend(false)}, 5_000);
+        this.blockSendStep = new Schedule(async()=>{this.onBlockSend()}, 5_000);
         this.blockReceivedStep = new Schedule(async()=>{this.onBlockReceived(true)}, 10_000);
         this.blockFinalizedStep = new Schedule(async()=>{this.onBlockFinalized()}, 15_000);
     }
@@ -36,11 +35,9 @@ export class Slot {
     }
 
 
-    private async onBlockSend(timeout: boolean) {
+    private async onBlockSend() {
+        if (this.blockSendStep.hasFinished()) { return; }
         this.blockSendStep.cancel();
-        if (timeout) {
-            return;
-        }
 
         for (const staker of validator.stakers) {
             if (this.committee.isProposer(staker.address)) {
@@ -67,8 +64,6 @@ export class Slot {
 
     private async onBlockFinalized() {
         this.blockFinalizedStep.cancel();
-
-        POS.startNewSlot(this.index.add(1));
 
         const agreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree");
         const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
