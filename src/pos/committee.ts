@@ -7,7 +7,7 @@ import { Dict } from "../utils/dataUtils.js";
 abstract class VCommitteeMemberData {
 
     public readonly nonce: Uint64;
-    public readonly slashVotes: string[] = [];
+    //public readonly slashVotes: string[] = [];
 
     constructor(nonce = Uint64.from(0)) {
         this.nonce = nonce;
@@ -16,6 +16,7 @@ abstract class VCommitteeMemberData {
 
 class VCommitteeAttesterData extends VCommitteeMemberData {
     public vote: "agree" | "disagree" | "none" = "none";
+    public late_vote = false;
 }
 
 class VCommitteeProposerData extends VCommitteeMemberData {

@@ -7,7 +7,6 @@ import Schedule from "../utils/schedule.js";
 import validator from "../validator/index.js";
 import { AttesterJob, ProposerJob } from "../validator/jobs.js";
 import VCommittee from "./committee.js";
-import POS from "./index.js";
 
 export class Slot {
 

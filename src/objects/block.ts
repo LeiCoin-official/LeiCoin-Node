@@ -4,7 +4,6 @@ import blockchain from "../storage/blockchain.js";
 import cli from "../cli/cli.js";
 import Crypto from "../crypto/index.js";
 import Attestation from "./attestation.js";
-import config from "../handlers/configHandler.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";

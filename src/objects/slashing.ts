@@ -1,8 +1,8 @@
 
 
-export class Slashing {
+// export class Slashing {
 
-}
+// }
 
-export default Slashing;
+// export default Slashing;
 
