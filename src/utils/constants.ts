@@ -16,8 +16,11 @@ export class Constants {
     //static readonly MIN_VALIDATORS_SLOT = 4;
     static readonly MAX_VALIDATORS = 128;
 
-    // in percentage
-    static readonly STAKE_REWARD = 1.01;
+    // maybe later in percentage
+    static readonly STAKE_REWARD = 5_00;
+
+    // maybe later in percentage
+    static readonly SLASHING_AMOUNT = 5_00;
 
 }
 

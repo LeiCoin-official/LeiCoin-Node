@@ -1,3 +1,5 @@
+import Reward from "../objects/reward.js";
+import Slashing from "../objects/slashing.js";
 import { Uint64 } from "../utils/binary.js";
 import Constants from "../utils/constants.js";
 import { Dict } from "../utils/dataUtils.js";
@@ -6,8 +8,11 @@ import cron from "node-cron";
 
 export class POS {
 
-    private static slots: Dict<Slot> = {};
+    public static readonly slots: Dict<Slot> = {};
     private static currentSlot: Slot;
+
+    public static readonly watingSlashings: Slashing[] = [];
+    public static readonly watingRewards: Reward[] = [];
 
     public static init() {
         

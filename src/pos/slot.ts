@@ -1,12 +1,17 @@
+import { AddressHex } from "../objects/address.js";
 import Attestation from "../objects/attestation.js";
-import Block from "../objects/block.js";
-import Proposition from "../objects/proposition.js";
+import { type Block } from "../objects/block.js";
+import { type Proposition } from "../objects/proposition.js";
+import Reward from "../objects/reward.js";
+import Slashing from "../objects/slashing.js";
 import blockchain from "../storage/blockchain.js";
 import { Uint64 } from "../utils/binary.js";
+import Constants from "../utils/constants.js";
 import Schedule from "../utils/schedule.js";
 import validator from "../validator/index.js";
 import { AttesterJob, ProposerJob } from "../validator/jobs.js";
 import VCommittee from "./committee.js";
+import POS from "./index.js";
 
 export class Slot {
 
@@ -64,18 +69,35 @@ export class Slot {
     private async onBlockFinalized() {
         this.blockFinalizedStep.cancel();
 
-        const agreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "agree");
-        const disagreeVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "disagree");
-        const noneVotes = Object.values(this.committee.getAttesters()).filter(data => data.vote === "none");
+        const agreeVotes = Object.entries(this.committee.getAttesters()).filter(data => data[1].vote === "agree");
+        const disagreeVotes = Object.entries(this.committee.getAttesters()).filter(data => data[1].vote === "disagree");
+        const noneVotes = Object.entries(this.committee.getAttesters()).filter(data => data[1].vote === "none");
+
+        const reward_amount = Uint64.from(Constants.STAKE_REWARD);
+        const slashing_amount = Uint64.from(Constants.SLASHING_AMOUNT)
+
+        POS.watingSlashings.push(...noneVotes.map(data => 
+            new Slashing(AddressHex.from(data[0]), slashing_amount)
+        ));
 
         if (((agreeVotes.length + 1) >= 2/3 * this.committee.getSize()) && this.block) {
             
             blockchain.blocks.addBlock(this.block);
 
+            POS.watingRewards.push(...agreeVotes.map(data => 
+                new Reward(AddressHex.from(data[0]), slashing_amount)
+            ));
+            POS.watingSlashings.push(...disagreeVotes.map(data => 
+                new Slashing(AddressHex.from(data[0]), slashing_amount)
+            ));
+
         } else {
-
-            
-
+            POS.watingRewards.push(...disagreeVotes.map(data => 
+                new Reward(AddressHex.from(data[0]), slashing_amount)
+            ));
+            POS.watingSlashings.push(...agreeVotes.map(data => 
+                new Slashing(AddressHex.from(data[0]), slashing_amount)
+            ));
         }
     }
 

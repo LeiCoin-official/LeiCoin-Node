@@ -1,6 +1,5 @@
 import Crypto from "../crypto/index.js";
 import ValidatorPipeline from "../leicoin-net/pipelines/validators.js";
-import { AddressHex } from "../objects/address.js";
 import Attestation from "../objects/attestation.js";
 import Block from "../objects/block.js";
 import { LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
@@ -11,7 +10,6 @@ import Staker from "../objects/staker.js";
 import POS from "../pos/index.js";
 import { Uint64 } from "../utils/binary.js";
 import Verification from "../verification/index.js";
-import validator from "./index.js";
 
 export class AttesterJob {
 

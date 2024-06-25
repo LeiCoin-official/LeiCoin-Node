@@ -5,10 +5,11 @@ import { Uint, Uint64 } from "../utils/binary.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { AddressHex } from "./address.js";
 
-export class Slashing {
 
-    public readonly address: AddressHex;
-    public readonly amount: Uint64;
+export class Reward {
+
+    public address: AddressHex;
+    public amount: Uint64;
 
     constructor(address: AddressHex, amount: Uint64) {
         this.address = address;
@@ -16,16 +17,16 @@ export class Slashing {
     }
 
     public encodeToHex(forHash = false) {
-        return ObjectEncoding.encode(this, Slashing.encodingSettings, forHash).data;
+        return ObjectEncoding.encode(this, Reward.encodingSettings, forHash).data;
     }
 
     public static fromDecodedHex(hexData: Uint) {
         try {
-            const returnData = ObjectEncoding.decode(hexData, Slashing.encodingSettings);
+            const returnData = ObjectEncoding.decode(hexData, Reward.encodingSettings);
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
-                return DataUtils.createInstanceFromJSON(Slashing, data);;
+                return DataUtils.createInstanceFromJSON(Reward, data);;
             }
         } catch (err: any) {
             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
@@ -44,5 +45,5 @@ export class Slashing {
 
 }
 
-export default Slashing;
+export default Reward;
 
