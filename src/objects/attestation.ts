@@ -13,16 +13,14 @@ export class Attestation {
     public slotIndex: Uint64;
     public blockHash: Uint256;
     public vote: boolean;
-    public nonce: Uint64;
     public signature: Signature;
     public readonly version: PX;
 
-    constructor(attester: AddressHex, slotIndex: Uint64, blockHash: Uint256, vote: boolean, nonce: Uint64, signature: Signature, version = PX.V_00) {
+    constructor(attester: AddressHex, slotIndex: Uint64, blockHash: Uint256, vote: boolean, signature: Signature, version = PX.V_00) {
         this.attester = attester;
         this.slotIndex = slotIndex;
         this.blockHash = blockHash;
         this.vote = vote;
-        this.nonce = nonce;
         this.signature = signature;
         this.version = version;
     }
@@ -62,7 +60,6 @@ export class Attestation {
         {key: "slotIndex"},
         {key: "blockHash", type: "hash"},
         {key: "vote", type: "bool"},
-        {key: "nonce"},
         {key: "signature", hashRemove: true}
     ]
 

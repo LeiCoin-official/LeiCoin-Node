@@ -67,7 +67,7 @@ export class Chainstate {
             const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
             const hexData = fs.readFileSync(latestBlockInfoFilePath, { encoding: "hex" });
 
-            const data = EncodingUtils.decodeHexToString(hexData);            
+            const data = EncodingUtils.decodeHexToString(hexData);
 
             return {cb: Callbacks.SUCCESS, data: JSON.parse(data)};
         } catch (err: any) {

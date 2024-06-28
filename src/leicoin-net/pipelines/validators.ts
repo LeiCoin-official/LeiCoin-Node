@@ -15,7 +15,7 @@ export default class ValidatorPipeline {
 
         if (await Verification.verifyBlockProposition(proposition) !== 12000) return;
 
-        this.broadcast(type, data, proposition.proposer);
+        this.broadcast(type, data);
         POS.getSlot(proposition.slotIndex).processProposition(proposition);
 
     }
@@ -26,7 +26,7 @@ export default class ValidatorPipeline {
 
         if (await Verification.verifyBlockAttestation(attestation) !== 12000) return;
 
-        this.broadcast(type, data, attestation.attester);
+        this.broadcast(type, data);
         POS.getSlot(attestation.slotIndex).processAttestation(attestation);
 
     }
@@ -46,8 +46,7 @@ export default class ValidatorPipeline {
         }
     }
 
-    public static async broadcast(type: LeiCoinNetDataPackageType, data: Uint, address: AddressHex) {
-        POS.getCurrentSlot().committee.getMemberData(address);
+    public static async broadcast(type: LeiCoinNetDataPackageType, data: Uint) {
         await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
     

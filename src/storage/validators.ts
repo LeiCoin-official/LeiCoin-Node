@@ -34,15 +34,15 @@ export class ValidatorDB extends LevelBasedStorage {
 
     public async selectNextValidators(slot: Uint64) {
 
-        let validators: Uint[] = await this.level.keys({limit: 129}).all();
-        if (validators.length <= 128) {
+        let validators: Uint[] = await this.level.keys({limit: 130}).all();
+        if (validators.length <= 129) {
             return validators;
         }
 
         validators = [];
         let nextHash = Crypto.sha256(slot).split(21)[0];
 
-        while (validators.length !== 128) {
+        while (validators.length !== 129) {
             let winner = (
                 (await this.level.keys({gte: nextHash, limit: 1}).all())[0] ||
                 (await this.level.keys({lte: nextHash, limit: 1, reverse: true}).all())[0]

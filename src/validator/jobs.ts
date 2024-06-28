@@ -8,34 +8,36 @@ import Proposition from "../objects/proposition.js";
 import Signature from "../objects/signature.js";
 import Staker from "../objects/staker.js";
 import POS from "../pos/index.js";
-import { Uint64 } from "../utils/binary.js";
+import blockchain from "../storage/blockchain.js";
+import mempool from "../storage/mempool.js";
+import { Uint256, Uint64 } from "../utils/binary.js";
 import Verification from "../verification/index.js";
 
 export class AttesterJob {
 
-	private static async createAttestation(block: Block, staker: Staker) {
-
-		const vote = (await Verification.verifyBlock(block)).status === 12000;
+	private static async createAttestation(blockHash: Uint256, vote: boolean, staker: Staker) {
 		const attestation = new Attestation(
 			staker.address,
-			block.slotIndex,
-			block.hash,
+			POS.getCurrentSlot().index,
+			blockHash,
 			vote,
-			Uint64.from(0),
 			Signature.empty()
 		);
 		attestation.signature = Crypto.sign(attestation.calculateHash(), PX.A_0e, staker.privateKey);
 		return attestation;
-		
 	}
 
-	public static async attest(proposition: Proposition, staker: Staker) {
-		const attestation = await this.createAttestation(proposition.block, staker);
+	public static async attest(proposition: Proposition | null, staker: Staker) {
+		
+		const attestation = await this.createAttestation(
+			proposition?.block.hash || Uint256.alloc(),
+			proposition ? ((await Verification.verifyBlock(proposition.block)).status === 12000) : false,
+			staker
+		);
 
 		ValidatorPipeline.broadcast(
 			LeiCoinNetDataPackageType.V_VOTE,
-			attestation.encodeToHex(),
-			attestation.attester
+			attestation.encodeToHex()
 		);
 
 		POS.getCurrentSlot().processAttestation(attestation);
@@ -47,11 +49,25 @@ export class ProposerJob {
 
 	private static async createProposition(staker: Staker) {
 		const currentSlotIndex = POS.getCurrentSlot().index;
-		const block = Block.createNewBlock(currentSlotIndex, staker);
+		
+		const previousBlock = blockchain.chainstate.getLatestBlockInfo();
+		const block = new Block(
+			previousBlock?.index.add(1) || Uint64.from(0),
+			currentSlotIndex,
+			Uint256.alloc(),
+			previousBlock?.hash || Uint256.alloc(),
+			Uint64.from(new Date().getTime()),
+			staker.address,
+			POS.watingAttestations,
+			POS.watingProposerSlashings,
+			POS.watingAttesterSlashings,
+			Object.values(mempool.transactions)
+		)
+		block.hash.set(block.calculateHash());
+
 		const proposition = new Proposition(
 			staker.address,
 			currentSlotIndex,
-			Uint64.from(0),
 			Signature.empty(),
 			block
 		);
@@ -64,8 +80,7 @@ export class ProposerJob {
 
 		ValidatorPipeline.broadcast(
 			LeiCoinNetDataPackageType.V_PROPOSE,
-			proposition.encodeToHex(),
-			proposition.proposer
+			proposition.encodeToHex()
 		);
 
 		POS.getCurrentSlot().processProposition(proposition);

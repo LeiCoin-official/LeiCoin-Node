@@ -2,8 +2,6 @@ import { AddressHex } from "../objects/address.js";
 import Attestation from "../objects/attestation.js";
 import { type Block } from "../objects/block.js";
 import { type Proposition } from "../objects/proposition.js";
-import Reward from "../objects/reward.js";
-import Slashing from "../objects/slashing.js";
 import blockchain from "../storage/blockchain.js";
 import { Uint64 } from "../utils/binary.js";
 import Constants from "../utils/constants.js";
@@ -11,6 +9,7 @@ import Schedule from "../utils/schedule.js";
 import validator from "../validator/index.js";
 import { AttesterJob, ProposerJob } from "../validator/jobs.js";
 import VCommittee from "./committee.js";
+import { Execution } from "./execution.js";
 import POS from "./index.js";
 
 export class Slot {
@@ -29,7 +28,7 @@ export class Slot {
         this.committee = committee;
 
         this.blockSendStep = new Schedule(async()=>{this.onBlockSend()}, 5_000);
-        this.blockReceivedStep = new Schedule(async()=>{this.onBlockReceived(true)}, 10_000);
+        this.blockReceivedStep = new Schedule(async()=>{this.onBlockReceived(null)}, 10_000);
         this.blockFinalizedStep = new Schedule(async()=>{this.onBlockFinalized()}, 15_000);
     }
 
@@ -51,13 +50,10 @@ export class Slot {
         }
     }
 
-    private async onBlockReceived(timeout: boolean, proposition?: Proposition) {
-        this.blockReceivedStep.cancel();       
-        if (timeout || !proposition?.block) {
-            return;
-        }
+    private async onBlockReceived(proposition: Proposition | null) {
+        this.blockReceivedStep.cancel();
 
-        this.block = proposition.block;
+        if (proposition) this.block = proposition.block;
 
         for (const staker of validator.stakers) {
             if (this.committee.isAttester(staker.address)) {
@@ -68,37 +64,30 @@ export class Slot {
 
     private async onBlockFinalized() {
         this.blockFinalizedStep.cancel();
+        
+        const {agreed, disagreed, missing} = this.committee.getAllAttestations("split");
 
-        const agreeVotes = Object.entries(this.committee.getAttesters()).filter(data => data[1].vote === "agree");
-        const disagreeVotes = Object.entries(this.committee.getAttesters()).filter(data => data[1].vote === "disagree");
-        const noneVotes = Object.entries(this.committee.getAttesters()).filter(data => data[1].vote === "none");
+        // implemenzing inactivity penalty here later
 
-        const reward_amount = Uint64.from(Constants.STAKE_REWARD);
-        const slashing_amount = Uint64.from(Constants.SLASHING_AMOUNT)
+        //if (agreed.length >= 2/3 * this.committee.getSize()) 
 
-        POS.watingSlashings.push(...noneVotes.map(data => 
-            new Slashing(AddressHex.from(data[0]), slashing_amount)
-        ));
-
-        if (((agreeVotes.length + 1) >= 2/3 * this.committee.getSize()) && this.block) {
+        if (this.block) {
             
-            blockchain.blocks.addBlock(this.block);
+            const valid_status = (await Execution.executeBlock(this.block)).status;
+            
+            if (valid_status === 12000) {
+                // reward those who agreed with the proposed block and slash those who disagreed
+                POS.watingAttestations.push(...agreed);
+                POS.watingAttesterSlashings.push(...disagreed);
+                return;
+            }
 
-            POS.watingRewards.push(...agreeVotes.map(data => 
-                new Reward(AddressHex.from(data[0]), slashing_amount)
-            ));
-            POS.watingSlashings.push(...disagreeVotes.map(data => 
-                new Slashing(AddressHex.from(data[0]), slashing_amount)
-            ));
-
-        } else {
-            POS.watingRewards.push(...disagreeVotes.map(data => 
-                new Reward(AddressHex.from(data[0]), slashing_amount)
-            ));
-            POS.watingSlashings.push(...agreeVotes.map(data => 
-                new Slashing(AddressHex.from(data[0]), slashing_amount)
-            ));
         }
+
+        // reward those who disagreed with the not proposed block and slash those who agreed
+        POS.watingAttestations.push(...disagreed);
+        POS.watingAttesterSlashings.push(...agreed);
+
     }
 
 
@@ -107,7 +96,7 @@ export class Slot {
             return;
         }
         
-        this.committee.getProposerData().proposed = true;
+        this.committee.getProposer().proposed = true;
 
         this.onBlockReceived(false, proposition);
     }
@@ -116,9 +105,8 @@ export class Slot {
         if (this.blockFinalizedStep.hasFinished()) {
             return;
         }
-        const attester = this.committee.getAttesterData(attestation.attester);
-        attester.vote = attestation.vote ? "agree" : "disagree";
-        attester.nonce.iadd(1);
+
+        this.committee.getAttester(attestation.attester)!.attestation = attestation;
     }
 
 }

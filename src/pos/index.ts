@@ -1,5 +1,5 @@
-import Reward from "../objects/reward.js";
-import Slashing from "../objects/slashing.js";
+import Attestation from "../objects/attestation.js";
+import { AttesterSlashing, ProposerSlashing } from "../objects/slashing.js";
 import { Uint64 } from "../utils/binary.js";
 import Constants from "../utils/constants.js";
 import { Dict } from "../utils/dataUtils.js";
@@ -11,8 +11,9 @@ export class POS {
     public static readonly slots: Dict<Slot> = {};
     private static currentSlot: Slot;
 
-    public static readonly watingSlashings: Slashing[] = [];
-    public static readonly watingRewards: Reward[] = [];
+    public static readonly watingAttestations: Attestation[] = [];
+    public static readonly watingProposerSlashings: ProposerSlashing[] = [];
+    public static readonly watingAttesterSlashings: AttesterSlashing[] = [];
 
     public static init() {
         

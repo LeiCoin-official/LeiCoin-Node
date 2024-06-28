@@ -94,12 +94,11 @@ export class Verification {
         if (proposition.slotIndex.eqn(currentSlot.index)) return 12540;
         if (currentSlot.blockFinalizedStep.hasFinished()) return 12541;
 
-        if (!currentSlot.committee.isProposer(proposition.proposer)) return 12551;
+        const proposerData = currentSlot.committee.getProposer();
+        if (!proposerData) return 12551;
 
-        const proposerData = currentSlot.committee.getProposerData();
-
+        // if already proposed
         if (proposerData.proposed) return 12552;
-        if (proposition.nonce.eqn(proposerData.nonce)) return 12508;
 
         return 12000;
 
@@ -115,12 +114,11 @@ export class Verification {
         if (attestation.slotIndex.eqn(currentSlot.index)) return 12540;
         if (currentSlot.blockReceivedStep.hasFinished()) return 12541;
 
-        if (!currentSlot.committee.isAttester(attestation.attester)) return 12561;
+        const attesterData = currentSlot.committee.getAttester(attestation.attester);
+        if (!attesterData) return 12561;
 
-        const attesterData = currentSlot.committee.getAttesterData(attestation.attester);
-
-        if (attesterData.vote !== "none") return 12562;
-        if (attestation.nonce.eqn(attesterData.nonce)) return 12508;
+        // if already attested
+        if (attesterData.attestation) return 12562;
 
         return 12000;
 

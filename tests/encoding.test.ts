@@ -15,9 +15,19 @@ describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
-        const staker = new Staker(PrivateKey.empty(), address);
 
-        const block = Block.createNewBlock(Uint64.from(0), staker, [], []);
+        const block = new Block(
+            Uint64.from(0),
+            Uint64.from(0),
+            Uint256.empty(),
+            Uint256.empty(),
+            Uint64.from(0),
+            address,
+            [],
+            [],
+            [],
+            []
+        )
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
         const decoded2 = Block.fromDecodedHex(decoded.encodeToHex());
@@ -49,7 +59,6 @@ describe('encoding_testing', () => {
             Uint64.from(0),
             Uint256.empty(),
             true,
-            Uint64.from(0),
             Signature.empty()
         );
 
@@ -61,14 +70,23 @@ describe('encoding_testing', () => {
     test('proposition_enoding_and_decoding', () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
-        const staker = new Staker(PrivateKey.empty(), address);
 
         const proposition = new Proposition(
             address,
             Uint64.from(0),
-            Uint64.from(0),
             Signature.empty(),
-            Block.createNewBlock(Uint64.from(0), staker, [], [])
+            new Block(
+                Uint64.from(0),
+                Uint64.from(0),
+                Uint256.empty(),
+                Uint256.empty(),
+                Uint64.from(0),
+                address,
+                [],
+                [],
+                [],
+                []
+            )
         );
 
         const decoded: any = Proposition.fromDecodedHex(proposition.encodeToHex());

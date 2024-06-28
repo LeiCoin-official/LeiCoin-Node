@@ -1,6 +1,4 @@
 import { Transaction } from "./transaction.js";
-import mempool from "../storage/mempool.js";
-import blockchain from "../storage/blockchain.js";
 import cli from "../cli/cli.js";
 import Crypto from "../crypto/index.js";
 import { DataUtils } from "../utils/dataUtils.js";
@@ -8,9 +6,9 @@ import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { PX } from "./prefix.js";
-import Staker from "./staker.js";
-import Reward from "./reward.js";
-import Slashing from "./slashing.js";
+import Attestation from "./attestation.js";
+import { AttesterSlashing, ProposerSlashing } from "./slashing.js";
+import Proposition from "./proposition.js";
 
 export class Block {
 
@@ -20,8 +18,9 @@ export class Block {
     public previousHash: Uint256;
     public timestamp: Uint64;
     public proposer: AddressHex;
-    public rewards: Reward[];
-    public slashings: Slashing[];
+    public attestations: Attestation[];
+    public proposer_slashings: ProposerSlashing[];
+    public attester_slashings: AttesterSlashing[];
     public transactions: Transaction[];
     public version: PX;
 
@@ -32,8 +31,9 @@ export class Block {
         previousHash: Uint256,
         timestamp: Uint64,
         proposer: AddressHex,
-        rewards: Reward[],
-        slashings: Slashing[],
+        attestations: Attestation[],
+        proposer_slashings: ProposerSlashing[],
+        attester_slashings: AttesterSlashing[],
         transactions: Transaction[],
         version = PX.A_00
     ) {
@@ -44,46 +44,12 @@ export class Block {
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.proposer = proposer;
-        this.rewards = rewards;
-        this.slashings = slashings;
+        this.attestations = attestations;
+        this.proposer_slashings = proposer_slashings;
+        this.attester_slashings = attester_slashings;
         this.transactions = transactions;
         this.version = version;
 
-    }
-
-    public static createNewBlock(slotIndex: Uint64, staker: Staker, watingRewards: Reward[], watingSlashings: Slashing[]) {
-        
-        const previousBlock = blockchain.chainstate.getLatestBlockInfo();
-    
-        let newIndex: Uint64;
-        let previousHash: Uint256;
-    
-        if (!previousBlock || (typeof(previousBlock.index) !== 'number')) newIndex = Uint64.alloc();
-        else newIndex = previousBlock.index, "1";
-    
-        if (!previousBlock || (typeof(previousBlock.hash) !== 'string')) previousHash = Uint256.alloc();
-        else previousHash = previousBlock.hash;
-
-        //const coinbase = Transaction.createCoinbaseTransaction(staker);
-
-        const transactions = Object.values(mempool.transactions);
-        //transactions.unshift(coinbase);
-    
-        const newBlock = new Block(
-            newIndex,
-            slotIndex,
-            Uint256.alloc(),
-            previousHash,
-            Uint64.from(new Date().getTime()),
-            staker.address,
-            watingRewards,
-            watingSlashings,
-            transactions
-        );
-        
-        newBlock.hash.set(newBlock.calculateHash());
-
-        return newBlock;
     }
 
     public encodeToHex(forHash = false) {
@@ -120,9 +86,10 @@ export class Block {
         {key: "previousHash", type: "hash"},
         {key: "timestamp"},
         {key: "proposer", type: "address"},
-        {key: "rewards", type: "array", length: 1, encodeFunc: Reward.prototype.encodeToHex, decodeFunc: Reward.fromDecodedHex},
-        {key: "slashings", type: "array", length: 1, encodeFunc: Slashing.prototype.encodeToHex, decodeFunc: Slashing.fromDecodedHex},
-        {key: "transactions", type: "array", length: 1, encodeFunc: Transaction.prototype.encodeToHex, decodeFunc: Transaction.fromDecodedHex}
+        {key: "attestations", type: "array", length: 1, encodeFunc: Attestation.prototype.encodeToHex, decodeFunc: Attestation.fromDecodedHex},
+        {key: "proposer_slashings", type: "array", length: 1, encodeFunc: Proposition.prototype.encodeToHex, decodeFunc: Proposition.fromDecodedHex},
+        {key: "attester_slashings", type: "array", length: 1, encodeFunc: Attestation.prototype.encodeToHex, decodeFunc: Attestation.fromDecodedHex},
+        {key: "transactions", type: "array", length: 2, encodeFunc: Transaction.prototype.encodeToHex, decodeFunc: Transaction.fromDecodedHex}
     ]
 
     public calculateHash() {
@@ -131,4 +98,6 @@ export class Block {
 
 }
 
+
 export default Block;
+

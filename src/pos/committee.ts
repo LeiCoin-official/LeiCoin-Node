@@ -1,83 +1,114 @@
 import { AddressHex } from "../objects/address.js";
+import Attestation from "../objects/attestation.js";
 import blockchain from "../storage/blockchain.js";
 import { Uint, Uint64 } from "../utils/binary.js";
 import { Dict } from "../utils/dataUtils.js";
 
+export type AttestationListAll = (Attestation | null)[];
+export type AttestationListSorted = {
+    agreed: Attestation[];
+    disagreed: Attestation[];
+    missing: AddressHex[];
+}
 
-abstract class VCommitteeMemberData {
 
-    public readonly nonce: Uint64;
-    //public readonly slashVotes: string[] = [];
+export class VCAttester {
 
-    constructor(nonce = Uint64.from(0)) {
-        this.nonce = nonce;
+    public readonly address: AddressHex;
+    public attestation: Attestation | null;
+
+    constructor(address: AddressHex, attestation: Attestation | null = null) {
+        this.address = address;
+        this.attestation = attestation;
     }
+
 }
 
-class VCommitteeAttesterData extends VCommitteeMemberData {
-    public vote: "agree" | "disagree" | "none" = "none";
-    public late_vote = false;
+export class VCProposer {
+
+    public readonly address: AddressHex;
+    public proposed: boolean = false;
+
+    constructor(address: AddressHex) {
+        this.address = address;
+    }
+
 }
-
-class VCommitteeProposerData extends VCommitteeMemberData {
-    public proposed = false;
-}
-
-
-type VCommitteeAttesterList = Dict<VCommitteeAttesterData>;
-type VCommitteeProposer = [string, VCommitteeProposerData];
 
 
 export class VCommittee {
 
-    private readonly attesters: VCommitteeAttesterList;
-    private readonly proposer: VCommitteeProposer;
+    private readonly attesters: VCAttester[];
+    private readonly proposer: VCProposer;
+
     private readonly size: number;
 
-    private constructor(attesters: VCommitteeAttesterList, proposer: VCommitteeProposer) {
+    private constructor(attesters: VCAttester[], proposer: VCProposer) {
         this.attesters = attesters;
         this.proposer = proposer;
-        this.size = Object.keys(attesters).length + 1;
+        this.size = attesters.length;
     }
 
     public static async create(slotIndex: Uint64) {
         const members = await blockchain.validators.selectNextValidators(slotIndex);
-        const proposer: VCommitteeProposer = [(members.shift() as Uint).toHex(), new VCommitteeProposerData()];
-        const attesters: VCommitteeAttesterList = {};
-        for (const [, address] of members.entries()) {
-            attesters[new AddressHex(address).toHex()] = new VCommitteeAttesterData();
-        }
+
+        const proposer = new VCProposer(new AddressHex(members.shift() as Uint));
+        const attesters = members.map((address) => new VCAttester(new AddressHex(address)));
+
         return new VCommittee(attesters, proposer);
     }
 
-    public getMemberData(address: AddressHex) {
-        return this.attesters[address.toHex()] || this.proposer[1];
-    }
-
-    public getAttesters() {
+    public getAllAttesters() {
         return this.attesters;
     }
+    
+    public getAllAttestations(sort?: "all"): (Attestation | null)[];
+    public getAllAttestations(sort: "split"): {agreed: Attestation[]; disagreed: Attestation[]; missing: AddressHex[]}
+    public getAllAttestations(sort: "all" | "split" = "all") {
+        switch (sort) {
+            case "all": {
+                return this.attesters.map((attester) => attester.attestation);
+            }
+            case "split": {
 
-    public getAttesterData(address: AddressHex) {
-        return this.attesters[address.toHex()];
+                const agreed: Attestation[] = [];
+                const disagreed: Attestation[] = [];
+                const missing: AddressHex[] = [];
+
+                for (const attester of this.attesters) {
+                    if (!attester.attestation) {
+                        missing.push(attester.address);
+                        continue;
+                    }
+                    attester.attestation.vote ?
+                        agreed.push(attester.attestation) :
+                        disagreed.push(attester.attestation);
+                }
+
+                return { agreed, disagreed, missing };
+
+            }
+        }
+    }
+
+    public getAttester(address: AddressHex) {
+        return this.attesters.find((attester) => attester.address.eq(address));
     }
 
     public isAttester(address: AddressHex) {
-        return address.toHex() in this.attesters;
+        return this.attesters.some((attester) => attester.address.eq(address));
     }
 
     public getProposer() {
         return this.proposer;
     }
 
-    public getProposerData() {
-        return this.proposer[1];
-    }
-
     public isProposer(address: AddressHex) {
-        return this.proposer[0] === address.toHex();
+        return this.proposer.address.eq(address);
     }
 
+
+    /** Returns the number of Attesters */
     public getSize() {
         return this.size;
     }
