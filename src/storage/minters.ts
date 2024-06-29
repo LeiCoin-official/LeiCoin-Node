@@ -1,11 +1,11 @@
-import Validator from "../objects/validator.js";
+import Validator from "../objects/minter.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Crypto from "../crypto/index.js";
 import { LevelBasedStorage } from "./storageTypes.js";
 
-export class ValidatorDB extends LevelBasedStorage {
+export class MinterDB extends LevelBasedStorage {
 
     protected path = "/validators";
 
@@ -32,30 +32,14 @@ export class ValidatorDB extends LevelBasedStorage {
 
     }
 
-    public async selectNextValidators(slot: Uint64) {
-
-        let validators: Uint[] = await this.level.keys({limit: 130}).all();
-        if (validators.length <= 129) {
-            return validators;
-        }
-
-        validators = [];
-        let nextHash = Crypto.sha256(slot).split(21)[0];
-
-        while (validators.length !== 129) {
-            let winner = (
-                (await this.level.keys({gte: nextHash, limit: 1}).all())[0] ||
-                (await this.level.keys({lte: nextHash, limit: 1, reverse: true}).all())[0]
-            );
-            if (!validators.some(item => item.eq(winner))) {
-                validators.push(winner);
-            }
-            nextHash = Crypto.sha256(nextHash).split(21)[0];
-        }
-        return validators;
-
+    public async selectNextMinter(slot: Uint64) {
+        let slotHash = Crypto.sha256(slot).split(21)[0];
+        return new AddressHex(
+            (await this.level.keys({gte: slotHash, limit: 1}).all())[0] ||
+            (await this.level.keys({lte: slotHash, limit: 1, reverse: true}).all())[0]
+        );
     }
 
 }
 
-export default ValidatorDB;
+export default MinterDB;

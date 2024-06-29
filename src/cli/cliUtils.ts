@@ -12,7 +12,7 @@ export class CLIUtils {
     }
 
     public static invalidNumberOfArguments(): void {
-        cli.default_message.info("Invalid number of arguments!");
+        cli.default.info("Invalid number of arguments!");
     }
 
 }

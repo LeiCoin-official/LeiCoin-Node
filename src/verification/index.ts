@@ -1,8 +1,6 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
 import blockchain from "../storage/blockchain.js";
-import Proposition from "../objects/proposition.js";
-import Attestation from "../objects/attestation.js";
 import POS from "../pos/index.js";
 import { VCode } from "./codes.js";
 import { AddressHex } from "../objects/address.js";
@@ -15,10 +13,10 @@ interface BlockValidationValidResult {
     forktype: "child" | "newfork";
     forkparent: string;
 }
-
 interface BlockValidationInvalidResult {
     status: Exclude<VCode, 12000>;
 }
+export type BlockValidationResult = BlockValidationValidResult | BlockValidationInvalidResult;
 
 
 export class Verification {
@@ -40,7 +38,7 @@ export class Verification {
         return 12000;
     }
 
-    public static async verifyBlock(block: Block): Promise<BlockValidationValidResult | BlockValidationInvalidResult> {
+    public static async verifyBlock(block: Block): Promise<BlockValidationResult> {
 
         if (!block) return { status: 12501 };
 
@@ -84,41 +82,14 @@ export class Verification {
         return { status: 12000, forkchain: forkchain, forktype: forktype, forkparent: forkparent };
     }
 
-    public static async verifyBlockProposition(proposition: Proposition | null): Promise<VCode> {
-
-        if (!proposition) return 12501;
-
-        const currentSlot = POS.getCurrentSlot();
-
-        // the following two lines do pretty much the same thing, but I keep it because we don't know if that will still be the case later
-        if (proposition.slotIndex.eqn(currentSlot.index)) return 12540;
-        if (currentSlot.blockFinalizedStep.hasFinished()) return 12541;
-
-        const proposerData = currentSlot.committee.getProposer();
-        if (!proposerData) return 12551;
-
-        // if already proposed
-        if (proposerData.proposed) return 12552;
-
-        return 12000;
-
-    }
-
-    public static async verifyBlockAttestation(attestation: Attestation | null): Promise<VCode> {
-
-        if (!attestation) return 12501;
+    public static async verifyMintedBlock(block: Block | null): Promise<VCode> {
+        if (!block) return 12501;
 
         const currentSlot = POS.getCurrentSlot();
 
-        // the following two lines do pretty much the same thing, but I keep it because we don't know if that will still be the case later
-        if (attestation.slotIndex.eqn(currentSlot.index)) return 12540;
-        if (currentSlot.blockReceivedStep.hasFinished()) return 12541;
-
-        const attesterData = currentSlot.committee.getAttester(attestation.attester);
-        if (!attesterData) return 12561;
-
-        // if already attested
-        if (attesterData.attestation) return 12562;
+        if (block.slotIndex.eqn(currentSlot.index)) return 12540;
+        if (block.minter.eqn(currentSlot.minter)) return 12534;
+        if (currentSlot.block) return 12535;
 
         return 12000;
 

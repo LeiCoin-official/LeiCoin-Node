@@ -2,27 +2,19 @@ import cli from "../cli/cli.js";
 import { type Block } from "../objects/block.js";
 import blockchain from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
-import Verification from "../verification/index.js";
-import { type VCommittee } from "./committee.js";
-import POS from "./index.js";
+import { type BlockValidationResult } from "../verification/index.js";
 
 
 export class Execution {
 
-    static async executeBlock(block: Block): ReturnType<typeof Verification.verifyBlock> {
-
-        if (!block || !blockchain.chainstate.isBlockChainStateMatching(block).valid) {
-            return {status: 12533};
-        }
-    
-        const validationresult = await Verification.verifyBlock(block);
+    static async executeBlock(block: Block, validationresult: BlockValidationResult) {
     
         if (validationresult.status !== 12000) {
-            cli.leicoin_net_message.server.info(`Block with hash ${block.hash} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
-            return validationresult;
+            cli.leicoin_net.server.info(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
+            return;
         }
 
-        if (validationresult.forktype = "newfork") {
+        if (validationresult.forktype === "newfork") {
             blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);
         }
     
@@ -39,8 +31,7 @@ export class Execution {
             await blockchain.wallets.adjustWalletsByBlock(block);
         }
         
-        cli.leicoin_net_message.server.success(`Block with hash ${block.hash} has been validated, executed and added to Blockchain.`);
-        return validationresult;
+        cli.leicoin_net.server.success(`Block with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain.`);
     }
 
 }

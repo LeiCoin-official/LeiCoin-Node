@@ -3,8 +3,9 @@ import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
+import { PrivateKey } from "../crypto/cryptoKeys.js";
 
-export class Validator {
+export class Minter {
 
     public address: AddressHex;
     private stake: Uint64;
@@ -25,19 +26,19 @@ export class Validator {
     }
 
     public encodeToHex() {
-        return ObjectEncoding.encode(this, Validator.encodingSettings, false).data;
+        return ObjectEncoding.encode(this, Minter.encodingSettings, false).data;
     }
 
     public static fromDecodedHex(address: AddressHex, hexData: Uint) {
         try {
-            const resultData = ObjectEncoding.decode(hexData, Validator.encodingSettings);
+            const resultData = ObjectEncoding.decode(hexData, Minter.encodingSettings);
             const data = resultData.data;
         
             if (data && data.version.eq(0)) {
-                return new Validator(address, data.stake, data.version);
+                return new Minter(address, data.stake, data.version);
             }
         } catch (err: any) {
-            cli.data_message.error(`Error loading Validator from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Validator from Decoded Hex: ${err.message}`);
         }
         return null;
     }
@@ -50,4 +51,16 @@ export class Validator {
 
 }
 
-export default Validator;
+export class MinterCredentials {
+
+	public readonly privateKey: PrivateKey;
+	public readonly address: AddressHex;
+
+    constructor(privateKey: PrivateKey, address: AddressHex) {
+        this.privateKey = privateKey;
+        this.address = address;
+    }
+
+}
+
+export default Minter;

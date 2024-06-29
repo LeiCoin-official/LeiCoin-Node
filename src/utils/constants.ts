@@ -6,21 +6,20 @@ export class Constants {
     // please change this value when using in MainNet
     static readonly GENESIS_TIME = 1718841600_000;
 
-    // 15000 milliseconds (= 15 seconds)
-    static readonly BLOCK_TIME = 15_000;
+    // 5000 milliseconds (= 5 seconds) the goal is to reach 1 second later
+    static readonly SLOT_TIME = 5_000;
+
+    // SLOT_TIME in Seconds * 2.000 = 10.000 Transactions per Block. Ideal is 2.000 Transactions per Block when we have 1 second Slot Time later
+    static readonly TRANSACTIONS_PER_BLOCK = this.SLOT_TIME * 2;
     
-    //static readonly BLOCKS_PER_EPOCH = 32;
-    //static readonly LAST_EPOCH_SLOT = 31;
-
-    //static readonly MIN_VALIDATORS_EPOCH = 8;
-    //static readonly MIN_VALIDATORS_SLOT = 4;
-    static readonly MAX_VALIDATORS = 128;
+    // 100.000.00 Leis = 100.000,00 LeiCoins
+    static readonly MINTER_JOIN_AMOUNT = 100_000_00;
 
     // maybe later in percentage
-    static readonly STAKE_REWARD = 5_00;
+    static readonly MINTING_REWARD = 4_000_00;
 
     // maybe later in percentage
-    static readonly SLASHING_AMOUNT = 5_00;
+    static readonly SLASHING_AMOUNT = 3_000_00;
 
 }
 

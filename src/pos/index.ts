@@ -1,5 +1,3 @@
-import Attestation from "../objects/attestation.js";
-import { AttesterSlashing, ProposerSlashing } from "../objects/slashing.js";
 import { Uint64 } from "../utils/binary.js";
 import Constants from "../utils/constants.js";
 import { Dict } from "../utils/dataUtils.js";
@@ -11,13 +9,9 @@ export class POS {
     public static readonly slots: Dict<Slot> = {};
     private static currentSlot: Slot;
 
-    public static readonly watingAttestations: Attestation[] = [];
-    public static readonly watingProposerSlashings: ProposerSlashing[] = [];
-    public static readonly watingAttesterSlashings: AttesterSlashing[] = [];
-
     public static init() {
         
-        const task = cron.schedule('0,15,30,45 * * * * *', () => {
+        const task = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
             const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
             //this.endSlot(this.currentSlot.index);
             this.startNewSlot(currentSlotIndex);
@@ -29,7 +23,7 @@ export class POS {
 
     public static calulateCurrentSlotIndex() {
         return Math.floor(
-            (Date.now() - Constants.GENESIS_TIME) / Constants.BLOCK_TIME
+            (Date.now() - Constants.GENESIS_TIME) / Constants.SLOT_TIME
         );
     }
 

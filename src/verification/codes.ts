@@ -48,19 +48,12 @@ export const VCodes = {
     12532: "Invalid Block Index",
     12533: "Block not matching Chainstate",
 
-    // Validators Messages
+    12534: "Invalid Minter for Slot",
+    12535: "Minter has already send a Block",
+
+    // Minter Messages
     12540: "Invalid Slot",
     12541: "Time Window has expired",
-
-    // Proposition Only
-    12550: "Invalid Proposition",
-    12551: "Invalid Proposer for Slot",
-    12552: "Proposer has already proposed",
-
-    // Attestation Only
-    12560: "Invalid Attestation",
-    12561: "Invalid Attester for Slot",
-    12562: "Attester has already attested",
     
 };
 

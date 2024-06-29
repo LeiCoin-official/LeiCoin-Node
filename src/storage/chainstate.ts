@@ -10,14 +10,8 @@ export interface SingleChainstateData {
     parent: {
         name: string;
     };
-    base: {
-        index: Uint64;
-        hash: Uint256;
-    };
-    previousBlockInfo: {
-        index: Uint64;
-        hash: Uint256;
-    };
+    base: Block;
+    previousBlockInfo: Block;
     latestBlockInfo: Block;
 }
 
@@ -71,7 +65,7 @@ export class Chainstate {
 
             return {cb: Callbacks.SUCCESS, data: JSON.parse(data)};
         } catch (err: any) {
-            cli.data_message.error(`Error reading latest block info: ${err.message}`);
+            cli.data.error(`Error reading latest block info: ${err.message}`);
             return {cb: Callbacks.ERROR, data: { version: "00", chains: {} }};
         }
     }
@@ -80,13 +74,18 @@ export class Chainstate {
         try {
 
             const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
-
-            const hexData = EncodingUtils.encodeStringToHex(JSON.stringify(this.chainStateData));
+            
+            const hexData = EncodingUtils.encodeStringToHex(JSON.stringify(this.chainStateData, (key, value) => {
+                if (value instanceof Block) {
+                    return value.encodeToHex().toHex();
+                }
+                return value;
+            }));
     
             fs.writeFileSync(latestBlockInfoFilePath, hexData, { encoding: "hex" });
             return {cb: Callbacks.SUCCESS};
         } catch (err: any) {
-            cli.data_message.error(`Error updating Chainstate File: ${err.message}`);
+            cli.data.error(`Error updating Chainstate File: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
     }
@@ -120,7 +119,7 @@ export class Chainstate {
 
             return {cb: Callbacks.SUCCESS};
         } catch (err: any) {
-            cli.data_message.error(`Error updating Chainstate: ${err.message}`);
+            cli.data.error(`Error updating Chainstate: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
 
@@ -170,7 +169,7 @@ export class Chainstate {
             const previousBlockInfo = chainData.previousBlockInfo;
             const latestBlockInfo = chainData.latestBlockInfo;
 
-            if (latestBlockInfo.hash === block.hash) {
+            if (latestBlockInfo.hash.eq(block.hash)) {
 
                 return { valid: false, status: 400, message: 'Bad Request. Block aleady exists.' };
 

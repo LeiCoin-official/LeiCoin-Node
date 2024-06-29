@@ -1,13 +1,13 @@
 import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
-import Validator from "../../objects/validator.js";
+import Validator from "../../objects/minter.js";
 import blockchain from "../../storage/blockchain.js";
 import { Uint, Uint64 } from "../../utils/binary.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
 
-export default class ValidatorDBCMD extends CLISubCMD {
+export default class MinterDBCMD extends CLISubCMD {
     public name = "vsdb";
     public description = "Manage the validator database";
     public usage = "vsdb <command> [args]";
@@ -33,9 +33,9 @@ class ReadCMD extends CLICMD {
         }
 
         if (args[0] === "all") {
-            cli.default_message.info(
+            cli.default.info(
                 "Validators:\n" + 
-                (await blockchain.validators.getAllVAddresses()).map((address) => {
+                (await blockchain.minters.getAllVAddresses()).map((address) => {
                     return address.toHex();
                 }).join("\n")
             );
@@ -43,9 +43,9 @@ class ReadCMD extends CLICMD {
         }
 
         const validatorAddress = args[0];
-        const validator = await blockchain.validators.getValidator(AddressHex.from(validatorAddress));
+        const validator = await blockchain.minters.getValidator(AddressHex.from(validatorAddress));
         if (validator) {
-            cli.default_message.info(JSON.stringify(validator, (key, value) => {
+            cli.default.info(JSON.stringify(validator, (key, value) => {
                 if (value instanceof Uint64) {
                     return (value.toInt() / 1_0000_0000).toFixed(8);
                 } else if (value instanceof Uint) {
@@ -54,7 +54,7 @@ class ReadCMD extends CLICMD {
                 return value;
             }));
         } else {
-            cli.default_message.info("Validator not found!");
+            cli.default.info("Validator not found!");
         }
 
     }
@@ -72,8 +72,8 @@ class InsertCMD extends CLICMD {
         }
 
         const validator = new Validator(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
-        await blockchain.validators.setValidator(validator);
-        cli.default_message.info("Validator inserted!");
+        await blockchain.minters.setValidator(validator);
+        cli.default.info("Validator inserted!");
     }
 }
 
@@ -88,12 +88,12 @@ class RemoveCMD extends CLICMD {
             return;
         }
 
-        const validator = await blockchain.validators.getValidator(AddressHex.from(args[0]));
+        const validator = await blockchain.minters.getValidator(AddressHex.from(args[0]));
         if (validator) {
-            await blockchain.validators.removeValidator(validator);
-            cli.default_message.info("Validator removed!");
+            await blockchain.minters.removeValidator(validator);
+            cli.default.info("Validator removed!");
         } else {
-            cli.default_message.info("Validator not found!");
+            cli.default.info("Validator not found!");
         }
 
     }

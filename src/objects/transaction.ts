@@ -8,7 +8,7 @@ import { DataUtils } from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Signature from "./signature.js";
 import { PX } from "./prefix.js";
-import Staker from "./staker.js";
+import { MinterCredentials } from "./minter.js";
 
 export class Transaction {
 
@@ -44,12 +44,12 @@ export class Transaction {
         this.version = version;
     }
 
-    public static createCoinbaseTransaction(staker: Staker) {
+    public static createCoinbaseTransaction(mc: MinterCredentials) {
 
         const coinbase = new Transaction(
             Uint256.alloc(),
             AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
-            staker.address,
+            mc.address,
             Uint64.from(utils.mining_pow),
             Uint64.from(0),
             Uint64.from(new Date().getTime()),
@@ -88,7 +88,7 @@ export class Transaction {
                 return instance;
             }
         } catch (err: any) {
-            cli.data_message.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
         }
         return null;
     }

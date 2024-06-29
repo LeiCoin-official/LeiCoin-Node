@@ -23,10 +23,10 @@ class BCUtils {
         try {
             if (!fs.existsSync(fullDirectoryPath)) {
                 fs.mkdirSync(fullDirectoryPath, { recursive: true });
-                cli.data_message.info(`Directory ${directoryPath} was created because it was missing.`);
+                cli.data.info(`Directory ${directoryPath} was created because it was missing.`);
             }
         } catch (err: any) {
-            cli.data_message.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
+            cli.data.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
         }
     }
     
@@ -37,14 +37,14 @@ class BCUtils {
             const dir = path.dirname(fullFilePath);
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
-                cli.data_message.info(`Directory ${dir} was created because it was missing.`);
+                cli.data.info(`Directory ${dir} was created because it was missing.`);
             }
             if (!fs.existsSync(fullFilePath)) {
                 fs.writeFileSync(fullFilePath, content, { encoding });
-                cli.data_message.info(`File ${filePath} was created because it was missing.`);
+                cli.data.info(`File ${filePath} was created because it was missing.`);
             }
         } catch (err: any) {
-            cli.data_message.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
+            cli.data.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
         }
     }
     

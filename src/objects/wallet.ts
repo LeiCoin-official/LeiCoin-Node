@@ -35,7 +35,7 @@ export class Wallet {
                 return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }
         } catch (err: any) {
-            cli.data_message.error(`Error loading Wallet from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Wallet from Decoded Hex: ${err.message}`);
         }
         return null;
     }

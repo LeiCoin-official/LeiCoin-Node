@@ -6,8 +6,8 @@ export enum LeiCoinNetDataPackageType {
     MESSAGE = "0003",
 
     // V means Validator
-    V_PROPOSE = "0101",
-    V_VOTE = "0102",
+    //V_PROPOSE = "0101",
+    //V_VOTE = "0102",
     //V_SLASH_ATTESTER = "0103",
     //V_SLASH_PROPOSER = "0104",
 }

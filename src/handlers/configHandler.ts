@@ -150,7 +150,7 @@ class Config {
 
             }
         } catch (error: any) {
-            cli.data_message.error(`Error loading config configuration: ${error}`);
+            cli.data.error(`Error loading config configuration: ${error}`);
             return null;
         }
         
@@ -177,7 +177,7 @@ class Config {
                 return null;
             }
         } catch (error: any) {
-            cli.data_message.error(`Error loading peers configuration: ${error.message}`);
+            cli.data.error(`Error loading peers configuration: ${error.message}`);
             return null;
         }
     }
@@ -208,7 +208,7 @@ class Config {
                 return null
             }
         } catch (error: any) {
-            cli.data_message.error(`Error loading .env configuration: ${error.message}`);
+            cli.data.error(`Error loading .env configuration: ${error.message}`);
             return null;
         }
     }

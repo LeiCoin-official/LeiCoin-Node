@@ -105,7 +105,7 @@ class Blockchain extends Chain {
             return { cb: Callbacks.SUCCESS };
 
         } catch (err: any) {
-            cli.data_message.error(`Error transfering Fork ${fork} to Main Blockchain: ${err.message}`);
+            cli.data.error(`Error transfering Fork ${fork} to Main Blockchain: ${err.message}`);
             return { cb: Callbacks.ERROR };
         }
 

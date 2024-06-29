@@ -32,10 +32,10 @@ class Utils {
         try {
             if (!this.cli)
             this.cli = (await import("../cli/cli.js")).default;
-            this.cli.default_message.info('Shutting down...');
+            this.cli.default.info('Shutting down...');
             this.events.emit("stop_server");
             setTimeout(async() => {
-                this.cli?.default_message.info('LeiCoin-Node stopped.');
+                this.cli?.default.info('LeiCoin-Node stopped.');
                 await this.cli?.close();
                 process.exit(exitCode);
             }, 1000);

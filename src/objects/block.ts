@@ -6,9 +6,7 @@ import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import { PX } from "./prefix.js";
-import Attestation from "./attestation.js";
-import { AttesterSlashing, ProposerSlashing } from "./slashing.js";
-import Proposition from "./proposition.js";
+import Signature from "./signature.js";
 
 export class Block {
 
@@ -17,10 +15,8 @@ export class Block {
     public hash: Uint256;
     public previousHash: Uint256;
     public timestamp: Uint64;
-    public proposer: AddressHex;
-    public attestations: Attestation[];
-    public proposer_slashings: ProposerSlashing[];
-    public attester_slashings: AttesterSlashing[];
+    public minter: AddressHex;
+    public signature: Signature;
     public transactions: Transaction[];
     public version: PX;
 
@@ -30,10 +26,8 @@ export class Block {
         hash: Uint256,
         previousHash: Uint256,
         timestamp: Uint64,
-        proposer: AddressHex,
-        attestations: Attestation[],
-        proposer_slashings: ProposerSlashing[],
-        attester_slashings: AttesterSlashing[],
+        minter: AddressHex,
+        signature: Signature,
         transactions: Transaction[],
         version = PX.A_00
     ) {
@@ -43,10 +37,8 @@ export class Block {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
-        this.proposer = proposer;
-        this.attestations = attestations;
-        this.proposer_slashings = proposer_slashings;
-        this.attester_slashings = attester_slashings;
+        this.minter = minter;
+        this.signature = signature;
         this.transactions = transactions;
         this.version = version;
 
@@ -56,7 +48,7 @@ export class Block {
         return ObjectEncoding.encode(this, Block.encodingSettings, forHash).data;
     }
 
-    public static fromDecodedHex(hexData: Uint, returnLength = false) {
+    public static fromDecodedHex(hexData: Uint, returnLength = false, withMinterAddress = true) {
 
         try {
             const returnData = ObjectEncoding.decode(hexData, Block.encodingSettings, returnLength);
@@ -66,13 +58,17 @@ export class Block {
             if (data && data.version.eq(0)) {
                 const block = DataUtils.createInstanceFromJSON(Block, data);
 
+                if (withMinterAddress) {
+                    block.minter = AddressHex.fromSignature(block.calculateHash(), data.signature);
+                }
+
                 if (returnLength) {
                     return {data: block, length: returnData.length};
                 }
                 return block;
             }
         } catch (err: any) {
-            cli.data_message.error(`Error loading Block from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Block from Decoded Hex: ${err.message}`);
         }
 
         return null;
@@ -85,10 +81,7 @@ export class Block {
         {key: "hash", hashRemove: true},
         {key: "previousHash", type: "hash"},
         {key: "timestamp"},
-        {key: "proposer", type: "address"},
-        {key: "attestations", type: "array", length: 1, encodeFunc: Attestation.prototype.encodeToHex, decodeFunc: Attestation.fromDecodedHex},
-        {key: "proposer_slashings", type: "array", length: 1, encodeFunc: Proposition.prototype.encodeToHex, decodeFunc: Proposition.fromDecodedHex},
-        {key: "attester_slashings", type: "array", length: 1, encodeFunc: Attestation.prototype.encodeToHex, decodeFunc: Attestation.fromDecodedHex},
+        {key: "signature", hashRemove: true},
         {key: "transactions", type: "array", length: 2, encodeFunc: Transaction.prototype.encodeToHex, decodeFunc: Transaction.fromDecodedHex}
     ]
 

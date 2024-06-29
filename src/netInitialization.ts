@@ -18,9 +18,9 @@ export default async function initNetConnections() {
         web_server = http.createServer(initAPI())
 
         web_server.listen(config.api.port, config.api.host, () => {
-            cli.api_message.info(`API listening on ${config.api.host}:${config.api.port}`);
+            cli.api.info(`API listening on ${config.api.host}:${config.api.port}`);
         });
-        cli.api_message.info("API started");
+        cli.api.info("API started");
     }
 
     // Initialize LeiCoinNet-Server
@@ -35,15 +35,15 @@ export default async function initNetConnections() {
 
     // Listen for 'listening' event to indicate successful server start
     leiCoinNetServer.on('listening', () => {
-        cli.leicoin_net_message.server.info(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
+        cli.leicoin_net.server.info(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
     });
 
-    cli.leicoin_net_message.server.info("LeiCoinNet-Server started");
+    cli.leicoin_net.server.info("LeiCoinNet-Server started");
 
     // Initialize LeiCoinNet-Client
     //leiCoinNetClient = initLeiCoinNetClient();
     leiCoinNetClientsHandler.initAllClients();
-    cli.leicoin_net_message.client.info("LeiCoinNet-Client started");
+    cli.leicoin_net.client.info("LeiCoinNet-Client started");
 
     // handle shutdown
     utils.events.once("stop_server", function() {
@@ -51,16 +51,16 @@ export default async function initNetConnections() {
         // API shutdown
         if (web_server) {
             web_server.close();
-            cli.api_message.info(`API stopped`);
+            cli.api.info(`API stopped`);
         }
 
         // LeiCoinNet-Server shutdown
         leiCoinNetServer.close();
-        cli.leicoin_net_message.server.info(`LeiCoinNet-Server stopped`);
+        cli.leicoin_net.server.info(`LeiCoinNet-Server stopped`);
 
         // LeiCoinNet-Server shutdown
         leiCoinNetClientsHandler.shutdown();
-        cli.leicoin_net_message.client.info(`LeiCoinNet-Client stopped`);
+        cli.leicoin_net.client.info(`LeiCoinNet-Client stopped`);
     });
 
 }

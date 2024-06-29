@@ -43,14 +43,14 @@ class GenKeyPairCMD extends CLICMD {
                 prefix = PX.A_0c;
                 break;
             default:
-                cli.default_message.info("Invalid key pair type!");
+                cli.default.info("Invalid key pair type!");
                 return;
         }
 
         const addressHex = AddressHex.fromPrivateKey(prefix!, PrivateKey.from(privKey));
         const address32 = Address32.fromAddressHex(addressHex); 
 
-        cli.default_message.info(
+        cli.default.info(
             `Here is your new key pair:\n` +
             ` - Private Key: ${privKey}\n` +
             ` - AddressHex: ${addressHex.toHex()}\n` +

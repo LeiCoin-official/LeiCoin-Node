@@ -74,7 +74,7 @@ export class WalletDB extends LevelBasedStorage {
             return { cb: Callbacks.SUCCESS };
 
         } catch (err: any) {
-            cli.data_message.error(`Error updating Wallets from Block ${block.index}: ${err.message}`);
+            cli.data.error(`Error updating Wallets from Block ${block.index}: ${err.message}`);
             return { cb: Callbacks.ERROR };
         }
     }

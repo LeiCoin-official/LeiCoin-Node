@@ -3,7 +3,6 @@ import { Uint } from "../../utils/binary.js";
 import { Callbacks } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
-import ValidatorPipeline from "./validators.js";
 
 export interface PipelineLike {
     receive(type: LeiCoinNetDataPackageType, data: Uint): Promise<void>;
@@ -24,7 +23,7 @@ export class Pipelines {
     private pipelines: { [id: string]: PipelineLike } = {
         "0001": BlockPipeline,
         "0002": TransactionPipeline,
-        "01xx": ValidatorPipeline,
+        //"01xx": SomePipeline, the x is used as a wildcard
     };
 
     public async receiveData(rawData: Buffer) {

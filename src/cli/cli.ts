@@ -21,16 +21,16 @@ interface LeiCoinNetLogMessageLike {
 }
 
 export interface CLILike {
-    default_message: LogMessageLike;
-    staker_message: LogMessageLike;
-    api_message: LogMessageLike;
-    data_message: LogMessageLike;
-    leicoin_net_message: LeiCoinNetLogMessageLike;
+    default: LogMessageLike;
+    minter: LogMessageLike;
+    api: LogMessageLike;
+    data: LogMessageLike;
+    leicoin_net: LeiCoinNetLogMessageLike;
     setup(): Promise<void>;
     close(): Promise<any>;
 }
 
-class CLI {
+class CLI implements CLILike {
 
     private static instance: CLI;
 
@@ -65,11 +65,11 @@ class CLI {
         }
     }
 
-    public readonly default_message: LogMessageLike = new CLI.LogMessage('Global', '#ffffff');
-    public readonly staker_message: LogMessageLike = new CLI.LogMessage('Staker', '#00ffff');
-    public readonly api_message: LogMessageLike = new CLI.LogMessage('API', '#c724b1');
-    public readonly data_message: LogMessageLike = new CLI.LogMessage('Data', '#1711df');
-    public readonly leicoin_net_message: LeiCoinNetLogMessageLike = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
+    public readonly default: LogMessageLike = new CLI.LogMessage('Global', '#ffffff');
+    public readonly minter: LogMessageLike = new CLI.LogMessage('MinterClient', '#00ffff');
+    public readonly api: LogMessageLike = new CLI.LogMessage('API', '#c724b1');
+    public readonly data: LogMessageLike = new CLI.LogMessage('Data', '#1711df');
+    public readonly leicoin_net: LeiCoinNetLogMessageLike = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
 
     private ctx: Chalk | null = null;
 
@@ -210,11 +210,11 @@ class NoCLI implements CLILike {
         }
     }
 
-    public readonly default_message: LogMessageLike = new NoCLI.LogMessage('Global');
-    public readonly staker_message: LogMessageLike = new NoCLI.LogMessage('Staker');
-    public readonly api_message: LogMessageLike = new NoCLI.LogMessage('API');
-    public readonly data_message: LogMessageLike = new NoCLI.LogMessage('Data');
-    public readonly leicoin_net_message: LeiCoinNetLogMessageLike = new NoCLI.LeiCoinNetLogMessage('LeiCoinNet');
+    public readonly default: LogMessageLike = new NoCLI.LogMessage('Global');
+    public readonly minter: LogMessageLike = new NoCLI.LogMessage('MinterClient');
+    public readonly api: LogMessageLike = new NoCLI.LogMessage('API');
+    public readonly data: LogMessageLike = new NoCLI.LogMessage('Data');
+    public readonly leicoin_net: LeiCoinNetLogMessageLike = new NoCLI.LeiCoinNetLogMessage('LeiCoinNet');
 
     public async setup() { return; }
     public async close() { return; }

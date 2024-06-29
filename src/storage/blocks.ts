@@ -26,11 +26,11 @@ export class BlockDB {
 
                 return { cb: Callbacks.SUCCESS };
             } else {
-                cli.data_message.info(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
+                cli.data.info(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
                 return { cb: Callbacks.ERROR };
             }
         } catch (err: any) {
-            cli.data_message.error(`Error writing block ${blockIndex}: ${err.message}.`);
+            cli.data.error(`Error writing block ${blockIndex}: ${err.message}.`);
             return { cb: Callbacks.ERROR };
         }
     }
@@ -47,7 +47,7 @@ export class BlockDB {
                 return {cb: Callbacks.NONE};
             }
         } catch (err: any) {
-            cli.data_message.error(`Error reading block ${blockIndex}: ${err.message}.`);
+            cli.data.error(`Error reading block ${blockIndex}: ${err.message}.`);
             return {cb: Callbacks.ERROR};
         }
     }

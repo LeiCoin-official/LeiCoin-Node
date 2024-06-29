@@ -1,15 +1,12 @@
 import Transaction from "../src/objects/transaction.js";
 import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
-import Attestation from "../src/objects/attestation.js";
-import Proposition from "../src/objects/proposition.js";
-import Validator from "../src/objects/validator.js";
 import fs from "fs";
 import Signature from "../src/objects/signature.js";
 import { Uint256, Uint64 } from "../src/utils/binary.js";
 import { AddressHex } from "../src/objects/address.js";
-import Staker from "../src/objects/staker.js";
 import { PrivateKey } from "../src/crypto/cryptoKeys.js";
+import Minter, { MinterCredentials } from "../src/objects/minter.js";
 
 describe('encoding_testing', () => {
     test('block_enoding_and_decoding', () => {
@@ -23,9 +20,7 @@ describe('encoding_testing', () => {
             Uint256.empty(),
             Uint64.from(0),
             address,
-            [],
-            [],
-            [],
+            Signature.empty(),
             []
         )
 
@@ -50,73 +45,29 @@ describe('encoding_testing', () => {
 
         expect(JSON.stringify(decoded)).toBe(JSON.stringify(block));
     });*/
-    test('attestation_enoding_and_decoding', () => {
-
-        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
-
-        const attestation = new Attestation(
-            address,
-            Uint64.from(0),
-            Uint256.empty(),
-            true,
-            Signature.empty()
-        );
-
-        const decoded: any = Attestation.fromDecodedHex(attestation.encodeToHex());
-        const decoded2 = Attestation.fromDecodedHex(decoded.encodeToHex());
-
-        expect(JSON.stringify(decoded2)).toBe(JSON.stringify(attestation));
-    });
-    test('proposition_enoding_and_decoding', () => {
-
-        const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
-
-        const proposition = new Proposition(
-            address,
-            Uint64.from(0),
-            Signature.empty(),
-            new Block(
-                Uint64.from(0),
-                Uint64.from(0),
-                Uint256.empty(),
-                Uint256.empty(),
-                Uint64.from(0),
-                address,
-                [],
-                [],
-                [],
-                []
-            )
-        );
-
-        const decoded: any = Proposition.fromDecodedHex(proposition.encodeToHex());
-        const decoded2 = Proposition.fromDecodedHex(decoded.encodeToHex());
-
-        expect(JSON.stringify(decoded2)).toBe(JSON.stringify(proposition));
-    });
     test('transaction_enoding_and_decoding', () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
-        const staker = new Staker(PrivateKey.empty(), address);
+        const mc = new MinterCredentials(PrivateKey.empty(), address);
 
-        const tx = Transaction.createCoinbaseTransaction(staker);
+        const tx = Transaction.createCoinbaseTransaction(mc);
 
         const decoded: any = Transaction.fromDecodedHex(tx.encodeToHex());
         const decoded2 = Transaction.fromDecodedHex(decoded.encodeToHex());
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(tx));
     });
-    test('validator_enoding_and_decoding', () => {
+    test('minter_enoding_and_decoding', () => {
 
         const address = AddressHex.from("0e7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
-        const validator = new Validator(
+        const validator = new Minter(
             address,
             Uint64.from(32_0000_0000)
         );
 
-        const decoded: any = Validator.fromDecodedHex(address, validator.encodeToHex());
-        const decoded2 = Validator.fromDecodedHex(address, decoded.encodeToHex());
+        const decoded: any = Minter.fromDecodedHex(address, validator.encodeToHex());
+        const decoded2 = Minter.fromDecodedHex(address, decoded.encodeToHex());
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(validator));
 
