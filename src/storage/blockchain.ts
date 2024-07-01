@@ -50,14 +50,16 @@ class Blockchain extends Chain {
             parent: {
                 name: parentChain
             },
-            base: {
-                index: latestBlock.index,
-                hash: latestBlock.hash,
-            },
-            previousBlockInfo: {
-                index: latestBlock.index.sub(1),
-                hash: latestBlock.previousHash
-            },
+            // base: {
+            //     index: latestBlock.index,
+            //     hash: latestBlock.hash,
+            // },
+            base: latestBlock,
+            // previousBlockInfo: {
+            //     index: latestBlock.index.sub(1),
+            //     hash: latestBlock.previousHash
+            // },
+            previousBlockInfo: this.blocks.getBlock(latestBlock.index.sub(1).toHex()).data as Block,
             latestBlockInfo: latestBlock
         });
 
