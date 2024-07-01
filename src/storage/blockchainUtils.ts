@@ -2,8 +2,7 @@ import path from "path";
 import fs from "fs";
 import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
-import EncodingUtils from "../encoding/index.js";
-import { Callbacks } from "../utils/callbacks.js";
+import { Uint } from "../utils/binary.js";
 
 class BCUtils {
 
@@ -31,25 +30,34 @@ class BCUtils {
     }
     
     // Function to ensure the existence of a file
-    public static ensureFileExists(filePath: string, content = '', encoding: BufferEncoding = "utf8", fork = "main") {
+    public static ensureFileExists(
+        filePath: string,
+        content: Uint,
+        fork = "main"
+    ) {
         const fullFilePath = this.getBlockchainDataFilePath(filePath, fork);
+
         try {
             const dir = path.dirname(fullFilePath);
+
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
                 cli.data.info(`Directory ${dir} was created because it was missing.`);
             }
+
             if (!fs.existsSync(fullFilePath)) {
-                fs.writeFileSync(fullFilePath, content, { encoding });
+                fs.writeFileSync(fullFilePath, content.getRaw(), { encoding: "hex" });
                 cli.data.info(`File ${filePath} was created because it was missing.`);
             }
+
         } catch (err: any) {
             cli.data.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
         }
     }
     
     // Function to check if a file is empty or contains an empty JSON object or array
-    public static isFileNotEmpty(filePath: any, jsonFormat = '[]') {
+    /** @deprecated Needs recoding */
+    public static isFileNotEmpty(filePath: string, jsonFormat = '[]') {
         try {
             const content = fs.readFileSync(this.getBlockchainDataFilePath(filePath), 'utf8');
             let jsonData;
@@ -74,6 +82,7 @@ class BCUtils {
     }
     
     // Function to check if a directory is empty
+    /** @deprecated Needs recoding */
     public static isDirectoryNotEmpty(directoryPath: any) {
         try {
             const fullDirectoryPath = this.getBlockchainDataFilePath(directoryPath);
@@ -82,6 +91,10 @@ class BCUtils {
         } catch (err: any) {
             this.ensureDirectoryExists(directoryPath);
         }
+    }
+
+    public static readFile(filePath: any) {
+
     }
 
 }

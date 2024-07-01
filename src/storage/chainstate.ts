@@ -1,58 +1,133 @@
-import { Callbacks } from "../utils/callbacks.js";
-import fs from "fs";
 import cli from "../cli/cli.js";
+import Crypto from "../crypto/index.js";
+import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
+import Block from "../objects/block.js";
+import { PX } from "../objects/prefix.js";
+import { Uint, Uint256 } from "../utils/binary.js";
+import { Callbacks } from "../utils/callbacks.js";
+import { DataUtils, Dict } from "../utils/dataUtils.js";
 import BCUtils from "./blockchainUtils.js";
-import EncodingUtils from "../encoding/index.js";
-import Block from "../objects/block.js"
-import { Uint256, Uint64 } from "../utils/binary.js";
 
-export interface SingleChainstateData {
-    parent: {
-        name: string;
-    };
-    base: Block;
-    previousBlockInfo: Block;
-    latestBlockInfo: Block;
+
+export class ForkChainstateData {
+    public readonly parent: Uint256;
+    public readonly stateHash: Uint256;
+    public readonly base: Block;
+    public latestBlock: Block;
+
+    constructor(parent: Uint256, stateHash: Uint256, base: Block, latestBlock: Block) {
+        this.parent = parent;
+        this.stateHash = stateHash;
+        this.base = base;
+        this.latestBlock = latestBlock;
+    }
+
+    public encodeToHex(forHash = false) {
+        return ObjectEncoding.encode(this, ForkChainstateData.encodingSettings, forHash).data;
+    }
+
+    public static fromDecodedHex(hexData: Uint, returnLength = false) {
+        
+        try {
+            const returnData = ObjectEncoding.decode(hexData, ForkChainstateData.encodingSettings, returnLength);
+
+            const data = returnData.data;
+        
+            if (data && data.version.eq(0)) {
+                const forkChainstateData = DataUtils.createInstanceFromJSON(ForkChainstateData, data);
+
+                if (returnLength) {
+                    return {data: forkChainstateData, length: returnData.length};
+                }
+                return forkChainstateData;
+            }
+        } catch (err: any) {
+            cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.message}`);
+        }
+
+        return null;
+    }
+
+    public calculateHash() {
+        return Crypto.sha256(this.encodeToHex(true));
+    }
+
+    private static encodingSettings: EncodingSettings[] = [
+        {key: "parent", type: "hash"},
+        {key: "stateHash", type: "hash", hashRemove: true},
+        {key: "base", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex},
+        {key: "latestBlock", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex}
+    ]
+
 }
 
 
-export interface ChainstateData {
-    version: string;
-    chains: {
-        [fork: string]: SingleChainstateData
+export class ChainstateData {
+    public readonly chains: Dict<ForkChainstateData> = {};
+    public readonly version: PX;
+
+    constructor(chains: ForkChainstateData[], version: PX) {
+        for (const chain of chains) {
+            this.chains[chain.base.hash.toHex()] = chain;
+        }
+        this.version = version;
     }
+
+    public encodeToHex(forHash = false) {
+        return ObjectEncoding.encode(
+            {
+                version: this.version,
+                chains: Object.values(this.chains)
+            },
+            ChainstateData.encodingSettings,
+            forHash
+        ).data;
+    }
+
+    public static fromDecodedHex(hexData: Uint) {
+        
+        try {
+            const returnData = ObjectEncoding.decode(hexData, ChainstateData.encodingSettings);
+
+            const data = returnData.data;
+        
+            if (data && data.version.eq(0)) {
+                return DataUtils.createInstanceFromJSON(ChainstateData, data);
+            }
+        } catch (err: any) {
+            cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.message}`);
+        }
+
+        return null;
+    }
+
+    public calculateHash() {
+        return Crypto.sha256(this.encodeToHex(true));
+    }
+
+    private static encodingSettings: EncodingSettings[] = [
+        {key: "version"},
+        {key: "chains", type: "array", length: 2, encodeFunc: ForkChainstateData.prototype.encodeToHex, decodeFunc: ForkChainstateData.fromDecodedHex}
+    ]
+
 }
 
 export class Chainstate {
 
     private static instance: Chainstate;
-    
-    private readonly chainStateData: ChainstateData;
-  
-    private constructor() {
-        BCUtils.ensureFileExists('/chainstate.dat', EncodingUtils.encodeStringToHex(JSON.stringify(
-            {
-                version: "00",
-                chains: {
-                    main: {
-                        parent: {
-                            name: "main"
-                        },
-                        base: {},
-                        previousBlockInfo: {},
-                        latestBlockInfo: {},
-                    }
-                }
-            }
-        )), "hex");
-        this.chainStateData = this.getChainStateFile().data;
-    }
-    
+
     public static getInstance() {
         if (!Chainstate.instance) {
             Chainstate.instance = new Chainstate();
         }
         return Chainstate.instance;
+    }
+
+    private readonly chainStateData: ChainstateData;
+
+    private constructor() {
+        BCUtils.ensureFileExists('/chainstate.dat', new ChainstateData([], PX.V_00).encodeToHex());
+        this.chainStateData = this.getChainStateFile().data;
     }
 
     private getChainStateFile(): {cb: Callbacks, data: ChainstateData} {
@@ -88,104 +163,7 @@ export class Chainstate {
             cli.data.error(`Error updating Chainstate File: ${err.message}`);
             return {cb: Callbacks.ERROR};
         }
-    }
-
-    public getAllChainStates() {
-        return this.chainStateData.chains;
-    }
-
-    public getChainState(chain = "main") {
-        return this.chainStateData.chains[chain];
-    }
-
-    public setChainState(data: SingleChainstateData, chain = "main") {
-        this.chainStateData.chains[chain] = data;
-    }
-
-    public getLatestBlockInfo(chain = "main") {
-        return this.chainStateData.chains[chain].latestBlockInfo;
-    }
-
-    public updateLatestBlockInfo(latestBlockInfo: Block, chain = "main", parentChain = "main") {
-
-        try {
-            
-            const previousBlockInfo = this.chainStateData.chains[parentChain].latestBlockInfo;
-
-            this.chainStateData.chains[chain].previousBlockInfo = previousBlockInfo;
-            this.chainStateData.chains[chain].latestBlockInfo = latestBlockInfo;
-            
-            this.updateChainStateFile();
-
-            return {cb: Callbacks.SUCCESS};
-        } catch (err: any) {
-            cli.data.error(`Error updating Chainstate: ${err.message}`);
-            return {cb: Callbacks.ERROR};
-        }
-
-    }
-
-    public isValidGenesisBlock(hash: Uint256) {
-    
-        const latestANDPreviousForkBlockInfo = this.chainStateData.chains.main;
-
-        if (latestANDPreviousForkBlockInfo) {
-
-            const previousBlockInfo = latestANDPreviousForkBlockInfo.previousBlockInfo;
-            const latestBlockInfo = latestANDPreviousForkBlockInfo.latestBlockInfo;
-    
-            if (previousBlockInfo) {
-                if (previousBlockInfo.index && previousBlockInfo.hash) {
-                    return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                }
-            }
-
-            if (latestBlockInfo) {
-                if (latestBlockInfo.index && latestBlockInfo.hash) {
-                    if (latestBlockInfo.hash !== hash)
-                        return { isGenesisBlock: true, isForkOFGenesisBlock: true };
-                    return { isGenesisBlock: false, isForkOFGenesisBlock: false };
-                }
-            }
-
-        }
-        
-        return { isGenesisBlock: true, isForkOFGenesisBlock: false };
-    }
-
-    public isBlockChainStateMatching(block: Block): {
-        valid: false;
-        status: 400;
-        message: string;
-    } | {
-        valid: true;
-        name: string;
-        type: "newfork" | "child";
-        parent: string;
-    } {
-
-        for (const [chainName, chainData] of Object.entries(this.chainStateData.chains)) {
-
-            const previousBlockInfo = chainData.previousBlockInfo;
-            const latestBlockInfo = chainData.latestBlockInfo;
-
-            if (latestBlockInfo.hash.eq(block.hash)) {
-
-                return { valid: false, status: 400, message: 'Bad Request. Block aleady exists.' };
-
-            } else if ((latestBlockInfo.hash === block.previousHash) && latestBlockInfo.index.add(1).eq(block.index)) {
-
-                return { valid: true, name: chainName, type: "child", parent: chainName };
-
-            } else if ((previousBlockInfo.hash === block.previousHash) && previousBlockInfo.index.add(1).eq(block.index)) {
-
-                return { valid: true, name: block.hash.toHex(), type: "newfork", parent: chainName };
-
-            }
-        }
-
-        return { valid: false, status: 400, message: 'Bad Request. Block is not a child of a valid blockchain or forkchain' };   
-    }
+    }    
 
 }
 

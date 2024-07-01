@@ -1,4 +1,4 @@
-import { AddressHex, SpecificAddress } from "../objects/address.js";
+import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
@@ -6,9 +6,10 @@ import { Callbacks } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/dataUtils.js";
 import EncodingUtils from "./index.js";
 
-type BasicTypes = "string" | "int" | "bigint" | "array" | "bool" | "object";
-type AdvancedTypes = "address" | "validator_address" | "hash" | "signature" | "nonce" | "version";
-type DefaultDataTypes = BasicTypes | AdvancedTypes;
+type NonBinaryBasicTypes = "string" | "int";
+type BasicTypes = "bigint" | "array" | "bool" | "object";
+type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
+type DefaultDataTypes = BasicTypes | AdvancedTypes /*| NonBinaryBasicTypes*/;
 
 export interface EncodingSettings {
     key: string;
@@ -17,7 +18,7 @@ export interface EncodingSettings {
     type?: DefaultDataTypes;
     hashRemove?: boolean,
     decodeFunc?(hexData: Uint, returnLength: boolean): any;
-    encodeFunc?(add_empty_bytes: boolean, forHash: boolean): Uint;
+    encodeFunc?(forHash: boolean): Uint;
 }
 
 export interface HexDataType {
@@ -57,6 +58,17 @@ export class ObjectEncoding {
             encode: (v: any) => (v ? Uint8.from(1) : Uint8.from(0)),
             parse: (v: Uint8) => (v.eq(1))
         };
+        
+        // this.types.int = {
+        //     defaultLength: 1,
+        //     lengthBefore: true,
+        //     encode: (v: any) => Uint.from(v),
+        //     parse: (v: Uint) => v.toInt()
+        // }
+        // this.types.string = {
+        //     encode: (v: string) => Uint.from(v, "utf8"),
+        //     parse: (v: Uint) => v.getRaw().toString("utf8"),
+        // };
 
         this.types.default = {};
 
@@ -194,7 +206,7 @@ export class ObjectEncoding {
 
                 if (data.type === "object" && data.encodeFunc) {
 
-                    hexData.push(data.encodeFunc.call(value, false, false));
+                    hexData.push(data.encodeFunc.call(value, false));
 
                 } else if (data.type === "array" && data.encodeFunc) {
 
@@ -206,7 +218,7 @@ export class ObjectEncoding {
                     }
 
                     for (let item of value) {
-                        hexData.push(data.encodeFunc.call(item, false, false));
+                        hexData.push(data.encodeFunc.call(item, false));
                     }
 
                 } else {
