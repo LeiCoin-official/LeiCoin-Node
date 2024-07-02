@@ -1,6 +1,6 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import { Uint256 } from "../utils/binary.js";
 import { Dict } from "../utils/dataUtils.js";
 
@@ -40,7 +40,7 @@ class Mempool {
         }
     
         this.transactions[txid.toHex()] = transaction;
-        return { cb: Callbacks.SUCCESS };
+        return { cb: CB.SUCCESS };
     }
     
     // Function to remove a transaction from the Mempool
@@ -48,11 +48,11 @@ class Mempool {
     
         if (txid.toHex() in this.transactions) {
             delete this.transactions[txid.toHex()];
-            return { cb: Callbacks.SUCCESS };
+            return { cb: CB.SUCCESS };
         }
     
         //cli.data_message.error(`Transaction ${transactionHash} not found in the Mempool.`);
-        return { cb: Callbacks.NONE };
+        return { cb: CB.NONE };
     }
     
 

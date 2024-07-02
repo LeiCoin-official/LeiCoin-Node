@@ -1,6 +1,6 @@
 import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
 import { Uint } from "../../utils/binary.js";
-import { Callbacks } from "../../utils/callbacks.js";
+import { CB } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
 
@@ -39,7 +39,7 @@ export class Pipelines {
         }
 
         if (!matchedPipelineId) {
-            return { cb: Callbacks.NONE, message: `Unknown Data Type: ${data.type}` };
+            return { cb: CB.NONE, message: `Unknown Data Type: ${data.type}` };
         }
 
         await this.pipelines[data.type].receive(data.type, data.content);

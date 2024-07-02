@@ -1,6 +1,6 @@
-//export type Callbacks = "SUCCESS" | "NONE" | "ERROR";
+//export type CB = "SUCCESS" | "NONE" | "ERROR";
 
-export enum Callbacks {
+export enum CB {
     SUCCESS,
     NONE,
     ERROR

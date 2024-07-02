@@ -3,7 +3,7 @@ const router = express.Router();
 import Verification from "../verification/index.js";
 import utils from "../utils/index.js";
 import mempool from "../storage/mempool.js";
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
 import { VCodes } from "../verification/codes.js";
 

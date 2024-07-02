@@ -1,5 +1,5 @@
 import path from "path";
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Wallet from "../objects/wallet.js";
 import BCUtils from "./blockchainUtils.js"
@@ -71,11 +71,11 @@ export class WalletDB extends LevelBasedStorage {
     
             await Promise.all(promises);
             
-            return { cb: Callbacks.SUCCESS };
+            return { cb: CB.SUCCESS };
 
         } catch (err: any) {
             cli.data.error(`Error updating Wallets from Block ${block.index}: ${err.message}`);
-            return { cb: Callbacks.ERROR };
+            return { cb: CB.ERROR };
         }
     }
 

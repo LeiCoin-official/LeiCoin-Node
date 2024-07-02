@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import BCUtils from "./blockchainUtils.js";
 import Chainstate from "./chainstate-old.js";
@@ -97,18 +97,18 @@ class Blockchain extends Chain {
 
                 const block = this.blocks.getBlock(blockIndex).data;
                 if (!block) {
-                    return { cb: Callbacks.ERROR };
+                    return { cb: CB.ERROR };
                 }
 
                 const blockInMain = this.blocks.getBlock(blockIndex);
 
             }
 
-            return { cb: Callbacks.SUCCESS };
+            return { cb: CB.SUCCESS };
 
         } catch (err: any) {
             cli.data.error(`Error transfering Fork ${fork} to Main Blockchain: ${err.message}`);
-            return { cb: Callbacks.ERROR };
+            return { cb: CB.ERROR };
         }
 
     }

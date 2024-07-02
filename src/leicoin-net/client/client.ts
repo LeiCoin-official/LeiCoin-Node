@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 import cli from "../../cli/cli.js";
-import { Callbacks } from "../../utils/callbacks.js";
+import { CB } from "../../utils/callbacks.js";
 
 export class LeiCoinNetClient {
 
@@ -43,7 +43,7 @@ export class LeiCoinNetClient {
             try {
                 this.client.send(data);
                 //cli.leicoin_net_message.client.log(`Data sent to ${this.host}`);
-                return Callbacks.SUCCESS;
+                return CB.SUCCESS;
             } catch (err: any) {
                 cli.leicoin_net.client.error(`Error sending Binary Data to ${this.host}: ${err.message}`);
             }
@@ -54,7 +54,7 @@ export class LeiCoinNetClient {
                 return this.sendData(data, 0);
             }, 2000);
         }
-        return Callbacks.ERROR;
+        return CB.ERROR;
     }
 
     public getClient() {

@@ -1,4 +1,4 @@
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import fs from "fs";
 import cli from "../cli/cli.js";
 import BCUtils from "./blockchainUtils.js";
@@ -55,7 +55,7 @@ export class Chainstate {
         return Chainstate.instance;
     }
 
-    private getChainStateFile(): {cb: Callbacks, data: ChainstateData} {
+    private getChainStateFile(): {cb: CB, data: ChainstateData} {
         try {
 
             const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
@@ -63,10 +63,10 @@ export class Chainstate {
 
             const data = EncodingUtils.decodeHexToString(hexData);
 
-            return {cb: Callbacks.SUCCESS, data: JSON.parse(data)};
+            return {cb: CB.SUCCESS, data: JSON.parse(data)};
         } catch (err: any) {
             cli.data.error(`Error reading latest block info: ${err.message}`);
-            return {cb: Callbacks.ERROR, data: { version: "00", chains: {} }};
+            return {cb: CB.ERROR, data: { version: "00", chains: {} }};
         }
     }
     
@@ -83,10 +83,10 @@ export class Chainstate {
             }));
     
             fs.writeFileSync(latestBlockInfoFilePath, hexData, { encoding: "hex" });
-            return {cb: Callbacks.SUCCESS};
+            return {cb: CB.SUCCESS};
         } catch (err: any) {
             cli.data.error(`Error updating Chainstate File: ${err.message}`);
-            return {cb: Callbacks.ERROR};
+            return {cb: CB.ERROR};
         }
     }
 
@@ -117,10 +117,10 @@ export class Chainstate {
             
             this.updateChainStateFile();
 
-            return {cb: Callbacks.SUCCESS};
+            return {cb: CB.SUCCESS};
         } catch (err: any) {
             cli.data.error(`Error updating Chainstate: ${err.message}`);
-            return {cb: Callbacks.ERROR};
+            return {cb: CB.ERROR};
         }
 
     }

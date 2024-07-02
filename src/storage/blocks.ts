@@ -1,4 +1,4 @@
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Block from "../objects/block.js";
 import fs from "fs";
@@ -24,14 +24,14 @@ export class BlockDB {
                 // Write the block data to the block file.
                 fs.writeFileSync(blockFilePath, block.encodeToHex().getRaw(), "hex");                
 
-                return { cb: Callbacks.SUCCESS };
+                return { cb: CB.SUCCESS };
             } else {
                 cli.data.info(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
-                return { cb: Callbacks.ERROR };
+                return { cb: CB.ERROR };
             }
         } catch (err: any) {
             cli.data.error(`Error writing block ${blockIndex}: ${err.message}.`);
-            return { cb: Callbacks.ERROR };
+            return { cb: CB.ERROR };
         }
     }
 
@@ -41,14 +41,14 @@ export class BlockDB {
             const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
             if (fs.existsSync(blockFilePath)) {
                 const hexData = fs.readFileSync(blockFilePath, "hex");
-                return {cb: Callbacks.SUCCESS, data: Block.fromDecodedHex(Uint.from(hexData))};
+                return {cb: CB.SUCCESS, data: Block.fromDecodedHex(Uint.from(hexData))};
             } else {
                 //cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
-                return {cb: Callbacks.NONE};
+                return {cb: CB.NONE};
             }
         } catch (err: any) {
             cli.data.error(`Error reading block ${blockIndex}: ${err.message}.`);
-            return {cb: Callbacks.ERROR};
+            return {cb: CB.ERROR};
         }
     }
 

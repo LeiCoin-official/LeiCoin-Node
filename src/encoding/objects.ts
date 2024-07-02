@@ -2,7 +2,7 @@ import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import Signature from "../objects/signature.js";
 import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
-import { Callbacks } from "../utils/callbacks.js";
+import { CB } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/dataUtils.js";
 import EncodingUtils from "./index.js";
 
@@ -225,17 +225,17 @@ export class ObjectEncoding {
                     const hexValue = this.encodeValue(value, data);
 
                     if (!hexValue) {
-                        return { cb: Callbacks.ERROR, data: Uint.empty() };
+                        return { cb: CB.ERROR, data: Uint.empty() };
                     }
 
                     hexData.push(...hexValue);
                 }
             }
 
-            return { cb: Callbacks.SUCCESS, data: Uint.concat(hexData) };
+            return { cb: CB.SUCCESS, data: Uint.concat(hexData) };
 
         } catch (err: any) {
-            return { cb: Callbacks.ERROR, data: Uint.empty() };
+            return { cb: CB.ERROR, data: Uint.empty() };
         }
 
     }
@@ -273,7 +273,7 @@ export class ObjectEncoding {
                     } else if (data.lengthBefore === "unlimited") {
                         [arrayCount, lenghValueLen] = this.decodeLengthFromUnlimited(arrayDataWithLength);
                     } else {
-                        return { cb: Callbacks.ERROR };
+                        return { cb: CB.ERROR };
                     }
 
                     //let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
@@ -297,7 +297,7 @@ export class ObjectEncoding {
                     const value = this.decodeValue(hexData.slice(current_length), data);
 
                     if (!value) {
-                        return { cb: Callbacks.ERROR };
+                        return { cb: CB.ERROR };
                     }
                     
                     final_data[key] = value.value;
@@ -306,13 +306,13 @@ export class ObjectEncoding {
             }
         
             if (returnLength) {
-                return { cb: Callbacks.SUCCESS, data: final_data, length: current_length };
+                return { cb: CB.SUCCESS, data: final_data, length: current_length };
             }
         
-            return { cb: Callbacks.SUCCESS, data: final_data };
+            return { cb: CB.SUCCESS, data: final_data };
 
         } catch (err: any) {
-            return { cb: Callbacks.ERROR };
+            return { cb: CB.ERROR };
         }
     
     }

@@ -3,6 +3,7 @@ import fs from "fs";
 import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 import { Uint } from "../utils/binary.js";
+import { CB } from "../utils/callbacks.js";
 
 class BCUtils {
 
@@ -14,6 +15,24 @@ class BCUtils {
         }
 
         return path.join(utils.processRootDirectory, '/blockchain_data' + forkpath + subpath);
+    }
+
+    public static readFile(filePath: string, fork = "main") {
+        try {
+            const fullFilePath = this.getBlockchainDataFilePath(filePath, fork);
+            if (fs.existsSync(fullFilePath)) {
+                const data = new Uint(fs.readFileSync(fullFilePath, null));
+                return { cb: CB.SUCCESS, data };
+            } else { return { cb: CB.NONE }; }
+        } catch (error: any) { return { cb: CB.ERROR, error }; }
+    }
+
+    public static writeFile(filePath: string, data: Uint, fork = "main") {
+        try {
+            const fullFilePath = this.getBlockchainDataFilePath(filePath, fork);
+            fs.writeFileSync(fullFilePath, data.getRaw());
+            return { cb: CB.SUCCESS };
+        } catch (error: any) { return { cb: CB.ERROR, error }; }
     }
     
     // Function to ensure the existence of a directory
@@ -46,7 +65,7 @@ class BCUtils {
             }
 
             if (!fs.existsSync(fullFilePath)) {
-                fs.writeFileSync(fullFilePath, content.getRaw(), { encoding: "hex" });
+                fs.writeFileSync(fullFilePath, content.getRaw());
                 cli.data.info(`File ${filePath} was created because it was missing.`);
             }
 
@@ -55,48 +74,43 @@ class BCUtils {
         }
     }
     
-    // Function to check if a file is empty or contains an empty JSON object or array
-    /** @deprecated Needs recoding */
-    public static isFileNotEmpty(filePath: string, jsonFormat = '[]') {
-        try {
-            const content = fs.readFileSync(this.getBlockchainDataFilePath(filePath), 'utf8');
-            let jsonData;
-            try {
-                jsonData = JSON.parse(content);
-            } catch (err: any) {
-                jsonData = JSON.parse(jsonFormat);
-                this.ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
-            }
+    // // Function to check if a file is empty or contains an empty JSON object or array
+    // /** @deprecated Needs recoding */
+    // public static isFileNotEmpty(filePath: string, jsonFormat = '[]') {
+    //     try {
+    //         const content = fs.readFileSync(this.getBlockchainDataFilePath(filePath), 'utf8');
+    //         let jsonData;
+    //         try {
+    //             jsonData = JSON.parse(content);
+    //         } catch (err: any) {
+    //             jsonData = JSON.parse(jsonFormat);
+    //             this.ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
+    //         }
     
-            if (Array.isArray(jsonData)) {
-                return jsonData.length > 0;
-            } else if (typeof jsonData === 'object') {
-                return Object.keys(jsonData).length > 0;
-            }
-            return false;
-        } catch (err: any) {
-            const jsonData = JSON.parse(jsonFormat);
-            this.ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
-            return true;
-        }
-    }
+    //         if (Array.isArray(jsonData)) {
+    //             return jsonData.length > 0;
+    //         } else if (typeof jsonData === 'object') {
+    //             return Object.keys(jsonData).length > 0;
+    //         }
+    //         return false;
+    //     } catch (err: any) {
+    //         const jsonData = JSON.parse(jsonFormat);
+    //         this.ensureFileExists(filePath, JSON.stringify(jsonData, null, 2));
+    //         return true;
+    //     }
+    // }
     
-    // Function to check if a directory is empty
-    /** @deprecated Needs recoding */
-    public static isDirectoryNotEmpty(directoryPath: any) {
-        try {
-            const fullDirectoryPath = this.getBlockchainDataFilePath(directoryPath);
-            const files = fs.readdirSync(fullDirectoryPath);
-            return files.length > 0;
-        } catch (err: any) {
-            this.ensureDirectoryExists(directoryPath);
-        }
-    }
-
-    public static readFile(filePath: any) {
-
-    }
-
+    // // Function to check if a directory is empty
+    // /** @deprecated Needs recoding */
+    // public static isDirectoryNotEmpty(directoryPath: any) {
+    //     try {
+    //         const fullDirectoryPath = this.getBlockchainDataFilePath(directoryPath);
+    //         const files = fs.readdirSync(fullDirectoryPath);
+    //         return files.length > 0;
+    //     } catch (err: any) {
+    //         this.ensureDirectoryExists(directoryPath);
+    //     }
+    // }
 }
 
 export { BCUtils as BlockchainUtils };
