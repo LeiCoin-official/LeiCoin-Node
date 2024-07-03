@@ -10,7 +10,7 @@ await build({
     //external: Object.keys(dependencies),
     bundle: true,
     sourcemap: true,
-    minify: true,
+    //minify: true,
     format: 'cjs',
     //tsconfig: "tsconfig.json",
     outfile: 'build/bin/leicoin-node.cjs'
