@@ -44,9 +44,9 @@ export const VCodes = {
 
     // Block Only
     12530: "Invalid Block",
-    12531: "Invalid Previous Hash",
-    12532: "Invalid Block Index",
-    12533: "Block not matching Chainstate",
+    12531: "Invalid Block Index",
+    12532: "Block not matching Chainstate: Previous Block not found",
+    12533: "Block not matching Chainstate: Block already exists",
 
     12534: "Invalid Minter for Slot",
     12535: "Minter has already send a Block",

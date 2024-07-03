@@ -1,6 +1,7 @@
 import cli from "./cli.js";
 import { CLISubCMD } from "./cliCMD.js";
 import BlockDBCMD from "./commands/blockDBCMD.js";
+import ChainstateDataCMD from "./commands/chainstateDataCMD.js";
 import CryptoCMD from "./commands/cryptoCMD.js";
 import MinterDBCMD from "./commands/minterDBCMD.js";
 import StopCMD from "./commands/stopCMD.js";
@@ -25,6 +26,7 @@ export class CLICMDHandler extends CLISubCMD {
         this.register(new CryptoCMD());
         this.register(new MinterDBCMD());
         this.register(new BlockDBCMD());
+        this.register(new ChainstateDataCMD());
     }
 
     protected async run_empty(parent_args: string[]): Promise<void> {

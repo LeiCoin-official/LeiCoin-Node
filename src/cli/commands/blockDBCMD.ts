@@ -20,7 +20,7 @@ export default class BlockDBCMD extends CLISubCMD {
 class ReadCMD extends CLICMD {
     public name = "read";
     public description = "Read the Block database";
-    public usage = "read <index>)";
+    public usage = "read <index>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -36,7 +36,7 @@ class ReadCMD extends CLICMD {
                     return value.toHex();
                 }
                 return value;
-            }));
+            }, 2));
         } else {
             cli.default.info(`Block with Index: ${blockIndex} not found!`);
         }

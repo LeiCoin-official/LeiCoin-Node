@@ -14,18 +14,20 @@ export class Execution {
             return;
         }
 
-        if (validationresult.forktype === "newfork") {
-            blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);
+        const { targetChain, parentChain } = validationresult;
+
+        if (targetChain !== parentChain) { // New fork if targetChain is different from parentChain
+            //blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);
         }
     
-        blockchain.chains[validationresult.forkchain].blocks.addBlock(block);
-        blockchain.chainstate.updateLatestBlockInfo (
+        blockchain.chains[targetChain].blocks.addBlock(block);
+        blockchain.chainstate.updateChainStateByBlock(
+            targetChain,
+            parentChain,
             block,
-            validationresult.forkchain,
-            validationresult.forkparent
         );
     
-        if (validationresult.forkchain === "main") {
+        if (targetChain === "main") {
             mempool.clearMempoolbyBlock(block);
                
             await blockchain.wallets.adjustWalletsByBlock(block);

@@ -30,7 +30,7 @@ export class Chainstate {
     private readonly chainStateData: ChainstateData;
   
     private constructor() {
-        BCUtils.ensureFileExists('/chainstate.dat', Uint.from(EncodingUtils.encodeStringToHex(JSON.stringify(
+        BCUtils.ensureFileExists('/chainstate.lcb', 'main', Uint.from(EncodingUtils.encodeStringToHex(JSON.stringify(
             {
                 version: "00",
                 chains: {
@@ -58,7 +58,7 @@ export class Chainstate {
     private getChainStateFile(): {cb: CB, data: ChainstateData} {
         try {
 
-            const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
+            const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.lcb`);
             const hexData = fs.readFileSync(latestBlockInfoFilePath, { encoding: "hex" });
 
             const data = EncodingUtils.decodeHexToString(hexData);
@@ -73,7 +73,7 @@ export class Chainstate {
     private updateChainStateFile() {
         try {
 
-            const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.dat`);
+            const latestBlockInfoFilePath = BCUtils.getBlockchainDataFilePath(`/chainstate.lcb`);
             
             const hexData = EncodingUtils.encodeStringToHex(JSON.stringify(this.chainStateData, (key, value) => {
                 if (value instanceof Block) {

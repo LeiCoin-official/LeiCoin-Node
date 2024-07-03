@@ -1,29 +1,27 @@
 import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Block from "../objects/block.js";
-import fs from "fs";
 import BCUtils from "./blockchainUtils.js";
-import { Uint } from "../utils/binary.js";
+import { Uint64 } from "../utils/binary.js";
 
 export class BlockDB {
     
-    private chain: string
+    private chain: string;
     
     constructor(chain = "main") {
         this.chain = chain;
-        BCUtils.ensureDirectoryExists('/blocks');
+        BCUtils.ensureDirectoryExists('/blocks', this.chain);
     }
 
     // Function to write a block
     public addBlock(block: Block, overwrite = false) {
         const blockIndex = block.index.toInt().toString();
         try {
-            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
+            const blockFilePath = `/blocks/${blockIndex}.lcb`;
             // Check if the block file already exists.
-            if (!fs.existsSync(blockFilePath) || overwrite) {
+            if (!BCUtils.existsPath(blockFilePath, this.chain) || overwrite) {
                 // Write the block data to the block file.
-                fs.writeFileSync(blockFilePath, block.encodeToHex().getRaw(), "hex");                
-
+                BCUtils.writeFile(blockFilePath, this.chain, block.encodeToHex());
                 return { cb: CB.SUCCESS };
             } else {
                 cli.data.info(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
@@ -36,12 +34,14 @@ export class BlockDB {
     }
 
     // Function to read a block
-    public getBlock(blockIndex: string) {
+    public getBlock(index: Uint64 | string): { cb: CB, data?: Block | null | undefined };
+    public getBlock(index: Uint64 & string) {
+        const blockIndex = index.toInt ? index.toInt().toString() : index;
         try {
-            const blockFilePath = BCUtils.getBlockchainDataFilePath(`/blocks/${blockIndex}.lcb`, this.chain);
-            if (fs.existsSync(blockFilePath)) {
-                const hexData = fs.readFileSync(blockFilePath, "hex");
-                return {cb: CB.SUCCESS, data: Block.fromDecodedHex(Uint.from(hexData))};
+            const blockFilePath = `/blocks/${blockIndex}.lcb`;
+            if (BCUtils.existsPath(blockFilePath, this.chain)) {
+                const hexData = BCUtils.readFile(blockFilePath, this.chain);
+                return {cb: CB.SUCCESS, data: Block.fromDecodedHex(hexData) as Block | null};
             } else {
                 //cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
                 return {cb: CB.NONE};

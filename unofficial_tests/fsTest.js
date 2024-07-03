@@ -1,6 +1,7 @@
 import fs from 'fs'
 import Block from "../build/src/objects/block.js"
 import { Uint } from "../build/src/utils/binary.js"
+import path from 'path';
 
 async function read() {
     
@@ -30,5 +31,5 @@ async function write() {
 
 }
 
-
-write()
+//read()
+//write()

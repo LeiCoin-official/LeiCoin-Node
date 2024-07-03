@@ -9,9 +9,8 @@ import { PX } from "../objects/prefix.js";
 
 interface BlockValidationValidResult {
     status: 12000;
-    forkchain: string;
-    forktype: "child" | "newfork";
-    forkparent: string;
+    targetChain: string;
+    parentChain: string;
 }
 interface BlockValidationInvalidResult {
     status: Exclude<VCode, 12000>;
@@ -42,32 +41,10 @@ export class Verification {
 
         if (!block) return { status: 12501 };
 
-        let forkchain = "main";
-        let forktype: "child" | "newfork" = "child";
-        let forkparent = "main";
+        const chainstateMatch = blockchain.chainstate.isBlockChainStateMatching(block);
+        if (chainstateMatch.status !== 12000) return chainstateMatch;
 
-        if (block.index.eq(0)) {
-
-            const isGenesisBlockResult = blockchain.chainstate.isValidGenesisBlock(block.hash);
-
-            if (!isGenesisBlockResult.isGenesisBlock) return { status: 12533 };
-
-            if (isGenesisBlockResult.isForkOFGenesisBlock) {
-                forkchain = block.hash.toHex();
-                forktype = "newfork";
-            }
-
-        } else {
-
-            const chainstateMatch = blockchain.chainstate.isBlockChainStateMatching(block);
-
-            if (!chainstateMatch.valid) return { status: 12533 };
-
-            forkchain = chainstateMatch.name;
-            forktype = chainstateMatch.type;
-            forkparent = chainstateMatch.parent;
-
-        }
+        let { targetChain, parentChain } = chainstateMatch;
         
         if (block.calculateHash().eqn(block.hash)) {
             return { status: 12504 };
@@ -79,7 +56,7 @@ export class Verification {
         }
         
         // Ensure that the block contains valid transactions
-        return { status: 12000, forkchain: forkchain, forktype: forktype, forkparent: forkparent };
+        return { status: 12000, targetChain: targetChain, parentChain: parentChain };
     }
 
     public static async verifyMintedBlock(block: Block | null): Promise<VCode> {

@@ -3,74 +3,64 @@ import fs from "fs";
 import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 import { Uint } from "../utils/binary.js";
-import { CB } from "../utils/callbacks.js";
 
 class BCUtils {
 
-    public static getBlockchainDataFilePath(subpath: string, fork = "main") {
-
+    private static getRelativePath(subpath: string, fork = "main") {
         let forkpath = "";
         if (fork !== "main") {
             forkpath = `/forks/${fork}`;
         }
-
-        return path.join(utils.processRootDirectory, '/blockchain_data' + forkpath + subpath);
+        return '/blockchain_data' + forkpath + subpath;
     }
 
-    public static readFile(filePath: string, fork = "main") {
-        try {
-            const fullFilePath = this.getBlockchainDataFilePath(filePath, fork);
-            if (fs.existsSync(fullFilePath)) {
-                const data = new Uint(fs.readFileSync(fullFilePath, null));
-                return { cb: CB.SUCCESS, data };
-            } else { return { cb: CB.NONE }; }
-        } catch (error: any) { return { cb: CB.ERROR, error }; }
+    public static getBlockchainDataFilePath(subpath: string, fork = "main") {
+        return path.join(utils.processRootDirectory, this.getRelativePath(subpath, fork));
     }
 
-    public static writeFile(filePath: string, data: Uint, fork = "main") {
-        try {
-            const fullFilePath = this.getBlockchainDataFilePath(filePath, fork);
-            fs.writeFileSync(fullFilePath, data.getRaw());
-            return { cb: CB.SUCCESS };
-        } catch (error: any) { return { cb: CB.ERROR, error }; }
+    public static readFile(filePath: string, fork: string) {
+        return new Uint(fs.readFileSync(this.getBlockchainDataFilePath(filePath, fork), null));
+    }
+
+    public static existsPath(fileORDirPath: string, fork: string) {
+        return fs.existsSync(this.getBlockchainDataFilePath(fileORDirPath, fork));
+    }
+
+    public static writeFile(filePath: string, fork: string, data: Uint) {
+        return fs.writeFileSync(this.getBlockchainDataFilePath(filePath, fork), data.getRaw());
+    }
+    
+    public static mkDir(directoryPath: string, fork: string) {
+        return fs.mkdirSync(this.getBlockchainDataFilePath(directoryPath, fork), { recursive: true });
     }
     
     // Function to ensure the existence of a directory
-    public static ensureDirectoryExists(directoryPath: string, fork = "main") {
-        const fullDirectoryPath = this.getBlockchainDataFilePath(directoryPath, fork);
+    public static ensureDirectoryExists(directoryPath: string, fork: string) {
         try {
-            if (!fs.existsSync(fullDirectoryPath)) {
-                fs.mkdirSync(fullDirectoryPath, { recursive: true });
-                cli.data.info(`Directory ${directoryPath} was created because it was missing.`);
+            if (!this.existsPath(directoryPath, fork)) {
+                this.mkDir(directoryPath, fork);
+                cli.data.info(`Directory ${this.getRelativePath(directoryPath, fork)} was created because it was missing.`);
             }
         } catch (err: any) {
-            cli.data.error(`Error ensuring the existence of a directory at ${directoryPath}: ${err.message}`);
+            cli.data.error(`Error ensuring the existence of a directory at ${this.getRelativePath(directoryPath, fork)}: ${err.message}`);
         }
     }
     
     // Function to ensure the existence of a file
     public static ensureFileExists(
         filePath: string,
-        content: Uint,
-        fork = "main"
+        fork: string,
+        content: Uint
     ) {
-        const fullFilePath = this.getBlockchainDataFilePath(filePath, fork);
-
         try {
-            const dir = path.dirname(fullFilePath);
-
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
-                cli.data.info(`Directory ${dir} was created because it was missing.`);
-            }
-
-            if (!fs.existsSync(fullFilePath)) {
-                fs.writeFileSync(fullFilePath, content.getRaw());
-                cli.data.info(`File ${filePath} was created because it was missing.`);
+            this.ensureDirectoryExists(path.dirname(filePath), fork)
+            if (!this.existsPath(filePath, fork)) {
+                this.writeFile(filePath, fork, content);
+                cli.data.info(`File ${this.getRelativePath(filePath, fork)} was created because it was missing.`);
             }
 
         } catch (err: any) {
-            cli.data.error(`Error ensuring the existence of a file at ${filePath}: ${err.message}`);
+            cli.data.error(`Error ensuring the existence of a file at ${this.getRelativePath(filePath, fork)}: ${err.message}`);
         }
     }
     

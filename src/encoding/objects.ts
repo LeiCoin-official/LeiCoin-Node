@@ -109,7 +109,11 @@ export class ObjectEncoding {
                     let hexValueLength = this.encodeLengthForUnlimited(hexValue.getLen());
                     return [hexValueLength, hexValue];
                 }
-                let hexValueLength = hexValue.getLen("uint");
+
+                const lengthBeforeBytesCount = data.length || hexDataType.defaultLength;
+                if (!lengthBeforeBytesCount) return null;
+
+                let hexValueLength = Uint.from(hexValue.getLen(), lengthBeforeBytesCount);
                 return [hexValueLength, hexValue];
             }
 
@@ -143,7 +147,7 @@ export class ObjectEncoding {
             
             if (data.length) length = data.length;
             else if (hexDataType.defaultLength) length = hexDataType.defaultLength;
-            else if (!lengthBefore) return null;
+            else if (lengthBefore !== "unlimited") return null;
 
             let totalLength = length;
 
@@ -214,7 +218,8 @@ export class ObjectEncoding {
                     if (data.lengthBefore === "unlimited") {
                         hexData.push(this.encodeLengthForUnlimited(value.length));
                     } else {
-                        hexData.push(Uint.from(value.length));
+                        if (!data.length) return { cb: CB.ERROR, data: Uint.empty() };
+                        hexData.push(Uint.from(value.length, data.length));
                     }
 
                     for (let item of value) {

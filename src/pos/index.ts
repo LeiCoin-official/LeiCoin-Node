@@ -6,10 +6,15 @@ import cron from "node-cron";
 
 export class POS {
 
+    private static initialized = false;
+
     public static readonly slots: Dict<Slot> = {};
     private static currentSlot: Slot;
 
     public static init() {
+
+        if (this.initialized) return;
+		this.initialized = true;
         
         const task = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
             const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());

@@ -355,7 +355,7 @@ export class Uint64 extends FixedUint {
                 return this.slice(i);
             }
         }
-        return Uint.empty();
+        return Uint.from(0);
     }
 
     /** Supports only a number up to (2^64)-1 */

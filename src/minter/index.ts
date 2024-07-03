@@ -18,10 +18,14 @@ import type Slot from "../pos/slot.js";
 
 export class MinterClient {
 
+	private static initialized = false;
+
 	public static active = false;
 	public static readonly minters: MinterCredentials[] = [];
 
 	private static init() {
+		if (this.initialized) return;
+		this.initialized = true;
 
 		for (const staker of config.staker.stakers) {
 			this.minters.push(new MinterCredentials(
@@ -51,9 +55,9 @@ export class MinterClient {
 
 	private static async createNewBlock(mc: MinterCredentials, currentSlotIndex: Uint64) {
 
-		const previousBlock = blockchain.chainstate.getLatestBlockInfo();
+		const previousBlock = blockchain.chainstate.getLatestBlock();
 		const block = new Block(
-			previousBlock?.index?.add(1) || Uint64.from(0),
+			previousBlock?.index.add(1) || Uint64.from(0),
 			currentSlotIndex,
 			Uint256.alloc(),
 			previousBlock?.hash || Uint256.alloc(),

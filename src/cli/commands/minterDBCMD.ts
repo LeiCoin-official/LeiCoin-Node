@@ -52,7 +52,7 @@ class ReadCMD extends CLICMD {
                     return value.toHex();
                 }
                 return value;
-            }));
+            }, 2));
         } else {
             cli.default.info("Validator not found!");
         }
