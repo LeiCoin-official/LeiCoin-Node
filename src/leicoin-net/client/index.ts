@@ -1,8 +1,4 @@
-import WebSocket from "ws";
-import utils from "../../utils/index.js";
 import config from "../../handlers/configHandler.js";
-import cli from "../../cli/cli.js";
-import LeiCoinNetClient from "./client.js";
 import LeiCoinNetClientsBasicHandler from "./basicHandler.js";
 
 class LeiCoinNetClientsHandler extends LeiCoinNetClientsBasicHandler {

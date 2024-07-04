@@ -12,7 +12,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
 
         nodeConnections.push(ws);
 
-        cli.leicoin_net.server.info(`${req.headers.host} established as connection to this Server.`);
+        cli.leicoin_net.server.info(`${req.socket.remoteAddress}:${req.socket.remotePort} established as connection to this Server.`);
 
         // Listen for messages from clients connected to the node
         ws.on('message', async (rawdata: Buffer, isBinary) => {
