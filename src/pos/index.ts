@@ -1,3 +1,4 @@
+import cli from "../cli/cli.js";
 import { Uint64 } from "../utils/binary.js";
 import Constants from "../utils/constants.js";
 import { Dict } from "../utils/dataUtils.js";
@@ -18,6 +19,7 @@ export class POS {
         
         const task = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
             const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
+            cli.minter.info(`Starting new slot: ${currentSlotIndex.toInt()} at ${new Date().toUTCString()}`);
             //this.endSlot(this.currentSlot.index);
             this.startNewSlot(currentSlotIndex);
         });

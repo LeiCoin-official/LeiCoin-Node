@@ -35,7 +35,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
             if (index !== -1) {
                 nodeConnections.splice(index, 1);
             }
-            cli.leicoin_net.server.info(`WebSocket connection to ${req.headers.host} closed.`);
+            cli.leicoin_net.server.info(`WebSocket connection to ${req.socket.remoteAddress}:${req.socket.remotePort} closed.`);
         });
         
     });
