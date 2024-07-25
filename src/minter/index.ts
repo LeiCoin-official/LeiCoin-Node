@@ -82,7 +82,7 @@ export class MinterClient {
 
 		currentSlot.processBlock(block);
 		
-		cli.minter.success(`Created block with hash ${block.hash.toHex()}. Broadcasting now.`);
+		cli.minter.success(`Created Block on Slot ${block.slotIndex.toInt()} with hash ${block.hash.toHex()}. Broadcasting now.`);
     }
 
 }
