@@ -15,7 +15,7 @@ export class Pipelines {
 
     public static getInstance() {
         if (!this.instance) {
-            this.instance = new this();
+            this.instance = new Pipelines();
         }
         return this.instance;
     }

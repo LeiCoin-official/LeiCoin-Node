@@ -1,4 +1,4 @@
-import config from "../handlers/configHandler.js";
+import config from "../config/index.js";
 import Crypto from "../crypto/index.js";
 import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
 import utils from "../utils/index.js";

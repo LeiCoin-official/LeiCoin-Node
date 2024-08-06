@@ -1,4 +1,4 @@
-import config from "../../handlers/configHandler.js";
+import config from "../../config/index.js";
 import LeiCoinNetClientsBasicHandler from "./basicHandler.js";
 
 class LeiCoinNetClientsHandler extends LeiCoinNetClientsBasicHandler {

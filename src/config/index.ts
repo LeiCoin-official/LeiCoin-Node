@@ -5,6 +5,7 @@ import utils from "../utils/index.js";
 import dotenv from "dotenv";
 import cli from "../cli/cli.js";
 import { Dict } from "../utils/dataUtils.js";
+import { ProcessArgsLike, ProcessArgsParser } from "./processArgs.js";
 
 interface DefaultConfigInterface {
     api: {
@@ -30,6 +31,7 @@ interface ENVConfigInterface extends Dict<any> {}
 
 interface ConfigInterface extends DefaultConfigInterface, ENVConfigInterface {
     peers: string[];
+    processArgs: ProcessArgsLike;
 }
 
 class Config {
@@ -40,14 +42,14 @@ class Config {
 
     public static getInstance() {
         if (!this.instance) {
-            this.instance = new this();
+            this.instance = new Config();
         }
         return this.instance;
     }
 
     private constructor() {
 
-        const processArgs = this.parseArgs();
+        const processArgs = new ProcessArgsParser().parse();
         const defaultConfig = this.loadDefaultConfig(processArgs);
         const knownNodesConfig = this.loadKnownNodesConfig();
         const envConfig = this.loadENVConfig();
@@ -59,7 +61,8 @@ class Config {
             this.config = {
                 ...defaultConfig,
                 ...envConfig,
-                peers: knownNodesConfig
+                peers: knownNodesConfig,
+                processArgs
             };
         }
     }
@@ -68,58 +71,59 @@ class Config {
         return this.config;
     }
 
-    private parseArgs() {
-        // Define default argument information with default values, types, and required flags
-        const defaultArgInfo: Dict<{
-            default: string | number | boolean,
-            type: string,
-            required: boolean
-        }> = {
-            'internal-port': { default: 12200, type: 'number', required: false },
-            'internal-host': { default: "0.0.0.0", type: 'string', required: false },
-            '--experimental': { default: false, type: 'boolean', required: false }
-            //'optional-arg': { type: 'string', required: false }, // This one is optional
-        };
+    // private parseArgs() {
+    //     // Define default argument information with default values, types, and required flags
+    //     const args: Dict<{
+    //         default: string | number | boolean,
+    //         type: string,
+    //         required: boolean
+    //     }> = {
+    //         '--internal-port': { default: 12200, type: 'number', required: false },
+    //         '--internal-host': { default: "0.0.0.0", type: 'string', required: false },
+    //         '--experimental': { default: false, type: 'boolean', required: false }
+    //         '--only-api: { default: false, type: 'boolean', required: false }
+    //         //'optional-arg': { type: 'string', required: false }, // This one is optional
+    //     };
     
-        // Merge provided argInfo with defaultArgInfo
-        const mergedArgInfo = defaultArgInfo;
+    //     // Merge provided argInfo with defaultArgInfo
+    //     const finalArgInfo = defaultArgInfo;
     
-        const argsObj: {[arg: string]: any} = {};
+    //     const argsObj: {[arg: string]: any} = {};
 
-        for (const arg of process.argv.slice(2)) {
-            try {
-                const [argName, argValue] = arg.split('=');
+    //     for (const arg of process.argv.slice(2)) {
+    //         try {
+    //             const [argName, argValue] = arg.split('=');
     
-                if (argName && mergedArgInfo[argName]) {
-                    const { type, default: defaultValue } = mergedArgInfo[argName];
+    //             if (argName && finalArgInfo[argName]) {
+    //                 const { type, default: defaultValue } = finalArgInfo[argName];
     
-                    if (argValue !== undefined) {
-                        if (type === 'number') {
-                            argsObj[argName] = parseFloat(argValue);
-                        } else if (type === 'string') {
-                            argsObj[argName] = argValue;
-                        }
-                    } else if (type === 'boolean') {
-                        argsObj[argName] = true;
-                    }
-                }
-            } catch (error) {
-                console.error(`Error parsing argument: ${arg}`);
-            }
-        }
+    //                 if (argValue !== undefined) {
+    //                     if (type === 'number') {
+    //                         argsObj[argName] = parseFloat(argValue);
+    //                     } else if (type === 'string') {
+    //                         argsObj[argName] = argValue;
+    //                     }
+    //                 } else if (type === 'boolean') {
+    //                     argsObj[argName] = true;
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error(`Error parsing argument: ${arg}`);
+    //         }
+    //     }
     
-        // Now, for each required argument, if it's not in argsObj, set it to the default value
-        for (const argName in mergedArgInfo) {
-            if (mergedArgInfo[argName].required && argsObj[argName] === undefined) {
-                argsObj[argName] = mergedArgInfo[argName];
-            }
-        }
+    //     // Now, for each required argument, if it's not in argsObj, set it to the default value
+    //     for (const argName in finalArgInfo) {
+    //         if (finalArgInfo[argName].required && argsObj[argName] === undefined) {
+    //             argsObj[argName] = finalArgInfo[argName];
+    //         }
+    //     }
 
-        return argsObj;
-    }
+    //     return argsObj;
+    // }
 
     // Function to load the configuration file or a default if it doesn't exist
-    private loadDefaultConfig(processArgs: {[arg: string]: any}, secondTry = false): DefaultConfigInterface | null {
+    private loadDefaultConfig(processArgs: ProcessArgsLike, secondTry = false): DefaultConfigInterface | null {
         // Define the paths for the configuration files
         const configFilePath = path.join(utils.processRootDirectory, '/config/config.json');
         const defaultConfigFilePath = path.join(utils.processRootDirectory, '/config/sample.config.json');
@@ -132,12 +136,12 @@ class Config {
                 let configDataJSON: DefaultConfigInterface = JSON.parse(configData);
 
                 // Check for internal-port and extract the value
-                if (processArgs['internal-port'])
-                    configDataJSON.leicoin_net.port = processArgs['internal-port'];
-                if (processArgs['internal-host'])
-                    configDataJSON.leicoin_net.host = processArgs['internal-host'];
+                if (processArgs['--port'])
+                    configDataJSON.leicoin_net.port = processArgs['--port'] as number;
+                if (processArgs['--host'])
+                    configDataJSON.leicoin_net.host = processArgs['--host'] as string;
                 if (processArgs['--experimental'])
-                    configDataJSON.experimental = processArgs['--experimental'];
+                    configDataJSON.experimental = processArgs['--experimental'] as boolean;
 
                 return configDataJSON;
             } else {

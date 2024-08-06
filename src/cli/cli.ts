@@ -36,7 +36,7 @@ class CLI implements CLILike {
 
     public static getInstance() {
         if (!this.instance) {
-            this.instance = new this();
+            this.instance = new CLI();
         }
         return this.instance;
     }
@@ -182,7 +182,7 @@ class NoCLI implements CLILike {
 
     public static getInstance() {
         if (!this.instance) {
-            this.instance = new this();
+            this.instance = new NoCLI();
         }
         return this.instance;
     }

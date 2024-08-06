@@ -1,5 +1,5 @@
 import { PrivateKey } from "../crypto/cryptoKeys.js";
-import config from "../handlers/configHandler.js";
+import config from "../config/index.js";
 import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import cli from "../cli/cli.js";

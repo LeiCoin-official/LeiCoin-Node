@@ -1,22 +1,41 @@
 
 export default class Main {
 
+    public static version = "0.5.2-beta.2";
+
     private static initialized = false;
 
     public static async init() {
         if (this.initialized) return;
         this.initialized = true;
 
+        // Core modules
         (await import("./utils/index.js"));
-        await (await import("./cli/cli.js")).default.setup();
+
+        const cli = (await import("./cli/cli.js")).default;
+        await cli.setup();
     
-        await import("./handlers/configHandler.js");
+        const config = (await import("./config/index.js")).default;
+
+        cli.default.info(`Starting LeiCoin-Node v${Main.version}`);
+        cli.default.info(`Loaded core modules`);
+
         await (await import("./storage/blockchain.js")).default.waitAllinit();
         
-        await (await import("./netInitialization.js")).default();
-        (await import("./minter/index.js")).MinterClient.initIfActive();
-    
-        (await import("./pos/index.js")).POS.init();
+        if (config.processArgs["--only-cli"]) {
+
+            cli.default.info(`LeiCoin-Node started in CLI Only mode`);
+
+        } else {
+
+            await (await import("./netInitialization.js")).default();
+
+            (await import("./minter/index.js")).MinterClient.initIfActive();
+            (await import("./pos/index.js")).POS.init();
+
+            cli.default.info(`LeiCoin-Node started in Full Node mode`);
+            
+        }
 
     }
 
