@@ -33,7 +33,7 @@ export class Execution {
             await blockchain.wallets.adjustWalletsByBlock(block);
         }
         
-        cli.leicoin_net.server.success(`Block on Slot ${block.slotIndex.toInt()} with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain.`);
+        cli.leicoin_net.server.success(`Block on Slot ${block.slotIndex.toBigInt()} with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain.`);
     }
 
 }

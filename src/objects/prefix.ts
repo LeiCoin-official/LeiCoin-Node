@@ -31,7 +31,7 @@ class Prefix extends Uint8 {
     public static readonly A_00 = Prefix.from("00");
     // Smart Contract Address Prefix: 0c
     public static readonly A_0c = Prefix.from("0c");
-    // Validator Address Prefix: 0e
+    // Minter Address Prefix: 0e
     public static readonly A_0e = Prefix.from("0e");
 
     public static from(hexType: string): Prefix;
@@ -51,6 +51,9 @@ class Prefix extends Uint8 {
 
     /** @deprecated Don't try to modify a Prefix, an error will occur! */
     public set(): any {lockedErr()};
+
+    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    public appendData(): any {lockedErr()};
 
     /** @deprecated Don't try to modify a Prefix, an error will occur! */
     public iadd(): any {lockedErr()};

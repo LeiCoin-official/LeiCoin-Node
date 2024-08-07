@@ -105,6 +105,30 @@ async function gen(size, db = "stake1") {
     await Promise.all(promises);
     await level.close();
 }
+async function gen_minter(size, db = "stake1") {
+
+    const level = await levelDBUtils.openDB(db);
+    
+    const validator_preifx = PX.A_0e;
+    const version_Prefix = PX.V_00;
+
+    const promises = [];
+
+    for (let i = 0; i < size; i++) {
+        promises.push(
+            level.put(
+                AddressHex.fromTypeAndBody(validator_preifx, Uint.from(crypto.randomBytes(20))),
+                Uint.concat([
+                    version_Prefix,
+                    Uint64.from(32_0000_0000)
+                ])
+            )
+        );
+    }
+
+    await Promise.all(promises);
+    await level.close();
+}
 
 /** @type {(db: DBs, seedHash: Uint256) => Promise<[Uint[], number, boolean]>} */
 async function selectNextValidators_old(db, seedHash) {
@@ -180,6 +204,21 @@ async function selectNextValidators(db, seedHash) {
     elapsedTime = endTimer(startTime);
     await level.close();
     return [validators, elapsedTime, using_first_validators];
+}
+
+async function selectNextMinter(slot) {
+    const level = await levelDBUtils.openDB("stake1");
+    let slotHash = Uint.concat([
+        PX.A_0e,
+        Crypto.sha256(slot).split(20)[0]
+    ]);
+    console.log("Hash: ", slotHash.toHex());
+    const address = new AddressHex(
+        (await level.keys({gte: slotHash, limit: 1}).all())[0] ||
+        (await level.keys({lte: slotHash, limit: 1, reverse: true}).all())[0]
+    );
+    await level.close();
+    return address;
 }
 
 async function test1(db = "stake1", func = selectNextValidators, returnTime = false) {
@@ -266,12 +305,19 @@ async function test4() {
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 }
 
+async function test5() {
+    for (let i = 0; i < 10; i++) {
+        const address = await selectNextMinter(Uint.from(Math.floor(Math.random() * 1_000_000)));
+        console.log("Address:", address.toHex());
+    }
+}
 
 //gen_old(129);
 //gen(129, "stake3");
 //gen_old(100_000);
 //gen_old(1_000);
 //gen(1_000_000, "stake3")
+//gen_minter(1_000_000, "stake1")
 
 //await gen();
 
@@ -307,4 +353,5 @@ async function test4() {
 //test1("stake1", selectNextValidators_old);
 //test2("stake1", "stake2", selectNextValidators_old);
 //test3();
-test4()
+//test4()
+test5();

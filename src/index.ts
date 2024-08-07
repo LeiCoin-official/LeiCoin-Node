@@ -1,7 +1,7 @@
 
 export default class Main {
 
-    public static version = "0.5.2-beta.2";
+    public static version = "0.5.2-beta.3";
 
     private static initialized = false;
 

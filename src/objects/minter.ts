@@ -38,7 +38,7 @@ export class Minter {
                 return new Minter(address, data.stake, data.version);
             }
         } catch (err: any) {
-            cli.data.error(`Error loading Validator from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Minter from Decoded Hex: ${err.message}`);
         }
         return null;
     }

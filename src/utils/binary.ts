@@ -144,6 +144,9 @@ export class Uint {
         this.buffer.set((list.getRaw ? list.getRaw() : list), offset);
     }
 
+    public appendData(data: Uint | Buffer) {
+        return Uint.concat([this.buffer, data]);
+    }
 
     public nci_slice<T>(CLS: New<T>, start?: number, end?: number) {
         return new CLS(this.buffer.subarray(start, end));   

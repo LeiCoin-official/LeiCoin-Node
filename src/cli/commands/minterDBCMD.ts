@@ -1,6 +1,6 @@
 import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
-import Validator from "../../objects/minter.js";
+import Minter from "../../objects/minter.js";
 import blockchain from "../../storage/blockchain.js";
 import { Uint, Uint64 } from "../../utils/binary.js";
 import cli from "../cli.js";
@@ -8,14 +8,15 @@ import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
 
 export default class MinterDBCMD extends CLISubCMD {
-    public name = "vsdb";
-    public description = "Manage the validator database";
-    public usage = "vsdb <command> [args]";
+    public name = "minterdb";
+    public description = "Manage the Minter database";
+    public usage = "minterdb <command> [args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
         this.register(new InsertCMD());
         this.register(new RemoveCMD());
+        this.register(new GetNextMinterCMD());
     }
 
 }
@@ -23,8 +24,8 @@ export default class MinterDBCMD extends CLISubCMD {
 
 class ReadCMD extends CLICMD {
     public name = "read";
-    public description = "Read the validator database";
-    public usage = "read <all(validator_address>)";
+    public description = "Read the Minter database";
+    public usage = "read <all(minter_address>)";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -34,7 +35,7 @@ class ReadCMD extends CLICMD {
 
         if (args[0] === "all") {
             cli.default.info(
-                "Validators:\n" + 
+                "Minters:\n" + 
                 (await blockchain.minters.getAllVAddresses()).map((address) => {
                     return address.toHex();
                 }).join("\n")
@@ -42,10 +43,10 @@ class ReadCMD extends CLICMD {
             return;
         }
 
-        const validatorAddress = args[0];
-        const validator = await blockchain.minters.getValidator(AddressHex.from(validatorAddress));
-        if (validator) {
-            cli.default.info(JSON.stringify(validator, (key, value) => {
+        const minterAddress = args[0];
+        const minter = await blockchain.minters.getMinter(AddressHex.from(minterAddress));
+        if (minter) {
+            cli.default.info(JSON.stringify(minter, (key, value) => {
                 if (value instanceof Uint64) {
                     return (value.toInt() / 1_0000_0000).toFixed(8);
                 } else if (value instanceof Uint) {
@@ -54,7 +55,7 @@ class ReadCMD extends CLICMD {
                 return value;
             }, 2));
         } else {
-            cli.default.info("Validator not found!");
+            cli.default.info("Minter not found!");
         }
 
     }
@@ -62,8 +63,8 @@ class ReadCMD extends CLICMD {
 
 class InsertCMD extends CLICMD {
     public name = "insert";
-    public description = "Insert Data into the validator database";
-    public usage = "insert <validator_address> <stake> <version>";
+    public description = "Insert Data into the Minter database";
+    public usage = "insert <minter_address> <stake> <version>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 3) {
@@ -71,16 +72,16 @@ class InsertCMD extends CLICMD {
             return;
         }
 
-        const validator = new Validator(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
-        await blockchain.minters.setValidator(validator);
-        cli.default.info("Validator inserted!");
+        const minter = new Minter(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
+        await blockchain.minters.setMinter(minter);
+        cli.default.info("Minter inserted!");
     }
 }
 
 class RemoveCMD extends CLICMD {
     public name = "remove";
-    public description = "Remove Data from the validator database";
-    public usage = "remove <validator_address>";
+    public description = "Remove Data from the Minter database";
+    public usage = "remove <minter_address>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -88,14 +89,31 @@ class RemoveCMD extends CLICMD {
             return;
         }
 
-        const validator = await blockchain.minters.getValidator(AddressHex.from(args[0]));
-        if (validator) {
-            await blockchain.minters.removeValidator(validator);
-            cli.default.info("Validator removed!");
+        const minter = await blockchain.minters.getMinter(AddressHex.from(args[0]));
+        if (minter) {
+            await blockchain.minters.removeMinter(minter);
+            cli.default.info("Minter removed!");
         } else {
-            cli.default.info("Validator not found!");
+            cli.default.info("Minter not found!");
         }
 
     }
 }
 
+class GetNextMinterCMD extends CLICMD {
+    public name = "getnext";
+    public description = "Get the next minter for a slot";
+    public usage = "getnext <slot>";
+
+    public async run(args: string[], parent_args: string[]): Promise<void> {
+        if (args.length !== 1) {
+            CLIUtils.invalidNumberOfArguments();
+            return;
+        }
+
+        const slot = Uint64.from(parseInt(args[0]));
+        const nextMinter = await blockchain.minters.selectNextMinter(slot);
+        cli.default.info(`Next minter for slot ${slot.toBigInt()}: ${nextMinter.toHex()}`);
+    }
+
+}

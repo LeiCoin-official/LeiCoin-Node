@@ -15,7 +15,7 @@ export class BlockDB {
 
     // Function to write a block
     public addBlock(block: Block, overwrite = false) {
-        const blockIndex = block.index.toInt().toString();
+        const blockIndex = block.index.toBigInt().toString();
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
             // Check if the block file already exists.
@@ -36,7 +36,7 @@ export class BlockDB {
     // Function to read a block
     public getBlock(index: Uint64 | string): { cb: CB, data?: Block | null | undefined };
     public getBlock(index: Uint64 & string) {
-        const blockIndex = index.toInt ? index.toInt().toString() : index;
+        const blockIndex = index.toBigInt ? index.toBigInt().toString() : index;
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
             if (BCUtils.existsPath(blockFilePath, this.chain)) {

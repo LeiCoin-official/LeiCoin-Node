@@ -5,6 +5,7 @@ import MinterClient from "../minter/index.js";
 import Verification, { BlockValidationResult } from "../verification/index.js";
 import { Execution } from "./execution.js";
 import blockchain from "../storage/blockchain.js";
+import cli from "../cli/cli.js";
 
 export class Slot {
 
@@ -25,6 +26,7 @@ export class Slot {
 
     public static async create(index: Uint64) {
         const nextMinter = await blockchain.minters.selectNextMinter(index);
+        cli.minter.info(`Slot ${index.toBigInt()} minter: ${nextMinter.toHex()}`);
         return new Slot(index, nextMinter);
     }
 

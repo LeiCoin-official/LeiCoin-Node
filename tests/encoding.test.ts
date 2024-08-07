@@ -61,15 +61,15 @@ describe('encoding_testing', () => {
 
         const address = AddressHex.from("0e7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
-        const validator = new Minter(
+        const minter = new Minter(
             address,
             Uint64.from(32_0000_0000)
         );
 
-        const decoded: any = Minter.fromDecodedHex(address, validator.encodeToHex());
+        const decoded: any = Minter.fromDecodedHex(address, minter.encodeToHex());
         const decoded2 = Minter.fromDecodedHex(address, decoded.encodeToHex());
 
-        expect(JSON.stringify(decoded2)).toBe(JSON.stringify(validator));
+        expect(JSON.stringify(decoded2)).toBe(JSON.stringify(minter));
 
     });
     test('wallet_enoding_and_decoding', () => {
