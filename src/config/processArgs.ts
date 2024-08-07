@@ -1,16 +1,31 @@
 import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 
-class PArg {
+
+type PArgAllowedTypes = "string" | "number" | "boolean";
+
+type PArgTypeMap = {
+    string: string | null;
+    number: number | null;
+    boolean: boolean | null;
+}
+
+type ArgsKeys = keyof typeof ProcessArgsParser.prototype.argsSettings;
+type ArgTypes = typeof ProcessArgsParser.prototype.argsSettings[ArgsKeys];
+type ArgsLike<T = "default"> = {
+    [key in ArgsKeys]?: T extends "default" ? typeof ProcessArgsParser.prototype.argsSettings[key]['default'] : any;
+}
+
+class PArg<T extends PArgAllowedTypes> {
     // default value will not be loaded when the argument is required
-    default: string | number | boolean | null;
-    type: "string" | "number" | "boolean";
+    default: PArgTypeMap[T];
+    type: PArgAllowedTypes;
     required: boolean;
 
     constructor(
-        defaultValue: string | number | boolean | null,
-        type: "string" | "number" | "boolean",
-        required: boolean
+        defaultValue: PArgTypeMap[T],
+        type: T,
+        required = false
     ) {
         this.default = defaultValue;
         this.type = type;
@@ -18,25 +33,21 @@ class PArg {
     }
 }
 
-type ArgsKeys = keyof typeof ProcessArgsParser.prototype.argsSettings;
-type ArgsLike = {
-    [key in ArgsKeys]: number | string | boolean;
-}
 
 export class ProcessArgsParser {
 
     public readonly argsSettings = {
-        '--port' : new PArg(12200, 'number', false),
-        '--host': new PArg("0.0.0.0", 'string', false),
-        '--experimental': new PArg(false, 'boolean', false),
-        '--only-cli': new PArg(false, 'boolean', false)
+        '--port' : new PArg(12200, "number"),
+        '--host': new PArg("0.0.0.0", "string"),
+        '--experimental': new PArg(false, "boolean"),
+        '--only-cli': new PArg(false, "boolean")
     };
     
     public parse(): ArgsLike {
 
-        const parsedArgs: ArgsLike = {} as any;
+        const parsedArgs: ArgsLike<any> = {} as any;
 
-        for (const [argName, argSettings] of Object.entries(this.argsSettings) as [ArgsKeys, PArg][]) {
+        for (const [argName, argSettings] of Object.entries(this.argsSettings) as [ArgsKeys, ArgTypes][]) {
             
             try {
 
@@ -44,10 +55,13 @@ export class ProcessArgsParser {
 
                 if (argIndex === -1) {
                     if (argSettings.required) {
-                        cli.data.error(`Argument ${argName} is required`);
-                        utils.gracefulShutdown(); return {} as any;
+                        if (argSettings.default === null) {
+                            cli.data.error(`Argument ${argName} is required`);
+                            utils.gracefulShutdown(); return {} as any;
+                        }
+                        parsedArgs[argName] = argSettings.default;
+                        continue;
                     }
-                    parsedArgs[argName] = argSettings.default as any;
                     continue;
                 }
 

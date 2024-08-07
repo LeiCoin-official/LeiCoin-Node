@@ -137,11 +137,11 @@ class Config {
 
                 // Check for internal-port and extract the value
                 if (processArgs['--port'])
-                    configDataJSON.leicoin_net.port = processArgs['--port'] as number;
+                    configDataJSON.leicoin_net.port = processArgs['--port'];
                 if (processArgs['--host'])
-                    configDataJSON.leicoin_net.host = processArgs['--host'] as string;
+                    configDataJSON.leicoin_net.host = processArgs['--host'];
                 if (processArgs['--experimental'])
-                    configDataJSON.experimental = processArgs['--experimental'] as boolean;
+                    configDataJSON.experimental = processArgs['--experimental'];
 
                 return configDataJSON;
             } else {
