@@ -28,14 +28,19 @@ class Utils {
         process.on("SIGTERM", this.gracefulShutdown);
     }
 
+    private runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
+    public getRunStatus() { return this.runStatus; }
+
     public async gracefulShutdown(exitCode: number = 0) {
         try {
-            if (!this.cli)
-            this.cli = (await import("../cli/cli.js")).default;
-            this.cli.default.info('Shutting down...');
+            this.runStatus = exitCode === 0 ? "shutdown" : "shutdown_on_error";
             this.events.emit("stop_server");
+            
+            if (!this.cli) this.cli = (await import("../cli/cli.js")).default;
+            this.cli.default.info('Shutting down...');
+
             setTimeout(async() => {
-                this.cli?.default.info('LeiCoin-Node stopped.');
+                this.cli?.default.info(`LeiCoin-Node stopped with exit code ${exitCode}`);
                 await this.cli?.close();
                 process.exit(exitCode);
             }, 1000);

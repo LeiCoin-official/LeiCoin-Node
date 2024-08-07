@@ -47,17 +47,19 @@ export class ProcessArgsParser {
 
         const parsedArgs: ArgsLike<any> = {} as any;
 
+        const process_argv = process.argv.slice(2);
+
         for (const [argName, argSettings] of Object.entries(this.argsSettings) as [ArgsKeys, ArgTypes][]) {
             
             try {
 
-                const argIndex = process.argv.slice(2).findIndex(arg => argName === arg)
+                const argIndex = process_argv.findIndex(arg => argName === arg)
 
                 if (argIndex === -1) {
                     if (argSettings.required) {
                         if (argSettings.default === null) {
                             cli.data.error(`Argument ${argName} is required`);
-                            utils.gracefulShutdown(); return {} as any;
+                            utils.gracefulShutdown(1); return {} as any;
                         }
                         parsedArgs[argName] = argSettings.default;
                         continue;
@@ -70,11 +72,11 @@ export class ProcessArgsParser {
                     continue;
                 }
 
-                const argValue = process.argv[argIndex + 1];
+                const argValue = process_argv[argIndex + 1];
 
                 if (!argValue || argValue.startsWith('--')) {
                     cli.data.error(`Argument ${argName} requires a value`);
-                    utils.gracefulShutdown(); return {} as any;
+                    utils.gracefulShutdown(1); return {} as any;
                 }
 
                 switch (argSettings.type) {
@@ -90,7 +92,7 @@ export class ProcessArgsParser {
 
             } catch (err: any) {
                 cli.data.error(`Unexpected error parsing argument ${argName}: ${err.message}`);
-                utils.gracefulShutdown(); return {} as any;
+                utils.gracefulShutdown(1); return {} as any;
             }
 
         }

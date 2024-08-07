@@ -10,15 +10,20 @@ export default class Main {
         this.initialized = true;
 
         // Core modules
-        (await import("./utils/index.js"));
+        const utils = (await import("./utils/index.js")).default;
 
         const cli = (await import("./cli/cli.js")).default;
         await cli.setup();
     
-        const config = (await import("./config/index.js")).default;
-
         cli.default.info(`Starting LeiCoin-Node v${Main.version}`);
         cli.default.info(`Loaded core modules`);
+
+        const config = (await import("./config/index.js")).default;
+
+        if (utils.getRunStatus() === "shutdown_on_error") {
+            cli.default.error("Error during startup");
+            return;
+        }
 
         await (await import("./storage/blockchain.js")).default.waitAllinit();
         
