@@ -6,7 +6,7 @@ import { CB } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/dataUtils.js";
 import EncodingUtils from "./index.js";
 
-type NonBinaryBasicTypes = "string" | "int";
+//type NonBinaryBasicTypes = "string" | "int";
 type BasicTypes = "bigint" | "array" | "bool" | "object";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
 type DefaultDataTypes = BasicTypes | AdvancedTypes /*| NonBinaryBasicTypes*/;
@@ -26,6 +26,96 @@ export interface HexDataType {
     lengthBefore?: boolean;
     encode?(v: any): Uint;
     parse?(v: Uint): any;
+}
+
+
+class ArrayEncoder {
+
+    readonly key: string;
+    readonly prefixLength: number | "unlimited";
+    readonly decodeFunc: (hexData: Uint, returnLength: boolean) => any;
+    readonly encodeFunc: (forHash: boolean) => Uint;
+    
+    constructor(key: string, prefixLength: number | "unlimited", decodeFunc: (hexData: Uint, returnLength: boolean) => any, encodeFunc: (forHash: boolean) => Uint) {
+        this.key = key;
+        this.prefixLength = prefixLength;
+        this.decodeFunc = decodeFunc;
+        this.encodeFunc = encodeFunc;
+    }
+
+    public encode(array: any[]) {
+        const result: Uint[] = [];
+
+        // length check implemeting later
+        if (this.prefixLength === "unlimited") {
+            result.push(ObjectEncoding.encodeLengthForUnlimited(array.length));
+        } else {
+            result.push(Uint.from(array.length, this.prefixLength));
+        }
+
+        for (let item of array) {
+            result.push(this.encodeFunc.call(item, false));
+        }
+
+        return result;
+    }
+
+    public decode(arrayDataWithLength: Uint) {
+        const final_array = [];
+        let arrayCount, prefixLength;
+
+        if (this.prefixLength === "unlimited") {
+            [arrayCount, prefixLength] = ObjectEncoding.decodeLengthFromUnlimited(arrayDataWithLength);
+        } else {
+            prefixLength = this.prefixLength;
+            arrayCount = arrayDataWithLength.slice(0, prefixLength).toInt();
+        }
+
+        let arrayData = arrayDataWithLength.slice(prefixLength);
+        let total_arrayLength = prefixLength;
+            
+        for (let i = 0; i < arrayCount; i++) {
+            const array_item = this.decodeFunc(arrayData, true);
+            final_array.push(array_item.data);
+            arrayData = arrayData.slice(array_item.length);
+            total_arrayLength += array_item.length;
+        }
+
+        return { value: final_array, length: total_arrayLength }
+    }
+
+}
+
+class ObjectEncoder {
+
+    readonly key: string;
+    readonly decodeFunc: (hexData: Uint, returnLength: boolean) => any;
+    readonly encodeFunc: (forHash: boolean) => Uint;
+
+    constructor(key: string, decodeFunc: (hexData: Uint, returnLength: boolean) => any, encodeFunc: (forHash: boolean) => Uint) {
+        this.key = key;
+        this.decodeFunc = decodeFunc;
+        this.encodeFunc = encodeFunc;
+    }
+
+    public encode(object: AnyObj) {
+        return this.encodeFunc.call(object, false);
+    }
+
+    public decode(hexData: Uint) {
+        return this.decodeFunc(hexData, true);
+    }
+}
+
+export class BigIntEncoder {
+
+    encode(v: any) {
+        return Uint64.prototype.toShortUint.call(v);
+    }
+    parse(v: Uint) {
+        return Uint64.create(v);
+    }
+
 }
 
 export class ObjectEncoding {
@@ -110,8 +200,7 @@ export class ObjectEncoding {
                     return [hexValueLength, hexValue];
                 }
 
-                const lengthBeforeBytesCount = data.length || hexDataType.defaultLength;
-                if (!lengthBeforeBytesCount) return null;
+                const lengthBeforeBytesCount = data.length || hexDataType.defaultLength || 1;
 
                 let hexValueLength = Uint.from(hexValue.getLen(), lengthBeforeBytesCount);
                 return [hexValueLength, hexValue];
@@ -183,12 +272,12 @@ export class ObjectEncoding {
 
     }
 
-    private static encodeLengthForUnlimited(length: number) {
+    public static encodeLengthForUnlimited(length: number) {
         const lenStr = length.toString(15) + "F";
         return Uint.from((lenStr.length % 2 === 0) ? lenStr : ("0" + lenStr));
     }
 
-    private static decodeLengthFromUnlimited(hexData: Uint) {
+    public static decodeLengthFromUnlimited(hexData: Uint) {
         const base15Length = EncodingUtils.splitWithTail(hexData.toHex().toUpperCase(), "F", 1)[0];
         return [
             parseInt(base15Length, 15),
@@ -214,17 +303,7 @@ export class ObjectEncoding {
 
                 } else if (data.type === "array" && data.encodeFunc) {
 
-                    // length check implemeting later
-                    if (data.lengthBefore === "unlimited") {
-                        hexData.push(this.encodeLengthForUnlimited(value.length));
-                    } else {
-                        if (!data.length) return { cb: CB.ERROR, data: Uint.empty() };
-                        hexData.push(Uint.from(value.length, data.length));
-                    }
-
-                    for (let item of value) {
-                        hexData.push(data.encodeFunc.call(item, false));
-                    }
+                    
 
                 } else {
                     const hexValue = this.encodeValue(value, data);
@@ -255,51 +334,24 @@ export class ObjectEncoding {
             for (const data of values) {
         
                 const key = data.key;
+
+                const currentPart = hexData.slice(current_length);
                 
                 if (data.type === "object" && data.decodeFunc) {
 
-                    const rawObj = hexData.slice(current_length);
-                    const object = data.decodeFunc(rawObj, true);
+                    const object = data.decodeFunc(currentPart, true);
                     final_data[key] = object.data;
                     current_length += object.length;
 
                 } else if (data.type === "array" && data.decodeFunc) {
-        
-                    const final_array = [];
 
-                    const arrayDataWithLength = hexData.slice(current_length);
-
-                    let lenghValueLen: number;
-                    let arrayCount: number;
-
-                    if (data.length) {
-                        lenghValueLen = data.length;
-                        arrayCount = arrayDataWithLength.slice(0, lenghValueLen).toInt();
-                    } else if (data.lengthBefore === "unlimited") {
-                        [arrayCount, lenghValueLen] = this.decodeLengthFromUnlimited(arrayDataWithLength);
-                    } else {
-                        return { cb: CB.ERROR };
-                    }
-
-                    //let arrayData = arrayDataWithLength.slice(lenghValueLen, arrayDataWithLength.length);
-                    let arrayData = arrayDataWithLength.slice(lenghValueLen);
-                    let total_arrayLength = lenghValueLen;
-                        
-                    for (let i = 0; i < arrayCount; i++) {
-            
-                        const array_item = data.decodeFunc(arrayData, true);
-                        final_array.push(array_item.data);
-                        arrayData = arrayData.slice(array_item.length);
-                        total_arrayLength += array_item.length;
-        
-                    }
-        
-                    current_length += total_arrayLength;
                     final_data[key] = final_array;
-        
+                    current_length += total_arrayLength;
+                    
+
                 } else {
                     
-                    const value = this.decodeValue(hexData.slice(current_length), data);
+                    const value = this.decodeValue(currentPart, data);
 
                     if (!value) {
                         return { cb: CB.ERROR };

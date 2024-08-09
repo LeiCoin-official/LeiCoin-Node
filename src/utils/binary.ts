@@ -49,13 +49,12 @@ export class Uint {
     
     protected readonly buffer: Buffer;
 
-    constructor(input: Uint | Buffer);
-    constructor(input: Uint & Buffer) {
-        this.buffer = input.getRaw ? input.getRaw() : input;
+    constructor(input: Uint | Buffer) {
+        this.buffer = input instanceof Uint ? input.getRaw() : input;
     }
 
     public static create<T>(this: New<T>, input: Uint | Buffer): T;
-    public static create(input: Uint & Buffer) {
+    public static create(input: Uint | Buffer) {
         return new this(input);
     }
 
@@ -96,10 +95,10 @@ export class Uint {
     }
 
     public static concat<T>(this: New<T>, list: (Uint | Buffer)[], totalLength?: number): T;
-    public static concat(list: (Uint & Buffer)[], totalLength?: number) {
+    public static concat(list: (Uint | Buffer)[], totalLength?: number) {
         return new this(Buffer.concat(
             list.map((item) => {
-                return item.getRaw ? item.getRaw() : item;
+                return item instanceof Uint ? item.getRaw() : item;
             }), totalLength
         ));
     }
@@ -139,9 +138,8 @@ export class Uint {
         return enc === "uint" ? Uint.from(this.buffer.byteLength) : this.buffer.byteLength;
     }
 
-    public set(list: ArrayLike<number> | Uint, offset?: number): void;
-    public set(list: ArrayLike<number> & Uint, offset?: number) {
-        this.buffer.set((list.getRaw ? list.getRaw() : list), offset);
+    public set(list: ArrayLike<number> | Uint, offset?: number) {
+        this.buffer.set((list instanceof Uint ? list.getRaw() : list), offset);
     }
 
     public appendData(data: Uint | Buffer) {
@@ -301,8 +299,8 @@ export class FixedUint extends Uint {
     }
 
     public static create<T>(this: New<T>, input: Uint | Buffer): T;
-    public static create(input: Uint & Buffer) {
-        return new this(UintUtils.correctByteLengthBuffer((input.getRaw ? input.getRaw() : input), this.byteLength));
+    public static create(input: Uint | Buffer) {
+        return new this(UintUtils.correctByteLengthBuffer((input instanceof Uint ? input.getRaw() : input), this.byteLength));
     }
 
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;

@@ -10,11 +10,10 @@ export class Crypto {
 
     public static readonly ec = new elliptic.ec("secp256k1");
 
-    public static sha256(input: Uint | Buffer): Uint256;
-    public static sha256(input: Uint & Buffer) {
+    public static sha256(input: Uint | Buffer) {
         return new Uint256(
             crypto.createHash('sha256').update(
-                input.getRaw ? input.getRaw() : input
+                input instanceof Uint ? input.getRaw() : input
             ).digest()
         );
     }

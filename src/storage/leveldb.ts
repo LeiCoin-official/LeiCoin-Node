@@ -1,13 +1,13 @@
 import { DatabaseOptions, Level } from "level";
-import { UintEncoder } from "../encoding/binaryEncoder.js";
+import { LevelDBEncoders } from "../encoding/leveldbEncoders.js";
 import { Uint } from "../utils/binary.js";
 
 export class LevelDB<K = Uint, V = Uint> extends Level<K, V> {
     
     constructor(location: string, options?: DatabaseOptions<K, V> | string);
     constructor(location: string, options: DatabaseOptions<any, any> = {
-        keyEncoding: UintEncoder,
-        valueEncoding: UintEncoder
+        keyEncoding: LevelDBEncoders.Uint,
+        valueEncoding: LevelDBEncoders.Uint
     }) {
         super(location, options);
     }

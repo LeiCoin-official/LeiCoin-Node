@@ -1,14 +1,14 @@
 import { AddressHex } from "../objects/address.js";
 import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../utils/binary.js";
 
-interface BinaryEncoderLike<T extends Uint> {
+interface LevelDBEncoderLike<T extends Uint> {
     readonly encode: (val: Uint | Uint8Array) => Uint8Array;
     readonly decode: (val: Uint8Array) => T;
     readonly name: string;
     readonly format: "buffer";
 }
 
-export class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
+export class LevelDBEncoder<T extends Uint> implements LevelDBEncoderLike<T> {
 
     public readonly name: string;
     public readonly format = "buffer";
@@ -20,7 +20,7 @@ export class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
     }
 
     public encode = (val: Uint | Uint8Array) => {
-        return (val as T).getRaw ? (val as T).getRaw() : (val as Uint8Array);
+        return val instanceof Uint ? val.getRaw() : val;
     }
 
     public decode = (val: Uint8Array) => {
@@ -36,7 +36,10 @@ export class BinaryEncoder<T extends Uint> implements BinaryEncoderLike<T> {
 }
 
 
-export const UintEncoder = new BinaryEncoder<Uint>("uint", Uint);
-export const Uint64Encoder = new BinaryEncoder<Uint64>("uint64", Uint64);
-export const Uint256Encoder = new BinaryEncoder<Uint256>("uint256", Uint256);
-export const AddressEncoder = new BinaryEncoder<AddressHex>("address", AddressHex);
+export const LevelDBEncoders = {
+    Uint: new LevelDBEncoder<Uint>("uint", Uint),
+    Uint64: new LevelDBEncoder<Uint64>("uint64", Uint64),
+    Uint256: new LevelDBEncoder<Uint256>("uint256", Uint256),
+    Address: new LevelDBEncoder<AddressHex>("address", AddressHex),
+}
+

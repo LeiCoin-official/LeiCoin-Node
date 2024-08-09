@@ -34,9 +34,8 @@ export class BlockDB {
     }
 
     // Function to read a block
-    public getBlock(index: Uint64 | string): { cb: CB, data?: Block | null | undefined };
-    public getBlock(index: Uint64 & string) {
-        const blockIndex = index.toBigInt ? index.toBigInt().toString() : index;
+    public getBlock(index: Uint64 | string) {
+        const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
             if (BCUtils.existsPath(blockFilePath, this.chain)) {
