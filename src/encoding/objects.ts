@@ -28,16 +28,24 @@ export interface HexDataType {
     parse?(v: Uint): any;
 }
 
+abstract class DataEncoder {
 
-class ArrayEncoder {
+    public readonly key: string;
 
-    readonly key: string;
+    constructor(key: string) {
+        this.key = key;
+    }
+
+}
+
+class ArrayEncoder extends DataEncoder {
+
     readonly prefixLength: number | "unlimited";
     readonly decodeFunc: (hexData: Uint, returnLength: boolean) => any;
     readonly encodeFunc: (forHash: boolean) => Uint;
     
     constructor(key: string, prefixLength: number | "unlimited", decodeFunc: (hexData: Uint, returnLength: boolean) => any, encodeFunc: (forHash: boolean) => Uint) {
-        this.key = key;
+        super(key);
         this.prefixLength = prefixLength;
         this.decodeFunc = decodeFunc;
         this.encodeFunc = encodeFunc;
@@ -107,7 +115,11 @@ class ObjectEncoder {
     }
 }
 
-export class BigIntEncoder {
+export class BigIntEncoder extends DataEncoder {
+
+    constructor(key: string) {
+        super(key);
+    }
 
     encode(v: any) {
         return Uint64.prototype.toShortUint.call(v);

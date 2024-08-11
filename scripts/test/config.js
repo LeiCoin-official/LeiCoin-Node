@@ -1,4 +1,4 @@
-/** @type {import('jest').Config} */
+
 module.exports = {
     rootDir: "../../",
     transform: {'^.+\\.ts?$': 'ts-jest'},
@@ -22,3 +22,4 @@ module.exports = {
     extensionsToTreatAsEsm: ['.ts'],
     setupFiles: ['./scripts/test/setupTestEnv.cjs'],
 };
+
