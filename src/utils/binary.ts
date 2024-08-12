@@ -106,7 +106,7 @@ export class Uint {
 
     public clone(): this {
         // @ts-ignore
-        return new this.constructor(Buffer.copyBytesFrom(this.buffer));
+        return new this.constructor(Buffer.from(this.buffer));
     }
 
     public toHex() {

@@ -1,16 +1,15 @@
-import { AddressHex } from "../objects/address.js";
-import { PX } from "../objects/prefix.js";
-import Signature from "../objects/signature.js";
-import { Uint, Uint256, Uint64, Uint8 } from "../utils/binary.js";
+import { Uint } from "../utils/binary.js";
 import { CB } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/dataUtils.js";
+import { DataEncoder } from "./binaryEncoders.js";
 import EncodingUtils from "./index.js";
 
+/*
 //type NonBinaryBasicTypes = "string" | "int";
 type BasicTypes = "bigint" | "array" | "bool" | "object";
 type AdvancedTypes = "address" | "hash" | "signature" | "nonce" | "version";
 type DefaultDataTypes = BasicTypes | AdvancedTypes /*| NonBinaryBasicTypes*/;
-
+/*
 export interface EncodingSettings {
     key: string;
     length?: number;
@@ -27,122 +26,22 @@ export interface HexDataType {
     encode?(v: any): Uint;
     parse?(v: Uint): any;
 }
+*/
 
-abstract class DataEncoder {
-
-    public readonly key: string;
-
-    constructor(key: string) {
-        this.key = key;
-    }
-
-}
-
-class ArrayEncoder extends DataEncoder {
-
-    readonly prefixLength: number | "unlimited";
-    readonly decodeFunc: (hexData: Uint, returnLength: boolean) => any;
-    readonly encodeFunc: (forHash: boolean) => Uint;
-    
-    constructor(key: string, prefixLength: number | "unlimited", decodeFunc: (hexData: Uint, returnLength: boolean) => any, encodeFunc: (forHash: boolean) => Uint) {
-        super(key);
-        this.prefixLength = prefixLength;
-        this.decodeFunc = decodeFunc;
-        this.encodeFunc = encodeFunc;
-    }
-
-    public encode(array: any[]) {
-        const result: Uint[] = [];
-
-        // length check implemeting later
-        if (this.prefixLength === "unlimited") {
-            result.push(ObjectEncoding.encodeLengthForUnlimited(array.length));
-        } else {
-            result.push(Uint.from(array.length, this.prefixLength));
-        }
-
-        for (let item of array) {
-            result.push(this.encodeFunc.call(item, false));
-        }
-
-        return result;
-    }
-
-    public decode(arrayDataWithLength: Uint) {
-        const final_array = [];
-        let arrayCount, prefixLength;
-
-        if (this.prefixLength === "unlimited") {
-            [arrayCount, prefixLength] = ObjectEncoding.decodeLengthFromUnlimited(arrayDataWithLength);
-        } else {
-            prefixLength = this.prefixLength;
-            arrayCount = arrayDataWithLength.slice(0, prefixLength).toInt();
-        }
-
-        let arrayData = arrayDataWithLength.slice(prefixLength);
-        let total_arrayLength = prefixLength;
-            
-        for (let i = 0; i < arrayCount; i++) {
-            const array_item = this.decodeFunc(arrayData, true);
-            final_array.push(array_item.data);
-            arrayData = arrayData.slice(array_item.length);
-            total_arrayLength += array_item.length;
-        }
-
-        return { value: final_array, length: total_arrayLength }
-    }
-
-}
-
-class ObjectEncoder {
-
-    readonly key: string;
-    readonly decodeFunc: (hexData: Uint, returnLength: boolean) => any;
-    readonly encodeFunc: (forHash: boolean) => Uint;
-
-    constructor(key: string, decodeFunc: (hexData: Uint, returnLength: boolean) => any, encodeFunc: (forHash: boolean) => Uint) {
-        this.key = key;
-        this.decodeFunc = decodeFunc;
-        this.encodeFunc = encodeFunc;
-    }
-
-    public encode(object: AnyObj) {
-        return this.encodeFunc.call(object, false);
-    }
-
-    public decode(hexData: Uint) {
-        return this.decodeFunc(hexData, true);
-    }
-}
-
-export class BigIntEncoder extends DataEncoder {
-
-    constructor(key: string) {
-        super(key);
-    }
-
-    encode(v: any) {
-        return Uint64.prototype.toShortUint.call(v);
-    }
-    parse(v: Uint) {
-        return Uint64.create(v);
-    }
-
-}
 
 export class ObjectEncoding {
 
     private static initialized = false; 
 
-    private static readonly types: Dict<HexDataType> = {};
+    //private static readonly types: Dict<HexDataType> = {};
 
     public static init() {
         if (this.initialized) return;
-        this.setupTypes();
+        //this.setupTypes();
         this.initialized = true;
     }
     
-    private static setupTypes() {
+    /*private static setupTypes() {
 
         this.types.index =
         this.types.slotIndex =
@@ -282,7 +181,7 @@ export class ObjectEncoding {
             return null;
         }
 
-    }
+    }*/
 
     public static encodeLengthForUnlimited(length: number) {
         const lenStr = length.toString(15) + "F";
@@ -296,36 +195,22 @@ export class ObjectEncoding {
             Math.ceil((base15Length.length + 1) / 2)
         ];
     }
-
-    public static encode(object: AnyObj, keys: EncodingSettings[], forHash: boolean) {
-
+    
+    public static encode(object: AnyObj, keyConfigs: DataEncoder[], forHash: boolean) {
         try {
+            const hexData: Uint[] = [];
 
-            let hexData: Uint[] = [];
+            for (const keyConfig of keyConfigs) {
+                if (forHash && keyConfig.hashRemove) continue;
 
-            for (const data of keys) {
+                const value = object[keyConfig.key]
+                const rawData = keyConfig.encode(value);
 
-                if (forHash && data.hashRemove) continue;
-
-                const value = object[data.key];
-
-                if (data.type === "object" && data.encodeFunc) {
-
-                    hexData.push(data.encodeFunc.call(value, false));
-
-                } else if (data.type === "array" && data.encodeFunc) {
-
-                    
-
-                } else {
-                    const hexValue = this.encodeValue(value, data);
-
-                    if (!hexValue) {
-                        return { cb: CB.ERROR, data: Uint.empty() };
-                    }
-
-                    hexData.push(...hexValue);
+                if (!rawData) {
+                    return { cb: CB.ERROR, data: Uint.empty() };
                 }
+
+                hexData.push(...rawData);
             }
 
             return { cb: CB.SUCCESS, data: Uint.concat(hexData) };
@@ -333,45 +218,23 @@ export class ObjectEncoding {
         } catch (err: any) {
             return { cb: CB.ERROR, data: Uint.empty() };
         }
-
     }
     
-    public static decode(hexData: Uint, values: EncodingSettings[], returnLength = false) {
-        
+    public static decode(hexData: Uint, keyConfigs: DataEncoder[], returnLength = false) {
         try {
-
             const final_data: Dict<any> = {};
             let current_length = 0;
         
-            for (const data of values) {
-        
-                const key = data.key;
-
+            for (const keyConfig of keyConfigs) {
                 const currentPart = hexData.slice(current_length);
-                
-                if (data.type === "object" && data.decodeFunc) {
+                const decoded = keyConfig.decode(currentPart);
 
-                    const object = data.decodeFunc(currentPart, true);
-                    final_data[key] = object.data;
-                    current_length += object.length;
-
-                } else if (data.type === "array" && data.decodeFunc) {
-
-                    final_data[key] = final_array;
-                    current_length += total_arrayLength;
-                    
-
-                } else {
-                    
-                    const value = this.decodeValue(currentPart, data);
-
-                    if (!value) {
-                        return { cb: CB.ERROR };
-                    }
-                    
-                    final_data[key] = value.value;
-                    current_length += value.length;
+                if (!decoded) {
+                    return { cb: CB.ERROR };
                 }
+
+                final_data[keyConfig.key] = decoded.data;
+                current_length += decoded.length;
             }
         
             if (returnLength) {
@@ -383,7 +246,6 @@ export class ObjectEncoding {
         } catch (err: any) {
             return { cb: CB.ERROR };
         }
-    
     }
 
 }

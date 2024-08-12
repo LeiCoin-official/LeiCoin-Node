@@ -42,7 +42,7 @@ class BCUtils {
                 cli.data.info(`Directory ${this.getRelativePath(directoryPath, fork)} was created because it was missing.`);
             }
         } catch (err: any) {
-            cli.data.error(`Error ensuring the existence of a directory at ${this.getRelativePath(directoryPath, fork)}: ${err.message}`);
+            cli.data.error(`Error ensuring the existence of a directory at ${this.getRelativePath(directoryPath, fork)}: ${err.stack}`);
         }
     }
     
@@ -60,7 +60,7 @@ class BCUtils {
             }
 
         } catch (err: any) {
-            cli.data.error(`Error ensuring the existence of a file at ${this.getRelativePath(filePath, fork)}: ${err.message}`);
+            cli.data.error(`Error ensuring the existence of a file at ${this.getRelativePath(filePath, fork)}: ${err.stack}`);
         }
     }
     

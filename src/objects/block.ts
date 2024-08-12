@@ -4,9 +4,10 @@ import Crypto from "../crypto/index.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
-import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
+import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";
 import Signature from "./signature.js";
+import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Block {
 
@@ -68,21 +69,21 @@ export class Block {
                 return block;
             }
         } catch (err: any) {
-            cli.data.error(`Error loading Block from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Block from Decoded Hex: ${err.stack}`);
         }
 
         return null;
     }
 
-    private static encodingSettings: EncodingSettings[] = [
-        {key: "version"},
-        {key: "index"},
-        {key: "slotIndex"},
-        {key: "hash", hashRemove: true},
-        {key: "previousHash", type: "hash"},
-        {key: "timestamp"},
-        {key: "signature", hashRemove: true},
-        {key: "transactions", type: "array", length: 2, encodeFunc: Transaction.prototype.encodeToHex, decodeFunc: Transaction.fromDecodedHex}
+    private static encodingSettings: DataEncoder[] = [
+        BE.PX("version"),
+        BE.BigInt("index"),
+        BE.BigInt("slotIndex"),
+        BE.Hash("hash", true),
+        BE.Hash("previousHash"),
+        BE.BigInt("timestamp"),
+        BE.Signature("signature", true),
+        BE.Array("transactions", 2, Transaction.prototype.encodeToHex, Transaction.fromDecodedHex)
     ]
 
     public calculateHash() {

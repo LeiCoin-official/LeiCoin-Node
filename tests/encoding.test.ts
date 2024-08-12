@@ -1,3 +1,4 @@
+import { describe, test, expect } from "bun:test";
 import Transaction from "../src/objects/transaction.js";
 import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
@@ -22,7 +23,7 @@ describe('encoding_testing', () => {
             address,
             Signature.empty(),
             []
-        )
+        );
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());
         const decoded2 = Block.fromDecodedHex(decoded.encodeToHex());

@@ -24,7 +24,7 @@ export default function initLeiCoinNetServer(options: WebSocket.ServerOptions) {
         });
 
         ws.on('error', (error) => {
-            cli.leicoin_net.server.info(`Websocket Server Error: ${error.message}`);
+            cli.leicoin_net.server.info(`Websocket Server Error: ${error.stack}`);
             //utils.events.emit("ws_reconnect");
         });
 

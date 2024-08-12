@@ -109,7 +109,7 @@ class Blockchain extends Chain {
     //         return { cb: CB.SUCCESS };
 
     //     } catch (err: any) {
-    //         cli.data.error(`Error transfering Fork ${fork} to Main Blockchain: ${err.message}`);
+    //         cli.data.error(`Error transfering Fork ${fork} to Main Blockchain: ${err.stack}`);
     //         return { cb: CB.ERROR };
     //     }
 

@@ -1,3 +1,4 @@
+import cli from "../cli/cli.js";
 import { BasicUintConstructable, Uint } from "./binary.js";
 
 
@@ -48,7 +49,6 @@ export class BMap<K extends Uint, V> extends Map {
             },
             next(): IteratorResult<[K, V]> {
                 const result = entriesIterator.next();
-                console.log("result", result.value)
                 if (result.done) {
                     return { done: true, value: undefined as any };
                 }

@@ -1,3 +1,4 @@
+import { describe, test, expect } from "bun:test";
 import { PrivateKey } from "../src/crypto/cryptoKeys.js";
 import Crypto from "../src/crypto/index.js"
 import { Address32, AddressHex } from "../src/objects/address.js";

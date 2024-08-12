@@ -1,3 +1,4 @@
+import { describe, test, expect } from "bun:test";
 import { AddressHex } from "../src/objects/address.js";
 import Block from "../src/objects/block.js";
 import Signature from "../src/objects/signature.js";

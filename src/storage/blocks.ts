@@ -28,7 +28,7 @@ export class BlockDB {
                 return { cb: CB.ERROR };
             }
         } catch (err: any) {
-            cli.data.error(`Error writing block ${blockIndex}: ${err.message}.`);
+            cli.data.error(`Error writing block ${blockIndex}: ${err.stack}.`);
             return { cb: CB.ERROR };
         }
     }
@@ -46,7 +46,7 @@ export class BlockDB {
                 return {cb: CB.NONE};
             }
         } catch (err: any) {
-            cli.data.error(`Error reading block ${blockIndex}: ${err.message}.`);
+            cli.data.error(`Error reading block ${blockIndex}: ${err.stack}.`);
             return {cb: CB.ERROR};
         }
     }
@@ -79,7 +79,7 @@ export class BlockDB {
             // Block not found in any fork
             return {cb: Callbacks.NONE};
         } catch (err: any) {
-            cli.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.message}`);
+            cli.data_message.error(`Error reading Block ${index} ${hash} in Forks: ${err.stack}`);
             return {cb: Callbacks.ERROR};
         }
     }*/

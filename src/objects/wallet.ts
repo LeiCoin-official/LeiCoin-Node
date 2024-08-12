@@ -1,8 +1,9 @@
-import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
+import ObjectEncoding from "../encoding/objects.js";
 import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
+import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Wallet {
 
@@ -35,15 +36,15 @@ export class Wallet {
                 return new Wallet(ownerAddress, data.balance, data.nonce, data.version);
             }
         } catch (err: any) {
-            cli.data.error(`Error loading Wallet from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Wallet from Decoded Hex: ${err.stack}`);
         }
         return null;
     }
 
-    private static encodingSettings: EncodingSettings[] = [
-        {key: "version"},
-        {key: "balance", type: "bigint"},
-        {key: "nonce"},
+    private static encodingSettings: DataEncoder[] = [
+        BE.PX("version"),
+        BE.BigInt("balance"),
+        BE.BigInt("nonce")
     ]
 
     public addMoney(amount: NumberLike) {

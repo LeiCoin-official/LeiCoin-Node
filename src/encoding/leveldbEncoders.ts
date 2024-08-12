@@ -24,7 +24,7 @@ export class LevelDBEncoder<T extends Uint> implements LevelDBEncoderLike<T> {
     }
 
     public decode = (val: Uint8Array) => {
-        return new this.CLS(Buffer.copyBytesFrom(val));
+        return new this.CLS(Buffer.from(val));
     }
 
     /*

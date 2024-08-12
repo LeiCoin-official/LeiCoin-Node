@@ -1,4 +1,5 @@
-import { Uint64, Uint } from "../src/utils/binary.js"
+import { describe, test, expect } from "bun:test";
+import { Uint64, Uint } from "../src/utils/binary.js";
 
 describe('binary_testing', () => {
 

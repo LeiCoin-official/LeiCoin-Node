@@ -29,7 +29,7 @@
 //                 return DataUtils.createInstanceFromJSON(Reward, data);;
 //             }
 //         } catch (err: any) {
-//             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
+//             cli.data_message.error(`Error loading Attestation from Decoded Hex: ${err.stack}`);
 //         }
 //         return null;
 //     }

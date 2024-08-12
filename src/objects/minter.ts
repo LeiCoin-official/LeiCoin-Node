@@ -1,9 +1,10 @@
-import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
+import ObjectEncoding from "../encoding/objects.js";
 import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
 import { PrivateKey } from "../crypto/cryptoKeys.js";
+import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Minter {
 
@@ -38,15 +39,15 @@ export class Minter {
                 return new Minter(address, data.stake, data.version);
             }
         } catch (err: any) {
-            cli.data.error(`Error loading Minter from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Minter from Decoded Hex: ${err.stack}`);
         }
         return null;
     }
 
-    private static encodingSettings: EncodingSettings[] = [
-        {key: "version"},
+    private static encodingSettings: DataEncoder[] = [
+        BE.PX("version"),
         //{key: "address"},
-        {key: "stake", type: "bigint"},
+        BE.BigInt("stake")
     ]
 
 }

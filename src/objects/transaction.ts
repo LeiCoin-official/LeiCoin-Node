@@ -1,6 +1,6 @@
 import config from "../config/index.js";
 import Crypto from "../crypto/index.js";
-import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
+import ObjectEncoding from "../encoding/objects.js";
 import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
@@ -9,6 +9,7 @@ import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import Signature from "./signature.js";
 import { PX } from "./prefix.js";
 import { MinterCredentials } from "./minter.js";
+import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Transaction {
 
@@ -88,20 +89,20 @@ export class Transaction {
                 return instance;
             }
         } catch (err: any) {
-            cli.data.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading Transaction from Decoded Hex: ${err.stack}`);
         }
         return null;
     }
 
-    private static encodingSettings: EncodingSettings[] = [
-        {key: "version"},
-        {key: "txid", type: "hash", hashRemove: true},
-        {key: "recipientAddress", type: "address"},
-        {key: "amount", type: "bigint"},
-        {key: "nonce"},
-        {key: "timestamp"},
-        {key: "input", lengthBefore: "unlimited"},
-        {key: "signature", hashRemove: true}
+    private static encodingSettings: DataEncoder[] = [
+        BE.PX("version"),
+        BE.Hash("txid", true),
+        BE.Address("recipientAddress"),
+        BE.BigInt("amount"),
+        BE.BigInt("nonce"),
+        BE.BigInt("timestamp"),
+        BE.Custom("input", { type: "prefix", val: "unlimited" }),
+        BE.Signature("signature", true)
     ]
 
     public calculateHash() {

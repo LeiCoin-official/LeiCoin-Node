@@ -112,7 +112,7 @@ class BigNum {
             const hexNum = BigInt(num).toString(16).toUpperCase();
             return hexNum.padStart(minLength, "0");
         } catch (error: any) {
-            return error.message;
+            return error.stack;
         }
     }
     
@@ -432,7 +432,7 @@ class Transaction {
                 return tx;
             }
         } catch (err: any) {
-            console.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
+            console.error(`Error loading Transaction from Decoded Hex: ${err.stack}`);
         }
 
         return null;
@@ -486,7 +486,7 @@ class AttestationInBlock {
                 return attestation;
             }
         } catch (err: any) {
-            console.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
+            console.error(`Error loading Attestation from Decoded Hex: ${err.stack}`);
         }
 
         return null;
@@ -612,7 +612,7 @@ class Block {
                 return block;
             }
         } catch (err: any) {
-            console.error(`Error loading Block from Decoded Hex: ${err.message}`);
+            console.error(`Error loading Block from Decoded Hex: ${err.stack}`);
         }
 
         return null;

@@ -65,7 +65,7 @@ export class Chainstate {
 
             return {cb: CB.SUCCESS, data: JSON.parse(data)};
         } catch (err: any) {
-            cli.data.error(`Error reading latest block info: ${err.message}`);
+            cli.data.error(`Error reading latest block info: ${err.stack}`);
             return {cb: CB.ERROR, data: { version: "00", chains: {} }};
         }
     }
@@ -85,7 +85,7 @@ export class Chainstate {
             fs.writeFileSync(latestBlockInfoFilePath, hexData, { encoding: "hex" });
             return {cb: CB.SUCCESS};
         } catch (err: any) {
-            cli.data.error(`Error updating Chainstate File: ${err.message}`);
+            cli.data.error(`Error updating Chainstate File: ${err.stack}`);
             return {cb: CB.ERROR};
         }
     }
@@ -119,7 +119,7 @@ export class Chainstate {
 
             return {cb: CB.SUCCESS};
         } catch (err: any) {
-            cli.data.error(`Error updating Chainstate: ${err.message}`);
+            cli.data.error(`Error updating Chainstate: ${err.stack}`);
             return {cb: CB.ERROR};
         }
 

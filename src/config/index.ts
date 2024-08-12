@@ -108,7 +108,7 @@ class Config {
     //                 }
     //             }
     //         } catch (error) {
-    //             console.error(`Error parsing argument: ${arg}`);
+    //             cli.data.error(`Error parsing argument: ${arg}`);
     //         }
     //     }
     
@@ -181,7 +181,7 @@ class Config {
                 return null;
             }
         } catch (error: any) {
-            cli.data.error(`Error loading peers configuration: ${error.message}`);
+            cli.data.error(`Error loading peers configuration: ${error.stack}`);
             return null;
         }
     }
@@ -212,7 +212,7 @@ class Config {
                 return null
             }
         } catch (error: any) {
-            cli.data.error(`Error loading .env configuration: ${error.message}`);
+            cli.data.error(`Error loading .env configuration: ${error.stack}`);
             return null;
         }
     }

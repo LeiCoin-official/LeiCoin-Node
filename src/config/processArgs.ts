@@ -91,7 +91,7 @@ export class ProcessArgsParser {
                 }
 
             } catch (err: any) {
-                cli.data.error(`Unexpected error parsing argument ${argName}: ${err.message}`);
+                cli.data.error(`Unexpected error parsing argument ${argName}: ${err.stack}`);
                 utils.gracefulShutdown(1); return {} as any;
             }
 

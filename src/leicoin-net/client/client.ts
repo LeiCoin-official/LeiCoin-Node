@@ -23,7 +23,7 @@ export class LeiCoinNetClient {
         });
     
         this.client.on('error', (error: any) => {
-            cli.leicoin_net.client.error(`Error connecting to ${this.host}: ${error.message}`);
+            cli.leicoin_net.client.error(`Error connecting to ${this.host}: ${error.stack}`);
         });
     
         this.client.on('close', (code: number) => {
@@ -45,7 +45,7 @@ export class LeiCoinNetClient {
                 //cli.leicoin_net_message.client.log(`Data sent to ${this.host}`);
                 return CB.SUCCESS;
             } catch (err: any) {
-                cli.leicoin_net.client.error(`Error sending Binary Data to ${this.host}: ${err.message}`);
+                cli.leicoin_net.client.error(`Error sending Binary Data to ${this.host}: ${err.stack}`);
             }
         } else if (trys > 0) {
             await this.connect();

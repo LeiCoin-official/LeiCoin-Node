@@ -116,7 +116,7 @@ class CLI implements CLILike {
 
         this.logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
         this.logStream.on('error', (err) => {
-            console.error(`[System] Error writing to log: ${err.message}`);
+            console.error(`[System] Error writing to log: ${err.stack}`);
             this.rl.prompt();
             this.rl.write(null, { ctrl: true, name: 'e' });
         });

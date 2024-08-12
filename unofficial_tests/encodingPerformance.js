@@ -82,7 +82,7 @@ class BigNum {
             return hexNum.padStart(minLength, "0");
         }
         catch (error) {
-            return error.message;
+            return error.stack;
         }
     }
     // Decode a hexadecimal string to a numeric string
@@ -325,7 +325,7 @@ class Transaction {
             }
         }
         catch (err) {
-            console.error(`Error loading Transaction from Decoded Hex: ${err.message}`);
+            console.error(`Error loading Transaction from Decoded Hex: ${err.stack}`);
         }
         return null;
     }
@@ -363,7 +363,7 @@ class AttestationInBlock {
             }
         }
         catch (err) {
-            console.error(`Error loading Attestation from Decoded Hex: ${err.message}`);
+            console.error(`Error loading Attestation from Decoded Hex: ${err.stack}`);
         }
         return null;
     }
@@ -446,7 +446,7 @@ class Block {
             }
         }
         catch (err) {
-            console.error(`Error loading Block from Decoded Hex: ${err.message}`);
+            console.error(`Error loading Block from Decoded Hex: ${err.stack}`);
         }
         return null;
     }

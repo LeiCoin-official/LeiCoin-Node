@@ -1,8 +1,9 @@
 
 await Bun.build({
     entrypoints: ['./src/index.ts'],
+    outdir: './build/bundle/',
     target: "bun",
-    sourcemap: "external",
+    sourcemap: "linked",
     format: 'esm',
-    outdir: './build/bin/',
+    naming: "[dir]/leicoin-node.[ext]"
 });

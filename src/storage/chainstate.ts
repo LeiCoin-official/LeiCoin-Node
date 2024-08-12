@@ -1,6 +1,7 @@
 import cli from "../cli/cli.js";
 import Crypto from "../crypto/index.js";
-import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
+import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import ObjectEncoding from "../encoding/objects.js";
 import Block from "../objects/block.js";
 import { PX } from "../objects/prefix.js";
 import { Uint, Uint256 } from "../utils/binary.js";
@@ -48,7 +49,7 @@ class ForkChainstateData {
                 return forkChainstateData;
             }
         } catch (err: any) {
-            cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.stack}`);
         }
 
         return null;
@@ -58,11 +59,11 @@ class ForkChainstateData {
         return Crypto.sha256(this.encodeToHex(true));
     }
 
-    private static encodingSettings: EncodingSettings[] = [
-        {key: "stateHash", type: "hash", hashRemove: true},
-        {key: "parentChain", type: "hash"},
-        {key: "base", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex},
-        {key: "latestBlock", type: "object", encodeFunc: Block.prototype.encodeToHex, decodeFunc: Block.fromDecodedHex}
+    private static encodingSettings: DataEncoder[] = [
+        BE.Hash("stateHash", true),
+        BE.Hash("parentChain"),
+        BE.Object("base", Block.prototype.encodeToHex, Block.fromDecodedHex),
+        BE.Object("latestBlock", Block.prototype.encodeToHex, Block.fromDecodedHex)
     ]
 
 }
@@ -105,7 +106,7 @@ class ChainstateData {
                 return DataUtils.createInstanceFromJSON(ChainstateData, data);
             }
         } catch (err: any) {
-            cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.message}`);
+            cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.stack}`);
         }
 
         return this.createEmpty();
@@ -115,9 +116,9 @@ class ChainstateData {
         return Crypto.sha256(this.encodeToHex(true));
     }
 
-    private static encodingSettings: EncodingSettings[] = [
-        {key: "version"},
-        {key: "chains", type: "array", length: 2, encodeFunc: ForkChainstateData.prototype.encodeToHex, decodeFunc: ForkChainstateData.fromDecodedHex}
+    private static encodingSettings: DataEncoder[] = [
+        BE.PX("version"),
+        BE.Array("chains", 2, ForkChainstateData.prototype.encodeToHex, ForkChainstateData.fromDecodedHex)
     ]
 
 }
@@ -145,7 +146,7 @@ export class Chainstate {
             const chainStateData = ChainstateData.fromDecodedHex(BCUtils.readFile('/chainstate.lcb', "main"));
             return {cb: CB.SUCCESS, data: chainStateData};
         } catch (err: any) {
-            cli.data.error(`Error reading Chainstate File: ${err.message}`);
+            cli.data.error(`Error reading Chainstate File: ${err.stack}`);
             return {cb: CB.ERROR, data: ChainstateData.createEmpty()};
         }
     }
@@ -155,7 +156,7 @@ export class Chainstate {
             BCUtils.writeFile('/chainstate.lcb', "main", this.chainStateData.encodeToHex());
             return {cb: CB.SUCCESS};
         } catch (err: any) {
-            cli.data.error(`Error updating Chainstate File: ${err.message}`);
+            cli.data.error(`Error updating Chainstate File: ${err.stack}`);
             return {cb: CB.ERROR};
         }
     }
