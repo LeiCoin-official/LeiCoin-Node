@@ -16,7 +16,7 @@
 		"debug:noCompactNewBuild": "tsc && bun run build/src",
 		"build": "bun run ./scripts/bundle",
 		"build:noCompact": "tsc",
-		"compile": "bun build --compile --sourcemap ./src/index.ts --outfile ./build/bin/leicoin-node",
+		"compile": "bun run ./scripts/compile",
 		"compile:linux-x64": "bun build --compile --sourcemap ./src/index.ts --outfile ./build/bin/leicoin-node",
 		"compile:linux-arm": "bun build --compile --sourcemap ./src/index.ts --outfile ./build/bin/leicoin-node",
 		"compile:win-x64": "bun build --compile --sourcemap ./src/index.ts --outfile ./build/bin/leicoin-node",

@@ -8,3 +8,5 @@ await Bun.build({
     format: 'esm',
     naming: "[dir]/leicoin-node.[ext]"
 });
+
+export {}

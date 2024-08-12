@@ -7,7 +7,6 @@ import { PX } from "../objects/prefix.js";
 import { Uint, Uint256 } from "../utils/binary.js";
 import { CB } from "../utils/callbacks.js";
 import { DataUtils, Dict } from "../utils/dataUtils.js";
-import { VCode } from "../verification/codes.js";
 import blockchain from "./blockchain.js";
 import BCUtils from "./blockchainUtils.js";
 
