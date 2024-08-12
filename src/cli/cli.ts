@@ -106,7 +106,7 @@ class CLI implements CLILike {
     private constructor() {
         // Generate a timestamp for the log file name
         const current_time = DataUtils.getCurrentLogTime();
-        const logFilePath = utils.processRootDirectory + `/logs/log-${current_time}.log`;
+        const logFilePath = utils.procCWD + `/logs/log-${current_time}.log`;
 
         const logFilePathdir = dirname(logFilePath);
         if (!fs.existsSync(logFilePathdir)) {

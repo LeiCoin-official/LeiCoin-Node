@@ -15,7 +15,7 @@ class BCUtils {
     }
 
     public static getBlockchainDataFilePath(subpath: string, fork = "main") {
-        return path.join(utils.processRootDirectory, this.getRelativePath(subpath, fork));
+        return path.join(utils.procCWD, this.getRelativePath(subpath, fork));
     }
 
     public static readFile(filePath: string, fork: string) {

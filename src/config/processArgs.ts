@@ -36,6 +36,15 @@ class PArg<T extends PArgAllowedTypes> {
 
 export class ProcessArgsParser {
 
+    private static instance: ProcessArgsParser | null = null;
+
+    constructor() {
+        if (ProcessArgsParser.instance) {
+            return ProcessArgsParser.instance;
+        }
+        ProcessArgsParser.instance = this;
+    }
+
     public readonly argsSettings = {
         '--port' : new PArg(12200, "number"),
         '--host': new PArg("0.0.0.0", "string"),

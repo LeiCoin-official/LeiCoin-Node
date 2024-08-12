@@ -17,11 +17,7 @@ class Utils {
 
     public readonly events = new EventEmitter();
 
-    public readonly processRootDirectory = process.cwd();
-
-    public readonly mining_difficulty = 6;
-    public readonly mining_pow = 10;
-
+    public readonly procCWD = process.cwd();
 
     private constructor() {
         //process.on("SIGINT", this.gracefulShutdown);

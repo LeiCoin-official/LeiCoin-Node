@@ -51,7 +51,7 @@ export class Transaction {
             Uint256.alloc(),
             AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2"),
             mc.address,
-            Uint64.from(utils.mining_pow),
+            Uint64.from(10),
             Uint64.from(0),
             Uint64.from(new Date().getTime()),
             Uint.empty(),
