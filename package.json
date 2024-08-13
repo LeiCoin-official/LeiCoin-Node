@@ -26,7 +26,8 @@
 		"url": "git+https://github.com/LeiCraft/LeiCoin-Node.git"
 	},
 	"author": "LeiCraft_",
-	"license": "ISC",
+	"publisher": "LeiCraft_MC",
+	"license": "AGPL-3.0-only",
 	"bugs": {
 		"url": "https://github.com/LeiCraft/LeiCoin-Node/issues"
 	},
