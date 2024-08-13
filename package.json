@@ -8,7 +8,7 @@
 		"old-dev": "ts-node --esm src/index.ts",
 		"setup": "bun run ./scripts/setup",
 		"clean:win": "cmd /C \"rmdir /Q /S node_modules\" ",
-		"clean:linux": "bash rm -r node_modules",
+		"clean:linux": "rm -r node_modules",
 		"test": "bun test",
 		"debug": "bun run ./build/bundle/leicoin-node.js",
 		"debug:newBuild": "bun run ./scripts/bundle && bun run ./build/bundle/leicoin-node.js",
