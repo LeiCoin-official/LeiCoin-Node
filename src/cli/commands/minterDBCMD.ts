@@ -25,7 +25,7 @@ export default class MinterDBCMD extends CLISubCMD {
 class ReadCMD extends CLICMD {
     public name = "read";
     public description = "Read the Minter database";
-    public usage = "read <all(minter_address>)";
+    public usage = "read (<minter_address> | all)";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {

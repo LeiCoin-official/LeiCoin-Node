@@ -74,5 +74,5 @@ class Config {
 
 }
 
-const config = Config.getInstance().loadConfig();
+const config = Config.getInstance().loadConfig() as ConfigLike;
 export default config;

@@ -1,18 +1,63 @@
 
-import { Compiler, Platforms } from "./compiler.js";
+import { Compiler, Platforms, PlatformArg } from "./compiler.js";
 
-const args = process.argv.slice(2);
+class CompileCMD {
 
-// if (args.length === 0) {
-//     console.log("Usage: npx bun compile <platform>");
-//     console.log("Platforms: " + Object.keys(Platforms).join(", "));
-//     process.exit(1);
-// }
+    private static readonly subCMDs = {
+        "--help": this.help,
+        "all": this.all,
+    };
 
-if (args[0] === "all") {
-    for (const platform in Platforms) {
-        new Compiler(platform as keyof typeof Platforms).build();
+    private static initialized = false;
+
+    public static init() {
+        if (this.initialized) return;
+        this.initialized = true;
     }
-} else {
-    new Compiler(args[0] as keyof typeof Platforms).build();
+
+    public static async run() {
+        const args = process.argv.slice(2);
+
+        if (args.length === 0) {
+            await new Compiler("auto").build();
+            return;
+        }
+
+        if (args[0] in this.subCMDs) {
+            await this.subCMDs[args[0]](args.slice(1));
+            return;
+        }
+
+        if (args.length !== 1) {
+            await this.help(args);
+            return;
+        }
+
+        if (Object.keys(Platforms).some(p => p === args[0])) {
+            await new Compiler(args[0] as PlatformArg).build();
+            return;
+        } else {
+            console.log(`Invalid platform: ${args[0]}`);
+            console.log("Platforms: " + Object.keys(Platforms).join(", "));
+        }
+    }
+
+    private static async help(args: string[]) {
+        console.log("Usage: npx bun compile (<platform> | auto | all)");
+        console.log("Platforms: " + Object.keys(Platforms).join(", "));
+    }
+
+    private static async all(args: string[]) {
+        const builds: Promise<void>[] = [];
+
+        for (const platform in Platforms) {
+            builds.push(new Compiler(platform as PlatformArg).build());
+        }
+        await Promise.all(builds);
+    }
+
 }
+
+CompileCMD.init();
+await CompileCMD.run();
+
