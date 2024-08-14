@@ -1,6 +1,6 @@
 
 function main() {
-    process.env.custom_cwd = process.cwd() + "/testnet";
+    process.env.custom_cwd = __dirname;
 }
 
 main();

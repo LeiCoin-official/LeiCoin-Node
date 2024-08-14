@@ -19,7 +19,7 @@ export class RocksDB<K = Uint, V = Uint> extends LevelUP {
         callback?: ErrorCallback
     ) {
         super(
-            new EncodingDown(
+            new EncodingDown<K, V>(
                 new RocksDBDown(location),
                 options,
             ),
