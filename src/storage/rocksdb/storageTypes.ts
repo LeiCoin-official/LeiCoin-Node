@@ -1,11 +1,11 @@
 import path from "path";
-import LevelDB from "./leveldb.js";
-import BCUtils from "./blockchainUtils.js";
+import RocksDB from "./index.js";
+import BCUtils from "../blockchainUtils.js";
 
-export abstract class LevelBasedStorage {
+export abstract class RocksBasedStorage {
 
     // @ts-ignore
-    protected level: LevelDB = null;
+    protected level: RocksDB = null;
     protected abstract path: string;
     protected chain: string = "";
 
@@ -20,8 +20,9 @@ export abstract class LevelBasedStorage {
         this.initialized = true;
         
         BCUtils.ensureDirectoryExists(this.path, this.chain);
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath(this.path, this.chain)));
+        this.level = new RocksDB(path.join(BCUtils.getBlockchainDataFilePath(this.path, this.chain)));
         await this.level.open();
     }
 
 }
+

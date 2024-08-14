@@ -1,7 +1,7 @@
 
 export class Schedule {
 
-    private timeout: NodeJS.Timeout;
+    private timeout: Timer;
     private finished = false;
 
     constructor(task: () => void, ms: number) {

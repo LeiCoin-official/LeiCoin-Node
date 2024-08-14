@@ -1,21 +1,26 @@
 import { AddressHex } from "../objects/address.js";
 import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../utils/binary.js";
 
-interface LevelDBEncoderLike<T extends Uint> {
+interface RocksDBEncoderLike<T extends Uint> {
     readonly encode: (val: Uint | Uint8Array) => Uint8Array;
     readonly decode: (val: Uint8Array) => T;
-    readonly name: string;
-    readonly format: "buffer";
+    //readonly name: string;
+    //readonly format: "buffer";
+    readonly type: string;
+    readonly buffer: true;
 }
 
-export class LevelDBEncoder<T extends Uint> implements LevelDBEncoderLike<T> {
+export class RocksDBEncoder<T extends Uint> implements RocksDBEncoderLike<T> {
 
-    public readonly name: string;
-    public readonly format = "buffer";
+    //public readonly name: string;
+    //public readonly format = "buffer";
+    public readonly type: string;
+    public readonly buffer = true;
     private readonly CLS: BasicUintConstructable<T>;
 
     constructor(name: string, CLS: BasicUintConstructable<T>) {
-        this.name = name;
+        //this.name = name;
+        this.type = name;
         this.CLS = CLS;
     }
 
@@ -36,10 +41,10 @@ export class LevelDBEncoder<T extends Uint> implements LevelDBEncoderLike<T> {
 }
 
 
-export const LevelDBEncoders = {
-    Uint: new LevelDBEncoder<Uint>("uint", Uint),
-    Uint64: new LevelDBEncoder<Uint64>("uint64", Uint64),
-    Uint256: new LevelDBEncoder<Uint256>("uint256", Uint256),
-    Address: new LevelDBEncoder<AddressHex>("address", AddressHex),
+export const RocksDBEncoders = {
+    Uint: new RocksDBEncoder<Uint>("uint", Uint),
+    Uint64: new RocksDBEncoder<Uint64>("uint64", Uint64),
+    Uint256: new RocksDBEncoder<Uint256>("uint256", Uint256),
+    Address: new RocksDBEncoder<AddressHex>("address", AddressHex),
 }
 

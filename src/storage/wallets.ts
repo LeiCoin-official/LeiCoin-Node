@@ -7,9 +7,9 @@ import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint64 } from "../utils/binary.js";
-import { LevelBasedStorage } from "./storageTypes.js";
+import { RocksBasedStorage } from "./rocksdb/storageTypes.js";
 
-export class WalletDB extends LevelBasedStorage {
+export class WalletDB extends RocksBasedStorage {
 
     protected path = "/wallets";
 

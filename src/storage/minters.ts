@@ -3,10 +3,10 @@ import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "../utils/binary.js";
 import Crypto from "../crypto/index.js";
-import { LevelBasedStorage } from "./storageTypes.js";
+import { RocksBasedStorage } from "./rocksdb/storageTypes.js";
 import { PX } from "../objects/prefix.js";
 
-export class MinterDB extends LevelBasedStorage {
+export class MinterDB extends RocksBasedStorage {
 
     protected path = "/validators";
 

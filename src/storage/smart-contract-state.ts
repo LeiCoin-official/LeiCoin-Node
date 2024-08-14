@@ -1,11 +1,8 @@
-import LevelDB from "./leveldb.js";
-import BCUtils from "./blockchainUtils.js";
-import path from "path";
 import { AddressHex } from "../objects/address.js";
 import { Uint } from "../utils/binary.js";
-import { LevelBasedStorage } from "./storageTypes.js";
+import { RocksBasedStorage } from "./rocksdb/storageTypes.js";
 
-class SmartContractStateDB extends LevelBasedStorage {
+class SmartContractStateDB extends RocksBasedStorage {
 
     protected path = "/smart-contracts/state";
 
