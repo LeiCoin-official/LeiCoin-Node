@@ -112,6 +112,7 @@
     "localtests/**/*",
     "scripts/**/*",
     "tests/**/*",
+    "testnet/**/*",
     "build/**/*"
   ],
   "ts-node": {

@@ -17,9 +17,14 @@ class Utils {
 
     public readonly events = new EventEmitter();
 
-    public readonly procCWD = process.cwd();
+    public readonly procCWD: string;
 
     private constructor() {
+        if (process.env.custom_cwd) {
+            process.chdir(process.env.custom_cwd);
+        }
+        this.procCWD = process.cwd();
+
         //process.on("SIGINT", this.gracefulShutdown);
         process.on("SIGTERM", this.gracefulShutdown);
     }
