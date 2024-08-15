@@ -27,6 +27,14 @@ export class Chain {
         ])
     }
 
+    public async close() {
+        await Promise.all([
+            this.wallets.close(),
+            this.cstates.close(),
+            this.minters.close(),
+        ]);
+    }
+
 }
 
 export default Chain;

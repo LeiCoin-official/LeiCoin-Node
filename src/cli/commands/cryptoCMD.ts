@@ -1,6 +1,6 @@
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import { PrivateKey } from "../../crypto/cryptoKeys.js";
-import Crypto from "../../crypto/index.js";
+import LCrypt from "../../crypto/index.js";
 import { Address32, AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
 import cli from "../cli.js";
@@ -29,7 +29,7 @@ class GenKeyPairCMD extends CLICMD {
             return;
         }
 
-        const privKey = Crypto.ec.genKeyPair().getPrivate("hex");
+        const privKey = LCrypt.ec.genKeyPair().getPrivate("hex");
         let prefix = null;
 
         switch (args[0]) {

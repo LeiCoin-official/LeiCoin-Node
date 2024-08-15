@@ -4,18 +4,20 @@ import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import { PrivateKey } from "../crypto/cryptoKeys.js";
+import LCrypt from "../crypto/index.js";
 
 export class Wallet {
 
-    public owner: AddressHex;
-    private balance: Uint64;
-    private nonce: Uint64;
-    public version: PX;
+    public readonly owner: AddressHex;
+    private readonly balance: Uint64;
+    private readonly nonce: Uint64;
+    public readonly version: PX;
 
     constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = PX.V_00) {
         this.owner = owner;
-        this.balance = balance;
-        this.nonce = nonce;
+        this.balance = balance.clone();
+        this.nonce = nonce.clone();
         this.version = version;
     }
 
@@ -41,7 +43,7 @@ export class Wallet {
         return null;
     }
 
-    private static encodingSettings: DataEncoder[] = [
+    protected static encodingSettings: DataEncoder[] = [
         BE.PX("version"),
         BE.BigInt("balance"),
         BE.BigInt("nonce")
@@ -74,5 +76,62 @@ export class Wallet {
     }
 
 }
+
+export class SecretWallet extends Wallet {
+
+    public privateKey: PrivateKey;
+
+    constructor(privateKey: PrivateKey, owner: AddressHex, balance: Uint64, nonce: Uint64, version = PX.V_00) {
+        super(owner, balance, nonce, version);
+        this.privateKey = privateKey;
+    }
+
+    public static fromPrivateKey(privateKey: PrivateKey, balance: Uint64, nonce: Uint64, version = PX.V_00) {
+        return new SecretWallet(
+            privateKey,
+            AddressHex.fromPrivateKey(PX.A_00, privateKey),
+            balance,
+            nonce,
+            version
+        );
+    }
+
+    public static createEmptyWallet(privateKey: PrivateKey): SecretWallet;
+    public static createEmptyWallet(ownerAddress: AddressHex): SecretWallet;
+    public static createEmptyWallet(privKeyORAddress: PrivateKey | AddressHex) {
+        let privateKey: PrivateKey = privKeyORAddress as PrivateKey;
+        if (privKeyORAddress instanceof AddressHex) {
+            privateKey = LCrypt.generatePrivateKey();
+        }
+        return SecretWallet.fromPrivateKey(privateKey, Uint64.alloc(), Uint64.alloc());
+    }
+
+    public SencodeToHex() {
+        return ObjectEncoding.encode(this, SecretWallet.SencodingSettings, false).data;
+    }
+    
+    public static SfromDecodedHex(hexData: Uint) {
+        try {
+            const resultData = ObjectEncoding.decode(hexData, SecretWallet.SencodingSettings);
+            const data = resultData.data;
+
+            if (data && data.version.eq(0)) {
+                return SecretWallet.fromPrivateKey(data.privateKey, data.balance, data.nonce, data.version)
+            }
+        } catch (err: any) {
+            cli.data.error(`Error loading Wallet from Decoded Hex: ${err.stack}`);
+        }
+        return null;
+    }
+
+    protected static SencodingSettings: DataEncoder[] = [
+        BE.PX("version"),
+        BE.Uint256("privateKey"),
+        BE.BigInt("balance"),
+        BE.BigInt("nonce")
+    ]
+
+}
+
 
 export default Wallet;

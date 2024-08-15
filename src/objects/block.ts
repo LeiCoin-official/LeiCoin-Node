@@ -1,6 +1,6 @@
 import { Transaction } from "./transaction.js";
 import cli from "../cli/cli.js";
-import Crypto from "../crypto/index.js";
+import LCrypt from "../crypto/index.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { Uint, Uint256, Uint64 } from "../utils/binary.js";
 import { AddressHex } from "./address.js";
@@ -87,7 +87,7 @@ export class Block {
     ]
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(true));
+        return LCrypt.sha256(this.encodeToHex(true));
     }
 
 }

@@ -10,7 +10,7 @@ class SmartContractStateDB extends LevelBasedStorage {
     protected path = "/smart-contracts/state";
 
     public async getState(address: AddressHex) {
-        return this.level.get(address.getBody());
+        return this.getData(address.getBody());
     }
 
     public async setState(address: AddressHex, state: Uint) {

@@ -1,6 +1,7 @@
 import path from "path";
 import LevelDB from "./leveldb.js";
 import BCUtils from "./blockchainUtils.js";
+import { Uint } from "../utils/binary.js";
 
 export abstract class LevelBasedStorage {
 
@@ -22,6 +23,19 @@ export abstract class LevelBasedStorage {
         BCUtils.ensureDirectoryExists(this.path, this.chain);
         this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath(this.path, this.chain)));
         await this.level.open();
+    }
+
+    public async close() {
+        await this.level.close();
+    }
+
+
+    protected async getData(key: Uint) {
+        try {
+            return await this.level.get(key);
+        } catch {
+            return null;
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 import { PrivateKey, PublicKey } from "../crypto/cryptoKeys.js";
-import Crypto from "../crypto/index.js";
+import LCrypt from "../crypto/index.js";
 import { FixedUint, Uint, Uint256 } from "../utils/binary.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { PX } from "./prefix.js";
@@ -19,15 +19,15 @@ export class SpecificAddress extends FixedUint {
     }
 
     public static fromPublicKey(publicKey: PublicKey) {
-        return this.concat([this.addressType, Crypto.sha256(publicKey).slice(0, 20)]);
+        return this.concat([this.addressType, LCrypt.sha256(publicKey).slice(0, 20)]);
     }
 
     public static fromPrivateKey(privateKey: Uint256) {
-        return this.fromPublicKey(Crypto.getPublicKeyFromPrivateKey(privateKey));
+        return this.fromPublicKey(LCrypt.getPublicKeyFromPrivateKey(privateKey));
     }
 
     public static fromSignature(hash: Uint256, signature: Signature) {
-        const publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
+        const publicKey = LCrypt.getPublicKeyFromSignature(hash, signature);
         return this.fromPublicKey(publicKey);
     }
 
@@ -53,15 +53,15 @@ export class AddressHex extends FixedUint {
     }
 
     public static fromPublicKey(addressType: PX, publicKey: PublicKey) {
-        return this.concat([addressType, Crypto.sha256(publicKey).slice(0, 20)]);
+        return this.concat([addressType, LCrypt.sha256(publicKey).slice(0, 20)]);
     }
 
     public static fromPrivateKey(addressType: PX, privateKey: Uint256) {
-        return this.fromPublicKey(addressType, Crypto.getPublicKeyFromPrivateKey(privateKey));
+        return this.fromPublicKey(addressType, LCrypt.getPublicKeyFromPrivateKey(privateKey));
     }
 
     public static fromSignature(hash: Uint256, signature: Signature) {
-        const publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
+        const publicKey = LCrypt.getPublicKeyFromSignature(hash, signature);
         return this.fromPublicKey(signature.getSignerType(), publicKey);
     }
 
@@ -104,11 +104,11 @@ export class Address32 {
     }
 
     public static fromPrivateKey(addressType: PX, privateKey: PrivateKey) {
-        return this.fromPublicKey(addressType, Crypto.getPublicKeyFromPrivateKey(privateKey));
+        return this.fromPublicKey(addressType, LCrypt.getPublicKeyFromPrivateKey(privateKey));
     }
 
     public static fromSignature(hash: Uint256, signature: Signature) {
-        const publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
+        const publicKey = LCrypt.getPublicKeyFromSignature(hash, signature);
         return this.fromPublicKey(signature.getSignerType(), publicKey);
     }
 

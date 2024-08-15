@@ -11,7 +11,7 @@ import blockchain from "../storage/blockchain.js";
 import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";
 import Signature from "../objects/signature.js";
-import Crypto from "../crypto/index.js";
+import LCrypt from "../crypto/index.js";
 import BlockPipeline from "../leicoin-net/pipelines/blocks.js";
 import { MinterCredentials } from "../objects/minter.js";
 import type Slot from "../pos/slot.js";
@@ -68,7 +68,7 @@ export class MinterClient {
 		)
 
 		block.hash.set(block.calculateHash());
-		block.signature = Crypto.sign(block.calculateHash(), PX.A_0e, mc.privateKey);
+		block.signature = LCrypt.sign(block.calculateHash(), PX.A_0e, mc.privateKey);
 		return block;
 	}
 

@@ -1,5 +1,5 @@
 import cli from "../cli/cli.js";
-import Crypto from "../crypto/index.js";
+import LCrypt from "../crypto/index.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 import ObjectEncoding from "../encoding/objects.js";
 import Block from "../objects/block.js";
@@ -55,7 +55,7 @@ class ForkChainstateData {
     }
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(true));
+        return LCrypt.sha256(this.encodeToHex(true));
     }
 
     private static encodingSettings: DataEncoder[] = [
@@ -112,7 +112,7 @@ class ChainstateData {
     }
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(true));
+        return LCrypt.sha256(this.encodeToHex(true));
     }
 
     private static encodingSettings: DataEncoder[] = [

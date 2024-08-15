@@ -29,7 +29,12 @@ export class ENVConfigParser {
                 }
                 return envData;
             } else {
-                fs.writeFileSync(envFilePath, JSON.stringify(this.sample));
+                let sampleFile = "";
+                for (let key in this.sample) {
+                    sampleFile += `${key}=${this.sample[key]}\n`;
+                }
+
+                fs.writeFileSync(envFilePath, sampleFile);
                 return this.sample;
             }
         } catch (error: any) {

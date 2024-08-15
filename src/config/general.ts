@@ -41,7 +41,7 @@ export class GeneralConfigParser {
                 const configData = fs.readFileSync(configFilePath, "utf-8");
                 return JSON.parse(configData) as GeneralConfigLike;
             } else {
-                fs.writeFileSync(configFilePath, JSON.stringify(this.sample));
+                fs.writeFileSync(configFilePath, JSON.stringify(this.sample, null, 4));
                 return this.sample;
             }
         } catch (error: any) {

@@ -6,11 +6,11 @@ import { EllipticBinarySignature, Signature } from "../objects/signature.js";
 import { PrivateKey, PublicKey } from "./cryptoKeys.js";
 import { PX } from "../objects/prefix.js";
 
-export class Crypto {
+export class LCrypt {
 
-    public static readonly ec = new elliptic.ec("secp256k1");
+    static readonly ec = new elliptic.ec("secp256k1");
 
-    public static sha256(input: Uint | Buffer) {
+    static sha256(input: Uint | Buffer) {
         return new Uint256(
             crypto.createHash('sha256').update(
                 input instanceof Uint ? input.getRaw() : input
@@ -18,7 +18,7 @@ export class Crypto {
         );
     }
 
-    public static sign(hash: Uint256, signerType: PX, privateKey: PrivateKey) {
+    static sign(hash: Uint256, signerType: PX, privateKey: PrivateKey) {
         try {
             const keyPair = this.ec.keyFromPrivate(privateKey.getRaw());
             const signature = keyPair.sign(hash.getRaw());
@@ -28,7 +28,7 @@ export class Crypto {
         }
     }
 
-    public static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
+     static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
         try {
             return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw()).getPublic(true, "array"));
         } catch (error: any) {
@@ -36,7 +36,7 @@ export class Crypto {
         }
     }
 
-    public static getPublicKeyFromSignature(hash: Uint256, signature: Signature) {
+    static getPublicKeyFromSignature(hash: Uint256, signature: Signature) {
         try {
             return PublicKey.from((this.ec.recoverPubKey(
                 hash.getRaw(),
@@ -48,7 +48,7 @@ export class Crypto {
         }
     }
 
-    public static getPreparedObjectForHashing(obj: Dict<any>, excludedKeys: string[] = []): Dict<any> {
+     static getPreparedObjectForHashing(obj: Dict<any>, excludedKeys: string[] = []): Dict<any> {
         const deepSort = (input: any): any => {
             if (typeof input !== 'object' || input === null) {
                 return input;
@@ -73,6 +73,17 @@ export class Crypto {
         return sortedObj;
     }
 
+
+    static randomBytes(length: number) {
+        return crypto.randomBytes(length);
+    }
+
+    static generatePrivateKey(length: number = 32) {
+        if (length === 32) {
+            return new PrivateKey(this.randomBytes(32));
+        }
+        return new PrivateKey(this.sha256(this.randomBytes(length)));
+    }
 }
 
-export default Crypto;
+export default LCrypt;

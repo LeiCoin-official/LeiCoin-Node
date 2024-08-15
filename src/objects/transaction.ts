@@ -1,5 +1,5 @@
 import config from "../config/index.js";
-import Crypto from "../crypto/index.js";
+import LCrypt from "../crypto/index.js";
 import ObjectEncoding from "../encoding/objects.js";
 import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
@@ -58,9 +58,9 @@ export class Transaction {
             Signature.alloc(),
         );
 
-        const hash = Crypto.sha256(coinbase.encodeToHex(true));
+        const hash = LCrypt.sha256(coinbase.encodeToHex(true));
         coinbase.txid = hash;
-        coinbase.signature = Crypto.sign(hash, PX.V_00, Uint256.alloc());
+        coinbase.signature = LCrypt.sign(hash, PX.V_00, Uint256.alloc());
 
         return coinbase;
     }
@@ -106,7 +106,7 @@ export class Transaction {
     ]
 
     public calculateHash() {
-        return Crypto.sha256(this.encodeToHex(true));
+        return LCrypt.sha256(this.encodeToHex(true));
     }
 
 }

@@ -1,12 +1,10 @@
-import path from "path";
 import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Wallet from "../objects/wallet.js";
-import BCUtils from "./blockchainUtils.js"
 import Block from "../objects/block.js";
 import blockchain from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
-import { Uint64 } from "../utils/binary.js";
+import { Uint, Uint64 } from "../utils/binary.js";
 import { LevelBasedStorage } from "./storageTypes.js";
 
 export class WalletDB extends LevelBasedStorage {
@@ -14,7 +12,8 @@ export class WalletDB extends LevelBasedStorage {
     protected path = "/wallets";
 
     public async getWallet(address: AddressHex) {
-        const raw_wallet = await this.level.get(address);
+        const raw_wallet = await this.getData(address);
+        if (!raw_wallet) return Wallet.createEmptyWallet(address);
         return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
     }
 
@@ -23,7 +22,8 @@ export class WalletDB extends LevelBasedStorage {
     }
 
     public async existsWallet(address: AddressHex): Promise<boolean> {
-        const raw_wallet = await this.level.get(address);
+        const raw_wallet = await this.getData(address);
+        if (!raw_wallet) return false;
         return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
     }
 
@@ -74,7 +74,7 @@ export class WalletDB extends LevelBasedStorage {
             return { cb: CB.SUCCESS };
 
         } catch (err: any) {
-            cli.data.error(`Error updating Wallets from Block ${block.index}: ${err.stack}`);
+            cli.data.error(`Error updating Wallets from Block ${block.index.toBigInt()}: ${err.stack}`);
             return { cb: CB.ERROR };
         }
     }

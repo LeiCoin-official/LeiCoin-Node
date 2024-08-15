@@ -133,20 +133,20 @@ class BigIntEncoder extends DataEncoder {
 
 class BoolEncoder extends DataEncoder {
 
-    readonly prefixLength = 1;
+    readonly fixedLength = 1;
 
     public encode(value: boolean) {
         return [value ? Uint8.from(1) : Uint8.from(0)];
     }
 
     public decode(hexData: Uint) {
-        const hexValue = hexData.slice(0, this.prefixLength);
-        if (hexValue.getLen() !== this.prefixLength) {
+        const hexValue = hexData.slice(0, this.fixedLength);
+        if (hexValue.getLen() !== this.fixedLength) {
             return null;
         }
         return {
             data: hexValue.eq(1),
-            length: this.prefixLength
+            length: this.fixedLength
         };
     }
 }
@@ -258,7 +258,7 @@ class CustomEncoder extends DataEncoder {
 
 const AddressEncoder = AdvancedTypeEncoderFactory.create(AddressHexClass);
 const SignatureEncoder = AdvancedTypeEncoderFactory.create(SignatureClass);
-const HashEncoder = AdvancedTypeEncoderFactory.create(Uint256Class);
+const Uint256Encoder = AdvancedTypeEncoderFactory.create(Uint256Class);
 const PXEncoder = AdvancedTypeEncoderFactory.create(PXClass);
 
 export namespace BE {
@@ -267,7 +267,8 @@ export namespace BE {
 
     export const Address = (key: string, hashRemove = false) => new AddressEncoder(key, hashRemove);
     export const Signature = (key: string, hashRemove = false) => new SignatureEncoder(key, hashRemove);
-    export const Hash = (key: string, hashRemove = false) => new HashEncoder(key, hashRemove);
+    export const Uint256 = (key: string, hashRemove = false) => new Uint256Encoder(key, hashRemove);
+    export const Hash = Uint256;
     export const PX = (key: string, hashRemove = false) => new PXEncoder(key, hashRemove);
 
     export const Array = (
