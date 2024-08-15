@@ -36,7 +36,7 @@ class ReadCMD extends CLICMD {
         if (args[0] === "all") {
             cli.default.info(
                 "Minters:\n" + 
-                (await blockchain.minters.getAllVAddresses()).map((address) => {
+                (await blockchain.minters.getAllKeys()).map((address) => {
                     return address.toHex();
                 }).join("\n")
             );
@@ -48,7 +48,10 @@ class ReadCMD extends CLICMD {
         if (minter) {
             cli.default.info(JSON.stringify(minter, (key, value) => {
                 if (value instanceof Uint64) {
-                    return (value.toInt() / 1_0000_0000).toFixed(8);
+                    if (key === "stake") {
+                        return (value.toInt() / 100).toFixed(2);
+                    }
+                    return value.toInt();
                 } else if (value instanceof Uint) {
                     return value.toHex();
                 }

@@ -1,4 +1,4 @@
-import { DatabaseOptions, Level } from "level";
+import { DatabaseOptions, GetOptions, Level } from "level";
 import { LevelDBEncoders } from "../encoding/leveldbEncoders.js";
 import { Uint } from "../utils/binary.js";
 

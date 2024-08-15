@@ -29,10 +29,23 @@ export abstract class LevelBasedStorage {
         await this.level.close();
     }
 
+    
+    public async getAllKeys() {
+        return this.level.keys().all();
+    }
+    
 
     protected async getData(key: Uint) {
         try {
             return await this.level.get(key);
+        } catch {
+            return null;
+        }
+    }
+
+    protected async delData(key: Uint) {
+        try {
+            return await this.level.del(key);
         } catch {
             return null;
         }

@@ -1,10 +1,10 @@
-import cli from "./cli.js";
 import { CLISubCMD } from "./cliCMD.js";
 import BlockDBCMD from "./commands/blockDBCMD.js";
 import ChainstateDataCMD from "./commands/chainstateDataCMD.js";
 import CryptoCMD from "./commands/cryptoCMD.js";
 import MinterDBCMD from "./commands/minterDBCMD.js";
 import StopCMD from "./commands/stopCMD.js";
+import WalletDBCMD from "./commands/walletDBCMD.js";
 
 
 export class CLICMDHandler extends CLISubCMD {
@@ -24,6 +24,7 @@ export class CLICMDHandler extends CLISubCMD {
     protected registerCommands(): void {
         this.register(new StopCMD());
         this.register(new CryptoCMD());
+        this.register(new WalletDBCMD());
         this.register(new MinterDBCMD());
         this.register(new BlockDBCMD());
         this.register(new ChainstateDataCMD());

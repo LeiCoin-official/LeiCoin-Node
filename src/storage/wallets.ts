@@ -79,6 +79,10 @@ export class WalletDB extends LevelBasedStorage {
         }
     }
 
+    public async deleteWallet(address: AddressHex) {
+        return this.delData(address);
+    }
+
 }
 
 export default WalletDB;

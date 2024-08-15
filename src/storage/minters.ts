@@ -10,10 +10,6 @@ export class MinterDB extends LevelBasedStorage {
 
     protected path = "/validators";
 
-    public async getAllVAddresses() {
-        return this.level.keys().all();
-    }
-
     public async getMinter(address: AddressHex) {
         const raw_minter_data = await this.getData(address);
         if (!raw_minter_data) return null;
@@ -25,7 +21,7 @@ export class MinterDB extends LevelBasedStorage {
     }
 
     public async removeMinter(minter: Minter) {
-        return this.level.del(minter.address);
+        return this.delData(minter.address);
     }
 
     private async adjustStakeByBlock(block: Block) {
