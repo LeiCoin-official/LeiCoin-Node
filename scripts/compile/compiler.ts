@@ -1,11 +1,17 @@
 
 export enum Platforms {
     "linux-x64" = "bun-linux-x64",
+    "linux-x64-baseline" = "bun-linux-x64-baseline",
+    "linux-x64-modern" = "bun-linux-x64-modern",
     "linux-arm64" = "bun-linux-arm64",
 
     "win-x64" = "bun-windows-x64",
+    "win-x64-baseline" = "bun-windows-x64-baseline",
+    "win-x64-modern" = "bun-windows-x64-modern",
 
     "macos-x64" = "bun-darwin-x64",
+    "macos-x64-baseline" = "bun-darwin-x64-baseline",
+    "macos-x64-modern" = "bun-darwin-x64-modern",
     "macos-arm64" = "bun-darwin-arm64",
 }
 
