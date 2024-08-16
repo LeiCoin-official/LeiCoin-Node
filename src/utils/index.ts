@@ -1,4 +1,3 @@
-import process from "process";
 import { EventEmitter } from "events";
 import type { CLILike } from "../cli/cli.js";
 
@@ -20,8 +19,8 @@ class Utils {
     public readonly procCWD: string;
 
     private constructor() {
-        if (process.env.custom_cwd) {
-            process.chdir(process.env.custom_cwd);
+        if (process.env.CUSTOM_CWD) {
+            process.chdir(process.env.CUSTOM_CWD);
         }
         this.procCWD = process.cwd();
 

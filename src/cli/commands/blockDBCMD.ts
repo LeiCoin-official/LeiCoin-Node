@@ -31,14 +31,14 @@ class ReadCMD extends CLICMD {
         const blockIndex = args[0];
         const block = blockchain.blocks.getBlock(blockIndex).data as Block;
         if (block) {
-            cli.default.info(JSON.stringify(block, (key, value) => {
+            cli.cmd.info(JSON.stringify(block, (key, value) => {
                 if (value instanceof Uint) {
                     return value.toHex();
                 }
                 return value;
             }, 2));
         } else {
-            cli.default.info(`Block with Index: ${blockIndex} not found!`);
+            cli.cmd.info(`Block with Index: ${blockIndex} not found!`);
         }
 
     }

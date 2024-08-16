@@ -120,7 +120,7 @@ class Blockchain extends Chain {
     // }
 
     public async registerOnShutdown() {
-        utils.events.on("stop_server", async () => {
+        utils.events.once("stop_server", async () => {
             cli.data.info("Saving blockchain data...");
 
             await Promise.all(

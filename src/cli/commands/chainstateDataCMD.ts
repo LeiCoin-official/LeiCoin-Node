@@ -22,7 +22,7 @@ class ReadCMD extends CLICMD {
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         const chainstate = blockchain.chainstate.getCompleteChainStateData();
-        cli.default.info(JSON.stringify(chainstate, (key, value) => {
+        cli.cmd.info(JSON.stringify(chainstate, (key, value) => {
             if (value instanceof Uint) {
                 return value.toHex();
             }

@@ -34,7 +34,7 @@ class ReadCMD extends CLICMD {
         }
 
         if (args[0] === "all") {
-            cli.default.info(
+            cli.cmd.info(
                 "Minters:\n" + 
                 (await blockchain.minters.getAllKeys()).map((address) => {
                     return address.toHex();
@@ -46,7 +46,7 @@ class ReadCMD extends CLICMD {
         const minterAddress = args[0];
         const minter = await blockchain.minters.getMinter(AddressHex.from(minterAddress));
         if (minter) {
-            cli.default.info(JSON.stringify(minter, (key, value) => {
+            cli.cmd.info(JSON.stringify(minter, (key, value) => {
                 if (value instanceof Uint64) {
                     if (key === "stake") {
                         return (value.toInt() / 100).toFixed(2);
@@ -58,7 +58,7 @@ class ReadCMD extends CLICMD {
                 return value;
             }, 2));
         } else {
-            cli.default.info("Minter not found!");
+            cli.cmd.info("Minter not found!");
         }
 
     }
@@ -77,7 +77,7 @@ class InsertCMD extends CLICMD {
 
         const minter = new Minter(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
         await blockchain.minters.setMinter(minter);
-        cli.default.info("Minter inserted!");
+        cli.cmd.info("Minter inserted!");
     }
 }
 
@@ -95,9 +95,9 @@ class RemoveCMD extends CLICMD {
         const minter = await blockchain.minters.getMinter(AddressHex.from(args[0]));
         if (minter) {
             await blockchain.minters.removeMinter(minter);
-            cli.default.info("Minter removed!");
+            cli.cmd.info("Minter removed!");
         } else {
-            cli.default.info("Minter not found!");
+            cli.cmd.info("Minter not found!");
         }
 
     }
@@ -116,7 +116,7 @@ class GetNextMinterCMD extends CLICMD {
 
         const slot = Uint64.from(parseInt(args[0]));
         const nextMinter = await blockchain.minters.selectNextMinter(slot);
-        cli.default.info(`Next minter for slot ${slot.toBigInt()}: ${nextMinter.toHex()}`);
+        cli.cmd.info(`Next minter for slot ${slot.toBigInt()}: ${nextMinter.toHex()}`);
     }
 
 }

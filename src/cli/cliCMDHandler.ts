@@ -31,7 +31,7 @@ export class CLICMDHandler extends CLISubCMD {
     }
 
     protected async run_empty(parent_args: string[]): Promise<void> {
-        //cli.default.info(`Command not recognized. Type "${CLIUtils.parsePArgs(parent_args, true)}help" for available commands.`);
+        //cli.cmd.info(`Command not recognized. Type "${CLIUtils.parsePArgs(parent_args, true)}help" for available commands.`);
         return;
     }
 

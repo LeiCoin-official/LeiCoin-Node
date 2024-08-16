@@ -38,7 +38,7 @@ export abstract class CLISubCMD extends CLICMD {
             help_message += `\n - ${parent_args_str}${cmd.name}: ${cmd.description}`;
         }
 
-        cli.default.info(help_message);
+        cli.cmd.info(help_message);
     }
 
     protected async run_empty(parent_args: string[]) {
@@ -47,12 +47,12 @@ export abstract class CLISubCMD extends CLICMD {
 
     protected async run_notFound(command_name: string, parent_args: string[]) {
         const parent_args_str = CLIUtils.parsePArgs(parent_args, true);
-        cli.default.info(`Command '${parent_args_str}${command_name}' not found. Type "${parent_args_str}help" for available commands.`);
+        cli.cmd.info(`Command '${parent_args_str}${command_name}' not found. Type "${parent_args_str}help" for available commands.`);
     }
 
     protected async run_sub_help(cmd: CLICMD, parent_args: string[]) {
         const parent_args_str = CLIUtils.parsePArgs(parent_args, true);
-        cli.default.info(
+        cli.cmd.info(
             `Command '${parent_args_str}${cmd.name}':\n` +
             `Description: ${cmd.description}\n` +
             `Usage: ${parent_args_str}${cmd.usage}`
@@ -62,7 +62,7 @@ export abstract class CLISubCMD extends CLICMD {
     public async run(args: string[], parent_args: string[]) {
         const command_name = args.shift();
         if (!command_name) return await this.run_empty(parent_args);
-        if (command_name == "help") return await this.run_help(parent_args);
+        if (command_name === "help") return await this.run_help(parent_args);
 
         const cmd = this.registry[command_name];
         if (!cmd) { return await this.run_notFound(command_name, parent_args); }

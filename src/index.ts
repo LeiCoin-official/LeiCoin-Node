@@ -3,20 +3,25 @@ export default class Main {
 
     public static version = "0.5.2-beta.4";
 
+    private static environment: "full" | "cli" | "command";
+
     private static initialized = false;
 
     public static async init() {
         if (this.initialized) return;
         this.initialized = true;
 
+        if (process.argv.slice(2)[0] === "-c") {
+            process.env.NO_OUTPUT = "true";
+        } else {
+            console.log(`Starting LeiCoin-Node v${Main.version}...`);
+        }
+
         // Core modules
         const utils = (await import("./utils/index.js")).default;
 
         const cli = (await import("./cli/cli.js")).default;
         await cli.setup();
-    
-        cli.default.info(`Starting LeiCoin-Node v${Main.version}`);
-        cli.default.info(`Loaded core modules`);
 
         const config = (await import("./config/index.js")).default;
 
@@ -25,21 +30,53 @@ export default class Main {
             return;
         }
 
-        await (await import("./storage/blockchain.js")).default.waitAllinit();
-        
+        this.environment = "full";
         if (config.processArgs["--only-cli"]) {
+            this.environment = "cli";
+        } else if (config.processArgs["-c"]) {
+            this.environment = "command"
+        };
 
-            cli.default.info(`LeiCoin-Node started in CLI Only mode`);
+        cli.default.info(`Loaded core modules`);
 
-        } else {
+        await (await import("./storage/blockchain.js")).default.waitAllinit();
 
-            await (await import("./netInitialization.js")).default();
+        switch (this.environment) {
+            case "full": {
+                await (await import("./netInitialization.js")).default();
 
-            (await import("./minter/index.js")).MinterClient.initIfActive();
-            (await import("./pos/index.js")).POS.init();
+                (await import("./minter/index.js")).MinterClient.initIfActive();
+                (await import("./pos/index.js")).POS.init();
+    
+                cli.default.info(`LeiCoin-Node started in Full Node mode`);
 
-            cli.default.info(`LeiCoin-Node started in Full Node mode`);
-            
+                break;
+            }
+            case "cli": {
+                cli.default.info(`LeiCoin-Node started in CLI Only mode`);
+                break;
+            }
+            case "command": {
+
+                const args = config.processArgs["-c"] as string[];
+
+                if (!args[0]) {
+                    cli.cmd.info("Command not recognized. Type leicoin-node -c help for available commands.");
+                    utils.gracefulShutdown(0);
+                    return;
+                }
+
+                const CLICMDHandler = (await import("./cli/cliCMDHandler.js")).default;
+
+                await CLICMDHandler.getInstance().run(
+                    args.map(arg => arg.toLowerCase())
+                        .filter(arg => arg),
+                    []
+                );
+
+                utils.gracefulShutdown(0);
+                break;
+            }
         }
 
     }

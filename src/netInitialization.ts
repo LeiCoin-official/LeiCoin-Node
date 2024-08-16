@@ -46,7 +46,7 @@ export default async function initNetConnections() {
     cli.leicoin_net.client.info("LeiCoinNet-Client started");
 
     // handle shutdown
-    utils.events.once("stop_server", function() {
+    utils.events.once("stop_server", () => {
 
         // API shutdown
         if (web_server) {

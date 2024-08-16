@@ -2,12 +2,13 @@ import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 
 
-type PArgAllowedTypes = "string" | "number" | "boolean";
+type PArgAllowedTypes = "string" | "number" | "flag" | "array";
 
 type PArgTypeMap = {
     string: string | null;
     number: number | null;
-    boolean: boolean | null;
+    flag: boolean | null;
+    array: string[] | null;
 }
 
 type ArgsKeys = keyof typeof ProcessArgsParser.prototype.argsSettings;
@@ -21,15 +22,18 @@ class PArg<T extends PArgAllowedTypes> {
     default: PArgTypeMap[T];
     type: PArgAllowedTypes;
     required: boolean;
+    fixedPosition: number | null;
 
     constructor(
-        defaultValue: PArgTypeMap[T],
         type: T,
-        required = false
+        fixedPosition: number | null = null,
+        required = false,
+        defaultValue: PArgTypeMap[T] = null,
     ) {
-        this.default = defaultValue;
         this.type = type;
+        this.default = defaultValue;
         this.required = required;
+        this.fixedPosition = fixedPosition;
     }
 }
 
@@ -46,10 +50,13 @@ export class ProcessArgsParser {
     }
 
     public readonly argsSettings = {
-        '--port' : new PArg(12200, "number"),
-        '--host': new PArg("0.0.0.0", "string"),
-        '--experimental': new PArg(false, "boolean"),
-        '--only-cli': new PArg(false, "boolean")
+        '--port' : new PArg("number"),
+        '--host': new PArg("string"),
+        '--experimental': new PArg("flag"),
+
+        '--only-cli': new PArg("flag", 0),
+
+        '-c' : new PArg("array", 0)
     };
     
     public parse(): ArgsLike {
@@ -71,32 +78,39 @@ export class ProcessArgsParser {
                             utils.gracefulShutdown(1); return {} as any;
                         }
                         parsedArgs[argName] = argSettings.default;
-                        continue;
                     }
                     continue;
                 }
 
-                if (argSettings.type === 'boolean') {
-                    parsedArgs[argName] = true;
-                    continue;
-                }
-
-                const argValue = process_argv[argIndex + 1];
-
-                if (!argValue || argValue.startsWith('--')) {
-                    cli.data.error(`Argument ${argName} requires a value`);
+                if (argSettings.fixedPosition && argIndex !== argSettings.fixedPosition) {
+                    cli.data.error(`Argument ${argName} cannot be used with other arguments`);
                     utils.gracefulShutdown(1); return {} as any;
                 }
 
+                function getArgValue() {
+                    const argValue = process_argv[argIndex + 1];
+                    if (!argValue || argValue.startsWith('-')) {
+                        cli.data.error(`Argument ${argName} requires a value`);
+                        utils.gracefulShutdown(1);
+                    }
+                    return argValue;
+                }
+
                 switch (argSettings.type) {
-                    case 'number': {
-                        parsedArgs[argName] = parseFloat(argValue);
+                
+                    case 'flag':
+                        parsedArgs[argName] = true;
                         break;
-                    }
-                    case 'string': {
-                        parsedArgs[argName] = argValue;
+                    case 'array':
+                        parsedArgs[argName] = process_argv.slice(argIndex + 1);
                         break;
-                    }
+                    case 'number':
+                        parsedArgs[argName] = parseFloat(getArgValue());
+                        break;
+                    case "string":
+                        parsedArgs[argName] = getArgValue();
+                        break;
+
                 }
 
             } catch (err: any) {

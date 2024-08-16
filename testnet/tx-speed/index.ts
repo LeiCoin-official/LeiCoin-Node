@@ -1,7 +1,7 @@
 
 async function run() {
-    process.env.custom_cwd = __dirname;
-    process.env.nocli = "true";
+    process.env.CUSTOM_CWD = __dirname;
+    process.env.NO_CLI = "true";
 
     const utils = (await import("../../src/utils/index.js")).default;
 
