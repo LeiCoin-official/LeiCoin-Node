@@ -21,7 +21,7 @@ export default class CryptoCMD extends CLISubCMD {
 class GenKeyPairCMD extends CLICMD {
     public name = "genKeyPair";
     public description = "Generate a new key pair";
-    public usage = "genKeyPair (wallet|staker|smart-contract)";
+    public usage = "genKeyPair (wallet|minter|smart-contract)";
 
     public async run(args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -29,8 +29,8 @@ class GenKeyPairCMD extends CLICMD {
             return;
         }
 
-        const privKey = LCrypt.generatePrivateKey().toHex();
-        let prefix = null;
+        const privKey = LCrypt.generatePrivateKey();
+        let prefix: PX;
 
         switch (args[0]) {
             case "wallet":
@@ -47,12 +47,12 @@ class GenKeyPairCMD extends CLICMD {
                 return;
         }
 
-        const addressHex = AddressHex.fromPrivateKey(prefix!, PrivateKey.from(privKey));
+        const addressHex = AddressHex.fromPrivateKey(prefix, privKey);
         const address32 = Address32.fromAddressHex(addressHex); 
 
         cli.cmd.info(
             `Here is your new key pair:\n` +
-            ` - Private Key: ${privKey}\n` +
+            ` - Private Key: ${privKey.toHex()}\n` +
             ` - AddressHex: ${addressHex.toHex()}\n` +
             ` - Address32: ${address32}`
         );
