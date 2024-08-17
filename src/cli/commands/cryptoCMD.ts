@@ -29,7 +29,7 @@ class GenKeyPairCMD extends CLICMD {
             return;
         }
 
-        const privKey = LCrypt.ec.genKeyPair().getPrivate("hex");
+        const privKey = LCrypt.generatePrivateKey().toHex();
         let prefix = null;
 
         switch (args[0]) {

@@ -78,11 +78,8 @@ export class LCrypt {
         return crypto.randomBytes(length);
     }
 
-    static generatePrivateKey(length: number = 32) {
-        if (length === 32) {
-            return new PrivateKey(this.randomBytes(32));
-        }
-        return new PrivateKey(this.sha256(this.randomBytes(length)));
+    static generatePrivateKey() {
+        return new PrivateKey(this.ec.genKeyPair().getPrivate().toBuffer());
     }
 }
 
