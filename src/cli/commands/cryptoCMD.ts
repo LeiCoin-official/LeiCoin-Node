@@ -36,7 +36,7 @@ class GenKeyPairCMD extends CLICMD {
             case "wallet":
                 prefix = PX.A_00;
                 break;
-            case "staker":
+            case "minter":
                 prefix = PX.A_0e;
                 break;
             case "smart-contract":
