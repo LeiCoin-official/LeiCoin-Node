@@ -6,21 +6,24 @@ import Verification, { BlockValidationResult } from "../verification/index.js";
 import { Execution } from "./execution.js";
 import blockchain from "../storage/blockchain.js";
 import cli from "../cli/cli.js";
+import Schedule from "../utils/schedule.js";
 
 export class Slot {
 
     public readonly index: Uint64;
     public readonly minter: AddressHex;
 
+    private slot_started = false;
+
     public block: Block | null = null;
     public block_verification: Promise<BlockValidationResult> | null = null;
-
-    private slot_started = false;
+    private readonly blockTimeout: Schedule;
 
     private constructor(index: Uint64, minter: AddressHex) {
         this.index = index;
         this.minter = minter;
 
+        this.blockTimeout = new Schedule(async() => await this.onBlockNotMinted(), 5000);
         this.onSlotStart();
     }
 
@@ -42,7 +45,17 @@ export class Slot {
         }
     }
 
+    private async onBlockNotMinted() {
+        if (this.blockTimeout.hasFinished()) return;
+        this.blockTimeout.cancel();
+        cli.leicoin_net.server.info(`Minter ${this.minter.toHex()} did not mint a block on Slot ${this.index.toBigInt()}`);
+    }
+
+
     public async processBlock(block: Block) {
+        if (this.blockTimeout.hasFinished()) return;
+        this.blockTimeout.cancel();
+
         if (this.block) return;
         this.block = block;
 

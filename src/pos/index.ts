@@ -2,6 +2,7 @@ import cli from "../cli/cli.js";
 import { Uint64 } from "../utils/binary.js";
 import Constants from "../utils/constants.js";
 import { Dict } from "../utils/dataUtils.js";
+import utils from "../utils/index.js";
 import Slot from "./slot.js";
 import cron from "node-cron";
 
@@ -12,20 +13,27 @@ export class POS {
     public static readonly slots: Dict<Slot> = {};
     private static currentSlot: Slot;
 
+    private static slotTask: cron.ScheduledTask;
+
     public static init() {
 
         if (this.initialized) return;
 		this.initialized = true;
         
-        const task = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
+        this.slotTask = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
             const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
             cli.minter.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${new Date().toUTCString()}`);
             //this.endSlot(this.currentSlot.index);
             this.startNewSlot(currentSlotIndex);
         });
 
-        task.start();
-        
+        utils.events.once("stop_server", () => {
+            this.slotTask.stop();
+            cli.minter.info("POS stopped");
+        });
+
+        this.slotTask.start();
+
     }
 
     public static calulateCurrentSlotIndex() {

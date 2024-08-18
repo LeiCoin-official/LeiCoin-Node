@@ -1,12 +1,12 @@
-import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage, NPPX } from "../../objects/leicoinnet.js";
 import { Uint } from "../../utils/binary.js";
 import { CB } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
 
 export interface PipelineLike {
-    receive(type: LeiCoinNetDataPackageType, data: Uint): Promise<void>;
-    broadcast(type: LeiCoinNetDataPackageType, data: Uint, ...args: any[]): Promise<void>;
+    receive(type: NPPX, data: Uint): Promise<void>;
+    broadcast(type: NPPX, data: Uint, ...args: any[]): Promise<void>;
 }
 
 export class Pipelines {
@@ -21,8 +21,8 @@ export class Pipelines {
     }
 
     private pipelines: { [id: string]: PipelineLike } = {
-        "0001": BlockPipeline,
-        "0002": TransactionPipeline,
+        "1001": BlockPipeline,
+        "1002": TransactionPipeline,
         //"01xx": SomePipeline, the x is used as a wildcard
     };
 
@@ -32,7 +32,7 @@ export class Pipelines {
 
         let matchedPipelineId: string | undefined;
         for (const id in this.pipelines) {
-            if (new RegExp(`^${id.replace(/x/g, ".")}$`).test(data.type)) {
+            if (new RegExp(`^${id.replace(/x/g, ".")}$`).test(data.type.toHex())) {
                 matchedPipelineId = id;
                 break;
             }
@@ -42,7 +42,7 @@ export class Pipelines {
             return { cb: CB.NONE, message: `Unknown Data Type: ${data.type}` };
         }
 
-        await this.pipelines[data.type].receive(data.type, data.content);
+        await this.pipelines[data.type.toHex()].receive(data.type, data.content);
 
     }
 

@@ -1,4 +1,4 @@
-import { Uint8 } from "../utils/binary.js";
+import { Uint } from "../utils/binary.js";
 
 class PrefixConstructError extends Error {
     name = "PrefixConstructError";
@@ -18,31 +18,20 @@ function lockedErr(...args: any[]): any {
     throw new PrefixLockedError();
 }
 
+export class LockedUint extends Uint {
+    public static readonly byteLength: number;
 
-class Prefix extends Uint8 {
-
-    // Prefix vor version 00
-    public static readonly V_00 = Prefix.from("00");
-
-    // Meta Data Prefix
-    public static readonly META = Prefix.from("ff");
-
-    // Standard Address Prefix: 00
-    public static readonly A_00 = Prefix.from("00");
-    // Smart Contract Address Prefix: 0c
-    public static readonly A_0c = Prefix.from("0c");
-    // Minter Address Prefix: 0e
-    public static readonly A_0e = Prefix.from("0e");
-
-    public static from(hexType: string): Prefix;
+    public static from<T>(this: new(buffer: Buffer) => T, hexType: string): T;
     /** @deprecated If you don't use {@link Prefix.from}(hexType: string) instead, an error will occur! */
     public static from(...args: any[]): any;
     public static from(input: string) {
-        if (typeof input === "string" && input.length === 2) {
-            return new Prefix(Buffer.from(input, "hex"));
+        if (typeof input === "string" && input.length === this.byteLength * 2) {
+            return new this(Buffer.from(input, "hex"));
         }
         constructErr();
     }
+
+    protected static _from(input: string) {}
 
     /** @deprecated Don't try to construct a Prefix with alloc(), an error will occur! */
     public static alloc(): any {constructErr()};
@@ -72,6 +61,29 @@ class Prefix extends Uint8 {
     /** @deprecated Don't try to modify a Prefix, an error will occur! */
     public mod(): any {lockedErr()};
 
+}
+
+class Prefix extends LockedUint {
+    public static readonly byteLength = 1;
+
+    // Prefix vor version 00
+    static readonly V_00 = Prefix.from("00");
+
+    // Meta Data Prefix
+    static readonly META = Prefix.from("ff");
+
+    // Standard Address Prefix: 00
+    static readonly A_00 = Prefix.from("00");
+
+    // Smart Contract Address Prefix: 0c
+    static readonly A_0c = Prefix.from("0c");
+
+    // Node Address Prefix: 0d
+    static readonly A_0d = Prefix.from("0d");
+
+    // Minter Address Prefix: 0e
+    static readonly A_0e = Prefix.from("0e");
+    
 }
 
 export { Prefix as PX };

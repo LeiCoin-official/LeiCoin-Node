@@ -29,7 +29,7 @@ export class Execution {
     
         if (targetChain === "main") {
             mempool.clearMempoolbyBlock(block);
-               
+            
             await blockchain.wallets.adjustWalletsByBlock(block);
         }
         

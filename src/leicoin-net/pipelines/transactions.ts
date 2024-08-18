@@ -3,13 +3,13 @@ import Transaction from "../../objects/transaction.js";
 import cli from "../../cli/cli.js";
 import Verification from "../../verification/index.js"
 import leiCoinNetClientsHandler from "../client/index.js";
-import { LeiCoinNetDataPackage, LeiCoinNetDataPackageType } from "../../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage, NPPX } from "../../objects/leicoinnet.js";
 import { DataUtils } from "../../utils/dataUtils.js";
 import { Uint } from "../../utils/binary.js";
 
 export default class TransactionPipeline {
 
-    public static async receive(type: LeiCoinNetDataPackageType, data: Uint) {
+    public static async receive(type: NPPX, data: Uint) {
 
         const transaction = DataUtils.createInstanceFromJSON(Transaction, data);
     
@@ -34,7 +34,7 @@ export default class TransactionPipeline {
 
     }
 
-    public static async broadcast(type: LeiCoinNetDataPackageType, data: Uint) {
+    public static async broadcast(type: NPPX, data: Uint) {
         await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
 

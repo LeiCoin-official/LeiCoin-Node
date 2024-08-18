@@ -1,7 +1,7 @@
 
 export default class Main {
 
-    public static version = "0.5.2-beta.4";
+    public static version = "0.5.3-beta.1";
 
     private static environment: "full" | "cli" | "command";
 

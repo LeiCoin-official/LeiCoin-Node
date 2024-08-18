@@ -6,7 +6,6 @@ import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
 import { Uint256, Uint64 } from "../utils/binary.js";
-import { LeiCoinNetDataPackageType } from "../objects/leicoinnet.js";
 import blockchain from "../storage/blockchain.js";
 import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";
@@ -15,6 +14,7 @@ import LCrypt from "../crypto/index.js";
 import BlockPipeline from "../leicoin-net/pipelines/blocks.js";
 import { MinterCredentials } from "../objects/minter.js";
 import type Slot from "../pos/slot.js";
+import { NPPX } from "../objects/leicoinnet.js";
 
 export class MinterClient {
 
@@ -76,7 +76,7 @@ export class MinterClient {
 		const block = await this.createNewBlock(mc, currentSlot.index);
 
 		BlockPipeline.broadcast(
-			LeiCoinNetDataPackageType.BLOCK,
+			NPPX.BLOCK,
 			block.encodeToHex()
 		);
 
