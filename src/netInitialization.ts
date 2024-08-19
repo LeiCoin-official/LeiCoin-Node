@@ -35,15 +35,15 @@ export default async function initNetConnections() {
 
     // Listen for 'listening' event to indicate successful server start
     leiCoinNetServer.on('listening', () => {
-        cli.leicoin_net.server.info(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
+        cli.leicoin_net.info(`LeiCoinNet-Server listening on ${config.leicoin_net.host}:${config.leicoin_net.port}`);
     });
 
-    cli.leicoin_net.server.info("LeiCoinNet-Server started");
+    cli.leicoin_net.info("LeiCoinNet-Server started");
 
     // Initialize LeiCoinNet-Client
     //leiCoinNetClient = initLeiCoinNetClient();
     leiCoinNetClientsHandler.initAllClients();
-    cli.leicoin_net.client.info("LeiCoinNet-Client started");
+    cli.leicoin_net.info("LeiCoinNet-Client started");
 
     // handle shutdown
     utils.events.once("stop_server", () => {
@@ -56,11 +56,11 @@ export default async function initNetConnections() {
 
         // LeiCoinNet-Server shutdown
         leiCoinNetServer.close();
-        cli.leicoin_net.server.info(`LeiCoinNet-Server stopped`);
+        cli.leicoin_net.info(`LeiCoinNet-Server stopped`);
 
         // LeiCoinNet-Server shutdown
         leiCoinNetClientsHandler.shutdown();
-        cli.leicoin_net.client.info(`LeiCoinNet-Client stopped`);
+        cli.leicoin_net.info(`LeiCoinNet-Client stopped`);
     });
 
 }

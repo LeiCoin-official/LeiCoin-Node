@@ -9,7 +9,7 @@ export interface ENVConfigLike extends Dict<any> {}
 
 export class ENVConfigParser {
 
-    private static instance: ENVConfigParser | null = null
+    private static instance: ENVConfigParser;
 
     constructor() {
         if (ENVConfigParser.instance) {

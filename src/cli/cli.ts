@@ -14,18 +14,13 @@ interface LogMessageLike {
     warn(message: string): void;
 }
 
-interface LeiCoinNetLogMessageLike {
-    server: LogMessageLike;
-    client: LogMessageLike;
-}
-
 export interface CLILike {
     default: LogMessageLike;
     minter: LogMessageLike;
     api: LogMessageLike;
     data: LogMessageLike;
     cmd: LogMessageLike;
-    leicoin_net: LeiCoinNetLogMessageLike;
+    leicoin_net: LogMessageLike;
     setup(): Promise<void>;
     close(): Promise<any>;
 }
@@ -56,21 +51,13 @@ class CLI implements CLILike {
         public error(message: string) {this._log(message, "error");}
         public warn(message: string) {this._log(message, "warn");}
     }
-    
-    private static LeiCoinNetLogMessage = class extends CLI.LogMessage {
-        public readonly server = new CLI.LogMessage('LeiCoinNet-Server', '#f47fff');
-        public readonly client = new CLI.LogMessage('LeiCoinNet-Client', '#f47fff');
-        constructor(prefix: string, color: string) {
-            super(prefix, color);
-        }
-    }
 
     readonly default = new CLI.LogMessage('Global', '#ffffff');
     readonly minter = new CLI.LogMessage('MinterClient', '#00ffff');
     readonly api = new CLI.LogMessage('API', '#c724b1');
     readonly data = new CLI.LogMessage('Data', '#1711df');
     readonly cmd = new CLI.LogMessage('CLI', '#ffffff');
-    readonly leicoin_net = new CLI.LeiCoinNetLogMessage('LeiCoinNet', '#f47fff');
+    readonly leicoin_net = new CLI.LogMessage('LeiCoinNet', '#f47fff');
 
     private ctx: Chalk | null = null;
 
@@ -202,21 +189,13 @@ class NoCLI implements CLILike {
         public error(message: string) {this._log(message, "error");}
         public warn(message: string) {this._log(message, "warn");}
     }
-    
-    private static LeiCoinNetLogMessage = class extends NoCLI.LogMessage {
-        public readonly server = new NoCLI.LogMessage('LeiCoinNet-Server');
-        public readonly client = new NoCLI.LogMessage('LeiCoinNet-Client');
-        constructor(prefix: string) {
-            super(prefix);
-        }
-    }
 
     readonly default = new NoCLI.LogMessage('Global');
     readonly minter = new NoCLI.LogMessage('MinterClient');
     readonly api = new NoCLI.LogMessage('API');
     readonly data = new NoCLI.LogMessage('Data');
     readonly cmd = new NoCLI.LogMessage('CLI');
-    readonly leicoin_net = new NoCLI.LeiCoinNetLogMessage('LeiCoinNet');
+    readonly leicoin_net = new NoCLI.LogMessage('LeiCoinNet');
 
     public async setup() { return; }
     public async close() { return; }
@@ -241,16 +220,11 @@ class OnlyCommandOutput implements CLILike {
         warn(message: string) {}
     }
 
-    private static LNNoOutput = new class {
-        readonly server = OnlyCommandOutput.NoOutput;
-        readonly client = OnlyCommandOutput.NoOutput;
-    }
-
     readonly default = OnlyCommandOutput.NoOutput;
     readonly minter = OnlyCommandOutput.NoOutput;
     readonly api = OnlyCommandOutput.NoOutput;
     readonly data = OnlyCommandOutput.NoOutput;
-    readonly leicoin_net = OnlyCommandOutput.LNNoOutput;
+    readonly leicoin_net = OnlyCommandOutput.NoOutput;
 
     readonly cmd = new class {
         private _log(message: string, type: string) {

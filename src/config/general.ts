@@ -25,7 +25,7 @@ export interface GeneralConfigLike {
 
 export class GeneralConfigParser {
 
-    private static instance: GeneralConfigParser | null = null;
+    private static instance: GeneralConfigParser;
 
     constructor() {
         if (GeneralConfigParser.instance) {

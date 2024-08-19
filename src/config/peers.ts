@@ -7,7 +7,7 @@ export type PeersConfigLike = string[];
 
 export class PeersConfigParser {
 
-    private static instance: PeersConfigParser | null = null;
+    private static instance: PeersConfigParser;
 
     constructor() {
         if (PeersConfigParser.instance) {

@@ -65,7 +65,7 @@ export abstract class CLISubCMD extends CLICMD {
         if (command_name === "help") return await this.run_help(parent_args);
 
         const cmd = this.registry[command_name];
-        if (!cmd) { return await this.run_notFound(command_name, parent_args); }
+        if (!cmd) return await this.run_notFound(command_name, parent_args);
 
         if (args[0] === "--help") return await this.run_sub_help(cmd, parent_args);
 

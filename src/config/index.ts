@@ -18,7 +18,7 @@ class Config {
 
     private config: ConfigLike | null = null;
 
-    private static instance: Config | null = null;
+    private static instance: Config;
 
     public static getInstance() {
         if (!this.instance) {

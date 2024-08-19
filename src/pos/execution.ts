@@ -10,7 +10,7 @@ export class Execution {
     static async executeBlock(block: Block, validationresult: BlockValidationResult) {
     
         if (validationresult.status !== 12000) {
-            cli.leicoin_net.server.info(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
+            cli.leicoin_net.info(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: ${JSON.stringify(validationresult)}`);
             return;
         }
 
@@ -33,7 +33,7 @@ export class Execution {
             await blockchain.wallets.adjustWalletsByBlock(block);
         }
         
-        cli.leicoin_net.server.success(`Block on Slot ${block.slotIndex.toBigInt()} with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain.`);
+        cli.leicoin_net.success(`Block on Slot ${block.slotIndex.toBigInt()} with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain.`);
     }
 
 }

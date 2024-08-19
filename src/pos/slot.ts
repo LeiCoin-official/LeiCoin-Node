@@ -48,7 +48,7 @@ export class Slot {
     private async onBlockNotMinted() {
         if (this.blockTimeout.hasFinished()) return;
         this.blockTimeout.cancel();
-        cli.leicoin_net.server.info(`Minter ${this.minter.toHex()} did not mint a block on Slot ${this.index.toBigInt()}`);
+        cli.leicoin_net.info(`Minter ${this.minter.toHex()} did not mint a block on Slot ${this.index.toBigInt()}`);
     }
 
 

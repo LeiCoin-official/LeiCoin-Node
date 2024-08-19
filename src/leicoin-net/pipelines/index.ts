@@ -21,8 +21,8 @@ export class Pipelines {
     }
 
     private pipelines: { [id: string]: PipelineLike } = {
-        "1001": BlockPipeline,
-        "1002": TransactionPipeline,
+        "2096": BlockPipeline,
+        "427d": TransactionPipeline,
         //"01xx": SomePipeline, the x is used as a wildcard
     };
 

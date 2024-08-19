@@ -40,7 +40,7 @@ class PArg<T extends PArgAllowedTypes> {
 
 export class ProcessArgsParser {
 
-    private static instance: ProcessArgsParser | null = null;
+    private static instance: ProcessArgsParser;
 
     constructor() {
         if (ProcessArgsParser.instance) {

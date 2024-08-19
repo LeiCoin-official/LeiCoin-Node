@@ -21,12 +21,12 @@ export default class TransactionPipeline {
 
                 mempool.addTransactionToMempool(transaction);
         
-                cli.leicoin_net.server.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
+                cli.leicoin_net.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
 
                 this.broadcast(type, data);
 
             } else {
-                cli.leicoin_net.server.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
+                cli.leicoin_net.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);
             }
         }
     

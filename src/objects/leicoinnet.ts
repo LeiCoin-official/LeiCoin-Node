@@ -4,12 +4,12 @@ import { LockedUint } from "./prefix.js";
 export class NPPX extends LockedUint {
     public static readonly byteLength = 2;
 
-    static readonly CHALLENGE = NPPX.from("0000")
-    static readonly CHALLENGE_RESPONSE = NPPX.from("0001")
+    //static readonly CHALLENGE = NPPX.from("0000")
+    //static readonly CHALLENGE_RESPONSE = NPPX.from("0001")
 
-    static readonly MESSAGE = NPPX.from("1000")
-    static readonly BLOCK = NPPX.from("1001")
-    static readonly TRANSACTION = NPPX.from("1002")
+    static readonly MESSAGE = NPPX.from("3b66")
+    static readonly BLOCK = NPPX.from("2096")
+    static readonly TRANSACTION = NPPX.from("427d")
 
 }
 
