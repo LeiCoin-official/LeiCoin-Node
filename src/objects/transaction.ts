@@ -5,7 +5,7 @@ import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { DataUtils } from "../utils/dataUtils.js";
-import { Uint, Uint256, Uint64 } from "../utils/binary.js";
+import { Uint, Uint256, Uint64 } from "../binary/uint.js";
 import Signature from "./signature.js";
 import { PX } from "./prefix.js";
 import { MinterCredentials } from "./minter.js";

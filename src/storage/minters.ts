@@ -1,7 +1,7 @@
 import Minter from "../objects/minter.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
-import { Uint, Uint64 } from "../utils/binary.js";
+import { Uint, Uint64 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
 import { LevelBasedStorage } from "./storageTypes.js";
 import { PX } from "../objects/prefix.js";

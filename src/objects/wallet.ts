@@ -1,5 +1,5 @@
 import ObjectEncoding from "../encoding/objects.js";
-import { NumberLike, Uint, Uint64 } from "../utils/binary.js";
+import { NumberLike, Uint, Uint64 } from "../binary/uint.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";

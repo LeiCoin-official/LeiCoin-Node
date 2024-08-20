@@ -1,17 +1,17 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
 import { CB } from "../utils/callbacks.js";
-import { Uint256 } from "../utils/binary.js";
-import { Dict } from "../utils/dataUtils.js";
+import { Uint256 } from "../binary/uint.js";
+import { UintMap } from "../binary/map.js";
 
 class Mempool {                                                                                                                                                                                                         
 
     private static instance: Mempool;
 
-    public transactions: Dict<Transaction>;
+    public transactions: UintMap<Transaction>;
   
     private constructor() {
-        this.transactions = {};
+        this.transactions = new UintMap<Transaction>();
     }
     
     public static getInstance() {
@@ -39,7 +39,7 @@ class Mempool {
             return { cb: 'exists' };
         }
     
-        this.transactions[txid.toHex()] = transaction;
+        this.transactions.set(txid, transaction);
         return { cb: CB.SUCCESS };
     }
     
@@ -47,7 +47,7 @@ class Mempool {
     public removeTransactionFromMempool(txid: Uint256) {
     
         if (txid.toHex() in this.transactions) {
-            delete this.transactions[txid.toHex()];
+            this.transactions.delete(txid);
             return { cb: CB.SUCCESS };
         }
     

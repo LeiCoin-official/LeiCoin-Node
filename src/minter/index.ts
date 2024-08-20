@@ -5,7 +5,7 @@ import { PX } from "../objects/prefix.js";
 import cli from "../cli/cli.js";
 import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
-import { Uint256, Uint64 } from "../utils/binary.js";
+import { Uint256, Uint64 } from "../binary/uint.js";
 import blockchain from "../storage/blockchain.js";
 import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";

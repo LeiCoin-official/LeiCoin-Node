@@ -1,5 +1,5 @@
 import { AddressHex } from "../objects/address.js";
-import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../utils/binary.js";
+import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../binary/uint.js";
 
 interface LevelDBEncoderLike<T extends Uint> {
     readonly encode: (val: Uint | Uint8Array) => Uint8Array;

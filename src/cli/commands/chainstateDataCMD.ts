@@ -1,5 +1,5 @@
 import blockchain from "../../storage/blockchain.js";
-import { Uint, Uint64 } from "../../utils/binary.js";
+import { Uint, Uint64 } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 

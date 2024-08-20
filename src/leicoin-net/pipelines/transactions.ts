@@ -5,7 +5,7 @@ import Verification from "../../verification/index.js"
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
 import { DataUtils } from "../../utils/dataUtils.js";
-import { Uint } from "../../utils/binary.js";
+import { Uint } from "../../binary/uint.js";
 
 export default class TransactionPipeline {
 

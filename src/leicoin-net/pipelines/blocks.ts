@@ -2,7 +2,7 @@ import Verification from "../../verification/index.js"
 import Block from "../../objects/block.js";
 import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
-import { Uint } from "../../utils/binary.js";
+import { Uint } from "../../binary/uint.js";
 import POS from "../../pos/index.js";
 
 export default class BlockPipeline {

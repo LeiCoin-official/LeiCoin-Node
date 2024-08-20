@@ -1,4 +1,4 @@
-import { Uint } from "../utils/binary.js";
+import { Uint } from "../binary/uint.js";
 import { LockedUint } from "../objects/prefix.js";
 
 export class LNPPX extends LockedUint {

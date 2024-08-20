@@ -1,6 +1,6 @@
 import { DatabaseOptions, GetOptions, Level } from "level";
 import { LevelDBEncoders } from "../encoding/leveldbEncoders.js";
-import { Uint } from "../utils/binary.js";
+import { Uint } from "../binary/uint.js";
 
 export class LevelDB<K = Uint, V = Uint> extends Level<K, V> {
     

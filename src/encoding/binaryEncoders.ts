@@ -1,8 +1,8 @@
 import { AddressHex as AddressHexClass } from "../objects/address.js";
 import { Signature as SignatureClass } from "../objects/signature.js";
-import { Uint256 as Uint256Class, Uint64, Uint8 } from "../utils/binary.js";
+import { Uint256 as Uint256Class, Uint64, Uint8 } from "../binary/uint.js";
 import { PX as PXClass } from "../objects/prefix.js";
-import { Uint } from "../utils/binary.js";
+import { Uint } from "../binary/uint.js";
 import ObjectEncoding from "./objects.js";
 import { AnyObj } from "../utils/dataUtils.js";
 

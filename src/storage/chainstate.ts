@@ -4,7 +4,7 @@ import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 import ObjectEncoding from "../encoding/objects.js";
 import Block from "../objects/block.js";
 import { PX } from "../objects/prefix.js";
-import { Uint, Uint256 } from "../utils/binary.js";
+import { Uint, Uint256 } from "../binary/uint.js";
 import { CB } from "../utils/callbacks.js";
 import { DataUtils, Dict } from "../utils/dataUtils.js";
 import blockchain from "./blockchain.js";

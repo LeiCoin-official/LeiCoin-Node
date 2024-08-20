@@ -1,5 +1,5 @@
 import cli from "../cli/cli.js";
-import { Uint64 } from "../utils/binary.js";
+import { Uint64 } from "../binary/uint.js";
 import Constants from "../utils/constants.js";
 import { Dict } from "../utils/dataUtils.js";
 import utils from "../utils/index.js";

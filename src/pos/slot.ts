@@ -1,6 +1,6 @@
 import { AddressHex } from "../objects/address.js";
 import { type Block } from "../objects/block.js";
-import { Uint64 } from "../utils/binary.js";
+import { Uint64 } from "../binary/uint.js";
 import MinterClient from "../minter/index.js";
 import Verification, { BlockValidationResult } from "../verification/index.js";
 import { Execution } from "./execution.js";

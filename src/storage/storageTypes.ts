@@ -1,7 +1,7 @@
 import path from "path";
 import LevelDB from "./leveldb.js";
 import BCUtils from "./blockchainUtils.js";
-import { Uint } from "../utils/binary.js";
+import { Uint } from "../binary/uint.js";
 
 export abstract class LevelBasedStorage {
 

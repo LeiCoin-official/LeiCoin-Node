@@ -2,7 +2,7 @@ import { Transaction } from "./transaction.js";
 import cli from "../cli/cli.js";
 import LCrypt from "../crypto/index.js";
 import { DataUtils } from "../utils/dataUtils.js";
-import { Uint, Uint256, Uint64 } from "../utils/binary.js";
+import { Uint, Uint256, Uint64 } from "../binary/uint.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";

@@ -1,5 +1,5 @@
 import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
-import { Uint } from "../../utils/binary.js";
+import { Uint } from "../../binary/uint.js";
 import { CB } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
