@@ -79,7 +79,7 @@ export class LeiCoinNetNode {
         utils.events.once("stop_server", async() => await this.stop());
     }
 
-    //#region Connectiosn Management
+    ////#region Connectiosn Management
 
     static addConnection(socket: LNSocket, genData = true) {
         if (genData) {
@@ -103,7 +103,7 @@ export class LeiCoinNetNode {
         return this.connections;
     }
 
-    //#endregion
+    ////#endregion
 
 }
 

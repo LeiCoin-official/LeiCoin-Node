@@ -1,16 +1,16 @@
 import cli from "../cli/cli.js";
 import { Uint64 } from "../binary/uint.js";
 import Constants from "../utils/constants.js";
-import { Dict } from "../utils/dataUtils.js";
 import utils from "../utils/index.js";
 import Slot from "./slot.js";
 import cron from "node-cron";
+import { UintMap } from "../binary/map.js";
 
 export class POS {
 
     private static initialized = false;
 
-    public static readonly slots: Dict<Slot> = {};
+    public static readonly slots: UintMap<Slot> = new UintMap<Slot>();
     private static currentSlot: Slot;
 
     private static slotTask: cron.ScheduledTask;
@@ -44,16 +44,16 @@ export class POS {
 
     public static async startNewSlot(slotIndex: Uint64) {
         const newSlot = await Slot.create(slotIndex);
-        this.slots[slotIndex.toHex()] = newSlot;
+        this.slots.set(slotIndex, newSlot);
         this.currentSlot = newSlot;
     }
 
     public static async endSlot(slotIndex: Uint64) {
-        delete this.slots[slotIndex.toHex()];
+        return this.slots.delete(slotIndex);
     }
 
     public static getSlot(index: Uint64) {
-        return this.slots[index.toHex()];
+        return this.slots.get(index);
     }
 
     public static getCurrentSlot() {
