@@ -11,39 +11,17 @@ import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Block {
 
-    public index: Uint64;
-    public slotIndex: Uint64;
-    public hash: Uint256;
-    public previousHash: Uint256;
-    public timestamp: Uint64;
-    public minter: AddressHex;
-    public signature: Signature;
-    public transactions: Transaction[];
-    public version: PX;
-
     constructor(
-        index: Uint64,
-        slotIndex: Uint64,
-        hash: Uint256,
-        previousHash: Uint256,
-        timestamp: Uint64,
-        minter: AddressHex,
-        signature: Signature,
-        transactions: Transaction[],
-        version = PX.A_00
-    ) {
-
-        this.index = index;
-        this.slotIndex = slotIndex;
-        this.hash = hash;
-        this.previousHash = previousHash;
-        this.timestamp = timestamp;
-        this.minter = minter;
-        this.signature = signature;
-        this.transactions = transactions;
-        this.version = version;
-
-    }
+        public index: Uint64,
+        public slotIndex: Uint64,
+        public hash: Uint256,
+        public previousHash: Uint256,
+        public timestamp: Uint64,
+        public minter: AddressHex,
+        public signature: Signature,
+        public transactions: Transaction[],
+        public readonly version: PX = PX.A_00
+    ) {}
 
     public encodeToHex(forHash = false) {
         return ObjectEncoding.encode(this, Block.encodingSettings, forHash).data;

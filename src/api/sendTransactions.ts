@@ -4,7 +4,7 @@ import Verification from "../verification/index.js";
 import utils from "../utils/index.js";
 import mempool from "../storage/mempool.js";
 import { CB } from "../utils/callbacks.js";
-import { LeiCoinNetDataPackage } from "../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage } from "../leicoin-net/packages.js";
 import { VCodes } from "../verification/codes.js";
 
 // Route for receiving new transactions

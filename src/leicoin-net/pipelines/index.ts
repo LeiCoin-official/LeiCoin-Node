@@ -1,12 +1,12 @@
-import { LeiCoinNetDataPackage, NPPX } from "../../objects/leicoinnet.js";
+import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
 import { Uint } from "../../utils/binary.js";
 import { CB } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
 
 export interface PipelineLike {
-    receive(type: NPPX, data: Uint): Promise<void>;
-    broadcast(type: NPPX, data: Uint, ...args: any[]): Promise<void>;
+    receive(type: LNPPX, data: Uint): Promise<void>;
+    broadcast(type: LNPPX, data: Uint, ...args: any[]): Promise<void>;
 }
 
 export class Pipelines {

@@ -1,67 +1,90 @@
+import { type ObjORNull } from "./dataUtils.js";
 import cli from "../cli/cli.js";
-import { BasicUintConstructable, Uint } from "./binary.js";
+import { BasicUintConstructable, Uint, Uint64 } from "./binary.js";
+
+type BinaryMapIteratorResultType<K, V> = K extends Uint ?
+                                             V extends null ? K : [K, V]
+                                         : V;
+
+type BasicUintConstructableORNull<T> = T extends Uint ? BasicUintConstructable<T> : null;
 
 
-/** @deprecated Dont Use BMap because it Dont work */
-export class BMap<K extends Uint, V> extends Map {
+class BinaryMapIterator<KVT extends [Uint, NonNullable<any>] | [Uint, null] | [null, NonNullable<any>]> implements IterableIterator<KVT> {
 
-    private readonly CLS: BasicUintConstructable<K>;
-    
-    // @ts-ignore
-    constructor(CLS: BasicUintConstructable<K> = Uint) {
-        super();
+    private CLS: BasicUintConstructable<Uint> | null;
+    private mapEntries: IterableIterator<[string, V] | string | V>;
+
+    constructor(CLS: BasicUintConstructable<Uint>, mapEntries: IterableIterator<[string, KVT[1]]>);
+    constructor(CLS: BasicUintConstructable<Uint>, mapEntries: IterableIterator<string>);
+    constructor(CLS: null, mapEntries: IterableIterator<V>);
+    constructor(CLS: BasicUintConstructable<Uint> | null, mapEntries: IterableIterator<[string, KVT[1]] | string | KVT[1]>) {
         this.CLS = CLS;
+        this.mapEntries = mapEntries
     }
 
-    public delete(key: K) {
-        return super.delete(key.getAB());
+    [Symbol.iterator]() {
+        return this;
     }
 
-    /*public forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
+    next(): IteratorResult<KVT> {
+        const result = this.mapEntries.next();
+        if (result.done) {
+            return { done: true, value: undefined as V };
+        }
+        if (Array.isArray(result.value)) {
+            return {
+                done: false,
+                value: [
+                    this.CLS.from(result.value[0]),
+                    result.value[1]
+                ]
+            };
+        } else {
+            return {
+                done: true,
+                value: result.value
+            };
+        }
+    }
+}
 
-    }*/
+
+///** @deprecated Dont Use BMap because it Dont work */
+abstract class AbstractBinaryMap<K extends Uint, V = any> implements Map<K, V> {
+
+    protected readonly map: Map<string, V>;
+    
+    constructor(
+        protected readonly CLS: BasicUintConstructable<K>
+    ) {
+        this.CLS = CLS;
+        this.map = new Map();
+    }
+
+    public get size() {
+        return this.map.size;
+    }
 
     public get(key: K) {
-        return super.get(key.getAB());
-    }
-
-    public has(key: K) {
-        return super.has(key.getAB());
+        return this.map.get(key.toHex());
     }
 
     public set(key: K, value: V) {
-        return super.set(key.getAB(), value);
+        this.map.set(key.toHex(), value);
+        return this;
     }
 
-    public [Symbol.iterator](): IterableIterator<[K, V]> {
-        /*const result: [K, V][] = [];
-        for (const [key, value] of super[Symbol.iterator]()) {
-            result.push([this.CLS.from(key), value]);
-        }
-        return result.values();*/
-
-        const CLS = this.CLS;
-        const entriesIterator = super[Symbol.iterator]();
-
-        return {
-            [Symbol.iterator]() {
-                return this;
-            },
-            next(): IteratorResult<[K, V]> {
-                const result = entriesIterator.next();
-                if (result.done) {
-                    return { done: true, value: undefined as any };
-                }
-                const [key, value] = result.value;
-                return {
-                    done: false,
-                    value: [new CLS(Buffer.from(key)), value as V]
-                };
-            }
-        };
-
+    public delete(key: K) {
+        return this.map.delete(key.toHex());
     }
 
+    public has(key: K) {
+        return this.map.has(key.toHex());
+    }
+
+    public [Symbol.iterator]() {
+        return new BinaryMapIterator(this.CLS, this.map[Symbol.iterator]());
+    }
 
     public entries() {
         const result: [K, V][] = [];
@@ -71,15 +94,33 @@ export class BMap<K extends Uint, V> extends Map {
         return result.values();
     }
     
-    /*public keys() {
-        const result = new Set();
-        for (const key of super.keys()) {
-            result.push(new this.CLS(Buffer.from(key)));
-        }
-        return result.values(;
-    }*/
+    public keys() {
+        return new BinaryMapIterator(this.CLS, this.map.keys());
+    }
 
+    public values() {
+        
+    }
+
+
+    public forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
+
+    }
+
+    public clear(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    public get [Symbol.toStringTag]() {
+        return this.constructor.name;
+    }
 }
 
-export { BMap as BinMap };
-export default BMap;
+export class UintMap<V = any> extends AbstractBinaryMap<Uint, V> {
+    constructor() {
+        super(Uint);
+    }
+}
+
+new BinaryMapIterator<[Uint, number]>(Uint, new Map<string, number>()[Symbol.iterator]()).next();
+

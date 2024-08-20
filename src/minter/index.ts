@@ -14,7 +14,7 @@ import LCrypt from "../crypto/index.js";
 import BlockPipeline from "../leicoin-net/pipelines/blocks.js";
 import { MinterCredentials } from "../objects/minter.js";
 import type Slot from "../pos/slot.js";
-import { NPPX } from "../objects/leicoinnet.js";
+import { LNPPX } from "../leicoin-net/packages.js";
 
 export class MinterClient {
 
@@ -76,7 +76,7 @@ export class MinterClient {
 		const block = await this.createNewBlock(mc, currentSlot.index);
 
 		BlockPipeline.broadcast(
-			NPPX.BLOCK,
+			LNPPX.BLOCK,
 			block.encodeToHex()
 		);
 

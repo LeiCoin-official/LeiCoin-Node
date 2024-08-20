@@ -1,7 +1,7 @@
 
 type New<T> = new(buffer: Buffer) => T;
 
-export interface BasicUintConstructable<T> extends New<T> {
+export interface BasicUintConstructable<T extends Uint> extends New<T> {
     alloc(length?: number): T;
     create(input: Buffer | Uint): T;
 
@@ -13,7 +13,7 @@ export interface BasicUintConstructable<T> extends New<T> {
     byteLength?: number;
 }
 
-export interface FixedUintConstructable<T> extends BasicUintConstructable<T> {
+export interface FixedUintConstructable<T extends FixedUint> extends BasicUintConstructable<T> {
     byteLength: number;
     alloc(): T;
 }

@@ -13,37 +13,17 @@ import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Transaction {
 
-    public txid: Uint256;
-    public senderAddress: AddressHex;
-    public recipientAddress: AddressHex;
-    public amount: Uint64;
-    public nonce: Uint64;
-    public timestamp: Uint64;
-    public input: Uint;
-    public signature: Signature;
-    public readonly version: PX;
-
     constructor(
-        txid: Uint256,
-        senderAddress: AddressHex,
-        recipientAddress: AddressHex,
-        amount: Uint64,
-        nonce: Uint64,
-        timestamp: Uint64,
-        input: Uint,
-        signature: Signature,
-        version = PX.V_00
-    ) {
-        this.txid = txid;
-        this.senderAddress = senderAddress;
-        this.recipientAddress = recipientAddress;
-        this.amount = amount;
-        this.nonce = nonce;
-        this.timestamp = timestamp;
-        this.input = input;
-        this.signature = signature;
-        this.version = version;
-    }
+        public txid: Uint256,
+        public senderAddress: AddressHex,
+        public recipientAddress: AddressHex,
+        public amount: Uint64,
+        public nonce: Uint64,
+        public timestamp: Uint64,
+        public input: Uint,
+        public signature: Signature,
+        public readonly version = PX.V_00
+    ) {}
 
     public static createCoinbaseTransaction(mc: MinterCredentials) {
 

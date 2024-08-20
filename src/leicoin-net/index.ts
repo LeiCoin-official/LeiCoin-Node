@@ -12,14 +12,21 @@ export class LeiCoinNetNode {
 
     static async init(): Promise<void> {
         Promise.all([
-            this.start(),
+            this.startSerevr(),
+            this.initConnections()
             this.setupEvents(),
         ]);
     }
 
-    static async start() {
-        this.server = await this.startSerevr();
+    private static async startSerevr() {
+        this.server = Bun.listen<SocketData>({
+            hostname: config.leicoin_net.host,
+            port: config.leicoin_net.port,
+            socket: lnSocketHandler
+        });
+    }
 
+    private static async initConnections() {
         const promises: Promise<void>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections
@@ -43,14 +50,6 @@ export class LeiCoinNetNode {
         await Promise.all(promises);
     }
 
-    private static async startSerevr() {
-        return Bun.listen<SocketData>({
-            hostname: config.leicoin_net.host,
-            port: config.leicoin_net.port,
-            socket: lnSocketHandler
-        });
-    }
-
     private static async connectToNode(host: string, port: number) {
         const connection = await Bun.connect<SocketData>({
             hostname: host,
@@ -70,7 +69,7 @@ export class LeiCoinNetNode {
         cli.leicoin_net.info(`LeiCoinNet-Node stopped`);
     }
 
-    static async brodcast(data: Buffer) {
+    static async broadcast(data: Buffer) {
 
 
 
@@ -80,6 +79,7 @@ export class LeiCoinNetNode {
         utils.events.once("stop_server", async() => await this.stop());
     }
 
+    //#region Connectiosn Management
 
     static addConnection(socket: LNSocket, genData = true) {
         if (genData) {
@@ -87,15 +87,23 @@ export class LeiCoinNetNode {
         }
         this.connections.push(socket);
     }
+
+    static getConnection(): readonly LNSocket[] {
+        return this.connections;
+    }
+
     static removeConnection(socket: LNSocket) {
         const index = this.connections.indexOf(socket);
         if (index !== -1) {
             this.connections.splice(index, 1);
         }
     }
-    static getConnections(): readonly LNSocket[] {
+
+    static getAllConnections(): readonly LNSocket[] {
         return this.connections;
     }
+
+    //#endregion
 
 }
 
