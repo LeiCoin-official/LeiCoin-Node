@@ -1,36 +1,54 @@
 import { TCPSocketListener } from "bun";
-import config from "../config/index.js";
-import { lnSocketHandler, LNSocket, SocketData } from "./socket.js";
-import utils from "../utils/index.js";
+import { BasicLNSocketHandler, LNSocketHandler, SocketData } from "./socket.js";
 import cli from "../cli/cli.js";
+import { LNConnections } from "./connections.js";
+import { type EventEmitter } from "events";
 
 export class LeiCoinNetNode {
 
-    private static server: TCPSocketListener<SocketData>;
+    protected server: TCPSocketListener<SocketData> | null = null;
 
-    private static readonly connections: LNSocket[] = [];
+    constructor(
+        readonly connections: LNConnections = new LNConnections(),
+        readonly socketHandler: BasicLNSocketHandler = new LNSocketHandler(connections),
+    ) {}
 
-    static async init(): Promise<void> {
-        Promise.all([
-            this.startSerevr(),
-            this.initConnections()
-            this.setupEvents(),
-        ]);
+    async start(config: {
+        host: string,
+        port: number,
+        peers: readonly string[]
+        eventHandler?: EventEmitter
+    }) {
+        const tasks: Promise<void>[] = [];
+
+        tasks.push(
+            this.startServer(config.host, config.port),
+            this.initPeers(config.peers)
+        );
+
+        if (config.eventHandler) {
+            tasks.push(this.setupEvents(config.eventHandler));
+        }
+
+        await Promise.all(tasks);
+
+        cli.leicoin_net.info(`LeiCoinNet-Node started on ${config.host}:${config.port}`);
     }
 
-    private static async startSerevr() {
+    protected async startServer(host: string, port: number) {
         this.server = Bun.listen<SocketData>({
-            hostname: config.leicoin_net.host,
-            port: config.leicoin_net.port,
-            socket: lnSocketHandler
+            hostname: host,
+            port: port,
+            socket: this.socketHandler
         });
     }
 
-    private static async initConnections() {
+    /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
+    protected async initPeers(peers: readonly string[]) {
         const promises: Promise<void>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections
-        for (const targetData of config.peers) {
+        for (const targetData of peers) {
             const dataArray = targetData.split(":");
             const host = dataArray[0];
             const port = dataArray[1] ? parseInt(dataArray[1]) : 12200;
@@ -46,64 +64,45 @@ export class LeiCoinNetNode {
 
             promises.push(this.connectToNode(host, port));
         }
-            
+
         await Promise.all(promises);
     }
 
-    private static async connectToNode(host: string, port: number) {
+    protected async connectToNode(host: string, port: number) {
         const connection = await Bun.connect<SocketData>({
             hostname: host,
             port: port,
-            socket: lnSocketHandler
+            socket: this.socketHandler
         })
-        this.connections.push(connection);
+        this.connections.add(connection);
     }
 
-    private static async stop() {
-        this.server.stop();
-
-        for (const connection of this.connections) {
+    public async stop() {
+        
+        for (const connection of this.connections.values()) {
             connection.end();
+        }
+        cli.leicoin_net.info(`Closed ${this.connections.size} connections`);
+
+        if (this.server) {
+            this.server.stop();
+        } else {
+            cli.leicoin_net.error(`LeiCoinNet-Node connot be stopped, because it is not running`);
         }
 
         cli.leicoin_net.info(`LeiCoinNet-Node stopped`);
     }
 
-    static async broadcast(data: Buffer) {
-
-
-
-    }
-
-    private static setupEvents() {
-        utils.events.once("stop_server", async() => await this.stop());
-    }
-
-    ////#region Connectiosn Management
-
-    static addConnection(socket: LNSocket, genData = true) {
-        if (genData) {
-            socket.data = new SocketData(socket.remoteAddress, socket.localPort);
-        }
-        this.connections.push(socket);
-    }
-
-    static getConnection(): readonly LNSocket[] {
-        return this.connections;
-    }
-
-    static removeConnection(socket: LNSocket) {
-        const index = this.connections.indexOf(socket);
-        if (index !== -1) {
-            this.connections.splice(index, 1);
+    public async broadcast(data: Buffer) {
+        for (const connection of this.connections.values()) {
+            connection.write(data);
         }
     }
 
-    static getAllConnections(): readonly LNSocket[] {
-        return this.connections;
+    protected async setupEvents(eventHandler: EventEmitter) {
+        eventHandler.once("stop_server", async() => await this.stop());
     }
-
-    ////#endregion
 
 }
 
+export default LeiCoinNetNode;

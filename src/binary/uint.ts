@@ -283,6 +283,10 @@ export class Uint {
         return this.buffer.compare(value.buffer);
     }
 
+    public get [Symbol.toStringTag]() {
+        return this.constructor.name;
+    }
+
 }
 
 export class FixedUint extends Uint {

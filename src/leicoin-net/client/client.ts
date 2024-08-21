@@ -2,6 +2,7 @@ import WebSocket from "ws";
 import cli from "../../cli/cli.js";
 import { CB } from "../../utils/callbacks.js";
 
+// export class LeiCoinNetClient {
 export class LeiCoinNetClient {
 
     private readonly host: string;
@@ -15,12 +16,7 @@ export class LeiCoinNetClient {
     }
 
     public async connect() {
-        this.client = Bun.connect<>({
-            hostname: this.host,
-            socket: {
-
-            }
-        })
+        this.client = new WebSocket(this.host);
     
         this.client.on('open', () => {
             cli.leicoin_net.info(`Connected to: ${this.host}`);

@@ -2,6 +2,8 @@ import cli from "../cli/cli.js";
 import pipelines from "./pipelines/index.js";
 import { Socket, SocketHandler } from "bun";
 import { LeiCoinNetNode } from "./index.js";
+import { Uint, Uint256 } from "../binary/uint.js";
+import LCrypt from "../crypto/index.js";
 
 // class UnverifiedSocket {
 //     readonly verified: boolean;
@@ -51,11 +53,13 @@ export class SocketData {
     readonly host: string;
     readonly port: number;
     readonly uri: string;
+    readonly id: Uint256;
 
     constructor(host: string, port: number) {
         this.host = host;
         this.port = port;
         this.uri = `${host}:${port}`;
+        this.id = LCrypt.sha256(Uint.from(this.uri, "utf8"));
     }
 }
 
@@ -65,6 +69,13 @@ export interface LNSocket extends Socket<SocketData> {
 
 class BasicLNSocketHandler implements SocketHandler<SocketData> {
     readonly binaryType = "buffer";
+
+    constructor(
+        connections
+
+    ) {
+
+    }
 
     async open(socket: LNSocket) {
         LeiCoinNetNode.addConnection(socket);
@@ -108,4 +119,7 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
     ) {}
 }
 
-export const lnSocketHandler = new BasicLNSocketHandler();
+export { type BasicLNSocketHandler }
+
+export class LNSocketHandler extends BasicLNSocketHandler {};
+

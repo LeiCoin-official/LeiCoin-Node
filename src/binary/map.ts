@@ -13,6 +13,14 @@ abstract class BMapIteratorLike<T, M> implements IterableIterator<T> {
         return { done: false, value: this._next(result.value) };
     }
     protected abstract _next(value: M): T;
+
+    public all(): readonly T[] {
+        const result: T[] = [];
+        for (const value of this) {
+            result.push(value);
+        }
+        return result;
+    }
 }
 
 class BMapEntriesIterator<K extends Uint, V> extends BMapIteratorLike<[K, V], [string, any]> {
@@ -42,8 +50,14 @@ class BMapValuesIterator<V> extends BMapIteratorLike<V, V> {
     }
 }
 
+export {
+    type BMapIteratorLike,
+    type BMapEntriesIterator,
+    type BMapKeysIterator,
+    type BMapValuesIterator,
+}
 
-///** @deprecated Dont Use BMap because it Dont work */
+
 abstract class AbstractBinaryMap<K extends Uint, V> extends Map<any, V> {
     
     constructor(
