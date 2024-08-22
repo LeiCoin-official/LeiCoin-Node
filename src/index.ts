@@ -62,7 +62,7 @@ export default class Main {
                     });
                 }
 
-                (await import("./minter/index.js")).MinterClient.initIfActive();
+                (await import("./minter/index.js")).MinterClient.createMinters(config.staker.stakers, this.leicoinNetNode);
                 (await import("./pos/index.js")).POS.init();
     
                 cli.default.info(`LeiCoin-Node started in Full Node mode`);

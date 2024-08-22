@@ -1,9 +1,7 @@
 import { PrivateKey } from "../crypto/cryptoKeys.js";
-import config from "../config/index.js";
 import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import cli from "../cli/cli.js";
-import utils from "../utils/index.js";
 import Verification from "../verification/index.js";
 import { Uint256, Uint64 } from "../binary/uint.js";
 import blockchain from "../storage/blockchain.js";
@@ -11,49 +9,60 @@ import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";
 import Signature from "../objects/signature.js";
 import LCrypt from "../crypto/index.js";
-import BlockPipeline from "../leicoin-net/pipelines/blocks.js";
 import { MinterCredentials } from "../objects/minter.js";
 import type Slot from "../pos/slot.js";
-import { LNPPX } from "../leicoin-net/packages.js";
+import { LeiCoinNetDataPackage, LNPPX } from "../leicoin-net/packages.js";
+import { LeiCoinNetNode } from "../leicoin-net/index.js";
 
 export class MinterClient {
 
-	private static initialized = false;
+	private constructor(
+		public readonly credentials: MinterCredentials,
+		protected readonly network: LeiCoinNetNode
+	) {}
 
-	public static active = false;
-	public static readonly minters: MinterCredentials[] = [];
-
-	private static init() {
-		if (this.initialized) return;
-		this.initialized = true;
-
-		for (const staker of config.staker.stakers) {
-			this.minters.push(new MinterCredentials(
-				PrivateKey.from(staker.privateKey),
-				AddressHex.from(staker.address)
-			));
+	public verifyCredentials(): { cb: true } | { cb: false, message: string } {
+		if (!Verification.verifyAddress(this.credentials.address, PX.A_0e)) {
+			return { cb: false, message: "MinterClient could not be started: Invalid Address." };
 		}
-
-		for (const staker of this.minters) {
-			if (!Verification.verifyAddress(staker.address, PX.A_0e)) {
-				cli.minter.error("MinterClient could not be started: Invalid Address.");
-				utils.gracefulShutdown(1);
-			}
-			if (AddressHex.fromPrivateKey(PX.A_0e, staker.privateKey).eqn(staker.address)) {
-				cli.minter.error("MinterClient could not be started: Invalid PrivateKey - Address Pair.");
-				utils.gracefulShutdown(1);
-			}
+		if (AddressHex.fromPrivateKey(PX.A_0e, this.credentials.privateKey).eqn(this.credentials.address)) {
+			return { cb: false, message: "MinterClient could not be started: Invalid PrivateKey - Address Pair." };
 		}
-
-		cli.minter.info("MinterClient started");
+		return { cb: true };
 	}
 
-	public static initIfActive() {
-		this.active = config.staker.active;
-		if (this.active) this.init();
+	static createMinters(
+		config: Array<{
+			address: string,
+			privateKey: string
+		}>,
+		network: LeiCoinNetNode
+	) {
+
+		const clients: MinterClient[] = [];
+
+		for (const staker of config) {
+			const mc = new MinterClient(
+				new MinterCredentials(
+					PrivateKey.from(staker.privateKey),
+					AddressHex.from(staker.address)
+				),
+				network
+			);
+
+			const mc_verification = mc.verifyCredentials()
+
+			if (mc_verification.cb) {
+				clients.push(mc);
+			} else {
+				cli.minter.error(mc_verification.message);
+			}
+		}
+
+		cli.minter.info("MinterClients started");
 	}
 
-	private static async createNewBlock(mc: MinterCredentials, currentSlotIndex: Uint64) {
+	private async createNewBlock(currentSlotIndex: Uint64) {
 
 		const previousBlock = blockchain.chainstate.getLatestBlock();
 		const block = new Block(
@@ -62,22 +71,24 @@ export class MinterClient {
 			Uint256.alloc(),
 			previousBlock?.hash || Uint256.alloc(),
 			Uint64.from(new Date().getTime()),
-			mc.address,
+			this.credentials.address,
 			Signature.empty(),
 			Object.values(mempool.transactions)
 		)
 
 		block.hash.set(block.calculateHash());
-		block.signature = LCrypt.sign(block.calculateHash(), PX.A_0e, mc.privateKey);
+		block.signature = LCrypt.sign(block.calculateHash(), PX.A_0e, this.credentials.privateKey);
 		return block;
 	}
 
-    public static async mint(mc: MinterCredentials, currentSlot: Slot) {
-		const block = await this.createNewBlock(mc, currentSlot.index);
+    async mint(currentSlot: Slot) {
+		const block = await this.createNewBlock(currentSlot.index);
 
-		BlockPipeline.broadcast(
-			LNPPX.BLOCK,
-			block.encodeToHex()
+		this.network.broadcast(
+			LeiCoinNetDataPackage.create(
+				LNPPX.BLOCK,
+				block.encodeToHex()
+			)
 		);
 
 		currentSlot.processBlock(block);

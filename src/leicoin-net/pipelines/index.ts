@@ -1,30 +1,51 @@
-import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
-import { Uint } from "../../binary/uint.js";
+import { LeiCoinNetDataPackage, type LNPPX } from "../packages.js";
+import { type Uint } from "../../binary/uint.js";
 import { CB } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
+import { type LeiCoinNetBroadcaster } from "../index.js";
 
-export interface PipelineLike {
-    receive(type: LNPPX, data: Uint): Promise<void>;
-    broadcast(type: LNPPX, data: Uint, ...args: any[]): Promise<void>;
+type PipelineConstructor<T extends Pipeline = Pipeline> = new (broadcaster: LeiCoinNetBroadcaster) => T;
+
+export abstract class Pipeline {
+
+    abstract readonly id: string;
+
+    constructor(
+        protected readonly broadcaster: LeiCoinNetBroadcaster
+    ) {}
+
+    abstract receive(type: LNPPX, data: Uint): Promise<void>;
+    
+    async broadcast(type: LNPPX, data: Uint, ...args: any[]) {
+        await this.broadcaster(LeiCoinNetDataPackage.create(type, data));
+    }
 }
 
 export class Pipelines {
 
-    private static instance: Pipelines;
+    // { "01xx": SomePipeline } , the x is used as a wildcard
+    private pipelines: { [id: string]: Pipeline } = {};
 
-    public static getInstance() {
-        if (!this.instance) {
-            this.instance = new Pipelines();
-        }
-        return this.instance;
+    constructor(
+        protected readonly broadcaster: LeiCoinNetBroadcaster
+    ) {
+        this.registerPipelines([
+            BlockPipeline,
+            TransactionPipeline
+        ]);
     }
 
-    private pipelines: { [id: string]: PipelineLike } = {
-        "2096": BlockPipeline,
-        "427d": TransactionPipeline,
-        //"01xx": SomePipeline, the x is used as a wildcard
-    };
+    protected registerPipelines(CLSs: PipelineConstructor[]) {
+        for (const CLS of CLSs) {
+            this.registerPipeline(CLS);
+        }
+    }
+
+    protected registerPipeline(CLS: PipelineConstructor) {
+        const pipeline = new CLS(this.broadcaster);
+        this.pipelines[pipeline.id] = pipeline;
+    }
 
     public async receiveData(rawData: Buffer) {
 
@@ -42,11 +63,10 @@ export class Pipelines {
             return { cb: CB.NONE, message: `Unknown Data Type: ${data.type}` };
         }
 
-        await this.pipelines[data.type.toHex()].receive(data.type, data.content);
+        await this.pipelines[matchedPipelineId].receive(data.type, data.content);
 
     }
 
 }
 
-const pipelines = Pipelines.getInstance();
-export default pipelines;
+export default Pipelines;

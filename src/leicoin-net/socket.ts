@@ -1,9 +1,9 @@
 import cli from "../cli/cli.js";
-import pipelines from "./pipelines/index.js";
-import { Socket, SocketHandler } from "bun";
-import { LeiCoinNetNode } from "./index.js";
-import { Uint, Uint256 } from "../binary/uint.js";
+import { type Pipelines } from "./pipelines/index.js";
+import type { Socket, SocketHandler } from "bun";
+import { Uint, type Uint256 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
+import { type LNConnections } from "./connections.js";
 
 // class UnverifiedSocket {
 //     readonly verified: boolean;
@@ -71,25 +71,23 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
     readonly binaryType = "buffer";
 
     constructor(
-        connections
-
-    ) {
-
-    }
+        protected readonly connections: LNConnections,
+        protected readonly pipelines: Pipelines
+    ) {}
 
     async open(socket: LNSocket) {
-        LeiCoinNetNode.addConnection(socket);
+        this.connections.add(socket);
         cli.leicoin_net.info(
             `A Connection was established with ${socket.data.uri}`
         );
     }
 
     async close(socket: LNSocket) {
-        LeiCoinNetNode.removeConnection(socket);
+        this.connections.remove(socket);
         cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
     }
     async end(socket: LNSocket) {
-        LeiCoinNetNode.removeConnection(socket);
+        this.connections.remove(socket);
         cli.leicoin_net.info(`Connection to ${socket.data.uri} ended.`);
     }
 
@@ -107,7 +105,7 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
     }
 
     async data(socket: LNSocket, data: Buffer) {
-        pipelines.receiveData(data);
+        this.pipelines.receiveData(data);
     }
 
     async drain(socket: LNSocket) {}

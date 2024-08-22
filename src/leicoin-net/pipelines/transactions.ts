@@ -2,14 +2,15 @@ import mempool from "../../storage/mempool.js";
 import Transaction from "../../objects/transaction.js";
 import cli from "../../cli/cli.js";
 import Verification from "../../verification/index.js"
-import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
 import { DataUtils } from "../../utils/dataUtils.js";
 import { Uint } from "../../binary/uint.js";
+import { Pipeline } from "./index.js";
 
-export default class TransactionPipeline {
+export default class TransactionPipeline extends Pipeline {
+    readonly id = "427d";
 
-    public static async receive(type: LNPPX, data: Uint) {
+    async receive(type: LNPPX, data: Uint) {
 
         const transaction = DataUtils.createInstanceFromJSON(Transaction, data);
     
@@ -32,10 +33,6 @@ export default class TransactionPipeline {
     
         //cli.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
 
-    }
-
-    public static async broadcast(type: LNPPX, data: Uint) {
-        await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
     }
 
 }

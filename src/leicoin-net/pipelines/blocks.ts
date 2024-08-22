@@ -1,14 +1,15 @@
 import Verification from "../../verification/index.js"
 import Block from "../../objects/block.js";
-import leiCoinNetClientsHandler from "../client/index.js";
-import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
-import { Uint } from "../../binary/uint.js";
+import { type LNPPX } from "../packages.js";
+import { type Uint } from "../../binary/uint.js";
 import POS from "../../pos/index.js";
 import { type Slot } from "../../pos/slot.js";
+import { Pipeline } from "./index.js";
 
-export default class BlockPipeline {
+export default class BlockPipeline extends Pipeline {
+    readonly id = "2096";
 
-    public static async receive(type: LNPPX, data: Uint) {
+    async receive(type: LNPPX, data: Uint) {
         const block = Block.fromDecodedHex(data) as Block;
 
         if (await Verification.verifyMintedBlock(block) !== 12000) return;
@@ -17,10 +18,5 @@ export default class BlockPipeline {
         (POS.getSlot(block.slotIndex) as Slot).processBlock(block);
 
     }
-
-    public static async broadcast(type: LNPPX, data: Uint) {
-        await leiCoinNetClientsHandler.broadcastData(LeiCoinNetDataPackage.create(type, data));
-    }
     
-
 }
