@@ -104,9 +104,8 @@ export class Uint {
     }
 
 
-    public clone(): this {
-        // @ts-ignore
-        return new this.constructor(Buffer.from(this.buffer));
+    public clone() {
+        return new (this.constructor as New<this>)(Buffer.from(this.buffer));
     }
 
     public toHex() {
@@ -222,8 +221,8 @@ export class Uint {
     }
 
     protected addUint(value: Uint) {
-        if (this.buffer.byteLength !== value.buffer.byteLength) { // @ts-ignore
-            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
+        if (this.buffer.byteLength !== value.buffer.byteLength) {
+            value = UintUtils.correctByteLengthUint(this.constructor as New<this>, value, this.buffer.byteLength)
         }
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
@@ -246,7 +245,7 @@ export class Uint {
 
     protected subUint(value: Uint) {
         if (this.buffer.byteLength !== value.buffer.byteLength) { // @ts-ignore
-            value = UintUtils.correctByteLengthUint(this.constructor, value, this.buffer.byteLength)
+            value = UintUtils.correctByteLengthUint(this.constructor as New<this>, value, this.buffer.byteLength)
         }
         let carry = 0;
         for (let i = this.buffer.byteLength - 1; i >= 0; i--) {
