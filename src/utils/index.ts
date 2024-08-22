@@ -1,24 +1,17 @@
 import { EventEmitter } from "events";
-import type { CLILike } from "../cli/cli.js";
+import cli from "../cli/cli.js";
 
 class Utils {
 
-    private static instance: Utils;
+    static readonly events = new EventEmitter();
 
-    public static getInstance() {
-        if (!Utils.instance) {
-            Utils.instance = new Utils();
-        }
-        return Utils.instance;
-    }
+    private readonly procCWD: string;
 
-    private cli: CLILike | null = null;
+    // public get cwd() {
+    //     return this.procCWD;
+    // }
 
-    public readonly events = new EventEmitter();
-
-    public readonly procCWD: string;
-
-    private constructor() {
+    static init() {
         if (process.env.CUSTOM_CWD) {
             process.chdir(process.env.CUSTOM_CWD);
         }
@@ -28,20 +21,19 @@ class Utils {
         process.on("SIGTERM", this.gracefulShutdown);
     }
 
-    private runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
-    public getRunStatus() { return this.runStatus; }
+    private static runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
+    static getRunStatus() { return this.runStatus; }
 
-    public async gracefulShutdown(exitCode: number = 0) {
+    static async gracefulShutdown(exitCode: number = 0) {
         try {
             this.runStatus = exitCode === 0 ? "shutdown" : "shutdown_on_error";
             this.events.emit("stop_server");
             
-            if (!this.cli) this.cli = (await import("../cli/cli.js")).default;
-            this.cli.default.info('Shutting down...');
+            cli.default.info('Shutting down...');
 
             setTimeout(async() => {
-                this.cli?.default.info(`LeiCoin-Node stopped with exit code ${exitCode}`);
-                await this.cli?.close();
+                cli.default.info(`LeiCoin-Node stopped with exit code ${exitCode}`);
+                await cli.close();
                 process.exit(exitCode);
             }, 1000);
         } catch {
@@ -51,4 +43,5 @@ class Utils {
 
 }
 
-export default Utils.getInstance();
+Utils.init();
+export default Utils;

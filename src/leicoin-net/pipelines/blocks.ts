@@ -4,6 +4,7 @@ import leiCoinNetClientsHandler from "../client/index.js";
 import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
 import { Uint } from "../../binary/uint.js";
 import POS from "../../pos/index.js";
+import { type Slot } from "../../pos/slot.js";
 
 export default class BlockPipeline {
 
@@ -13,7 +14,7 @@ export default class BlockPipeline {
         if (await Verification.verifyMintedBlock(block) !== 12000) return;
 
         this.broadcast(type, data);
-        POS.getSlot(block.slotIndex).processBlock(block);
+        (POS.getSlot(block.slotIndex) as Slot).processBlock(block);
 
     }
 

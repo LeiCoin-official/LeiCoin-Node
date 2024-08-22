@@ -3,7 +3,7 @@ import { AddressHex } from "../src/objects/address.js";
 import Block from "../src/objects/block.js";
 import Signature from "../src/objects/signature.js";
 import blockchain from "../src/storage/blockchain.js";
-import { Uint256, Uint64 } from "../src/utils/binary.js";
+import { Uint256, Uint64 } from "../src/binary/uint.js";
 
 describe('blockchain_testing', () => {
     test('is_valid_genesis_block', () => {

@@ -29,5 +29,5 @@ class LeiCoinNetClientsHandler extends LeiCoinNetClientsBasicHandler {
 
 }
 
-// const leiCoinNetClientsHandler = LeiCoinNetClientsHandler.getInstance();
-// export default leiCoinNetClientsHandler;
+const leiCoinNetClientsHandler = LeiCoinNetClientsHandler.getInstance();
+export default leiCoinNetClientsHandler;

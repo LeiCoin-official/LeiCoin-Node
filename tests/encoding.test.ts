@@ -4,7 +4,7 @@ import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
 import fs from "fs";
 import Signature from "../src/objects/signature.js";
-import { Uint256, Uint64 } from "../src/utils/binary.js";
+import { Uint256, Uint64 } from "../src/binary/uint.js";
 import { AddressHex } from "../src/objects/address.js";
 import { PrivateKey } from "../src/crypto/cryptoKeys.js";
 import Minter, { MinterCredentials } from "../src/objects/minter.js";

@@ -1,31 +1,34 @@
+import Utils from "./utils/index.js";
+import cli from "./cli/cli.js";
+import HTTP_API from "./api/index.js";
+import LeiCoinNetNode from "./leicoin-net/index.js";
 
 export default class Main {
+
+    private static initialized = false;
 
     public static version = "0.5.3-beta.1";
 
     private static environment: "full" | "cli" | "command";
 
-    private static initialized = false;
+    private static httpAPI: HTTP_API | null = null;
+    private static leicoinNetNode: LeiCoinNetNode | null = null;
 
     public static async init() {
         if (this.initialized) return;
         this.initialized = true;
 
         if (process.argv.slice(2)[0] === "-c") {
-            process.env.NO_OUTPUT = "true";
+            //process.env.NO_OUTPUT = "true";
+            await cli.init("none", "none", false, false, process.cwd());
         } else {
+            await cli.init("all", "all", true, true, process.cwd());
             console.log(`Starting LeiCoin-Node v${Main.version}...`);
         }
 
-        // Core modules
-        const utils = (await import("./utils/index.js")).default;
-
-        const cli = (await import("./cli/cli.js")).default;
-        await cli.setup();
-
         const config = (await import("./config/index.js")).default;
 
-        if (utils.getRunStatus() === "shutdown_on_error") {
+        if (Utils.getRunStatus() === "shutdown_on_error") {
             cli.default.error("Error during startup");
             return;
         }
@@ -43,7 +46,21 @@ export default class Main {
 
         switch (this.environment) {
             case "full": {
-                await (await import("./netInitialization.js")).default();
+                
+                this.leicoinNetNode = new LeiCoinNetNode();
+                await this.leicoinNetNode.start({
+                    ...config.leicoin_net,
+                    peers: config.peers,
+                    eventHandler: Utils.events
+                });
+
+                if (config.api.active) {
+                    this.httpAPI = new HTTP_API();
+                    await this.httpAPI.start({
+                        ...config.api,
+                        eventHandler: Utils.events
+                    });
+                }
 
                 (await import("./minter/index.js")).MinterClient.initIfActive();
                 (await import("./pos/index.js")).POS.init();
@@ -62,7 +79,7 @@ export default class Main {
 
                 if (!args[0]) {
                     cli.cmd.info("Command not recognized. Type leicoin-node -c help for available commands.");
-                    utils.gracefulShutdown(0);
+                    Utils.gracefulShutdown(0);
                     return;
                 }
 
@@ -74,7 +91,7 @@ export default class Main {
                     []
                 );
 
-                utils.gracefulShutdown(0);
+                Utils.gracefulShutdown(0);
                 break;
             }
         }

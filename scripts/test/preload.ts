@@ -1,5 +1,6 @@
 import { beforeAll } from "bun:test";
 
 beforeAll(() => {
-    process.env.NO_CLI = "true";
+    //process.env.NO_CLI = "true";
 });
+

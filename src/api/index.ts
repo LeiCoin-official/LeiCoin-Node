@@ -30,22 +30,30 @@ export class HTTP_API {
         this.app.use('/sendtransactions', sendTransactions_router);
     }
 
-    async start(host: string, port: number) {
-        this.server = this.app.listen(port, host, () => {
-            cli.api.info(`API listening on ${host}:${port}`);
+    async start(config: {
+        host: string,
+        port: number,
+        eventHandler?: EventEmitter
+    }) {
+        this.server = this.app.listen(config.port, config.host, () => {
+            cli.api.info(`API listening on ${config.host}:${config.port}`);
         });
+        if (config.eventHandler) {
+            await this.setupEvents(config.eventHandler);
+        }
     }
 
     async stop() {
         if (this.server) {
             this.server.close();
+            cli.api.info("API stopped");
         } else {
             cli.api.error("API could not be stopped, because it is not running");
             return;
         }
     }
 
-    async setupEvents(eventHandler: EventEmitter) {
+    protected async setupEvents(eventHandler: EventEmitter) {
         eventHandler.once("stop_server", async() => await this.stop());
     }
 }
