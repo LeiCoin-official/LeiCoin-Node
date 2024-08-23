@@ -5,9 +5,10 @@ import utils from "../utils/index.js";
 import Slot from "./slot.js";
 import cron from "node-cron";
 import { UintMap } from "../binary/map.js";
-import { APILike } from "../api.js";
+import API, { APICompatible, APILike } from "../api.js";
+import { Static } from "../utils/dataUtils.js";
 
-export class POS {
+export class POS implements Static<typeof POS, APICompatible> {
 
     protected slotTask: cron.ScheduledTask;
     

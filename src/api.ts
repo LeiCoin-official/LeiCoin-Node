@@ -4,13 +4,11 @@ import { type MinterClient } from "./minter";
 import { type POS } from "./pos";
 import { type Blockchain } from "./storage/blockchain";
 
-export interface APICompatibleConstructor {
-    new(api: APILike): APICompatible;
+export interface APICompatible {
+    new(api: APILike, ...args: any[]): APICompatibleInstance;
 }
 
-export interface APICompatible {}
-
-
+export interface APICompatibleInstance {}
 
 export class API {
 

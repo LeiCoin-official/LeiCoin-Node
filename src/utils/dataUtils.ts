@@ -13,6 +13,26 @@ interface Constructable<T> {
     new (...args: any[]): T;
 }
 
+
+type New<T = any> = new (...args: any[]) => T;
+type AbstractNew<T = any> = abstract new (...args: any[]) => T;
+
+export type Static<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>, SI extends New<any>, I = InstanceType<SI>> = 
+    C extends New<InstanceType<C>> 
+    // ConcreteClass
+    ? InstanceType<C> extends I 
+        ? C extends (SI & New<InstanceType<C>>)
+            ? (InstanceType<C> & I)
+            : (SI & New<InstanceType<C>>) // Indicate StaticInterface Error
+        : I // Indicate Interface Error
+    // AbstractClass
+    : InstanceType<C> extends I 
+        ? C extends (SI & AbstractNew<InstanceType<C>>)
+            ? (InstanceType<C> & I)
+            : (SI & AbstractNew<InstanceType<C>>) // Indicate StaticInterface Error
+        : I // Indicate Interface Error
+
+
 export class DataUtils {
 
     // Function to get the current date and time as a formatted string
