@@ -5,23 +5,20 @@ import utils from "../utils/index.js";
 import Slot from "./slot.js";
 import cron from "node-cron";
 import { UintMap } from "../binary/map.js";
+import { APILike } from "../api.js";
 
 export class POS {
 
-    private static initialized = false;
-
-    public static readonly slots: UintMap<Slot> = new UintMap<Slot>();
-    private static currentSlot: Slot;
-
-    private static slotTask: cron.ScheduledTask;
-
-    public static init() {
-
-        if (this.initialized) return;
-		this.initialized = true;
+    protected slotTask: cron.ScheduledTask;
+    
+    constructor(
+        protected api: APILike,
+        readonly slots: UintMap<Slot> = new UintMap<Slot>(),
+        protected currentSlot: Slot | null = null
+    ) {
         
         this.slotTask = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
-            const currentSlotIndex = Uint64.from(this.calulateCurrentSlotIndex());
+            const currentSlotIndex = Uint64.from(POS.calulateCurrentSlotIndex());
             cli.minter.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${new Date().toUTCString()}`);
             //this.endSlot(this.currentSlot.index);
             this.startNewSlot(currentSlotIndex);
@@ -42,21 +39,21 @@ export class POS {
         );
     }
 
-    public static async startNewSlot(slotIndex: Uint64) {
+    public async startNewSlot(slotIndex: Uint64) {
         const newSlot = await Slot.create(slotIndex);
         this.slots.set(slotIndex, newSlot);
         this.currentSlot = newSlot;
     }
 
-    public static async endSlot(slotIndex: Uint64) {
+    public async endSlot(slotIndex: Uint64) {
         return this.slots.delete(slotIndex);
     }
 
-    public static getSlot(index: Uint64) {
+    public getSlot(index: Uint64) {
         return this.slots.get(index);
     }
 
-    public static getCurrentSlot() {
+    public getCurrentSlot() {
         return this.currentSlot;
     }
     

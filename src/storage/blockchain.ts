@@ -134,4 +134,6 @@ class Blockchain extends Chain {
 
 }
 
+export { type Blockchain };
+
 export default Blockchain.getInstance();

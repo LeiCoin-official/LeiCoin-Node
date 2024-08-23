@@ -1,6 +1,6 @@
 import Utils from "./utils/index.js";
 import cli from "./cli/cli.js";
-import HTTP_API from "./api/index.js";
+import HTTP_API from "./http_api/index.js";
 import LeiCoinNetNode from "./leicoin-net/index.js";
 
 export default class Main {
