@@ -2,6 +2,7 @@ import Utils from "./utils/index.js";
 import cli from "./cli/cli.js";
 import HTTP_API from "./http_api/index.js";
 import LeiCoinNetNode from "./leicoin-net/index.js";
+import API from "./api.js";
 
 export default class Main {
 
@@ -11,6 +12,7 @@ export default class Main {
 
     private static environment: "full" | "cli" | "command";
 
+    private static api: API | null = null;
     private static httpAPI: HTTP_API | null = null;
     private static leicoinNetNode: LeiCoinNetNode | null = null;
 
@@ -46,7 +48,9 @@ export default class Main {
 
         switch (this.environment) {
             case "full": {
-                
+
+                this.api = new API();
+
                 this.leicoinNetNode = new LeiCoinNetNode();
                 await this.leicoinNetNode.start({
                     ...config.leicoin_net,

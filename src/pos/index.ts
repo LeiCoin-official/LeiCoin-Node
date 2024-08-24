@@ -13,7 +13,7 @@ export class POS implements Static<typeof POS, APICompatible> {
     protected slotTask: cron.ScheduledTask;
     
     constructor(
-        protected api: APILike,
+        protected readonly api: APILike,
         readonly slots: UintMap<Slot> = new UintMap<Slot>(),
         protected currentSlot: Slot | null = null
     ) {

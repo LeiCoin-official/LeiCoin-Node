@@ -13,8 +13,8 @@ export interface APICompatibleInstance {}
 export class API {
 
     public Blockchain: Blockchain | null = null;
-    public net: LeiCoinNetNode | null = null;
-    public http_api: HTTP_API | null = null;
+    public Net: LeiCoinNetNode | null = null;
+    public HTTP_API: HTTP_API | null = null;
     public Minters: MinterClient[] | null = null;
     public POS: POS | null = null;
 

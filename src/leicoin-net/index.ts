@@ -4,14 +4,17 @@ import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { Pipelines } from "./pipelines/index.js";
+import { Static } from "../utils/dataUtils.js";
+import { APICompatible, APILike } from "../api.js";
 
 export type LeiCoinNetBroadcaster = typeof LeiCoinNetNode.prototype.broadcast;
 
-export class LeiCoinNetNode {
+export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatible> {
 
     protected server: TCPSocketListener<SocketData> | null = null;
 
     constructor(
+        protected readonly api: APILike,
         readonly connections = new LNConnections(),
         readonly pipelines = new Pipelines(this.broadcast.bind(this)),
         readonly socketHandler: BasicLNSocketHandler = new LNSocketHandler(connections, pipelines),
