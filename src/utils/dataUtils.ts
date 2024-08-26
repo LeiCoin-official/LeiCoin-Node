@@ -8,6 +8,11 @@ export interface Dict<T> {
 export interface AnyObj extends Dict<any> {}
 
 
+export class CStatic {
+    protected constructor() {}
+}
+
+
 // Define a generic interface representing the class structure
 interface Constructable<T> {
     new (...args: any[]): T;
@@ -17,7 +22,11 @@ interface Constructable<T> {
 type New<T = any> = new (...args: any[]) => T;
 type AbstractNew<T = any> = abstract new (...args: any[]) => T;
 
-export type Static<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>, SI extends New<any>, I = InstanceType<SI>> = 
+export type Static<
+    C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>,
+    SI,
+    I = SI extends New<any> ? InstanceType<SI> : {}
+> = 
     C extends New<InstanceType<C>> 
     // ConcreteClass
     ? InstanceType<C> extends I 
@@ -32,6 +41,19 @@ export type Static<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>
             : (SI & AbstractNew<InstanceType<C>>) // Indicate StaticInterface Error
         : I // Indicate Interface Error
 
+
+
+interface IBasicModuleLike {
+    init(...args: any[]): Promise<void> | void;
+    stop(...args: any[]): Promise<void> | void;
+}
+interface IModuleLike extends IBasicModuleLike {
+    start(...args: any[]): Promise<void> | void;
+}
+export type BasicModuleLike<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>> = Static<C, IBasicModuleLike>;
+export type ModuleLike<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>> = Static<C, IModuleLike>;
+
+//export class ModuleLike<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>> extends CStatic implements Static<C, IModuleLike> {}
 
 export class DataUtils {
 

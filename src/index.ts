@@ -1,20 +1,18 @@
-import Utils from "./utils/index.js";
 import cli from "./cli/cli.js";
+import Utils from "./utils/index.js";
 import HTTP_API from "./http_api/index.js";
 import LeiCoinNetNode from "./leicoin-net/index.js";
-import API from "./api.js";
+import MinterClient from "./minter/index.js";
+import POS from "./pos/index.js";
+import { Blockchain } from "./storage/blockchain.js";
 
 export default class Main {
 
     private static initialized = false;
 
-    public static version = "0.5.3-beta.1";
+    static version = "0.5.3-beta.1";
 
     private static environment: "full" | "cli" | "command";
-
-    private static api: API | null = null;
-    private static httpAPI: HTTP_API | null = null;
-    private static leicoinNetNode: LeiCoinNetNode | null = null;
 
     public static async init() {
         if (this.initialized) return;
@@ -44,30 +42,27 @@ export default class Main {
 
         cli.default.info(`Loaded core modules`);
 
-        await (await import("./storage/blockchain.js")).default.waitAllinit();
+        Blockchain.start();
 
         switch (this.environment) {
             case "full": {
 
-                this.api = new API();
-
-                this.leicoinNetNode = new LeiCoinNetNode();
-                await this.leicoinNetNode.start({
+                LeiCoinNetNode.init();
+                await LeiCoinNetNode.start({
                     ...config.leicoin_net,
                     peers: config.peers,
                     eventHandler: Utils.events
                 });
 
                 if (config.api.active) {
-                    this.httpAPI = new HTTP_API();
-                    await this.httpAPI.start({
+                    await HTTP_API.start({
                         ...config.api,
                         eventHandler: Utils.events
                     });
                 }
 
-                (await import("./minter/index.js")).MinterClient.createMinters(config.staker.stakers, this.leicoinNetNode);
-                (await import("./pos/index.js")).POS.init();
+                MinterClient.createMinters(config.staker.stakers);
+                POS.();
     
                 cli.default.info(`LeiCoin-Node started in Full Node mode`);
 

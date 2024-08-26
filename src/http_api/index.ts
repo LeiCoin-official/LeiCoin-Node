@@ -7,10 +7,24 @@ import cli from "../cli/cli.js";
 import EventEmitter from "events";
 
 export class HTTP_API {
-    protected app: express.Express;
-    protected server: HTTP_Server | null = null;
+    private static app: express.Express;
+    private static server: HTTP_Server;
 
-    constructor() {
+    static async start(config: {
+        host: string,
+        port: number,
+        eventHandler?: EventEmitter
+    }) {
+        this.createApp();
+        this.server = this.app.listen(config.port, config.host, () => {
+            cli.api.info(`API listening on ${config.host}:${config.port}`);
+        });
+        if (config.eventHandler) {
+            await this.setupEvents(config.eventHandler);
+        }
+    }
+
+    private static createApp() {
         this.app = express();
 
         this.app.use(cors());
@@ -30,20 +44,7 @@ export class HTTP_API {
         this.app.use('/sendtransactions', sendTransactions_router);
     }
 
-    async start(config: {
-        host: string,
-        port: number,
-        eventHandler?: EventEmitter
-    }) {
-        this.server = this.app.listen(config.port, config.host, () => {
-            cli.api.info(`API listening on ${config.host}:${config.port}`);
-        });
-        if (config.eventHandler) {
-            await this.setupEvents(config.eventHandler);
-        }
-    }
-
-    async stop() {
+    static async stop() {
         if (this.server) {
             this.server.close();
             cli.api.info("API stopped");
@@ -53,7 +54,7 @@ export class HTTP_API {
         }
     }
 
-    protected async setupEvents(eventHandler: EventEmitter) {
+    private static async setupEvents(eventHandler: EventEmitter) {
         eventHandler.once("stop_server", async() => await this.stop());
     }
 }

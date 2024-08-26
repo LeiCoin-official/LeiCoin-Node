@@ -1,7 +1,7 @@
 import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
 import Minter from "../../objects/minter.js";
-import blockchain from "../../storage/blockchain.js";
+import { Blockchain } from "../../storage/blockchain.js";
 import { Uint, Uint64 } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";

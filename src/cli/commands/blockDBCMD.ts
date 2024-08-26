@@ -1,5 +1,5 @@
 import { type Block } from "../../objects/block.js";
-import blockchain from "../../storage/blockchain.js";
+import { Blockchain } from "../../storage/blockchain.js";
 import { Uint } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";

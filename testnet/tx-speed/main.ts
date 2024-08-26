@@ -2,7 +2,7 @@ import LCrypt from "../../src/crypto/index.js";
 import { AddressHex } from "../../src/objects/address.js";
 import Transaction from "../../src/objects/transaction.js";
 import Wallet, { SecretWallet } from "../../src/objects/wallet.js";
-import blockchain from "../../src/storage/blockchain.js";
+import { Blockchain } from "../../src/storage/blockchain.js";
 import { Uint, Uint256, Uint64 } from "../../src/utils/binary.js";
 import { PX } from "../../src/objects/prefix.js";
 import Signature from "../../src/objects/signature.js";

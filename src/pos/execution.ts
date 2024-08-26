@@ -1,6 +1,6 @@
 import cli from "../cli/cli.js";
 import { type Block } from "../objects/block.js";
-import blockchain from "../storage/blockchain.js";
+import { Blockchain } from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
 import { type BlockValidationResult } from "../verification/index.js";
 

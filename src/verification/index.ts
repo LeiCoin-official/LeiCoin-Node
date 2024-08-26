@@ -1,6 +1,6 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
-import blockchain from "../storage/blockchain.js";
+import { Blockchain } from "../storage/blockchain.js";
 import POS from "../pos/index.js";
 import { VCode } from "./codes.js";
 import { AddressHex } from "../objects/address.js";

@@ -5,11 +5,11 @@ import WalletDB from "./wallets.js";
 
 export class Chain {
 
-    public readonly name: string;
-    public readonly blocks: BlockDB;
-    public readonly wallets: WalletDB;
-    public readonly cstates: SmartContractStateDB;
-    public readonly minters: MinterDB;
+    readonly name: string;
+    readonly blocks: BlockDB;
+    readonly wallets: WalletDB;
+    readonly cstates: SmartContractStateDB;
+    readonly minters: MinterDB;
 
     constructor(name = "main") {
         this.name = name;

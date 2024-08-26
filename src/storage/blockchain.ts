@@ -3,38 +3,31 @@ import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";
 import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
+import { BasicModuleLike } from "../utils/dataUtils.js";
 
+export class Blockchain implements BasicModuleLike<typeof Blockchain> {
 
-class Blockchain extends Chain {
+    static chainstate: Chainstate;
+    static readonly chains: {[chain: string]: Chain} = {};
 
-    private static instance: Blockchain;
+    static get name() { return "main" }
+    static get blocks() { return this.chains["main"].blocks }
+    static get wallets() { return this.chains["main"].wallets }
+    static get cstates() { return this.chains["main"].cstates }
+    static get minters() { return this.chains["main"].minters }
 
-    public chainstate: Chainstate;
-    public chains: {[chain: string]: Chain} = {};
-
-    private constructor() {
-        super("main");
-
+    static init() {
         this.createStorageIfNotExists();
-        this.registerOnShutdown();
+        this.setupEvents();
 
         this.chainstate = Chainstate.getInstance();
-        this.chains["main"] = this;
         for (const chainName in this.chainstate.getAllChainStates()) {
-            if (chainName === "main") continue;
             this.chains[chainName] = new Chain(chainName);
         }
 
     }
-    
-    public static getInstance() {
-        if (!Blockchain.instance) {
-            Blockchain.instance = new Blockchain();
-        }
-        return Blockchain.instance;
-    }
 
-    private createStorageIfNotExists() {
+    private static createStorageIfNotExists() {
         BCUtils.ensureDirectoryExists('/forks', "main");
     }
 
@@ -119,21 +112,22 @@ class Blockchain extends Chain {
         
     // }
 
-    public async registerOnShutdown() {
+    private static async setupEvents() {
         utils.events.once("stop_server", async () => {
-            cli.data.info("Saving blockchain data...");
-
-            await Promise.all(
-                Object.values(this.chains).map(chain => chain.close())
-            );
-            this.chainstate.updateChainStateFile();
-
-            cli.data.info("Blockchain data saved!");
+            await this.stop();
         });
+    }
+
+    static async stop() {
+        cli.data.info("Saving blockchain data...");
+
+        await Promise.all(
+            Object.values(this.chains).map(chain => chain.close())
+        );
+        this.chainstate.updateChainStateFile();
+
+        cli.data.info("Blockchain data saved!");
     }
 
 }
 
-export { type Blockchain };
-
-export default Blockchain.getInstance();

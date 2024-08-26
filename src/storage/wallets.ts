@@ -2,7 +2,7 @@ import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Wallet from "../objects/wallet.js";
 import Block from "../objects/block.js";
-import blockchain from "./blockchain.js";
+import { Blockchain } from "./blockchain.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "../binary/uint.js";
 import { LevelBasedStorage } from "./storageTypes.js";

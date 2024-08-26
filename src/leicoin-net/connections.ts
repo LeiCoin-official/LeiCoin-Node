@@ -4,7 +4,16 @@ import { SocketData, type LNSocket } from "./socket.js";
 
 export class LNConnections {
 
-    constructor(
+    private static instance: LNConnections;
+    
+    static createInstance() {
+        if (!this.instance) {
+            this.instance = new LNConnections();
+        }
+        return this.instance;
+    }
+    
+    private constructor(
         protected readonly connections: UintMap<LNSocket> = new UintMap()
     ) {}
 

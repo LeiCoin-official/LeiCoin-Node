@@ -4,23 +4,22 @@ import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { Pipelines } from "./pipelines/index.js";
-import { Static } from "../utils/dataUtils.js";
-import { APICompatible, APILike } from "../api.js";
+import { ModuleLike } from "../utils/dataUtils.js";
 
-export type LeiCoinNetBroadcaster = typeof LeiCoinNetNode.prototype.broadcast;
+export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
-export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatible> {
+    private static server: TCPSocketListener<SocketData>;
 
-    protected server: TCPSocketListener<SocketData> | null = null;
+    private static connections: LNConnections;
+    private static socketHandler: BasicLNSocketHandler;
 
-    constructor(
-        protected readonly api: APILike,
-        readonly connections = new LNConnections(),
-        readonly pipelines = new Pipelines(this.broadcast.bind(this)),
-        readonly socketHandler: BasicLNSocketHandler = new LNSocketHandler(connections, pipelines),
-    ) {}
+    static async init() {
+        this.connections = LNConnections.createInstance();
+        Pipelines.registerPipelines();
+        this.socketHandler = LNSocketHandler.createInstance(this.connections);
+    }
 
-    async start(config: {
+    static async start(config: {
         host: string,
         port: number,
         peers: readonly string[]
@@ -42,7 +41,7 @@ export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatib
         cli.leicoin_net.info(`LeiCoinNet-Node started on ${config.host}:${config.port}`);
     }
 
-    protected async startServer(host: string, port: number) {
+    private static async startServer(host: string, port: number) {
         this.server = Bun.listen<SocketData>({
             hostname: host,
             port: port,
@@ -51,7 +50,7 @@ export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatib
     }
 
     /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
-    protected async initPeers(peers: readonly string[]) {
+    private static async initPeers(peers: readonly string[]) {
         const promises: Promise<void>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections
@@ -75,7 +74,7 @@ export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatib
         await Promise.all(promises);
     }
 
-    protected async connectToNode(host: string, port: number) {
+    private static async connectToNode(host: string, port: number) {
         const connection = await Bun.connect<SocketData>({
             hostname: host,
             port: port,
@@ -84,7 +83,7 @@ export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatib
         this.connections.add(connection);
     }
 
-    public async stop() {
+    static async stop() {
         
         for (const connection of this.connections.values()) {
             connection.end();
@@ -100,13 +99,13 @@ export class LeiCoinNetNode implements Static<typeof LeiCoinNetNode, APICompatib
         cli.leicoin_net.info(`LeiCoinNet-Node stopped`);
     }
 
-    public async broadcast(data: Buffer) {
+    static async broadcast(data: Buffer) {
         for (const connection of this.connections.values()) {
             connection.write(data);
         }
     }
 
-    protected async setupEvents(eventHandler: EventEmitter) {
+    private static async setupEvents(eventHandler: EventEmitter) {
         eventHandler.once("stop_server", async() => await this.stop());
     }
 

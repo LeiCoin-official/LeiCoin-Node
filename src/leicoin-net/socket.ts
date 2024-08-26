@@ -1,5 +1,5 @@
 import cli from "../cli/cli.js";
-import { type Pipelines } from "./pipelines/index.js";
+import { Pipelines } from "./pipelines/index.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, type Uint256 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
@@ -71,8 +71,7 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
     readonly binaryType = "buffer";
 
     constructor(
-        protected readonly connections: LNConnections,
-        protected readonly pipelines: Pipelines
+        protected readonly connections: LNConnections
     ) {}
 
     async open(socket: LNSocket) {
@@ -105,7 +104,7 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
     }
 
     async data(socket: LNSocket, data: Buffer) {
-        this.pipelines.receiveData(data);
+        Pipelines.receiveData(data);
     }
 
     async drain(socket: LNSocket) {}
@@ -119,5 +118,20 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
 
 export { type BasicLNSocketHandler }
 
-export class LNSocketHandler extends BasicLNSocketHandler {};
+export class LNSocketHandler extends BasicLNSocketHandler {
+
+    static instance: LNSocketHandler;
+
+    static createInstance(connections: LNConnections) {
+        if (!this.instance) {
+            this.instance = new LNSocketHandler(connections);
+        }
+        return this.instance;
+    }
+
+    private constructor(connections: LNConnections) {
+        super(connections);
+    }
+
+};
 
