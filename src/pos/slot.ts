@@ -25,7 +25,7 @@ export class Slot {
     }
 
     public static async create(index: Uint64) {
-        const nextMinter = await blockchain.minters.selectNextMinter(index);
+        const nextMinter = await Blockchain.minters.selectNextMinter(index);
         cli.minter.info(`Slot ${index.toBigInt()} minter: ${nextMinter.toHex()}`);
         return new Slot(index, nextMinter);
     }

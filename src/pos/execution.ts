@@ -17,11 +17,11 @@ export class Execution {
         const { targetChain, parentChain } = validationresult;
 
         if (targetChain !== parentChain) { // New fork if targetChain is different from parentChain
-            //blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);
+            //Blockchain.createFork(validationresult.forkchain, validationresult.forkparent, block);
         }
     
-        blockchain.chains[targetChain].blocks.addBlock(block);
-        blockchain.chainstate.updateChainStateByBlock(
+        Blockchain.chains[targetChain].blocks.addBlock(block);
+        Blockchain.chainstate.updateChainStateByBlock(
             targetChain,
             parentChain,
             block,
@@ -30,7 +30,7 @@ export class Execution {
         if (targetChain === "main") {
             mempool.clearMempoolbyBlock(block);
             
-            await blockchain.wallets.adjustWalletsByBlock(block);
+            await Blockchain.wallets.adjustWalletsByBlock(block);
         }
         
         cli.leicoin_net.success(`Block on Slot ${block.slotIndex.toBigInt()} with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain.`);

@@ -10,7 +10,7 @@ import mempool from "../storage/mempool.js";
 import Signature from "../objects/signature.js";
 import LCrypt from "../crypto/index.js";
 import { MinterCredentials } from "../objects/minter.js";
-import type Slot from "../pos/slot.js";
+import { type Slot } from "../pos/slot.js";
 import { LeiCoinNetDataPackage, LNPPX } from "../leicoin-net/packages.js";
 import { LeiCoinNetNode } from "../leicoin-net/index.js";
 
@@ -18,7 +18,6 @@ export class MinterClient {
 
 	private constructor(
 		public readonly credentials: MinterCredentials,
-		protected readonly network: LeiCoinNetNode
 	) {}
 
 	public verifyCredentials(): { cb: true } | { cb: false, message: string } {
@@ -35,8 +34,7 @@ export class MinterClient {
 		config: Array<{
 			address: string,
 			privateKey: string
-		}>,
-		network: LeiCoinNetNode
+		}>
 	) {
 
 		const clients: MinterClient[] = [];
@@ -47,7 +45,6 @@ export class MinterClient {
 					PrivateKey.from(staker.privateKey),
 					AddressHex.from(staker.address)
 				),
-				network
 			);
 
 			const mc_verification = mc.verifyCredentials()
@@ -60,11 +57,13 @@ export class MinterClient {
 		}
 
 		cli.minter.info("MinterClients started");
+
+		return clients;
 	}
 
 	private async createNewBlock(currentSlotIndex: Uint64) {
 
-		const previousBlock = blockchain.chainstate.getLatestBlock();
+		const previousBlock = Blockchain.chainstate.getLatestBlock();
 		const block = new Block(
 			previousBlock?.index.add(1) || Uint64.from(0),
 			currentSlotIndex,
@@ -84,7 +83,7 @@ export class MinterClient {
     async mint(currentSlot: Slot) {
 		const block = await this.createNewBlock(currentSlot.index);
 
-		this.network.broadcast(
+		LeiCoinNetNode.broadcast(
 			LeiCoinNetDataPackage.create(
 				LNPPX.BLOCK,
 				block.encodeToHex()

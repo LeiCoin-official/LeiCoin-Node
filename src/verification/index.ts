@@ -29,7 +29,7 @@ export class Verification {
         if (!tx) return 12501;
         if (tx.txid.eqn(tx.calculateHash())) return 12504;
 
-        const senderWallet = await blockchain.chains[chain].wallets.getWallet(tx.senderAddress);
+        const senderWallet = await Blockchain.chains[chain].wallets.getWallet(tx.senderAddress);
 
         if (senderWallet.getNonce().eqn(tx.nonce)) return 12508;
         if (!senderWallet.isSubtractMoneyPossible(tx.amount)) return 12524;
@@ -41,7 +41,7 @@ export class Verification {
 
         if (!block) return { status: 12501 };
 
-        const chainstateMatch = blockchain.chainstate.isBlockChainStateMatching(block);
+        const chainstateMatch = Blockchain.chainstate.isBlockChainStateMatching(block);
         if (chainstateMatch.status !== 12000) return chainstateMatch;
 
         let { targetChain, parentChain } = chainstateMatch;

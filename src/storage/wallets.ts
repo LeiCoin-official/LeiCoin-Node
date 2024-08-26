@@ -30,7 +30,7 @@ export class WalletDB extends LevelBasedStorage {
     public async addMoneyToWallet(address: AddressHex, amount: Uint64) {
         const wallet = await this.getWallet(address);
         if (this.chain === "main") {
-            for (const [chainName, chain] of Object.entries(blockchain.chains)) {
+            for (const [chainName, chain] of Object.entries(Blockchain.chains)) {
                 if (chainName === "main") continue;
                 if (!(await chain.wallets.existsWallet(address))) {
                     chain.wallets.setWallet(wallet);
@@ -44,7 +44,7 @@ export class WalletDB extends LevelBasedStorage {
     public async subtractMoneyFromWallet(address: AddressHex, amount: Uint64, adjustNonce = true) {
         const wallet = await this.getWallet(address);
         if (this.chain === "main") {
-            for (const [chainName, chain] of Object.entries(blockchain.chains)) {
+            for (const [chainName, chain] of Object.entries(Blockchain.chains)) {
                 if (chainName === "main") continue;
                 if (!(await chain.wallets.existsWallet(address))) {
                     chain.wallets.setWallet(wallet);

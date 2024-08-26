@@ -16,7 +16,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     static get cstates() { return this.chains["main"].cstates }
     static get minters() { return this.chains["main"].minters }
 
-    static init() {
+    static async init() {
         this.createStorageIfNotExists();
         this.setupEvents();
 

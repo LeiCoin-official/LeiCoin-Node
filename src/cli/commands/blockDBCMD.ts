@@ -29,7 +29,7 @@ class ReadCMD extends CLICMD {
         }
 
         const blockIndex = args[0];
-        const block = blockchain.blocks.getBlock(blockIndex).data as Block;
+        const block = Blockchain.blocks.getBlock(blockIndex).data as Block;
         if (block) {
             cli.cmd.info(JSON.stringify(block, (key, value) => {
                 if (value instanceof Uint) {

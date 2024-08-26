@@ -7,7 +7,7 @@ import { Uint256, Uint64 } from "../src/binary/uint.js";
 
 describe('blockchain_testing', () => {
     test('is_valid_genesis_block', () => {
-        const result = blockchain.chainstate.isBlockChainStateMatching(new Block(
+        const result = Blockchain.chainstate.isBlockChainStateMatching(new Block(
             Uint64.from(0),
             Uint64.from(0),
             Uint256.empty(),

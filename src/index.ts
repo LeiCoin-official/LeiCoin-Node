@@ -42,12 +42,12 @@ export default class Main {
 
         cli.default.info(`Loaded core modules`);
 
-        Blockchain.start();
+        await Blockchain.init();
 
         switch (this.environment) {
             case "full": {
 
-                LeiCoinNetNode.init();
+                await LeiCoinNetNode.init();
                 await LeiCoinNetNode.start({
                     ...config.leicoin_net,
                     peers: config.peers,
@@ -55,17 +55,17 @@ export default class Main {
                 });
 
                 if (config.api.active) {
+                    await HTTP_API.init();
                     await HTTP_API.start({
                         ...config.api,
-                        eventHandler: Utils.events
+                        eventHandler: Utils.events 
                     });
                 }
 
-                MinterClient.createMinters(config.staker.stakers);
-                POS.();
-    
-                cli.default.info(`LeiCoin-Node started in Full Node mode`);
+                POS.init(MinterClient.createMinters(config.staker.stakers));
+                POS.start();
 
+                cli.default.info(`LeiCoin-Node started in Full Node mode`);
                 break;
             }
             case "cli": {

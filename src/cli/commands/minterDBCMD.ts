@@ -36,7 +36,7 @@ class ReadCMD extends CLICMD {
         if (args[0] === "all") {
             cli.cmd.info(
                 "Minters:\n" + 
-                (await blockchain.minters.getAllKeys()).map((address) => {
+                (await Blockchain.minters.getAllKeys()).map((address) => {
                     return address.toHex();
                 }).join("\n")
             );
@@ -44,7 +44,7 @@ class ReadCMD extends CLICMD {
         }
 
         const minterAddress = args[0];
-        const minter = await blockchain.minters.getMinter(AddressHex.from(minterAddress));
+        const minter = await Blockchain.minters.getMinter(AddressHex.from(minterAddress));
         if (minter) {
             cli.cmd.info(JSON.stringify(minter, (key, value) => {
                 if (value instanceof Uint64) {
@@ -76,7 +76,7 @@ class InsertCMD extends CLICMD {
         }
 
         const minter = new Minter(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
-        await blockchain.minters.setMinter(minter);
+        await Blockchain.minters.setMinter(minter);
         cli.cmd.info("Minter inserted!");
     }
 }
@@ -92,9 +92,9 @@ class RemoveCMD extends CLICMD {
             return;
         }
 
-        const minter = await blockchain.minters.getMinter(AddressHex.from(args[0]));
+        const minter = await Blockchain.minters.getMinter(AddressHex.from(args[0]));
         if (minter) {
-            await blockchain.minters.removeMinter(minter);
+            await Blockchain.minters.removeMinter(minter);
             cli.cmd.info("Minter removed!");
         } else {
             cli.cmd.info("Minter not found!");
@@ -115,7 +115,7 @@ class GetNextMinterCMD extends CLICMD {
         }
 
         const slot = Uint64.from(parseInt(args[0]));
-        const nextMinter = await blockchain.minters.selectNextMinter(slot);
+        const nextMinter = await Blockchain.minters.selectNextMinter(slot);
         cli.cmd.info(`Next minter for slot ${slot.toBigInt()}: ${nextMinter.toHex()}`);
     }
 
