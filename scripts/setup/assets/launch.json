@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "type": "bun",
+            "name": "Test",
+            "request": "launch",
+            "program": "npx bun run test",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "bun",
+            "name": "Debug",
+            "request": "launch",
+            "program": "npx bun run debug",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "bun",
+            "name": "Debug new Build",
+            "request": "launch",
+            "program": "npx bun run debug:newBuild",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "bun",
+            "name": "Build",
+            "request": "launch",
+            "program": "npx bun run build",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "bun",
+            "name": "Start",
+            "request": "launch",
+            "program": "npx bun run start",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

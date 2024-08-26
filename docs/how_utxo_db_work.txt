@@ -1,0 +1,65 @@
+
+
+how the utxo database should work:
+
+keys:
+
+my address: lc0x01da74f8d1cf98760388643407cd1d4bc19f28
+
+remove lc prefix and convert the x to 0:
+00|01da74f8d1cf98760388643407cd1d4bc19f28
+<> <------------------------------------>
+d1            d2
+
+d1 = version
+d2 = address
+
+this data is now the encoded hex data thats used for the key.
+
+values:
+
+015fa1fb33996a457b08f0dd7d908add0af3915a0ccacdef66fa592a3bcbe1b7|1|0|01|1E3D1
+<--------------------------------------------------------------> | | <> <--->
+                         d1                                    d2 d3 d4  d5
+
+
+d1 = txid
+d2 = utxo height length (1 digit)
+d3 = utxo_height
+d4 = tx amount length (2 digits)
+d5 = amunt of uxto E(number) stands for a amount of zeros. D marks the decimal point (e and d is not reuqired)
+
+then the we can add this data mutiple lines
+
+
+
+
+function calculateEfficienty(wallets: number, utxos_per_wallet: number) {
+
+    const hash = 32;
+    const height = 6;
+    const amount = 6;
+    const seperator = 1;
+    const address = 20;
+    const utxos_per_transaction = 2;
+    const transactions = (wallets * utxos_per_wallet) / utxos_per_transaction;
+
+    const needWhenAddressBased = (address + ((seperator + hash + height + seperator + amount + seperator) * utxos_per_wallet)) * wallets;
+
+    const needWhenCTBasedBasic = (hash + (7 + ((address + seperator + amount) * utxos_per_transaction))) * transactions;
+
+    //const needWhenCTBasedIndex = (address + ((hash + height) * utxos_per_wallet)) * wallets;
+
+    console.log("needWhenAddressBased", needWhenAddressBased / 1024 / 1024 / 1024);
+
+    console.log("needWhenCTBasedBasic", needWhenCTBasedBasic / 1024 / 1024 / 1024);
+
+    //console.log("needWhenCTBasedBasic + needWhenCTBasedIndex", needWhenCTBasedBasic + needWhenCTBasedIndex);
+
+    // one million utxos
+    //console.log(((seperator + hash + height + seperator + amount + seperator) * 1000000) / 1024 / 1024)
+
+
+}
+
+calculateEfficienty(100000000, 10);
