@@ -1,10 +1,21 @@
 {
-    "server": {
+    "api": {
+        "active": false,
+        "host": "0.0.0.0",
         "port": 12200
     },
-    "miner": {
+    "leicoin_net": {
+        "host": "0.0.0.0",
+        "port": 12200
+    },
+    "staker": {
         "active": true,
-        "number_of_threads": 8,
-        "minerAddress": ""
-    }
+        "stakers": [
+            {
+                "privateKey": "",
+                "address": ""
+            }
+        ]
+    },
+    "experimental": false
 }

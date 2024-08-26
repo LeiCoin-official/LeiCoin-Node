@@ -10,20 +10,20 @@ if [ -n "$STARTUP" ] && [[ "$STARTUP" == "start"* ]]; then
     args_after_start="${STARTUP#start }"
 
     # Replace placeholders in args_after_start using eval and sed
-    MODIFIED_STARTUP=$(eval echo $(echo ${args_after_start} | sed -e 's/{{/${/g' -e 's/}}/}/g'))
+    MODIFIED_STARTUP=`eval echo $(echo ${args_after_start} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
 
-    args = $MODIFIED_STARTUP
+    args=$MODIFIED_STARTUP
 else
-    args = "$@"
+    args="$@"
 fi
 
-experimental = false
-branch_to_clone = "main"
+run_experimental=false
+branch_to_clone="main"
 
 if [[ "$args" == *"--experimental"* ]]; then
     echo "Experimental mode is active!"
-    experimental = true
-    branch_to_clone = "addfork"
+    run_experimental=true
+    branch_to_clone="addfork"
 fi
 
 # Clone the GitHub repo to /home/container/tmp with the "docker" branch
@@ -49,4 +49,11 @@ rm -rf /home/container/gittmp
 npm i
 
 # Start the Script
-node index.js $args
+if [[ "$run_experimental" == "true" ]]; then
+
+    npm run build
+    
+    node ./build/index.js $args
+else
+    node index.js $args
+fi

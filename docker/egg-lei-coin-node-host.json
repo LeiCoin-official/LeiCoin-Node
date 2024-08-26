@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2023-10-12T18:05:57+02:00",
+    "exported_at": "2024-02-20T18:43:32+01:00",
     "name": "LeiCoin Node Host",
     "author": "leicraft@leicraftmc.de",
     "description": null,
@@ -13,7 +13,7 @@
         "LeiCoin Node Latest": "ghcr.io\/leicraft\/leicoin-node:latest"
     },
     "file_denylist": [],
-    "startup": "start internal-port={{SERVER_PORT}}",
+    "startup": "start internal-port={{SERVER_PORT}} internal-host={{SERVER_IP}} $(if [ {{EXPERIMENTAL}} -eq 1 ]; then echo '--experimental'; fi)",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"\",\r\n    \"userInteraction\": []\r\n}",
@@ -27,5 +27,16 @@
             "entrypoint": "ash"
         }
     },
-    "variables": []
+    "variables": [
+        {
+            "name": "Experimental",
+            "description": "",
+            "env_variable": "EXPERIMENTAL",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "boolean|int",
+            "field_type": "text"
+        }
+    ]
 }

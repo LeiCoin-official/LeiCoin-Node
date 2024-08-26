@@ -1,6 +1,10 @@
-config/config.json
-config/.env
-config/peers.json
+# config
+config/*
+!config/sample*
+
 blockchain_data/
 logs/
 node_modules/
+/.vscode/
+/build/
+localtests/
