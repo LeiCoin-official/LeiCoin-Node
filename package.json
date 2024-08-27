@@ -5,7 +5,8 @@
 	"exports": "./src/index.ts",
 	"type": "module",
 	"scripts": {
-		"setup": "bun run ./scripts/setup",
+		"setup": "bun run ./scripts/setup && bun run patches",
+		"patches": "patch-package",
 		"clean:win": "cmd /C \"rmdir /Q /S node_modules\" ",
 		"clean:linux": "rm -r node_modules",
 		"test": "bun test",
@@ -42,6 +43,7 @@
 		"elliptic": "^6.5.5",
 		"express": "^4.18.2",
 		"node-cron": "^3.0.3",
+		"patch-package": "^8.0.0",
 		"ws": "^8.14.2"
 	},
 	"devDependencies": {

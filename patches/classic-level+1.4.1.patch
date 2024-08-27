@@ -1,0 +1,65 @@
+diff --git a/node_modules/classic-level/binding.js b/node_modules/classic-level/binding.js
+index ffd9386..93f268e 100644
+--- a/node_modules/classic-level/binding.js
++++ b/node_modules/classic-level/binding.js
+@@ -1 +1,58 @@
+-module.exports = require('node-gyp-build')(__dirname)
++//module.exports = require('node-gyp-build')(__dirname)
++
++const node_gyp_build = require('node-gyp-build');
++
++const os = require('os');
++
++const vars = (process.config && process.config.variables) || {}
++
++const arch = process.env.npm_config_arch || os.arch()
++const platform = process.env.npm_config_platform || os.platform()
++const libc = process.env.LIBC || (isAlpine(platform) ? 'musl' : 'glibc')
++const armv = process.env.ARM_VERSION || (arch === 'arm64' ? '8' : vars.arm_version) || ''
++
++const bindings = {
++    "android-arm": () => require("./prebuilds/android-arm/node.napi.armv7.node"),
++    "android-arm64": () => require("./prebuilds/android-arm64/node.napi.armv8.node"),
++
++    "darwin-arm64": () => require("./prebuilds/darwin-x64+arm64/node.napi.node"),
++    "darwin-x64": () => require("./prebuilds/darwin-x64+arm64/node.napi.node"),
++    
++    "linux-arm-v6": () => require("./prebuilds/linux-arm/node.napi.armv6.node"),
++    "linux-arm-v7": () => require("./prebuilds/linux-arm/node.napi.armv7.node"),
++    "linux-arm64": () => require("./prebuilds/linux-arm64/node.napi.armv8.node"),
++
++    "linux-x64-glibc": () => require("./prebuilds/linux-x64/node.napi.glibc.node"),
++    "linux-x64-musl": () => require("./prebuilds/linux-x64/node.napi.musl.node"),
++
++    "win32-ia32": () => require("./prebuilds/win32-ia32/node.napi.node"),
++    "win32-x64": () => require("./prebuilds/win32-x64/node.napi.node"),
++}
++
++function getBindingName() {
++    const tags = [
++        platform,
++        arch
++    ]
++
++    if (armv && armv !== "8") {
++        tags.push(`v${armv}`)
++    }
++
++    if (libc && tags[0] === "linux" && tags[1] === "x64") {
++        tags.push(libc)
++    }
++
++    return tags.join("-");
++}
++
++function getBinding() {
++    const binding = bindings[getBindingName()];
++    if (binding) {
++        return binding();
++    }
++
++    return node_gyp_build(__dirname)
++}
++
++module.exports = getBinding();
+\ No newline at end of file
