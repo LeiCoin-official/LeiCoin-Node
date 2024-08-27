@@ -3,7 +3,7 @@ import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
-import { LevelBasedStorage } from "./storageTypes.js";
+import { LevelBasedStorage } from "./leveldb/levelBasedStorage.js";
 import { PX } from "../objects/prefix.js";
 
 export class MinterDB extends LevelBasedStorage {

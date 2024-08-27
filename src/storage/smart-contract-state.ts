@@ -1,9 +1,9 @@
-import LevelDB from "./leveldb.js";
+import LevelDB from "./leveldb/index.js";
 import BCUtils from "./blockchainUtils.js";
 import path from "path";
 import { AddressHex } from "../objects/address.js";
 import { Uint } from "../binary/uint.js";
-import { LevelBasedStorage } from "./storageTypes.js";
+import { LevelBasedStorage } from "./leveldb/levelBasedStorage.js";
 
 class SmartContractStateDB extends LevelBasedStorage {
 

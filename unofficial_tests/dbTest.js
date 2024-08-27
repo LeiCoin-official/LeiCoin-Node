@@ -1,4 +1,4 @@
-import { Level } from "level";
+import { ClassicLevel } from "classic-level";
 import LevelDB from "../build/src/storage/leveldb.js";
 import crypto from 'crypto';
 import { shuffleArray } from './cryptoUtils.js';
@@ -39,7 +39,7 @@ async function speedTest(db1 = "stake1", db2) {
     console.log("Elapsed time 1:", time1 / 1000, "seconds");
 
     if (db2) {
-        const level2 = new Level(getDBPath(db2), {keyEncoding: "hex", valueEncoding: "hex"});
+        const level2 = new ClassicLevel(getDBPath(db2), {keyEncoding: "hex", valueEncoding: "hex"});
         const time2 = await doTest(level2);
         console.log("Elapsed time 2:", time2 / 1000, "seconds");
         console.log("DB working with Uint is", (time1 / time2), "times faster then with strings");
