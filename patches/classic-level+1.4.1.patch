@@ -1,8 +1,8 @@
 diff --git a/node_modules/classic-level/binding.js b/node_modules/classic-level/binding.js
-index ffd9386..93f268e 100644
+index ffd9386..f165793 100644
 --- a/node_modules/classic-level/binding.js
 +++ b/node_modules/classic-level/binding.js
-@@ -1 +1,58 @@
+@@ -1 +1,61 @@
 -module.exports = require('node-gyp-build')(__dirname)
 +//module.exports = require('node-gyp-build')(__dirname)
 +
@@ -11,10 +11,13 @@ index ffd9386..93f268e 100644
 +const os = require('os');
 +
 +const vars = (process.config && process.config.variables) || {}
-+
++const runtime = (isElectron && isElectron()) ?
++                'electron' : ((isNwjs && isNwjs()) ? 
++                    'node-webkit' : 'node'
++                )
 +const arch = process.env.npm_config_arch || os.arch()
 +const platform = process.env.npm_config_platform || os.platform()
-+const libc = process.env.LIBC || (isAlpine(platform) ? 'musl' : 'glibc')
++const libc = process.env.LIBC || ((isAlpine && isAlpine(platform)) ? 'musl' : 'glibc')
 +const armv = process.env.ARM_VERSION || (arch === 'arm64' ? '8' : vars.arm_version) || ''
 +
 +const bindings = {
