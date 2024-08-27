@@ -16,5 +16,6 @@ WORKDIR /home/container
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 EXPOSE 12200
+EXPOSE 12280
 
 CMD ["/bin/bash", "/docker-entrypoint.sh"]

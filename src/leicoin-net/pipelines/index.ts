@@ -1,22 +1,8 @@
 import { LeiCoinNetDataPackage, type LNPPX } from "../packages.js";
-import { type Uint } from "../../binary/uint.js";
 import { CB } from "../../utils/callbacks.js";
 import BlockPipeline from "./blocks.js";
 import TransactionPipeline from "./transactions.js";
-import LeiCoinNetNode from "../index.js";
-
-type PipelineConstructor<T extends Pipeline = Pipeline> = new() => T;
-
-export abstract class Pipeline {
-
-    abstract readonly id: string;
-
-    abstract receive(type: LNPPX, data: Uint): Promise<void>;
-    
-    async broadcast(type: LNPPX, data: Uint, ...args: any[]) {
-        await LeiCoinNetNode.broadcast(LeiCoinNetDataPackage.create(type, data));
-    }
-}
+import { Pipeline, PipelineConstructor } from "./abstractPipeline.js";
 
 export class Pipelines {
 

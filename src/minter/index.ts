@@ -72,7 +72,7 @@ export class MinterClient {
 			Uint64.from(new Date().getTime()),
 			this.credentials.address,
 			Signature.empty(),
-			Object.values(mempool.transactions)
+			mempool.transactions.values().all()
 		)
 
 		block.hash.set(block.calculateHash());

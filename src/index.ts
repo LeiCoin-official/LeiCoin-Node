@@ -19,10 +19,9 @@ export default class Main {
         this.initialized = true;
 
         if (process.argv.slice(2)[0] === "-c") {
-            //process.env.NO_OUTPUT = "true";
-            await cli.init("none", "none", false, false, process.cwd());
+            await cli.init("cmd", "none", false, false, Utils.procCWD);
         } else {
-            await cli.init("all", "all", true, true, process.cwd());
+            await cli.init("all", "all", true, true, Utils.procCWD);
             console.log(`Starting LeiCoin-Node v${Main.version}...`);
         }
 
@@ -43,6 +42,7 @@ export default class Main {
         cli.default.info(`Loaded core modules`);
 
         await Blockchain.init();
+        await Blockchain.waitAllChainsInit();
 
         switch (this.environment) {
             case "full": {

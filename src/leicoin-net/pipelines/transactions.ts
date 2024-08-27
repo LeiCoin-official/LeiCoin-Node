@@ -5,7 +5,7 @@ import Verification from "../../verification/index.js"
 import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
 import { DataUtils } from "../../utils/dataUtils.js";
 import { Uint } from "../../binary/uint.js";
-import { Pipeline } from "./index.js";
+import { Pipeline } from "./abstractPipeline.js";
 
 export default class TransactionPipeline extends Pipeline {
     readonly id = "427d";

@@ -1,12 +1,12 @@
 import { AddressHex } from "../objects/address.js";
 import { type Block } from "../objects/block.js";
 import { type Uint64 } from "../binary/uint.js";
-import { type MinterClient } from "../minter/index.js";
 import Verification, { BlockValidationResult } from "../verification/index.js";
 import { Execution } from "./execution.js";
 import { Blockchain } from "../storage/blockchain.js";
 import cli from "../cli/cli.js";
 import Schedule from "../utils/schedule.js";
+import POS from "./index.js";
 
 export class Slot {
 
@@ -34,7 +34,7 @@ export class Slot {
         if (this.slot_started) return;
         this.slot_started = true;
 
-        for (const mc of this.minterClients) {
+        for (const mc of POS.minters) {
             if (this.isMinter(mc.credentials.address)) {
                 await mc.mint(this);
                 break;
