@@ -29,13 +29,29 @@ jobs:
     - name: Set up Bun
       uses: oven-sh/setup-bun@v2
       with:
-       bun-version: latest
+        bun-version: latest
 
     - name: Install dependencies
       run: bun install
 
     - name: Build binaries
       run: bun compile all ${{ github.event.inputs.version }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: binaries
+        path: build/bin/*
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: binaries
 
     - name: Create GitHub Release
       id: create_release
@@ -46,4 +62,4 @@ jobs:
         name: ${{ github.event.inputs.release_name }}
         body: ${{ github.event.inputs.release_notes }}
         prerelease: ${{ github.event.inputs.prerelease }}
-        artifacts: build/bin/*
+        artifacts: binaries/*
