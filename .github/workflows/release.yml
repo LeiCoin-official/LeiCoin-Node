@@ -58,9 +58,6 @@ jobs:
         name: binaries
         path: ./binaries
 
-    - name: List downloaded files for debugging
-      run: ls -R ./binaries
-
     - name: Create GitHub Release
       id: create_release
       uses: ncipollo/release-action@v1
