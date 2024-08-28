@@ -45,8 +45,11 @@ jobs:
         retention-days: 1  # Set to 1 day for temporary storage
 
   release:
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
     - name: Download build artifacts
@@ -63,4 +66,4 @@ jobs:
         name: ${{ github.event.inputs.release_name }}
         body: ${{ github.event.inputs.release_notes }}
         prerelease: ${{ github.event.inputs.prerelease }}
-        #artifacts: binaries/*
+        artifacts: binaries/*
