@@ -1,7 +1,7 @@
 
 async function run() {
-    process.env.CUSTOM_CWD = __dirname;
-    process.env.NO_CLI = "true";
+    Bun.env.CUSTOM_CWD = __dirname;
+    Bun.env.NO_CLI = "true";
 
     const utils = (await import("../../src/utils/index.js")).default;
 
@@ -10,7 +10,7 @@ async function run() {
         throw new Error("CWD not set correctly!");
     }
 
-    await (await import("../../src/storage/blockchain.js")).default.waitAllinit();
+    await (await import("../../src/storage/blockchain.js")).Blockchain.waitAllChainsInit();
 
 
     const count = 10_000;

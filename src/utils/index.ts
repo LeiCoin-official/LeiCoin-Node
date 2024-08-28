@@ -9,13 +9,9 @@ class Utils {
         return process.cwd();
     }
 
-    // public get cwd() {
-    //     return this.procCWD;
-    // }
-
     static init() {
-        if (process.env.CUSTOM_CWD) {
-            process.chdir(process.env.CUSTOM_CWD);
+        if (Bun.env.CUSTOM_CWD) {
+            process.chdir(Bun.env.CUSTOM_CWD);
         }
 
         //process.on("SIGINT", this.gracefulShutdown);

@@ -14,26 +14,60 @@ export enum Platforms {
 
 export type PlatformArg = keyof typeof Platforms | "auto";
 
+class CompilerBuilder {
+
+    public sourcemap = true;
+    public entrypoint = "./src/index.ts";
+    public outfile = "./build/bin/leicoin-node";
+    public env: NodeJS.ProcessEnv = {};
+
+    constructor(private baseCommand = "bun build --compile") {}
+
+    public setArg(arg: string) {
+        //this.command += ` ${arg}`;
+    }
+
+    public getCommand() {
+        return [
+            this.baseCommand,
+            (this.sourcemap ? " --sourcemap" : ""),
+            this.entrypoint,
+            "--outfile", this.outfile,
+            ...Object.entries(this.env).map(([key, value]) => `--define "Bun.env.${key}='${value}'"`)
+        ].join(" ");
+    }
+
+}
+
 export class Compiler {
 
-    private command = "bun build --compile --sourcemap ./src/index.ts --outfile ./build/bin/leicoin-node";
-    private platform: PlatformArg;
+    private command = new CompilerBuilder();
 
-    constructor(platform: PlatformArg) {
-        this.platform = platform;
+    constructor(
+        private platform: PlatformArg,
+        private version: string,
+        versionInFileName: boolean
+    ) {
+        if (versionInFileName) {
+            this.command.outfile += `-${version}`;
+        }
+
         if (platform !== "auto") {
-
             if (Object.keys(Platforms).some(p => p === platform) === false) {
                 throw new Error(`Invalid platform: ${platform}`);
             }
-            
-            this.command += `-${platform} --target=${Platforms[platform]}`;
+            this.command.outfile += `-${platform} --target=${Platforms[platform]}`;
         }
+        
+        this.command.env.LEICOIN_NODE_VERSION = version;
     }
 
     async build() {
         try {
-            const output = await Bun.$`echo "Building from sources. Platform: ${this.platform}"; ${{ raw: this.command }}`.text()
+            const output = await Bun.$`
+                echo "Building from sources. Version: ${this.version} Platform: ${this.platform}";
+                ${{ raw: this.command.getCommand() }}
+                `.text()
             console.log(output);
         } catch (err) {
             console.log(`Failed with code ${err.exitCode}`);

@@ -1,64 +1,45 @@
 
-import { Compiler, Platforms, PlatformArg } from "./compiler.js";
+import { SubCommand } from "./command.js";
+import { CompileAllCMD, CompileAutoCMD, CompileToTargetCMD } from "./commands/compile.js";
+import { HelpCMD } from "./commands/help.js";
+import { Platforms } from "./compiler.js";
 
-class CompileCMD {
+const CompileCMD = new class CompileCMD extends SubCommand {
 
-    private static readonly subCMDs: {[key: string]: (args: string[]) => Promise<void>} = {
-        "--help": this.help,
-        "all": this.all,
-        "auto": () => new Compiler("auto").build()
-    };
+    protected registerCommands() {
+        this.register("help", HelpCMD);
+        this.register("-h", HelpCMD);
+        this.register("--help", HelpCMD);
 
-    private static initialized = false;
-
-    public static init() {
-        if (this.initialized) return;
-        this.initialized = true;
-    }
-
-    public static async run() {
-        const args = process.argv.slice(2);
-
-        if (args.length === 0) {
-            await new Compiler("auto").build();
-            return;
-        }
-
-        if (args[0] in this.subCMDs) {
-            await this.subCMDs[args[0]](args.slice(1));
-            return;
-        }
-
-        if (args.length !== 1) {
-            await this.help(args);
-            return;
-        }
-
-        if (Object.keys(Platforms).some(p => p === args[0])) {
-            await new Compiler(args[0] as PlatformArg).build();
-            return;
-        }
-
-        console.log(`Invalid platform: ${args[0]}`);
-        console.log("Platforms: " + Object.keys(Platforms).join(", "));    
-    }
-
-    private static async help(args: string[]) {
-        console.log("Usage: npx bun compile (<platform> | auto | all)");
-        console.log("Platforms: " + Object.keys(Platforms).join(", "));
-    }
-
-    private static async all(args: string[]) {
-        const builds: Promise<void>[] = [];
+        this.register("all", CompileAllCMD);
+        this.register("auto", CompileAutoCMD);
 
         for (const platform in Platforms) {
-            builds.push(new Compiler(platform as PlatformArg).build());
+            this.register(platform, CompileToTargetCMD);
         }
-        await Promise.all(builds);
     }
 
-}
+    async run(args: string[]) {
+        const cmd_name = args[0] as string | undefined;
 
-CompileCMD.init();
-await CompileCMD.run();
+        if (!cmd_name) {
+            return this.registry["auto"].run([]);
+        }
 
+        const cmd = this.registry[cmd_name] as SubCommand | undefined;
+
+        if (!cmd) {
+            console.log(`Invalid Command: ${cmd_name}`);
+            console.log(`Run bun compile --help`);
+            return;
+        }
+
+        return cmd.run(args.slice(1));
+    }
+
+}();
+
+
+await CompileCMD.run(
+    process.argv.slice(2)
+);
