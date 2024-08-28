@@ -15,10 +15,10 @@ class Utils {
         }
 
         //process.on("SIGINT", this.gracefulShutdown);
-        process.on("SIGTERM", this.gracefulShutdown);
+        process.once("SIGTERM", this.gracefulShutdown);
 
-        process.on("uncaughtException", this.uncaughtException);
-        process.on("unhandledRejection", this.unhandledRejection);
+        process.once("uncaughtException", this.uncaughtException);
+        process.once("unhandledRejection", this.unhandledRejection);
     }
 
     private static runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
@@ -42,12 +42,13 @@ class Utils {
     }
 
     private static async uncaughtException(error: Error) {
-        cli.default.error(`Uncaught Exception: ${error.stack}`);
+        cli.default.error(`Uncaught Exception:\n${error.stack}`);
         Utils.gracefulShutdown(1);
     }
 
-    private static async unhandledRejection(reason: any, promise: Promise<any>) {
-        cli.default.error(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+    private static async unhandledRejection(reason: any) {
+        const error = reason.stack ? reason.stack : reason;
+        cli.default.error(`Unhandled Rejection:\n${error}`);
         Utils.gracefulShutdown(1);
     }
 
