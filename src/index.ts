@@ -62,7 +62,12 @@ export default class Main {
                     });
                 }
 
-                POS.init(MinterClient.createMinters(config.staker.stakers));
+                const minters: MinterClient[] = [];
+                if (config.minter.active) {
+                    minters.push(...MinterClient.createMinters(config.staker.stakers));
+                }
+                
+                POS.init(minters);
                 POS.start();
 
                 cli.default.info(`LeiCoin-Node started in Full Node mode`);
