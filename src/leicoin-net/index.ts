@@ -1,5 +1,5 @@
 import { type TCPSocketListener } from "bun";
-import { type BasicLNSocketHandler, LNSocketHandler, type SocketData } from "./socket.js";
+import { LNSocketHandlerFactory, type BasicLNSocketHandler, type SocketData } from "./socket.js";
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
@@ -16,7 +16,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     static async init() {
         this.connections = LNConnections.createInstance();
         Pipelines.registerPipelines();
-        this.socketHandler = LNSocketHandler.createInstance(this.connections);
+        this.socketHandler = LNSocketHandlerFactory.create(this.connections);
     }
 
     static async start(config: {
