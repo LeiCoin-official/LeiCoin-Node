@@ -1,0 +1,53 @@
+name: Create Release and Attach Binaries
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+      release_name:
+        description: 'Release title'
+        required: true
+      release_notes:
+        description: 'Release notes or changelog'
+        required: true
+      prerelease:
+        description: 'Is this a pre-release?'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Runs on Ubuntu, as per the Bun documentation
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: 1.0.11  # Specify the Bun version or use "latest"
+
+    - name: Install dependencies
+      run: |
+        bun install
+
+    - name: Build binaries
+      run: |
+        bun compile all
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ github.event.inputs.version }}
+        name: ${{ github.event.inputs.release_name }}
+        body: ${{ github.event.inputs.release_notes }}
+        prerelease: ${{ github.event.inputs.prerelease }}
+        files: |
+          dist/*  # Adjust this path based on your output binaries
+
