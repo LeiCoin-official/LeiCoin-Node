@@ -42,7 +42,7 @@ class Utils {
     }
 
     private static async uncaughtException(error: Error) {
-        cli.default.error(`Uncaught Exception: ${error.message}`);
+        cli.default.error(`Uncaught Exception: ${error.stack}`);
         Utils.gracefulShutdown(1);
     }
 

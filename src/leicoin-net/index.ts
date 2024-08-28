@@ -42,11 +42,15 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     private static async startServer(host: string, port: number) {
-        this.server = Bun.listen<SocketData>({
-            hostname: host,
-            port: port,
-            socket: this.socketHandler
-        });
+        try {
+            this.server = Bun.listen<SocketData>({
+                hostname: host,
+                port: port,
+                socket: this.socketHandler
+            });
+        } catch (error: any) {
+            cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);
+        }
     }
 
     /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
@@ -75,12 +79,16 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     private static async connectToNode(host: string, port: number) {
-        const connection = await Bun.connect<SocketData>({
-            hostname: host,
-            port: port,
-            socket: this.socketHandler
-        })
-        this.connections.add(connection);
+        try {
+            const connection = await Bun.connect<SocketData>({
+                hostname: host,
+                port: port,
+                socket: this.socketHandler
+            })
+            this.connections.add(connection);
+        } catch (error: any) {
+            cli.leicoin_net.error(`Failed to connect to ${host}:${port}, Error: ${error.stack}`);
+        }
     }
 
     static async stop() {

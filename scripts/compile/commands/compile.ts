@@ -7,7 +7,7 @@ class CompileUtils {
             const packageJSON = await Bun.file(process.cwd() + "/package.json").json() as {version: string};
             return packageJSON.version;
         } catch (err) {
-            console.log("Error reading package.json: " + err.message);
+            console.log("Error reading package.json: " + err.stack);
             process.exit(1);
         }
     }
