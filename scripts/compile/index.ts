@@ -29,7 +29,7 @@ class CompileCMD {
             return;
         }
 
-        if (args.length !== 1) {
+        if (args.length !== 2) {
             await this.help(args);
             return;
         }
@@ -44,7 +44,7 @@ class CompileCMD {
     }
 
     private static async help(args: string[]) {
-        console.log("Usage: npx bun compile (<platform> | auto | all)");
+        console.log("Usage: npx bun compile [<platform> | auto | all] [version]");
         console.log("Platforms: " + Object.keys(Platforms).join(", "));
     }
 

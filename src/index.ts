@@ -10,7 +10,7 @@ export default class Main {
 
     private static initialized = false;
 
-    static version = "0.5.4";
+    static readonly version = process.env.LEICOIN_NODE_VERSION || "DEV";
 
     private static environment: "full" | "cli" | "command";
 
