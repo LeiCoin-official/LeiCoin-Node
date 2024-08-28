@@ -10,7 +10,7 @@ export default class Main {
 
     private static initialized = false;
 
-    static version = "0.5.3-beta.1";
+    static version = "0.5.4";
 
     private static environment: "full" | "cli" | "command";
 
