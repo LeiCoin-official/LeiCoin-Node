@@ -63,7 +63,7 @@ export default class Main {
                 }
 
                 const minters: MinterClient[] = [];
-                if (config.minter.active) {
+                if (config.staker.active) {
                     minters.push(...MinterClient.createMinters(config.staker.stakers));
                 }
                 
