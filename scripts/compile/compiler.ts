@@ -49,7 +49,7 @@ export class Compiler {
         versionInFileName: boolean
     ) {
         if (versionInFileName) {
-            this.command.outfile += `-${version}`;
+            this.command.outfile += `-v${version}`;
         }
 
         if (platform !== "auto") {
