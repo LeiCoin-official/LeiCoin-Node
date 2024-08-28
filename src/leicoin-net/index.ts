@@ -1,5 +1,5 @@
 import { type TCPSocketListener } from "bun";
-import { type BasicLNSocketHandler, LNSocketHandler, type SocketData } from "./socket.js";
+import { LNSocketHandlerFactory, type BasicLNSocketHandler, type SocketData } from "./socket.js";
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
@@ -16,7 +16,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     static async init() {
         this.connections = LNConnections.createInstance();
         Pipelines.registerPipelines();
-        this.socketHandler = LNSocketHandler.createInstance(this.connections);
+        this.socketHandler = LNSocketHandlerFactory.create(this.connections);
     }
 
     static async start(config: {
@@ -42,11 +42,15 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     private static async startServer(host: string, port: number) {
-        this.server = Bun.listen<SocketData>({
-            hostname: host,
-            port: port,
-            socket: this.socketHandler
-        });
+        try {
+            this.server = Bun.listen<SocketData>({
+                hostname: host,
+                port: port,
+                socket: this.socketHandler
+            });
+        } catch (error: any) {
+            cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);
+        }
     }
 
     /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
@@ -75,12 +79,16 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     private static async connectToNode(host: string, port: number) {
-        const connection = await Bun.connect<SocketData>({
-            hostname: host,
-            port: port,
-            socket: this.socketHandler
-        })
-        this.connections.add(connection);
+        try {
+            const connection = await Bun.connect<SocketData>({
+                hostname: host,
+                port: port,
+                socket: this.socketHandler
+            })
+            this.connections.add(connection);
+        } catch (error: any) {
+            cli.leicoin_net.error(`Failed to connect to ${host}:${port}, Error: ${error.stack}`);
+        }
     }
 
     static async stop() {

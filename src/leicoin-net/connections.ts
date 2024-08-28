@@ -6,15 +6,15 @@ export class LNConnections {
 
     private static instance: LNConnections;
     
-    static createInstance() {
+    static createInstance(connections: UintMap<LNSocket> = new UintMap()) {
         if (!this.instance) {
-            this.instance = new LNConnections();
+            this.instance = new LNConnections(connections);
         }
         return this.instance;
     }
     
     private constructor(
-        protected readonly connections: UintMap<LNSocket> = new UintMap()
+        protected readonly connections: UintMap<LNSocket>
     ) {}
 
     public get size() {
