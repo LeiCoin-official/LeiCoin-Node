@@ -10,7 +10,7 @@ export default class Main {
 
     private static initialized = false;
 
-    static readonly version = process.env.LEICOIN_NODE_VERSION || "DEV";
+    static readonly version = Bun.env.LEICOIN_NODE_VERSION || "DEV";
 
     private static environment: "full" | "cli" | "command";
 
@@ -18,11 +18,11 @@ export default class Main {
         if (this.initialized) return;
         this.initialized = true;
 
-        if (process.argv.slice(2)[0] === "-c") {
+        if (Bun.argv.slice(2)[0] === "-c") {
             await cli.init("cmd", "none", false, false, Utils.procCWD);
         } else {
             await cli.init("all", "all", true, true, Utils.procCWD);
-            console.log(`Starting LeiCoin-Node v${Main.version}...`);
+            cli.default.info(`Starting LeiCoin-Node v${Main.version}...`);
         }
 
         const config = (await import("./config/index.js")).default;

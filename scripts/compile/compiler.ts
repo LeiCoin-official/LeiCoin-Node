@@ -17,10 +17,16 @@ export type PlatformArg = keyof typeof Platforms | "auto";
 export class Compiler {
 
     private command = "bun build --compile --sourcemap ./src/index.ts --outfile ./build/bin/leicoin-node";
-    private platform: PlatformArg;
 
-    constructor(platform: PlatformArg) {
-        this.platform = platform;
+    constructor(
+        private platform: PlatformArg,
+        private version: string,
+        versionInFileName: boolean
+    ) {
+        if (versionInFileName) {
+            this.command += `-${version}`;
+        }
+
         if (platform !== "auto") {
 
             if (Object.keys(Platforms).some(p => p === platform) === false) {
@@ -33,7 +39,10 @@ export class Compiler {
 
     async build() {
         try {
-            const output = await Bun.$`echo "Building from sources. Platform: ${this.platform}"; ${{ raw: this.command }}`.text()
+            const output = await Bun.$`
+                echo "Building from sources. Version: ${this.version} Platform: ${this.platform}";
+                ${{ raw: this.command }}
+                `.text()
             console.log(output);
         } catch (err) {
             console.log(`Failed with code ${err.exitCode}`);

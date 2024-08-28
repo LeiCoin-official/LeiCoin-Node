@@ -24,8 +24,8 @@ export class ENVConfigParser {
             if (fs.existsSync(envFilePath)) {
                 dotenv.config({ path: envFilePath });
                 const envData: ENVConfigLike = {};
-                for (let key in process.env) {
-                    envData[key] = process.env[key];
+                for (let key in Bun.env) {
+                    envData[key] = Bun.env[key];
                 }
                 return envData;
             } else {
