@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
-import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
+import Utils from "../utils/index.js";
 
 export interface GeneralConfigLike {
     leicoin_net: {
@@ -35,7 +35,7 @@ export class GeneralConfigParser {
     }
 
     public parse() {
-        const configFilePath = path.join(utils.procCWD, "/config/config.json");
+        const configFilePath = path.join(Utils.procCWD, "/config/config.json");
         try {
             if (fs.existsSync(configFilePath)) {
                 const configData = fs.readFileSync(configFilePath, "utf-8");
@@ -67,7 +67,7 @@ export class GeneralConfigParser {
         api: {
             "active": false,
             "host": "0.0.0.0",
-            "port": 12200
+            "port": 12280
         },
         experimental: false
     }

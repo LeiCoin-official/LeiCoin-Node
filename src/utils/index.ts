@@ -5,7 +5,9 @@ class Utils {
 
     static readonly events = new EventEmitter();
 
-    private readonly procCWD: string;
+    static get procCWD() {
+        return process.cwd();
+    }
 
     // public get cwd() {
     //     return this.procCWD;
@@ -15,7 +17,6 @@ class Utils {
         if (process.env.CUSTOM_CWD) {
             process.chdir(process.env.CUSTOM_CWD);
         }
-        this.procCWD = process.cwd();
 
         //process.on("SIGINT", this.gracefulShutdown);
         process.on("SIGTERM", this.gracefulShutdown);

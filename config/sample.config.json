@@ -2,7 +2,7 @@
     "api": {
         "active": false,
         "host": "0.0.0.0",
-        "port": 12200
+        "port": 12280
     },
     "leicoin_net": {
         "host": "0.0.0.0",

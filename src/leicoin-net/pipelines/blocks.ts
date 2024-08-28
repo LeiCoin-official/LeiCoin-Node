@@ -4,7 +4,7 @@ import { type LNPPX } from "../packages.js";
 import { type Uint } from "../../binary/uint.js";
 import POS from "../../pos/index.js";
 import { type Slot } from "../../pos/slot.js";
-import { Pipeline } from "./index.js";
+import { Pipeline } from "./abstractPipeline.js";
 
 export default class BlockPipeline extends Pipeline {
     readonly id = "2096";

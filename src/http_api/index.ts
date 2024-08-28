@@ -5,26 +5,13 @@ import sendTransactions_router from "./sendTransactions.js";
 import { Server as HTTP_Server } from "http";
 import cli from "../cli/cli.js";
 import EventEmitter from "events";
+import { ModuleLike } from "../utils/dataUtils.js";
 
-export class HTTP_API {
+export class HTTP_API implements ModuleLike<typeof HTTP_API>{
     private static app: express.Express;
     private static server: HTTP_Server;
 
-    static async start(config: {
-        host: string,
-        port: number,
-        eventHandler?: EventEmitter
-    }) {
-        this.createApp();
-        this.server = this.app.listen(config.port, config.host, () => {
-            cli.api.info(`API listening on ${config.host}:${config.port}`);
-        });
-        if (config.eventHandler) {
-            await this.setupEvents(config.eventHandler);
-        }
-    }
-
-    private static createApp() {
+    static async init() {
         this.app = express();
 
         this.app.use(cors());
@@ -42,6 +29,20 @@ export class HTTP_API {
         });
         
         this.app.use('/sendtransactions', sendTransactions_router);
+    }
+
+
+    static async start(config: {
+        host: string,
+        port: number,
+        eventHandler?: EventEmitter
+    }) {
+        this.server = this.app.listen(config.port, config.host, () => {
+            cli.api.info(`API listening on ${config.host}:${config.port}`);
+        });
+        if (config.eventHandler) {
+            await this.setupEvents(config.eventHandler);
+        }
     }
 
     static async stop() {

@@ -11,7 +11,7 @@ function createVSCodeFolder() {
     }
 }
 
-function copyLaunchJsonFile() {
+function copyLaunchFile() {
     const sourceFilePath = path.join(process.cwd(), 'scripts/setup/assets/launch.json');
     const destinationFilePath = path.join(process.cwd(), '.vscode/launch.json');
 
@@ -19,8 +19,17 @@ function copyLaunchJsonFile() {
     console.log('launch.json file copied successfully.');
 }
 
+function createSettingsFile() {
+    const sourceFilePath = path.join(process.cwd(), 'scripts/setup/assets/settings.json');
+    const destinationFilePath = path.join(process.cwd(), '.vscode/settings.json');
+
+    fs.copyFileSync(sourceFilePath, destinationFilePath);
+    console.log('settings.json file copied successfully.');
+}
+
 export default function () {
     createVSCodeFolder();
-    copyLaunchJsonFile();
+    copyLaunchFile();
+    createSettingsFile();
 }
 

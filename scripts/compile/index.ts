@@ -3,9 +3,10 @@ import { Compiler, Platforms, PlatformArg } from "./compiler.js";
 
 class CompileCMD {
 
-    private static readonly subCMDs = {
+    private static readonly subCMDs: {[key: string]: (args: string[]) => Promise<void>} = {
         "--help": this.help,
         "all": this.all,
+        "auto": () => new Compiler("auto").build()
     };
 
     private static initialized = false;
@@ -36,10 +37,10 @@ class CompileCMD {
         if (Object.keys(Platforms).some(p => p === args[0])) {
             await new Compiler(args[0] as PlatformArg).build();
             return;
-        } else {
-            console.log(`Invalid platform: ${args[0]}`);
-            console.log("Platforms: " + Object.keys(Platforms).join(", "));
         }
+
+        console.log(`Invalid platform: ${args[0]}`);
+        console.log("Platforms: " + Object.keys(Platforms).join(", "));    
     }
 
     private static async help(args: string[]) {

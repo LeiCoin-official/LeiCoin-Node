@@ -40,7 +40,7 @@ class Wallets {
             )
 
             Wallets.senderWallets.push(wallet);
-            await blockchain.wallets.setWallet(wallet);
+            await Blockchain.wallets.setWallet(wallet);
         }
     
         for (let i = 0; i < this.count; i++) {
@@ -166,14 +166,14 @@ export class TXSpeedTest {
         console.log("Starting Execution Speed Test...");
         console.time("TX Execute Speed");
 
-        await blockchain.wallets.adjustWalletsByBlock(this.block);
+        await Blockchain.wallets.adjustWalletsByBlock(this.block);
 
         console.timeEnd("TX Execute Speed");
         console.log("Finished Execution Speed Test!");
     }
 
     public static async end() {
-        await blockchain.close();
+        await Blockchain.close();
 
         fs.rmSync(__dirname + "/blockchain_data", {recursive: true});
         fs.rmSync(__dirname + "/logs", {recursive: true});

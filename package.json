@@ -5,21 +5,21 @@
 	"exports": "./src/index.ts",
 	"type": "module",
 	"scripts": {
-		"old-dev": "ts-node --esm src/index.ts",
-		"setup": "bun run ./scripts/setup",
+		"setup": "bun run ./scripts/setup && bun run patches",
+		"patches": "patch-package",
 		"clean:win": "cmd /C \"rmdir /Q /S node_modules\" ",
 		"clean:linux": "rm -r node_modules",
 		"test": "bun test",
-		"debug": "bun run ./build/bundle/leicoin-node.js",
-		"debug:newBuild": "bun run ./scripts/bundle && bun run ./build/bundle/leicoin-node.js",
+		"debug": "bun run src/index.ts",
+		"debug:bundle": "bun run ./build/bundle/leicoin-node.js",
+		"debug:newBundle": "bun run ./scripts/bundle && bun run ./build/bundle/leicoin-node.js",
 		"debug:noCompact": "bun run ./build/src",
-		"debug:noCompactNewBuild": "tsc && bun run build/src",
-		"build": "bun run ./scripts/bundle",
-		"build:noCompact": "tsc",
+		"debug:noCompactNewTsc": "tsc && bun run build/src",
+		"bundle": "bun run ./scripts/bundle",
+		"tsc": "tsc",
 		"compile": "bun run ./scripts/compile",
 		"release": "bun run ./scripts/build/withEntryPoint",
-		"start": "bun run leicoin-node.js",
-		"start:noCompact": "bun run src/index.js"
+		"start": "./build/bin/leicoin-node"
 	},
 	"repository": {
 		"type": "git",
@@ -35,14 +35,15 @@
 	"dependencies": {
 		"@noble/secp256k1": "^2.1.0",
 		"ansi-escapes": "^4.3.2",
-		"bun": "^1.1.24",
+		"bun": "^1.1.26",
 		"chalk": "^4.1.2",
+		"classic-level": "^1.4.1",
 		"cors": "^2.8.5",
 		"dotenv": "^16.3.1",
 		"elliptic": "^6.5.5",
 		"express": "^4.18.2",
-		"level": "^8.0.1",
 		"node-cron": "^3.0.3",
+		"patch-package": "^8.0.0",
 		"ws": "^8.14.2"
 	},
 	"devDependencies": {

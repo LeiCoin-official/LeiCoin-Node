@@ -1,6 +1,6 @@
-import { Level, DatabaseOptions } from "level";
+import { ClassicLevel, DatabaseOptions } from "classic-level";
 import LevelUP from "levelup";
-import { Uint } from "../../src/utils/binary.js";
+import { Uint } from "../../src/binary/uint.js";
 import { CodecOptions } from "level-codec";
 import EncodingDown from "encoding-down";
 import RocksDBDown from "rocksdb";
@@ -28,7 +28,7 @@ const RocksDBEncoder = {
     }
 }
 
-export class LevelDB<K = Uint, V = Uint> extends Level<K, V> {
+export class LevelDB<K = Uint, V = Uint> extends ClassicLevel<K, V> {
     
     constructor(location: string, options?: DatabaseOptions<K, V> | string);
     constructor(location: string, options: DatabaseOptions<any, any> = {

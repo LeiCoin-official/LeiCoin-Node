@@ -14,7 +14,7 @@ abstract class BMapIteratorLike<T, M> implements IterableIterator<T> {
     }
     protected abstract _next(value: M): T;
 
-    public all(): readonly T[] {
+    public all(): T[] {
         const result: T[] = [];
         for (const value of this) {
             result.push(value);

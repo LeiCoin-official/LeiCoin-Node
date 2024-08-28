@@ -19,10 +19,9 @@ export default class Main {
         this.initialized = true;
 
         if (process.argv.slice(2)[0] === "-c") {
-            //process.env.NO_OUTPUT = "true";
-            await cli.init("none", "none", false, false, process.cwd());
+            await cli.init("cmd", "none", false, false, Utils.procCWD);
         } else {
-            await cli.init("all", "all", true, true, process.cwd());
+            await cli.init("all", "all", true, true, Utils.procCWD);
             console.log(`Starting LeiCoin-Node v${Main.version}...`);
         }
 
@@ -42,12 +41,13 @@ export default class Main {
 
         cli.default.info(`Loaded core modules`);
 
-        Blockchain.start();
+        await Blockchain.init();
+        await Blockchain.waitAllChainsInit();
 
         switch (this.environment) {
             case "full": {
 
-                LeiCoinNetNode.init();
+                await LeiCoinNetNode.init();
                 await LeiCoinNetNode.start({
                     ...config.leicoin_net,
                     peers: config.peers,
@@ -55,17 +55,17 @@ export default class Main {
                 });
 
                 if (config.api.active) {
+                    await HTTP_API.init();
                     await HTTP_API.start({
                         ...config.api,
-                        eventHandler: Utils.events
+                        eventHandler: Utils.events 
                     });
                 }
 
-                MinterClient.createMinters(config.staker.stakers);
-                POS.();
-    
-                cli.default.info(`LeiCoin-Node started in Full Node mode`);
+                POS.init(MinterClient.createMinters(config.staker.stakers));
+                POS.start();
 
+                cli.default.info(`LeiCoin-Node started in Full Node mode`);
                 break;
             }
             case "cli": {

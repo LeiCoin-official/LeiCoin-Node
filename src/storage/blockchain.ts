@@ -16,7 +16,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     static get cstates() { return this.chains["main"].cstates }
     static get minters() { return this.chains["main"].minters }
 
-    static init() {
+    static async init() {
         this.createStorageIfNotExists();
         this.setupEvents();
 
@@ -24,7 +24,9 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         for (const chainName in this.chainstate.getAllChainStates()) {
             this.chains[chainName] = new Chain(chainName);
         }
-
+        if (!this.chains["main"]) {
+            this.chains["main"] = new Chain("main");
+        }
     }
 
     private static createStorageIfNotExists() {
@@ -111,6 +113,12 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     // public deleteFork(name: string) {
         
     // }
+
+    static async waitAllChainsInit() {
+        for (const chain of Object.values(this.chains)) {
+            await chain.waitAllinit();
+        }
+    }
 
     private static async setupEvents() {
         utils.events.once("stop_server", async () => {

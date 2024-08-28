@@ -21,7 +21,7 @@ class Logger {
 }
 
 type LogType = "info" | "success" | "error" | "warn";
-type LogLevel = "none" | "error" | "warns" | "all";
+type LogLevel = "none" | "cmd" | "error" | "warns" | "all";
 
 type AllowedLogLevelConfig = {
     [key in LogType]: boolean
@@ -36,7 +36,8 @@ class CLIUtils {
 
     public static async setLogLevelConfig(logLevel: LogLevel, config: AllowedLogLevelConfig) {
         switch (logLevel) {
-            case "none": {
+            case "none":
+            case "cmd": {
                 config.info = config.success = config.error = config.warn = false;
                 break;
             }
@@ -98,7 +99,7 @@ class CLI {
 
     public async init(
         logLevel: LogLevel,
-        logFileLevel: LogLevel,
+        logFileLevel: Exclude<LogLevel, "cmd">,
         colorized: boolean,
         interactiveCLI: boolean,
         cwd: string
@@ -123,10 +124,13 @@ class CLI {
     }
 
     private log(message: string, type: LogType, prefix: string, prefixColor: string) {
-        if (this.allowdLogs.console[type] || prefix === 'CLI') {
+        if (this.allowdLogs.console[type]) {
             this.logToConsole(message, type, prefix, prefixColor);
+        } else if (this.logLevel === "cmd" && prefix === "CLI") {
+            console.log(`[${type.toUpperCase()}]: ${message}`);
+            return;
         }
-        if (this.allowdLogs.file[type] || prefix === 'CLI') {
+        if (this.allowdLogs.file[type]) {
             this.logToFile(message, type, prefix);
         }
     }

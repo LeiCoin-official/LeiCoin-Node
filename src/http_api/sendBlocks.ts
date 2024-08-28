@@ -28,8 +28,8 @@ router.use('/', async (req, res, next) => {
 	}
 
     // Add the transaction to the mempool (replace with your blockchain logic)
-    blockchain.blocks.addBlock(blockData);
-    //blockchain.updateLatestBlockInfo(blockData.index, blockData.hash);
+    Blockchain.blocks.addBlock(blockData);
+    //Blockchain.updateLatestBlockInfo(blockData.index, blockData.hash);
     mempool.clearMempoolbyBlock(blockData);
 
 });
