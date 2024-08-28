@@ -99,7 +99,7 @@ class BasicLNSocketHandler implements SocketHandler<SocketData> {
     }
     async connectError(socket: LNSocket, error: Error) {
         cli.leicoin_net.info(
-            `Connection Error: ${error.stack} on ${socket.data.uri}`
+            `Connection Error: ${error.stack}`
         );
     }
 

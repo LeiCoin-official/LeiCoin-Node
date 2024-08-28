@@ -16,6 +16,9 @@ class Utils {
 
         //process.on("SIGINT", this.gracefulShutdown);
         process.on("SIGTERM", this.gracefulShutdown);
+        
+        process.on("uncaughtException", this.uncaughtException);
+        process.on("unhandledRejection", this.unhandledRejection);
     }
 
     private static runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
@@ -36,6 +39,16 @@ class Utils {
         } catch {
             process.exit(1);
         }
+    }
+
+    static async uncaughtException(error: Error) {
+        cli.default.error(`Uncaught Exception: ${error.message}`);
+        this.gracefulShutdown(1);
+    }
+
+    private static async unhandledRejection(reason: any, promise: Promise<any>) {
+        cli.default.error(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+        this.gracefulShutdown(1);
     }
 
 }
