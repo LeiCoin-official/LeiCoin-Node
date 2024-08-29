@@ -1,4 +1,3 @@
-import config from "../../config/index.js";
 import LeiCoinNetClientsBasicHandler from "./basicHandler.js";
 
 class LeiCoinNetClientsHandler extends LeiCoinNetClientsBasicHandler {
@@ -16,7 +15,7 @@ class LeiCoinNetClientsHandler extends LeiCoinNetClientsBasicHandler {
         return LeiCoinNetClientsHandler.instance;
     }
 
-    public async initAllClients() {
+    public async initAllClients(config: { peers: string[] }) {
         const promises: Promise<void>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections

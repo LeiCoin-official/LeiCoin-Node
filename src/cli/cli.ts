@@ -74,7 +74,7 @@ class CLI {
     private constructor() {}
     
     private logLevel: LogLevel = "all";
-    private logFileLevel: LogLevel = "all";
+    private logFileLevel: LogLevel = "none";
     private colorized: boolean = false;
     private interactiveCLI: boolean = false;
 

@@ -14,27 +14,20 @@ type PArgTypeMap = {
 type ArgsKeys = keyof typeof ProcessArgsParser.prototype.argsSettings;
 type ArgTypes = typeof ProcessArgsParser.prototype.argsSettings[ArgsKeys];
 type ArgsLike<T = "default"> = {
-    [key in ArgsKeys]?: T extends "default" ? typeof ProcessArgsParser.prototype.argsSettings[key]['default'] : any;
+    [key in ArgsKeys]?: T extends "default" ? typeof ProcessArgsParser.prototype.argsSettings[key]['defaultValue'] : any;
 }
 
 class PArg<T extends PArgAllowedTypes> {
-    // default value will not be loaded when the argument is required
-    default: PArgTypeMap[T];
-    type: PArgAllowedTypes;
-    required: boolean;
-    fixedPosition: number | null;
-
+    constructor(type: "array" extends T?T:T, lastArg: true, required?: false, defaultValue?: null);
+    constructor(type: "array" extends T?T:T, lastArg: true, required: true, defaultValue: PArgTypeMap[T]);
+    constructor(type: Exclude<T, "array">, lastArg?: boolean, required?: false, defaultValue?: null);
+    constructor(type: Exclude<T, "array">, lastArg: boolean, required: true, defaultValue: PArgTypeMap[T]);
     constructor(
-        type: T,
-        fixedPosition: number | null = null,
-        required = false,
-        defaultValue: PArgTypeMap[T] = null,
-    ) {
-        this.type = type;
-        this.default = defaultValue;
-        this.required = required;
-        this.fixedPosition = fixedPosition;
-    }
+        readonly type: T,
+        readonly lastArg = false,
+        readonly required = false,
+        readonly defaultValue: PArgTypeMap[T] = null // default value only will be loaded when the argument is required
+    ) {}
 }
 
 
@@ -53,71 +46,75 @@ export class ProcessArgsParser {
         '--port' : new PArg("number"),
         '--host': new PArg("string"),
         '--experimental': new PArg("flag"),
-
-        '--only-cli': new PArg("flag", 0),
-
-        '-c' : new PArg("array", 0)
+        "--cwd": new PArg("string"),
+        '--only-cli': new PArg("flag", true),
+        '-c' : new PArg("array", true)
     };
     
     public parse(): ArgsLike {
 
         const parsedArgs: ArgsLike<any> = {} as any;
+        const process_argv = Bun.argv.slice(2);
+        const providedArgs: string[] = [];
 
-        const process_argv = process.argv.slice(2);
+        let argIndex = 0;
 
-        for (const [argName, argSettings] of Object.entries(this.argsSettings) as [ArgsKeys, ArgTypes][]) {
-            
-            try {
+        while (argIndex < process_argv.length) {
 
-                const argIndex = process_argv.findIndex(arg => argName === arg)
+            const argName = process_argv[argIndex] as ArgsKeys;
+            const argSettings = this.argsSettings[argName];
 
-                if (argIndex === -1) {
-                    if (argSettings.required) {
-                        if (argSettings.default === null) {
-                            cli.data.error(`Argument ${argName} is required`);
-                            utils.gracefulShutdown(1); return {} as any;
-                        }
-                        parsedArgs[argName] = argSettings.default;
-                    }
-                    continue;
-                }
-
-                if (argSettings.fixedPosition && argIndex !== argSettings.fixedPosition) {
-                    cli.data.error(`Argument ${argName} cannot be used with other arguments`);
-                    utils.gracefulShutdown(1); return {} as any;
-                }
-
-                function getArgValue() {
-                    const argValue = process_argv[argIndex + 1];
-                    if (!argValue || argValue.startsWith('-')) {
-                        cli.data.error(`Argument ${argName} requires a value`);
-                        utils.gracefulShutdown(1);
-                    }
-                    return argValue;
-                }
-
-                switch (argSettings.type) {
-                
-                    case 'flag':
-                        parsedArgs[argName] = true;
-                        break;
-                    case 'array':
-                        parsedArgs[argName] = process_argv.slice(argIndex + 1);
-                        break;
-                    case 'number':
-                        parsedArgs[argName] = parseFloat(getArgValue());
-                        break;
-                    case "string":
-                        parsedArgs[argName] = getArgValue();
-                        break;
-
-                }
-
-            } catch (err: any) {
-                cli.data.error(`Unexpected error parsing argument ${argName}: ${err.stack}`);
+            if (!argSettings) {
+                cli.data.error(`Unknown argument ${argName}`);
                 utils.gracefulShutdown(1); return {} as any;
             }
 
+            providedArgs.push(argName);
+            
+            function getArgValue(): string {
+                const argValue = process_argv[argIndex + 1];
+                if (!argValue || argValue.startsWith('-')) {
+                    cli.data.error(`Argument ${argName} requires a value`);
+                    utils.gracefulShutdown(1); return null as any;
+                }
+                return argValue;
+            }
+
+            switch (argSettings.type) {
+                
+                case 'flag':
+                    parsedArgs[argName] = true;
+                    argIndex++;
+                    break;
+                case 'array':
+                    parsedArgs[argName] = process_argv.slice(argIndex + 1);
+                    break;
+                case 'number':
+                    parsedArgs[argName] = parseFloat(getArgValue());
+                    argIndex += 2;
+                    break;
+                case "string":
+                    parsedArgs[argName] = getArgValue();
+                    argIndex += 2;
+                    break;
+
+            }
+
+            if (argSettings.lastArg) {
+                break;
+            }
+
+        }
+
+
+        for (const [argName, argSettings] of Object.entries(this.argsSettings) as [ArgsKeys, ArgTypes][]) {
+            if (argSettings.required && !providedArgs.includes(argName)) {
+                if (argSettings.defaultValue === null) {
+                    cli.data.error(`Argument ${argName} is required`);
+                    utils.gracefulShutdown(1); return {} as any;
+                }
+                parsedArgs[argName] = argSettings.defaultValue;
+            }
         }
 
         return parsedArgs;

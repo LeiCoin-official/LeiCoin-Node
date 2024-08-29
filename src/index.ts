@@ -5,6 +5,7 @@ import LeiCoinNetNode from "./leicoin-net/index.js";
 import MinterClient from "./minter/index.js";
 import POS from "./pos/index.js";
 import { Blockchain } from "./storage/blockchain.js";
+import { Configs } from "./config/index.js";
 
 export default class Main {
 
@@ -18,14 +19,25 @@ export default class Main {
         if (this.initialized) return;
         this.initialized = true;
 
-        if (Bun.argv.slice(2)[0] === "-c") {
+        const processArgs = Configs.loadProcessArgs();
+
+        if (processArgs["--cwd"]) {
+            try {
+                process.chdir(processArgs["--cwd"]);
+            } catch (err: any) {
+                cli.default.error(`Failed to set working directory: ${err.message}`);
+                Utils.gracefulShutdown(1); return;
+            }
+        }
+
+        if (processArgs["-c"]) {
             await cli.init("cmd", "none", false, false, Utils.procCWD);
         } else {
             await cli.init("all", "all", true, true, Utils.procCWD);
             cli.default.info(`Starting LeiCoin-Node v${Main.version}...`);
         }
 
-        const config = (await import("./config/index.js")).default;
+        const config = Configs.loadFullConfig();
 
         if (Utils.getRunStatus() === "shutdown_on_error") {
             cli.default.error("Error during startup");
@@ -39,10 +51,10 @@ export default class Main {
             this.environment = "command"
         };
 
-        cli.default.info(`Loaded core modules`);
-
         await Blockchain.init();
         await Blockchain.waitAllChainsInit();
+
+        cli.default.info(`Loaded core modules`);
 
         switch (this.environment) {
             case "full": {
@@ -81,13 +93,11 @@ export default class Main {
 
                 const args = config.processArgs["-c"] as string[];
 
-                if (!args[0]) {
-                    cli.cmd.info("Command not recognized. Type leicoin-node -c help for available commands.");
-                    Utils.gracefulShutdown(0);
-                    return;
-                }
-
                 const CLICMDHandler = (await import("./cli/cliCMDHandler.js")).default;
+
+                if (!args[0]) {
+                    args.push("help");
+                }
 
                 await CLICMDHandler.getInstance().run(
                     args.map(arg => arg.toLowerCase())
