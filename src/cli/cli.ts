@@ -84,6 +84,7 @@ class CLI {
     }
 
     readonly default = new Logger('Global', '#ffffff', this.log);
+    readonly pos = new Logger('POS', '#0000ff', this.log);
     readonly minter = new Logger('MinterClient', '#00ffff', this.log);
     readonly api = new Logger('API', '#c724b1', this.log);
     readonly data = new Logger('Data', '#1711df', this.log);

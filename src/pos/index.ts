@@ -21,7 +21,7 @@ export class POS implements ModuleLike<typeof POS> {
      
         this.slotTask = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
             const currentSlotIndex = Uint64.from(POS.calulateCurrentSlotIndex());
-            cli.minter.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${new Date().toUTCString()}`);
+            cli.pos.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${new Date().toUTCString()}`);
             //this.endSlot(this.currentSlot.index);
             this.startNewSlot(currentSlotIndex);
         });
@@ -30,6 +30,7 @@ export class POS implements ModuleLike<typeof POS> {
     }
 
     static async start() {
+        cli.pos.info("POS started");
         this.slotTask.start();
     }
 

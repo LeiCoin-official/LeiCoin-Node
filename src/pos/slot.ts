@@ -58,6 +58,7 @@ export class Slot {
 
         this.block_verification = Verification.verifyBlock(block);
         const verification_result = await this.block_verification;
+        cli.leicoin_net.info(`Block ${block.hash.toHex()} verification result: ${verification_result.status}`);
         await Execution.executeBlock(block, verification_result)
     }
 

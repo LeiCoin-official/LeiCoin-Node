@@ -64,6 +64,8 @@ export class Verification {
 
         const currentSlot = POS.getCurrentSlot();
 
+        if (!currentSlot) return 12500;
+
         if (block.slotIndex.eqn(currentSlot.index)) return 12540;
         if (block.minter.eqn(currentSlot.minter)) return 12534;
         if (currentSlot.block) return 12535;
