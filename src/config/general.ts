@@ -65,9 +65,9 @@ export class GeneralConfigParser {
             ]
         },
         api: {
-            "active": false,
-            "host": "0.0.0.0",
-            "port": 12280
+            active: false,
+            host: "0.0.0.0",
+            port: 12280
         },
         experimental: false
     }
