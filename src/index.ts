@@ -19,6 +19,10 @@ export default class Main {
         if (this.initialized) return;
         this.initialized = true;
 
+        /**
+         * @todo Implement help command for processArgs or better full command loader
+         */
+
         const processArgs = Configs.loadProcessArgs();
 
         if (processArgs["--cwd"]) {
@@ -75,8 +79,8 @@ export default class Main {
                 }
 
                 const minters: MinterClient[] = [];
-                if (config.staker.active) {
-                    minters.push(...MinterClient.createMinters(config.staker.stakers));
+                if (config.minter.active) {
+                    minters.push(...MinterClient.createMinters(config.minter.credentials));
                 }
                 
                 POS.init(minters);

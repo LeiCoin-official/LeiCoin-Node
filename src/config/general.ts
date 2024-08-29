@@ -8,9 +8,9 @@ export interface GeneralConfigLike {
         host: string;
         port: number;
     };
-    staker: {
+    minter: {
         active: boolean;
-        stakers: Array<{
+        credentials: Array<{
             readonly privateKey: string;
             readonly address: string;
         }>;
@@ -55,9 +55,9 @@ export class GeneralConfigParser {
             host: "0.0.0.0",
             port: 12200
         },
-        staker: {
+        minter: {
             active: false,
-            stakers: [
+            credentials: [
                 {
                     privateKey: "",
                     address: ""
