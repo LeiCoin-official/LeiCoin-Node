@@ -1,34 +1,36 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
 import sendTransactions_router from "./sendTransactions.js";
 import { Server as HTTP_Server } from "http";
 import cli from "../cli/cli.js";
 import EventEmitter from "events";
 import { ModuleLike } from "../utils/dataUtils.js";
+import Elysia from "elysia";
+import cors from "@elysiajs/cors";
 
 export class HTTP_API implements ModuleLike<typeof HTTP_API>{
-    private static app: express.Express;
-    private static server: HTTP_Server;
+    private static app: Elysia;
 
     static async init() {
-        this.app = express();
-
-        this.app.use(cors());
-        this.app.use(bodyParser.json());
+        this.app = new Elysia()
+            .use(cors({
+                origin: "*"
+            }))
+            .get('/', async ({set}) => {
+                set.status = 200;
+                return Response.json({ message: "Online" });
+            })
+            /*.all('*', ({path, set}) => {
+                set.status = 404;
+                return Response.json({ error: "Not Found", path })
+            })*/
+            .post('/send', () => {
+                return Response.json({ message: "sendtransactions" });
+            })
+            /*.onError(({ code, error, set }) => {
+                set.status = 500;
+                return Response.json({ error });
+            })*/
         
-        this.app.use(function(req, res, next) {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            next();
-        });
-        
-        this.app.use('/', (req, res, next) => {
-            res.status(200);
-            res.json({ message: "Online" });
-        });
-        
-        this.app.use('/sendtransactions', sendTransactions_router);
+        //this.app.use('/sendtransactions', sendTransactions_router);
     }
 
 
@@ -37,17 +39,21 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API>{
         port: number,
         eventHandler?: EventEmitter
     }) {
-        this.server = this.app.listen(config.port, config.host, () => {
-            cli.api.info(`API listening on ${config.host}:${config.port}`);
+        this.app = this.app.listen({
+            port: config.port,
+            hostname: config.host,
         });
+        if (this.app.server) {
+            cli.api.info(`API listening on ${config.host}:${config.port}`);
+        }
         if (config.eventHandler) {
             await this.setupEvents(config.eventHandler);
         }
     }
 
     static async stop() {
-        if (this.server) {
-            this.server.close();
+        if (this.app?.server) {
+            this.app.server.stop();
             cli.api.info("API stopped");
         } else {
             cli.api.error("API could not be stopped, because it is not running");

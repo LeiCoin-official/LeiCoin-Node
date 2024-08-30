@@ -1,5 +1,3 @@
-import express from "express";
-const router = express.Router();
 import Verification from "../verification/index.js";
 import utils from "../utils/index.js";
 import mempool from "../storage/mempool.js";
