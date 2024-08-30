@@ -24,9 +24,11 @@ export class ENVConfigParser {
             if (fs.existsSync(envFilePath)) {
                 dotenv.config({ path: envFilePath });
                 const envData: ENVConfigLike = {};
+                /* only load env vars into config that are in the env file
                 for (let key in Bun.env) {
                     envData[key] = Bun.env[key];
                 }
+                */
                 return envData;
             } else {
                 let sampleFile = "";

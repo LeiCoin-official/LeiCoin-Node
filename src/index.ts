@@ -70,7 +70,7 @@ export default class Main {
                     eventHandler: Utils.events
                 });
 
-                if (config.api.active) {
+                if (config.api?.active) {
                     await HTTP_API.init();
                     await HTTP_API.start({
                         ...config.api,
@@ -79,7 +79,7 @@ export default class Main {
                 }
 
                 const minters: MinterClient[] = [];
-                if (config.minter.active) {
+                if (config.minter?.active) {
                     minters.push(...MinterClient.createMinters(config.minter.credentials));
                 }
                 

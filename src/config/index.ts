@@ -40,7 +40,7 @@ export class Configs {
                 utils.gracefulShutdown(1);
                 return {} as ConfigLike;
             }
-    
+
             this.config = {
                 ...defaultConfig,
                 ...envConfig,
