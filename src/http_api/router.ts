@@ -11,13 +11,6 @@ export abstract class HTTPRoute {
 
 }
 
-function hi({handler, request, response}: InlineHandler<Schema, Singleton & {
-    derive: Ephemeral['derive'] & Volatile['derive'];
-    resolve: Ephemeral['resolve'] & Volatile['resolve'];
-}, JoinPath<BasePath, Path>) {
-    handler.set(response, 200, "Hi");
-            
-}
 
 export abstract class HTTPSubRouter extends HTTPRoute {
 
@@ -39,4 +32,8 @@ export class HTTPRootRouter extends HTTPSubRouter {
     
 
 
+}
+
+function () {
+    
 }
