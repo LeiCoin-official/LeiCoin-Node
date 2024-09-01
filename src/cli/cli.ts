@@ -91,12 +91,12 @@ class CLI {
     readonly cmd = new Logger('CLI', '#ffffff', this.log);
     readonly leicoin_net = new Logger('LeiCoinNet', '#f47fff', this.log);
 
-    private ctx: Chalk | null = null;
+    private ctx?: Chalk;
     private messageStyles: Dict<Chalk> = {};
-    private ansiEscapes: any = null;
-    private rl: ReadlineInterface | null = null;
-    private logStream: fs.WriteStream | null = null;
-    private cmdHandler: CLICMDHandler | null = null;
+    private ansiEscapes: any;
+    private rl?: ReadlineInterface;
+    private logStream?: fs.WriteStream;
+    private cmdHandler?: CLICMDHandler;
 
     public async init(
         logLevel: LogLevel,

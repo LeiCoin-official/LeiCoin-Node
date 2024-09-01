@@ -1,38 +1,34 @@
 import Verification from "../verification/index.js";
-import utils from "../utils/index.js";
 import mempool from "../storage/mempool.js";
-import { CB } from "../utils/callbacks.js";
-import { LeiCoinNetDataPackage } from "../leicoin-net/packages.js";
 import { VCodes } from "../verification/codes.js";
+import Elysia from "elysia";
+import { type Transaction } from "../objects/transaction.js";
+
+let router = new Elysia({prefix: '/sendTransactions'})
 
 // Route for receiving new transactions
-router.use('/', async (req, res, next) => {
+.all('/', async({request, set}) => {
+	if (request.method !== 'POST') {
+		set.status = 405;
+		return Response.json({ message: 'Method Not Allowed. Use POST instead' });
+	}
+})
 
-	if (req.method !== 'POST') {
-        res.status(405);
-        res.json({ message: 'Method Not Allowed. Use POST instead' });
-        return;
-    }
-
-	const transactionData = req.body;
+.post('/', async({set, body}) => {
+	const transactionData = body as Transaction;
 
 	// Validate the transaction (add your validation logic here)
 	const validationresult = await Verification.verifyTransaction(transactionData);
 
-	//res.status(validationresult.status);
-	res.status(400);
-	res.json({message: VCodes[validationresult]});
-
 	if (validationresult !== 12000) {
-		return;
+		set.status = 400;
+		return Response.json({message: VCodes[validationresult]});
 	}
 
 	// Add the transaction to the mempool (replace with your blockchain logic)
 	mempool.addTransactionToMempool(transactionData);
 
-	
-
-	return;
+	return Response.json({code: validationresult, message: 'Transaction added to the mempool'});
 });
 
 const sendTransactions_route = router;

@@ -12,8 +12,8 @@ export class Slot {
 
     protected slot_started = false;
 
-    public block: Block | null = null;
-    public block_verification: Promise<BlockValidationResult> | null = null;
+    public block?: Block;
+    public block_verification?: Promise<BlockValidationResult>;
     protected readonly blockTimeout: Schedule;
 
     protected constructor(

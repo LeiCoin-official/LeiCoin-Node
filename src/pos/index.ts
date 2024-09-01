@@ -12,7 +12,7 @@ export class POS implements ModuleLike<typeof POS> {
 
     private static slotTask: cron.ScheduledTask;
     static readonly slots: UintMap<Slot> = new UintMap<Slot>();
-    private static currentSlot: Slot | null = null;
+    private static currentSlot?: Slot;
 
     static readonly minters: MinterClient[] = [];
 

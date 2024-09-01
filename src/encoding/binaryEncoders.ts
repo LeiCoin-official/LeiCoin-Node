@@ -182,8 +182,8 @@ class AdvancedTypeEncoderFactory {
 
 class CustomEncoder extends DataEncoder {
 
-    readonly prefixLength: number | "unlimited" | null = null;
-    readonly fixedLength: number | null = null;
+    readonly prefixLength?: number | "unlimited";
+    readonly fixedLength?: number;
 
     constructor(
         key: string,

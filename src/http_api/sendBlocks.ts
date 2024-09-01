@@ -1,30 +1,30 @@
-import express from "express";
 import Verification from "../verification/index.js";
 import { Blockchain } from "../storage/blockchain.js";
 import mempool from "../storage/mempool.js";
+import Elysia from "elysia";
+import { type Block } from "../objects/block.js";
 import { VCodes } from "../verification/codes.js";
 
-const router = express.Router();
+let router = new Elysia({prefix: '/sendBlocks'})
 
 // Route for receiving new transactions
-router.use('/', async (req, res, next) => {
-
-    if (req.method !== 'POST') {
-        res.status(405);
-        res.json({ message: 'Method Not Allowed. Use POST instead' });
-        return;
+.all('/', async ({request, set}) => {
+    if (request.method !== 'POST') {
+        set.status = 405;
+        return Response.json({ message: 'Method Not Allowed. Use POST instead' });
     }
+})
 
-	const blockData = req.body;
+.post('/', async ({set, body}) => {
+    const blockData = body as Block;
 	
 	// Validate the transaction (add your validation logic here)
 	const validationresult = await Verification.verifyBlock(blockData);
 
-    res.status(validationresult.status);
-	res.json({ message: VCodes[validationresult.status] });
+    set.status = validationresult.status;
 
 	if (validationresult.status !== 12000) {
-		return;
+		return Response.json({ code: validationresult.status, message: VCodes[validationresult.status] });
 	}
 
     // Add the transaction to the mempool (replace with your blockchain logic)
@@ -32,6 +32,7 @@ router.use('/', async (req, res, next) => {
     //Blockchain.updateLatestBlockInfo(blockData.index, blockData.hash);
     mempool.clearMempoolbyBlock(blockData);
 
+    return Response.json({ code: validationresult.status, message: 'Block added to the blockchain' });
 });
 
 const sendBlocks_route = router;

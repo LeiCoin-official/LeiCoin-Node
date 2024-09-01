@@ -1,38 +1,15 @@
-import sendTransactions_router from "./sendTransactions.js";
-import { Server as HTTP_Server } from "http";
 import cli from "../cli/cli.js";
 import EventEmitter from "events";
 import { ModuleLike } from "../utils/dataUtils.js";
 import Elysia from "elysia";
-import cors from "@elysiajs/cors";
+import { HTTPRootRouter } from "./routes/main.js";
 
 export class HTTP_API implements ModuleLike<typeof HTTP_API>{
     private static app: Elysia;
 
     static async init() {
-        this.app = new Elysia()
-            .use(cors({
-                origin: "*"
-            }))
-            .get('/', async ({set}) => {
-                set.status = 200;
-                return Response.json({ message: "Online" });
-            })
-            /*.all('*', ({path, set}) => {
-                set.status = 404;
-                return Response.json({ error: "Not Found", path })
-            })*/
-            .post('/send', () => {
-                return Response.json({ message: "sendtransactions" });
-            })
-            /*.onError(({ code, error, set }) => {
-                set.status = 500;
-                return Response.json({ error });
-            })*/
-        
-        //this.app.use('/sendtransactions', sendTransactions_router);
+        this.app = new Elysia().use(HTTPRootRouter);
     }
-
 
     static async start(config: {
         host: string,
