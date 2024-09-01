@@ -1,39 +1,38 @@
-import Elysia, { Handler } from "elysia";
-import { InlineHandler } from "elysia/dist/types";
+import Elysia from "elysia";
 
-export abstract class HTTPRoute {
-    abstract path: string;
+export abstract class HTTPRoute extends Elysia {
+    
 
-    async get(...args[]: typeof Elysia.prototype.get.) {
-        return;
-        
+    public get() {
+
     }
+
 
 }
 
 
 export abstract class HTTPSubRouter extends HTTPRoute {
 
-    protected app: Elysia;
+    protected readonly app: Elysia;
 
     protected routes: HTTPRoute[] = [];
 
     constructor(app: Elysia) {
         super();
-        this.app = app.get("/", ({server}) => {
+        this.app = app;
+        new Elysia({
             
-        });
+        })
     }
 
 }
 
 export class HTTPRootRouter extends HTTPSubRouter {
-    path: string;
-    
-
-
+    protected path: string;
 }
 
-function () {
-    
+function HTTPRouter(app: Elysia) {
+    app.get("/", ({}) => {
+        res.send("Hello World");
+    }
 }
