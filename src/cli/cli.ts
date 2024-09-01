@@ -5,40 +5,83 @@ import { dirname as path_dirname } from "path";
 import { Dict } from "../utils/dataUtils.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import CLICMDHandler from "./cliCMDHandler.js";
+import { BlockchainUtils } from "../storage/blockchainUtils.js";
 
 class Logger {
-
     constructor(
         private readonly prefix: string,
         private readonly color: string,
-        private readonly logger: (message: string, type: LogType, prefix: string, prefixColor: string) => void
+        private readonly logger: (
+            message: string,
+            type: LogType,
+            prefix: string,
+            prefixColor: string
+        ) => void
     ) {}
 
-    public info(message: string) { this.logger.call(CLI.getInstance(), message, "info", this.prefix, this.color) }
-    public success(message: string) { this.logger.call(CLI.getInstance(), message, "success", this.prefix, this.color) }
-    public error(message: string) { this.logger.call(CLI.getInstance(), message, "error", this.prefix, this.color) }
-    public warn(message: string) { this.logger.call(CLI.getInstance(), message, "warn", this.prefix, this.color) }
+    public info(message: string) {
+        this.logger.call(
+            CLI.getInstance(),
+            message,
+            "info",
+            this.prefix,
+            this.color
+        );
+    }
+    public success(message: string) {
+        this.logger.call(
+            CLI.getInstance(),
+            message,
+            "success",
+            this.prefix,
+            this.color
+        );
+    }
+    public error(message: string) {
+        this.logger.call(
+            CLI.getInstance(),
+            message,
+            "error",
+            this.prefix,
+            this.color
+        );
+    }
+    public warn(message: string) {
+        this.logger.call(
+            CLI.getInstance(),
+            message,
+            "warn",
+            this.prefix,
+            this.color
+        );
+    }
 }
 
 type LogType = "info" | "success" | "error" | "warn";
 type LogLevel = "none" | "cmd" | "error" | "warns" | "all";
 
 type AllowedLogLevelConfig = {
-    [key in LogType]: boolean
-}
+    [key in LogType]: boolean;
+};
 
 type AllowedLogLevelConfigs = {
     console: AllowedLogLevelConfig;
     file: AllowedLogLevelConfig;
-}
+};
 
 class CLIUtils {
-
-    public static async setLogLevelConfig(logLevel: LogLevel, config: AllowedLogLevelConfig) {
+    static async setLogLevelConfig(
+        logLevel: LogLevel,
+        config: AllowedLogLevelConfig
+    ) {
         switch (logLevel) {
             case "none":
             case "cmd": {
-                config.info = config.success = config.error = config.warn = false;
+                config.info =
+                    config.success =
+                    config.error =
+                    config.warn =
+                        false;
                 break;
             }
             case "error": {
@@ -52,7 +95,11 @@ class CLIUtils {
                 break;
             }
             case "all": {
-                config.info = config.success = config.error = config.warn = true;
+                config.info =
+                    config.success =
+                    config.error =
+                    config.warn =
+                        true;
                 break;
             }
         }
@@ -61,7 +108,6 @@ class CLIUtils {
 }
 
 class CLI {
-
     private static instance: CLI;
 
     public static getInstance() {
@@ -72,7 +118,7 @@ class CLI {
     }
 
     private constructor() {}
-    
+
     private logLevel: LogLevel = "all";
     private logFileLevel: LogLevel = "none";
     private colorized: boolean = false;
@@ -80,16 +126,16 @@ class CLI {
 
     private allowdLogs: AllowedLogLevelConfigs = {
         console: { info: true, success: true, error: true, warn: true },
-        file: { info: true, success: true, error: true, warn: true }
-    }
+        file: { info: true, success: true, error: true, warn: true },
+    };
 
-    readonly default = new Logger('Global', '#ffffff', this.log);
-    readonly pos = new Logger('POS', '#0000ff', this.log);
-    readonly minter = new Logger('MinterClient', '#00ffff', this.log);
-    readonly api = new Logger('API', '#c724b1', this.log);
-    readonly data = new Logger('Data', '#1711df', this.log);
-    readonly cmd = new Logger('CLI', '#ffffff', this.log);
-    readonly leicoin_net = new Logger('LeiCoinNet', '#f47fff', this.log);
+    readonly default = new Logger("Global", "#ffffff", this.log);
+    readonly pos = new Logger("POS", "#0000ff", this.log);
+    readonly minter = new Logger("MinterClient", "#00ffff", this.log);
+    readonly api = new Logger("API", "#c724b1", this.log);
+    readonly data = new Logger("Data", "#1711df", this.log);
+    readonly cmd = new Logger("CLI", "#ffffff", this.log);
+    readonly leicoin_net = new Logger("LeiCoinNet", "#f47fff", this.log);
 
     private ctx?: Chalk;
     private messageStyles: Dict<Chalk> = {};
@@ -110,21 +156,32 @@ class CLI {
         this.colorized = colorized;
         this.interactiveCLI = interactiveCLI;
 
-        await CLIUtils.setLogLevelConfig(this.logLevel, this.allowdLogs.console);
-        await CLIUtils.setLogLevelConfig(this.logFileLevel, this.allowdLogs.file);
+        await CLIUtils.setLogLevelConfig(
+            this.logLevel,
+            this.allowdLogs.console
+        );
+        await CLIUtils.setLogLevelConfig(
+            this.logFileLevel,
+            this.allowdLogs.file
+        );
 
         if (this.logFileLevel !== "none") {
             this.startLogStream(cwd);
         }
         if (this.interactiveCLI) {
-            await this.setupCLI();
+            await this.setupCLI(cwd);
         }
         if (this.colorized) {
             await this.setupCTX();
         }
     }
 
-    private log(message: string, type: LogType, prefix: string, prefixColor: string) {
+    private log(
+        message: string,
+        type: LogType,
+        prefix: string,
+        prefixColor: string
+    ) {
         if (this.allowdLogs.console[type]) {
             this.logToConsole(message, type, prefix, prefixColor);
         } else if (this.logLevel === "cmd" && prefix === "CLI") {
@@ -136,10 +193,15 @@ class CLI {
         }
     }
 
-    private logToConsole(message: string, type: LogType, prefix: string, prefixColor: string) {
-        const styledMessage = this.colorized ?
-            this.getColorizedMessage(message, type, prefix, prefixColor) :
-            this.getUnColorizedMessage(message, type, prefix);
+    private logToConsole(
+        message: string,
+        type: LogType,
+        prefix: string,
+        prefixColor: string
+    ) {
+        const styledMessage = this.colorized
+            ? this.getColorizedMessage(message, type, prefix, prefixColor)
+            : this.getUnColorizedMessage(message, type, prefix);
 
         if (this.interactiveCLI) {
             // Clear the current line and move the cursor to the beginning
@@ -154,22 +216,38 @@ class CLI {
     }
 
     private logToFile(message: string, type: LogType, prefix: string) {
-        this.logStream?.write(`${this.getUnColorizedMessage(message, type, prefix)}\n`);
+        this.logStream?.write(
+            `${this.getUnColorizedMessage(message, type, prefix)}\n`
+        );
     }
 
-    private getColorizedMessage(message: string, type: LogType, prefix: string, prefixColor: string) {
-        const colorizedPrefix = this.ctx?.hex(prefixColor).visible(`[${prefix}]`);
-        const styleFunction = this.messageStyles[type] || this.messageStyles.reset;
+    private getColorizedMessage(
+        message: string,
+        type: LogType,
+        prefix: string,
+        prefixColor: string
+    ) {
+        const colorizedPrefix = this.ctx
+            ?.hex(prefixColor)
+            .visible(`[${prefix}]`);
+        const styleFunction =
+            this.messageStyles[type] || this.messageStyles.reset;
         const styledMessage = `${colorizedPrefix} ${styleFunction(message)}`;
         return styledMessage;
     }
-    private getUnColorizedMessage(message: string, type: LogType, prefix: string) {
+    private getUnColorizedMessage(
+        message: string,
+        type: LogType,
+        prefix: string
+    ) {
         return `[${type.toUpperCase()}]: [${prefix}] ${message}`;
     }
 
     private async setupCTX() {
         if (!this.ctx) {
-            this.ctx = new (await import("chalk")).default.Instance({level: 3});
+            this.ctx = new (await import("chalk")).default.Instance({
+                level: 3,
+            });
             this.messageStyles.reset = this.ctx.reset;
             this.messageStyles.success = this.ctx.green;
             this.messageStyles.error = this.ctx.red;
@@ -178,7 +256,8 @@ class CLI {
     }
 
     private startLogStream(cwd: string) {
-        const logFilePath = cwd + `/logs/log-${DataUtils.getCurrentLogTime()}.log`;
+        const logFilePath =
+            cwd + `/logs/log-${DataUtils.getCurrentLogTime()}.log`;
 
         const logFilePathdir = path_dirname(logFilePath);
         if (!fs.existsSync(logFilePathdir)) {
@@ -186,65 +265,97 @@ class CLI {
             //logToConsole(`Directory ${logFilePathdir} was created because it was missing.`);
         }
 
-        this.logStream = fs.createWriteStream(logFilePath, { flags: 'a', encoding: 'utf8' });
-        this.logStream.on('error', (err) => {
+        this.logStream = fs.createWriteStream(logFilePath, {
+            flags: "a",
+            encoding: "utf8",
+        });
+        this.logStream.on("error", (err) => {
             console.error(`[System] Error writing to log: ${err.stack}`);
             if (this.interactiveCLI) this.rl?.prompt();
         });
     }
 
-    private async setupCLI() {
+    private getCLIHistory(cwd: string) {
+        if (!fs.existsSync(cwd + "/logs/cli_history.log")) {
+            fs.writeFileSync(cwd + "/logs/cli_history.log", "");
+            return [];
+        }
+        return fs
+            .readFileSync(cwd + "/logs/cli_history.log", "utf8")
+            .split("\n")
+            .filter((line) => line)
+            .reverse();
+    }
 
+    private async appendCLIHistory(cwd: string, input: string) {
+        if (input === "stop") return;
+
+        let lastLine = "";
+        try {
+            lastLine = await BlockchainUtils.readLastNLines(cwd + "/logs/cli_history.log", 1);
+        } catch {}
+
+        if (lastLine === input) return;
+
+        fs.appendFileSync(cwd + "/logs/cli_history.log", `${input}\n`);
+    }
+
+    private async setupCLI(cwd: string) {
         if (!this.ansiEscapes) {
             this.ansiEscapes = (await import("ansi-escapes")).default;
         }
         if (!this.cmdHandler) {
-            this.cmdHandler = (await import("./cliCMDHandler.js")).default.getInstance();
+            this.cmdHandler = (
+                await import("./cliCMDHandler.js")
+            ).default.getInstance();
         }
 
         if (!this.rl) {
             this.rl = createInterface({
                 input: process.stdin,
                 output: process.stdout,
+                history: this.getCLIHistory(cwd),
                 terminal: true,
             });
 
-            this.rl.on('line', (input) => {
-                //this.handleCommand(input.trim().toLowerCase());
-                this.cmdHandler?.handle(input);
-                this.rl?.prompt();
-            }).on('SIGINT', () => {
-                //this.default_message.info(`Command not recognized. Type "help" for available commands.`);
-    
-                process.stdout.write(this.ansiEscapes.eraseLines(1)); // Clear the current line
-                process.stdout.write(this.ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
-    
-                console.log(`> ${this.rl?.line}^C`);
-                this.rl?.prompt(true);
-                this.rl?.write(null, { ctrl: true, name: 'e' }); this.rl?.write(null, { ctrl: true, name: 'u' }); // Clear the current line
-    
-            }).on('close', () => {
-                //default_message.log('CLI closed.');
-            });
-        }
+            this.rl
+                .on("line", (input) => {
+                    this.cmdHandler?.handle(input);
+                    this.rl?.prompt();
+                    this.appendCLIHistory(cwd, input);
+                })
+                .on("SIGINT", () => {
+                    //this.default_message.info(`Command not recognized. Type "help" for available commands.`);
 
+                    process.stdout.write(this.ansiEscapes.eraseLines(1)); // Clear the current line
+                    process.stdout.write(this.ansiEscapes.cursorTo(0)); // Move the cursor to the beginning
+
+                    console.log(`> ${this.rl?.line}^C`);
+                    this.rl?.prompt(true);
+                    this.rl?.write(null, { ctrl: true, name: "e" });
+                    this.rl?.write(null, { ctrl: true, name: "u" }); // Clear the current line
+                })
+                .on("close", () => {
+                    //default_message.log('CLI closed.');
+                });
+        }
     }
 
     private async closeLogStream() {
         if (!this.logStream) return;
         return new Promise<null | Error>((resolve, reject) => {
-            this.logStream?.on('finish', () => {
+            this.logStream?.on("finish", () => {
                 this.logStream?.close();
                 resolve(null);
             });
-            
-            this.logStream?.on('error', (error) => {
-              reject(error);
+
+            this.logStream?.on("error", (error) => {
+                reject(error);
             });
             this.logStream?.end();
         });
     }
- 
+
     private async closeCLI() {
         if (!this.rl) return;
         this.rl.setPrompt("");
@@ -253,12 +364,8 @@ class CLI {
     }
 
     public async close() {
-        await Promise.all([
-            this.closeLogStream(),
-            this.closeCLI()
-        ]);
+        await Promise.all([this.closeLogStream(), this.closeCLI()]);
     }
- 
 }
 
 const cli = CLI.getInstance();

@@ -44,10 +44,14 @@ export type Static<
 
 
 interface IBasicModuleLike {
+    initialized: boolean;
+
     init(...args: any[]): Promise<void> | void;
     stop(...args: any[]): Promise<void> | void;
 }
 interface IModuleLike extends IBasicModuleLike {
+    started: boolean;
+
     start(...args: any[]): Promise<void> | void;
 }
 export type BasicModuleLike<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>> = Static<C, IBasicModuleLike>;

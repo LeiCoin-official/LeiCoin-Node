@@ -7,6 +7,8 @@ import { Pipelines } from "./pipelines/index.js";
 import { ModuleLike } from "../utils/dataUtils.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
+    public static initialized = false;
+    public static started = false;
 
     private static server: TCPSocketListener<SocketData>;
 
@@ -14,6 +16,9 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     private static socketHandler: BasicLNSocketHandler;
 
     static async init() {
+        if (this.initialized) return;
+        this.initialized = true;
+
         this.connections = LNConnections.createInstance();
         Pipelines.registerPipelines();
         this.socketHandler = LNSocketHandlerFactory.create(this.connections);
@@ -25,6 +30,9 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         peers: readonly string[]
         eventHandler?: EventEmitter
     }) {
+        if (this.started) return;
+        this.started = true;
+
         const tasks: Promise<void>[] = [];
 
         tasks.push(

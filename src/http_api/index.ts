@@ -2,13 +2,18 @@ import cli from "../cli/cli.js";
 import EventEmitter from "events";
 import { ModuleLike } from "../utils/dataUtils.js";
 import Elysia from "elysia";
-import { HTTPRootRouter } from "./routes/main.js";
 
-export class HTTP_API implements ModuleLike<typeof HTTP_API>{
+export class HTTP_API implements ModuleLike<typeof HTTP_API> {
+    public static initialized = false;
+    public static started = false;
+    
     private static app: Elysia;
 
     static async init() {
-        this.app = new Elysia().use(HTTPRootRouter);
+        if (this.initialized) return;
+        this.initialized = true;
+
+        this.app = (await import("./routes/main.js")).HTTPRootRouter;
     }
 
     static async start(config: {
@@ -16,6 +21,9 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API>{
         port: number,
         eventHandler?: EventEmitter
     }) {
+        if (this.started) return;
+        this.started = true;
+
         this.app = this.app.listen({
             port: config.port,
             hostname: config.host,

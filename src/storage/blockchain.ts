@@ -6,6 +6,7 @@ import cli from "../cli/cli.js";
 import { BasicModuleLike } from "../utils/dataUtils.js";
 
 export class Blockchain implements BasicModuleLike<typeof Blockchain> {
+    public static initialized = false;
 
     static chainstate: Chainstate;
     static readonly chains: {[chain: string]: Chain} = {};
@@ -17,6 +18,9 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     static get minters() { return this.chains["main"].minters }
 
     static async init() {
+        if (this.initialized) return;
+        this.initialized = true;
+
         this.createStorageIfNotExists();
         this.setupEvents();
 

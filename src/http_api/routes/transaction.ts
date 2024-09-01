@@ -1,19 +1,15 @@
-import Verification from "../verification/index.js";
-import mempool from "../storage/mempool.js";
-import { VCodes } from "../verification/codes.js";
+import Verification from "../../verification/index.js";
+import mempool from "../../storage/mempool.js";
+import { VCodes } from "../../verification/codes.js";
 import Elysia from "elysia";
-import { type Transaction } from "../objects/transaction.js";
+import { type Transaction } from "../../objects/transaction.js";
+import { HTTPRouter405Route } from "../route.js";
 
 let router = new Elysia({prefix: '/sendTransactions'})
 
-// Route for receiving new transactions
-.all('/', async({request, set}) => {
-	if (request.method !== 'POST') {
-		set.status = 405;
-		return Response.json({ message: 'Method Not Allowed. Use POST instead' });
-	}
-})
+.use(HTTPRouter405Route())
 
+// Route for receiving new transactions
 .post('/', async({set, body}) => {
 	const transactionData = body as Transaction;
 

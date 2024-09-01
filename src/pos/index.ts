@@ -9,6 +9,8 @@ import { type MinterClient } from "../minter/index.js";
 import { ModuleLike } from "../utils/dataUtils.js";
 
 export class POS implements ModuleLike<typeof POS> {
+    public static initialized = false;
+    public static started = false;
 
     private static slotTask: cron.ScheduledTask;
     static readonly slots: UintMap<Slot> = new UintMap<Slot>();
@@ -17,6 +19,9 @@ export class POS implements ModuleLike<typeof POS> {
     static readonly minters: MinterClient[] = [];
 
     static async init(minters: MinterClient[]) {
+        if (this.initialized) return;
+        this.initialized = true;
+
         this.minters.push(...minters);
      
         this.slotTask = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
@@ -30,6 +35,9 @@ export class POS implements ModuleLike<typeof POS> {
     }
 
     static async start() {
+        if (this.started) return;
+        this.started = true;
+
         cli.pos.info("POS started");
         this.slotTask.start();
     }

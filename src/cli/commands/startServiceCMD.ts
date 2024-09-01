@@ -19,6 +19,10 @@ class StartAPI extends CLICMD {
     public usage = "api [options]";
 
     public async run(args: string[], parent_args: string[]) {
+        if (HTTP_API.started) {
+            cli.cmd.info("API service already started");
+            return;
+        }
 
         if (!args[0]) {
             cli.cmd.info("No host or port specified");

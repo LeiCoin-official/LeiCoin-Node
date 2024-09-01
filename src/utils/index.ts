@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import cli from "../cli/cli.js";
 
 class Utils {
+    private static initialized = false;
 
     static readonly events = new EventEmitter();
 
@@ -10,6 +11,9 @@ class Utils {
     }
 
     static init() {
+        if (this.initialized) return;
+        this.initialized = true;
+        
         if (Bun.env.CUSTOM_CWD) {
             process.chdir(Bun.env.CUSTOM_CWD);
         }
