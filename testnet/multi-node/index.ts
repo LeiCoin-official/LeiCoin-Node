@@ -11,7 +11,8 @@ class LocalNodeTestNet {
     private static commands: {[cmd: string]: (args: string[]) => Promise<void>} = {
         "setup": LocalNodeTestNet.setup,
         "init": LocalNodeTestNet.initNode,
-        "start": LocalNodeTestNet.start
+        "start": LocalNodeTestNet.start,
+        "clean": LocalNodeTestNet.cleanup
     }
 
     static async run() {
@@ -33,6 +34,7 @@ class LocalNodeTestNet {
         console.log("- setup: Setup the testnet nodes");
         console.log("- init (1|2): Initialize a node and create the terminal");
         console.log("- start: Start the testnet nodes that are waiting to be started");
+        console.log("- clean: Cleanup the testnet nodes");
     }
 
     private static async setup(args: string[]) {
@@ -64,7 +66,10 @@ class LocalNodeTestNet {
             leicoin_net: nodes[index],
             minter: {
                 active: true,
-                credentials: []
+                credentials: [{
+                    privateKey: credentials[index].privateKey.toHex(),
+                    address: credentials[index].address.toHex()
+                }]
             },
             api: {
                 active: false,
@@ -132,6 +137,11 @@ class LocalNodeTestNet {
         await Bun.$`bun debug --cwd ${{ raw: cwd }}`.finally(() => {
             server.stop();
         });
+    }
+
+    private static async cleanup() {
+        fs.rmSync("./localtests/testnet-nodes", {recursive: true});
+        console.log("Cleanup complete")
     }
 
 }

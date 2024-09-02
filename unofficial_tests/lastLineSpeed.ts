@@ -35,7 +35,7 @@ function createLargeFile(filePath: string, lines: number): void {
 
 // Test function to measure performance
 async function testReadLastNLines() {
-    const filePath = 'localtests/large_test_file.txt';
+    const filePath = './localtests/large_test_file.txt';
     const totalLines = 100_000;
     const lastNLines = 10;
 
