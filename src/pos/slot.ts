@@ -26,7 +26,7 @@ export class Slot {
 
     public static async create(index: Uint64) {
         const nextMinter = await Blockchain.minters.selectNextMinter(index);
-        cli.minter.info(`Slot ${index.toBigInt()} minter: ${nextMinter.toHex()}`);
+        cli.pos.info(`Slot ${index.toBigInt()} minter: ${nextMinter.toHex()}`);
         return new Slot(index, nextMinter);
     }
 
@@ -50,6 +50,7 @@ export class Slot {
 
 
     public async processBlock(block: Block) {
+        cli.pos.info(`Slot ${this.index.toBigInt()} processing block ${block.hash.toHex()}`);
         if (this.blockTimeout.hasFinished()) return;
         this.blockTimeout.cancel();
 
