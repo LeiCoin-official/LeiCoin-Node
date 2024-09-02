@@ -62,6 +62,10 @@ export class MinterCredentials {
         this.address = address;
     }
 
+    static fromPrivateKey(privateKey: PrivateKey) {
+        return new MinterCredentials(privateKey, AddressHex.fromPrivateKey(PX.A_0e, privateKey));
+    }
+
 }
 
 export default Minter;
