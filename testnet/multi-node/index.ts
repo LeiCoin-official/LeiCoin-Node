@@ -32,8 +32,8 @@ class LocalNodeTestNet {
     static async help() {
         console.log("Usage: bun testnet multi-node (setup | init | start)");
         console.log("- setup: Setup the testnet nodes");
-        console.log("- init (1|2): Initialize a node and create the terminal");
-        console.log("- start [--clear]: Start the testnet nodes that are waiting to be started");
+        console.log("- init (0|1): Initialize a node and create the terminal");
+        console.log("- start [--clear | -c]: Start the testnet nodes that are waiting to be started");
         console.log("- clean: Cleanup the testnet nodes");
     }
 

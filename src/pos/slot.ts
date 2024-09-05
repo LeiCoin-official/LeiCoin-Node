@@ -50,17 +50,14 @@ export class Slot {
 
 
     public async processBlock(block: Block) {
-        //cli.pos.info(`Slot ${this.index.toBigInt()} processing block ${block.hash.toHex()}`);
-        cli.pos.info(`Slot ${this.index.toBigInt()} processing block ${block.hash.toHex()}: Step 0`);
         if (this.blockTimeout.hasFinished()) return;
         this.blockTimeout.cancel();
-        cli.pos.info(`Slot ${this.index.toBigInt()} processing block ${block.hash.toHex()}: Step 1`);
+
         if (this.block) return;
         this.block = block;
-        cli.pos.info(`Slot ${this.index.toBigInt()} processing block ${block.hash.toHex()}: Step 2`);
+
         this.block_verification = Verification.verifyBlock(block);
         const verification_result = await this.block_verification;
-        cli.leicoin_net.info(`Block ${block.hash.toHex()} verification result: ${verification_result.status}`);
         await Execution.executeBlock(block, verification_result)
     }
 

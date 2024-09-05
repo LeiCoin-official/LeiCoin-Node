@@ -7,6 +7,9 @@ import { DataUtils } from "../utils/dataUtils.js";
 import CLICMDHandler from "./cliCMDHandler.js";
 import { BlockchainUtils } from "../storage/blockchainUtils.js";
 
+/**
+ * @todo Add debug(message) method
+ */
 class Logger {
     constructor(
         private readonly prefix: string,
@@ -106,6 +109,10 @@ class CLIUtils {
     }
 
 }
+
+/**
+ * @todo Add Debug log level
+ */
 
 class CLI {
     private static instance: CLI;

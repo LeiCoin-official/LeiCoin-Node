@@ -1,7 +1,8 @@
 
-type New<T> = new(buffer: Buffer) => T;
+type New<T> = new(input: Uint | Buffer) => T;
 
 export interface BasicUintConstructable<T extends Uint> extends New<T> {
+    
     alloc(length?: number): T;
     create(input: Buffer | Uint): T;
 
@@ -105,7 +106,7 @@ export class Uint {
 
 
     public clone() {
-        return new (this.constructor as New<this>)(Buffer.from(this.buffer));
+        return (this.constructor as BasicUintConstructable<this>).from(this.buffer);
     }
 
     public toHex() {

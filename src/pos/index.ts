@@ -7,6 +7,8 @@ import cron from "node-cron";
 import { UintMap } from "../binary/map.js";
 import { type MinterClient } from "../minter/index.js";
 import { ModuleLike } from "../utils/dataUtils.js";
+import { formatDate } from "date-fns";
+import { UTCDate } from "@date-fns/utc";
 
 export class POS implements ModuleLike<typeof POS> {
     public static initialized = false;
@@ -26,7 +28,8 @@ export class POS implements ModuleLike<typeof POS> {
      
         this.slotTask = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
             const currentSlotIndex = Uint64.from(POS.calulateCurrentSlotIndex());
-            cli.pos.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${new Date().toUTCString()}`);
+            
+            cli.pos.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${formatDate(new UTCDate(), "dd-MMM-yyyy HH:mm:ss:SSS")}`);
             //this.endSlot(this.currentSlot.index);
             this.startNewSlot(currentSlotIndex);
         });
