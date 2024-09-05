@@ -114,7 +114,7 @@ async function gen_minter(size: number, db: LevelDBUtils.DBs = "stake1") {
     for (let i = 0; i < size; i++) {
         promises.push(
             level.put(
-                AddressHex.fromTypeAndBody(validator_preifx, Uint.from(LCrypt.randomBytes(20))),
+                AddressHex.fromTypeAndBody(validator_preifx, LCrypt.sha256(Uint64.from(i)).slice(0, 20)),
                 Uint.concat([
                     version_Prefix,
                     Uint64.from(32_0000_0000)
@@ -202,23 +202,58 @@ async function selectNextValidators(db: LevelDBUtils.DBs, seedHash: Uint256): Pr
     return [validators, elapsedTime, using_first_validators];
 }
 
-async function selectNextMinter(slot, customLevel?: LevelDB) {
+async function selectNextMinter(slot: Uint, customLevel?: LevelDB) {
     let level = customLevel || await LevelDBUtils.openDB("stake1");
 
-    const slotHash = Uint.concat([
-        PX.A_0e,
-        LCrypt.sha256(slot).split(20)[0]
-    ]);
+    const slotHash = AddressHex.fromTypeAndBody(PX.A_0e, LCrypt.sha256(slot).slice(0, 20));
 
-    // console.log("Hash: ", slotHash.toHex());
     const address = new AddressHex(
         (await level.keys({gte: slotHash, limit: 1}).all())[0] ||
-        (await level.keys({lte: slotHash, limit: 1, reverse: true}).all())[0]
+        (await level.keys({lte: slotHash, limit: 1}).all())[0]
     );
+
     if (!customLevel) {
         await level.close();
     }
     return address;
+}
+
+function findBestKey(addresses: AddressHex[], target: AddressHex) {
+    let bestKey: AddressHex | null = null;  // The key to return
+    let bestDifference = Uint.from(-1, 21);  // The smallest difference found for greater values
+    let furthestKey: AddressHex | null = null;  // The key with the most difference
+    let furthestDifference = AddressHex.from(0);  // The largest difference found
+
+    // Iterate through each key-value pair in the object
+    for (let address of addresses) {
+        const difference = address.sub(target);
+
+        // If the value is equal to the target, return the key immediately
+        if (address.eq(target)) {
+            return address;
+        }
+
+        // If the value is greater than the target, check if it's the smallest greater value so far
+        if (address.gt(target) && difference.lt(bestDifference)) {
+            bestDifference = difference;
+            bestKey = address;
+        }
+
+        // Track the furthest difference if we don't find a suitable greater value
+        const absDifference = address.gt(target) ? difference : target.sub(address);
+        if (absDifference.gt(furthestDifference)) {
+            furthestDifference = absDifference;
+            furthestKey = address;
+        }
+    }
+
+    // If we found a key with a greater value, return it
+    if (bestKey !== null) {
+        return bestKey;
+    }
+
+    // Otherwise, return the key with the most difference
+    return furthestKey as AddressHex;
 }
 
 async function test1(db: LevelDBUtils.DBs, func: (db: LevelDBUtils.DBs, seedHash: Uint256) => Promise<any>, returnTime?: false): Promise<undefined>;
@@ -312,8 +347,8 @@ async function test5(returnPicks: true, slotsCount?: number, randomSlotIndexes?:
 async function test5(returnPicks = false, slotsCount = 100, randomSlotIndexes = false, level?: LevelDB) {
     let print = returnPicks ? () => {} : console.log;
     let slotIndexGenerator = randomSlotIndexes ? 
-        (i: any) => Uint.from(Math.floor(Math.random() * 1_000_000)) :
-        (i: number) => Uint.from(i);
+        (i: any) => Uint64.from(Math.floor(Math.random() * 1_000_000)) :
+        (i: number) => Uint64.from(i);
 
     const results: AddressHex[] = [];
     
@@ -330,16 +365,16 @@ async function test_minter_randomness(config: {
     randomSlotIndexes: boolean,
     randomMinters: boolean,
     sortedBy: "address" | "count",
-    onlyFirst2Digits: boolean
+    onlyFirstDigits: false | number
 } = {
     mintersCount: 2,
     slotsCount: 100,
     randomSlotIndexes: false,
     randomMinters: false,
     sortedBy: "count",
-    onlyFirst2Digits: false
+    onlyFirstDigits: false
 }) {
-    const {mintersCount, slotsCount, randomSlotIndexes, randomMinters, sortedBy, onlyFirst2Digits} = config;
+    const {mintersCount, slotsCount, randomSlotIndexes, randomMinters, sortedBy, onlyFirstDigits} = config;
 
     await gen_minter(mintersCount, "stake1");
     const level = await LevelDBUtils.openDB("stake1");
@@ -347,9 +382,10 @@ async function test_minter_randomness(config: {
     const minterAddresses = await level.keys().all();
 
     let frequencyMap: UintMap<Uint64>;
+    const expectedFrequency = slotsCount / (onlyFirstDigits ? (256 ** onlyFirstDigits) : mintersCount);
 
-    if (onlyFirst2Digits) {
-        frequencyMap = new UintMap<Uint64>(minterAddresses.map(address => [address.slice(0, 2), Uint64.from(0)]));
+    if (onlyFirstDigits) {
+        frequencyMap = new UintMap<Uint64>(minterAddresses.map(address => [address.slice(1, onlyFirstDigits + 1), Uint64.from(0)]));
     } else {
         frequencyMap = new UintMap<Uint64>(minterAddresses.map(address => [address, Uint64.from(0)]));
     }
@@ -365,13 +401,9 @@ async function test_minter_randomness(config: {
         chosenMinters = await test5(true, slotsCount, randomSlotIndexes, level);
     }
 
-    for (let i = 0; i < slotsCount; i++) {
-        chosenMinters.push();
-    }
-
-    if (onlyFirst2Digits) {
+    if (onlyFirstDigits) {
         for (const address of chosenMinters) {
-            (frequencyMap.get(address.slice(0, 2)) as Uint64).iadd(1);
+            (frequencyMap.get(address.slice(1, onlyFirstDigits + 1)) as Uint64).iadd(1);
         }
     } else {
         for (const address of chosenMinters) {
@@ -394,38 +426,34 @@ async function test_minter_randomness(config: {
     const green_underline = "\x1b[38;2;0;150;0m\x1b[4m";
     const reset = "\x1b[0m";
 
-    console.log(green_underline + `Results sorted by ${sortedBy}:` + reset);
+    // console.log(green_underline + `Results sorted by ${sortedBy}:` + reset);
 
-    for (const [index, [address, count]] of sortedResults.entries()) {
-        const light_blue = "\x1b[38;2;58;150;221m";
-        const light_magenta = "\x1b[38;2;221;58;150m";
-        const color = index % 2 === 0 ? light_blue : light_magenta;
+    // for (const [index, [address, count]] of sortedResults.entries()) {
+    //     const light_blue = "\x1b[38;2;58;150;221m";
+    //     const light_magenta = "\x1b[38;2;221;58;150m";
+    //     const color = index % 2 === 0 ? light_blue : light_magenta;
 
-        if (onlyFirst2Digits) {
-            console.log(color +
-                `Prefix: ${address.toHex().slice(2, 4)}` + "    " +
-                `${count.toInt()} times` +
-            reset);
-        } else {
-            console.log(color +
-                `Minter: ${address.toHex()}` + "    " +
-                `${count.toInt()} times` +
-            reset);
+    //     console.log(color +
+    //         `Minter: ${address.toHex()}` + "    " +
+    //         `${count.toInt()} times` +
+    //     reset);
+        
+    // }
+
+    let highestDeviation = 0;
+
+    for (const [, count] of sortedResults) {
+
+        const deviation = Math.abs(count.toInt() - expectedFrequency);
+
+        if (deviation > highestDeviation) {
+            highestDeviation = deviation;
         }
     }
 
-    let highestCount = sortedResults[0][1];
-    let lowestCount = sortedResults[0][1];
-
-    for (const [address, count] of sortedResults) {
-        if (count.gt(highestCount)) {
-            highestCount = count;
-        } else if (count.lt(lowestCount)) {
-            lowestCount = count;
-        }
-    }
-
-    console.log("Difference Ratio:", highestCount.toInt() / (lowestCount.toInt() === 0 ? 1 : lowestCount.toInt()));
+    console.log(green_underline + "test_minter_randomness Results:" + reset);
+    console.log("- Expexted Frequency:", expectedFrequency);
+    console.log("- Highest Deviation:", highestDeviation);
 
     await level.close();
     await LevelDBUtils.destroyDB("stake1");
@@ -451,9 +479,13 @@ async function test_minter_randomness2(config: {
     let results: Uint[];
 
     if (reverse) {
-        results = await level.keys({lte: hash,reverse: true}).all();
+        results = await level.keys({lte: hash, reverse: true}).all();
     } else {
         results = await level.keys({gte: hash}).all();
+        if (!results[0]) {
+            console.log("No results found, trying reverse");
+            results = await level.keys({lte: hash}).all();
+        }
     }
 
     const green_underline = "\x1b[38;2;0;150;0m\x1b[4m";
@@ -477,6 +509,109 @@ async function test_minter_randomness2(config: {
 
     await level.close();
     await LevelDBUtils.destroyDB("stake1");
+}
+
+async function test_minter_randomness3(config: {
+    mintersCount: number,
+    slotsCount: number,
+    prefixLength: number
+} = {
+    mintersCount: 65536,
+    slotsCount: 1000000,
+    prefixLength: 1
+}) {
+    const { mintersCount, slotsCount, prefixLength } = config;
+
+    function sha256(input: number) {
+        return LCrypt.sha256(Uint64.from(input)).toHex();
+    }
+
+    let frequency = {};
+    const expectedFrequency = slotsCount / mintersCount;
+
+    for (let i = 1; i <= slotsCount; i++) {
+        const hash = sha256(i);
+        const prefix = hash.substring(0, prefixLength * 2);
+
+        if (frequency[prefix]) {
+            frequency[prefix]++;
+        } else {
+            frequency[prefix] = 1;
+        }
+    }
+
+    let totalDeviation = 0;
+    let highestDeviation = 0;
+
+    const green_underline = "\x1b[38;2;0;150;0m\x1b[4m";
+    const reset = "\x1b[0m";
+
+    for (let prefix in frequency) {
+        const actualFreq = frequency[prefix];
+        const deviation = Math.abs(actualFreq - expectedFrequency);
+        totalDeviation += deviation;
+
+        if (deviation > highestDeviation) {
+            highestDeviation = deviation;
+        }
+    }
+
+    console.log(green_underline + "test_minter_randomness3 Results:" + reset);
+    console.log("- Expexted Frequency:", expectedFrequency);
+    console.log("- Highest Deviation:", highestDeviation);
+
+}
+
+async function test_minter_randomness4(config: {
+    mintersCount: number,
+    slotsCount: number
+    prefixLength: number
+} = {
+    mintersCount: 65536,
+    slotsCount: 1000000,
+    prefixLength: 1
+}) {
+    const { mintersCount, slotsCount, prefixLength } = config;
+
+    const minters: AddressHex[] = [];
+
+    for (let i = 0; i < mintersCount; i++) {
+        minters.push(AddressHex.fromTypeAndBody(PX.A_0e, LCrypt.sha256(Uint64.from(i)).slice(0, 20)));
+    }
+
+    let frequency = new UintMap<Uint64>();
+    const expectedFrequency = slotsCount / (256 ** prefixLength);
+
+    for (let i = 0; i < slotsCount; i++) {
+        const address = findBestKey(minters, AddressHex.fromTypeAndBody(PX.A_0e, LCrypt.sha256(Uint64.from(i)).slice(0, 20)));
+        const prefix = address.slice(1, prefixLength + 1);
+
+        if (frequency.has(prefix)) {
+            (frequency.get(prefix) as Uint64).iadd(1);
+        } else {
+            frequency.set(prefix, Uint64.from(1));
+        }
+    }
+
+    let totalDeviation = 0;
+    let highestDeviation = 0;
+
+    const green_underline = "\x1b[38;2;0;150;0m\x1b[4m";
+    const reset = "\x1b[0m";
+
+    for (let [prefix, count] of frequency) {
+        const actualFreq = count.toInt();
+        const deviation = Math.abs(actualFreq - expectedFrequency);
+        totalDeviation += deviation;
+
+        if (deviation > highestDeviation) {
+            highestDeviation = deviation;
+        }
+    }
+
+    console.log(green_underline + "test_minter_randomness4 Results:" + reset);
+    console.log("- Expexted Frequency:", expectedFrequency);
+    console.log("- Highest Deviation:", highestDeviation);
 }
 
 //gen_old(129);
@@ -527,12 +662,12 @@ async function test_minter_randomness2(config: {
 
 
 test_minter_randomness({
-    mintersCount: 10,
-    slotsCount: 100,
-    randomSlotIndexes: true,
+    mintersCount: 256,
+    slotsCount: 3906,
+    randomSlotIndexes: false,
     randomMinters: false,
     sortedBy: "count",
-    onlyFirst2Digits: false
+    onlyFirstDigits: 1
 });
 
 // test_minter_randomness2({
@@ -540,3 +675,15 @@ test_minter_randomness({
 //     reverse: false
 // });
 
+test_minter_randomness3({
+    mintersCount: 256,
+    slotsCount: 3906,
+    //slotsCount: 512,
+    prefixLength: 1
+});
+
+// test_minter_randomness4({
+//     mintersCount: 256,
+//     slotsCount: 3906,
+//     prefixLength: 1
+// });

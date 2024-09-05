@@ -373,11 +373,19 @@ export class Uint64 extends FixedUint {
 // @ts-ignore
 export class Uint96 extends Uint64 {
     public static readonly byteLength = 12;
+
+    public toBigInt(): bigint {
+        throw new Error("Method not implemented.");
+    }
 }
 
 // @ts-ignore
 export class Uint256 extends Uint64 {
     public static readonly byteLength = 32;
+
+    public toBigInt(): bigint {
+        throw new Error("Method not implemented.");
+    }
 }
 
 export class Uint8 extends FixedUint {
