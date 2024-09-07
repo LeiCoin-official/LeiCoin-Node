@@ -1,14 +1,14 @@
 import { ClassicLevel } from "classic-level";
-import LevelDB from "../src/storage/leveldb/index.js";
-import { shuffleArray } from './cryptoUtils.js';
-import { startTimer, endTimer } from "./testUtils.js";
-import { Uint, Uint256, Uint64 } from "../src/binary/uint.js";
-import { UintMap } from "../src/binary/map.js";
-import { AddressHex } from "../src/objects/address.js";
-import { LCrypt } from "../src/crypto/index.js";
-import { PX } from "../src/objects/prefix.js";
+import LevelDB from "../../src/storage/leveldb/index.js";
+import { shuffleArray } from '../cryptoUtils.js';
+import { startTimer, endTimer } from "../testUtils.js";
+import { Uint, Uint256, Uint64 } from "../../src/binary/uint.js";
+import { UintMap } from "../../src/binary/map.js";
+import { AddressHex } from "../../src/objects/address.js";
+import { LCrypt } from "../../src/crypto/index.js";
+import { PX } from "../../src/objects/prefix.js";
 import { LevelDBUtils } from "./leveldb_utils.js";
-import { Dict } from "../src/utils/dataUtils.js";
+import { Dict } from "../../src/utils/dataUtils.js";
 
 async function speedTest(db1: LevelDBUtils.DBs = "stake1", db2?: LevelDBUtils.DBs) {
 
@@ -41,90 +41,6 @@ async function speedTest(db1: LevelDBUtils.DBs = "stake1", db2?: LevelDBUtils.DB
         console.log("Elapsed time 2:", time2 / 1000, "seconds");
         console.log("DB working with Uint is", (time1 / time2), "times faster then with strings");
     }
-}
-
-
-async function gen_old(size: number, db1: LevelDBUtils.DBs = "stake1", db2: LevelDBUtils.DBs = "stake2") {
-
-    const level1 = await LevelDBUtils.openDB(db1);
-    const level2 = await LevelDBUtils.openDB(db2);
-
-    const hashes: Uint256[] = [];
-
-    const emptyUint = Uint.from("00")
-
-    for (let i = 0; i < size; i++) {
-        hashes.push(new Uint256(LCrypt.randomBytes(32)));
-    }
-
-    const shuffledHashes = shuffleArray(hashes);
-
-    for (let i = 0; i < size; i++) {
-        await Promise.all([
-            level1.put(hashes[i], emptyUint),
-            level2.put(shuffledHashes[i], emptyUint)
-        ]);
-    }
-
-    await level1.close();
-    await level2.close();
-}
-async function gen(size: number, db: LevelDBUtils.DBs = "stake1") {
-
-    const level = await LevelDBUtils.openDB(db);
-    
-    const validator_preifx = PX.A_0e;
-    const metaDataPrefix = PX.META;
-
-    const promises: Promise<void>[] = [];
-
-    for (let i = 0; i < size; i++) {
-        promises.push(
-            level.put(
-                Uint.concat([
-                    validator_preifx,
-                    Uint.from(i)
-                ]),
-                Uint.concat([
-                    // Withdraw Address
-                    new AddressHex(LCrypt.randomBytes(21)).getBody(),
-
-                    // Stake Amount
-                    Uint64.from(32_0000_0000)
-                ])
-            )
-        );
-    }
-
-    //& length
-    await level.put(Uint.concat([metaDataPrefix, Uint.from("00ed")]), Uint.from(size));
-
-    await Promise.all(promises);
-    await level.close();
-}
-async function gen_minter(size: number, db: LevelDBUtils.DBs = "stake1") {
-
-    const level = await LevelDBUtils.openDB(db);
-    
-    const validator_preifx = PX.A_0e;
-    const version_Prefix = PX.V_00;
-
-    const promises: Promise<void>[] = [];
-
-    for (let i = 0; i < size; i++) {
-        promises.push(
-            level.put(
-                AddressHex.fromTypeAndBody(validator_preifx, LCrypt.sha256(Uint64.from(i)).slice(0, 20)),
-                Uint.concat([
-                    version_Prefix,
-                    Uint64.from(32_0000_0000)
-                ])
-            )
-        );
-    }
-
-    await Promise.all(promises);
-    await level.close();
 }
 
 
@@ -202,7 +118,7 @@ async function selectNextValidators(db: LevelDBUtils.DBs, seedHash: Uint256): Pr
     return [validators, elapsedTime, using_first_validators];
 }
 
-async function selectNextMinter(slot: Uint, customLevel?: LevelDB) {
+async function selectNextMinter(slot: Uint64, customLevel?: LevelDB) {
     let level = customLevel || await LevelDBUtils.openDB("stake1");
 
     const slotHash = AddressHex.fromTypeAndBody(PX.A_0e, LCrypt.sha256(slot).slice(0, 20));

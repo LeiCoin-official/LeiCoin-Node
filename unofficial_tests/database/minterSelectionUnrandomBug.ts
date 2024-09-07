@@ -452,21 +452,25 @@ async function testRandomness3(config?: ConfigLike) {
 
 (async () => {
     
-    /*
-    const config = {
-        mintersCount: 1,
-        slotsCount: 15.2578125,
-        prefixLength: 1,
-    };
-    */
+    // const config: ConfigLike = {
+    //     mintersFactor: 1,
+    //     slotsFactor: 15.2578125,
+    //     prefixLen: 1
+    // };
+    
+    // const config: ConfigLike = {
+    //     mintersFactor: 1,
+    //     slotsFactor: 1,
+    //     prefixLen: 1
+    // };
 
     const config: ConfigLike = {
-        mintersFactor: 1,
-        slotsFactor: 1,
-        prefixLen: 1,
+        mintersFactor: 256,
+        slotsFactor: 100_000,
+        prefixLen: 1
     };
 
-    //await testRandomness1(config);
+    await testRandomness1(config);
     //await testRandomness2(config);
-    await testRandomness3(config);
+    //await testRandomness3(config);
 })();

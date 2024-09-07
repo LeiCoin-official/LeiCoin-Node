@@ -1,4 +1,4 @@
-import LevelDB from "../src/storage/leveldb/index.js";
+import LevelDB from "../../src/storage/leveldb/index.js";
 import path from "path";
 
 export namespace LevelDBUtils {
