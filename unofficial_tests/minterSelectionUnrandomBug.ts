@@ -322,95 +322,44 @@ function findPseudoRandomBestKey(
 
 
 interface ConfigLike {
+    mintersFactor?: number;
+    slotsFactor?: number;
+    prefixLen?: number;
+};
+
+type CompleteConfigLike = Required<ConfigLike>;
+
+const defaultConfig: Readonly<CompleteConfigLike> = {
+    mintersFactor: 1,
+    slotsFactor: 15.2578125,
+    prefixLen: 1,
+};
+
+interface TestSettings {
     mintersCount: number;
     slotsCount: number;
     prefixLength: number;
 }
 
-const defaultConfig: ConfigLike = {
-    mintersCount: 65536,
-    slotsCount: 1_000_000,
-    prefixLength: 1,
-};
+async function preTest(testIndex: number, testDescription: string, config?: ConfigLike): Promise<TestSettings> {
+    console.log(`Test ${testIndex}: ${testDescription}`)
 
+    const completeConfig: CompleteConfigLike = { ...defaultConfig, ...config };
+    let { mintersFactor, slotsFactor, prefixLen } = completeConfig;
 
-async function testRandomness1(config = defaultConfig) {
-    console.log("Test 1");
+    const mintersCount = mintersFactor * 256;
+    const slotsCount = Math.round(mintersCount * slotsFactor);
+    const prefixLength = prefixLen;
 
-    const { mintersCount, slotsCount, prefixLength } = config;
-
-    const minters: Uint160[] = [];
-
-    for (let i = 0; i < mintersCount; i++) {
-        minters.push(hashNumber(i));
-    }
-
-    let frequency = new Map<string, Uint160>();
-    const expectedFrequency = slotsCount / 256 ** prefixLength;
-
-    for (let i = 0; i < slotsCount; i++) {
-        const address = findBestKey(minters, hashNumber(i));
-        const prefix = address.slice(0, prefixLength).toHex();
-
-        if (frequency.has(prefix)) {
-            (frequency.get(prefix) as Uint160).iadd(1);
-        } else {
-            frequency.set(prefix, Uint160.from(1));
-        }
-    }
-
-    let totalDeviation = 0;
-    let highestDeviation = 0;
-
-    for (let [prefix, count] of frequency) {
-        const actualFreq = count.toInt();
-        const deviation = Math.abs(actualFreq - expectedFrequency);
-        totalDeviation += deviation;
-
-        if (deviation > highestDeviation) {
-            highestDeviation = deviation;
-        }
-    }
-
-    console.log("Expexted Frequency:", expectedFrequency);
-    console.log("Highest Deviation:", highestDeviation);
+    return { mintersCount, slotsCount, prefixLength };
 }
 
-async function testRandomness2(config = defaultConfig) {
-    console.log("Test 2");
-
-    const { mintersCount, slotsCount, prefixLength } = config;
-
-    const minters: Uint160[] = [];
-
-    // Generate minters (addresses) deterministically
-    for (let i = 0; i < mintersCount; i++) {
-        minters.push(hashNumber(i));
-    }
-
-    let frequency = new Map<string, Uint160>();
+async function calulateResults(frequency: Map<string, Uint160>, slotsCount: number, prefixLength: number) {
     const expectedFrequency = slotsCount / 256 ** prefixLength;
-
-    for (let i = 0; i < slotsCount; i++) {
-        const target = hashNumber(i);
-
-        // Find the best key with deterministic pseudo-random fallback
-        const address = findPseudoRandomBestKey(minters, target, i);
-
-        const prefix = address.slice(0, prefixLength).toHex();
-
-        // Update frequency for the selected address prefix
-        if (frequency.has(prefix)) {
-            (frequency.get(prefix) as Uint160).iadd(1);
-        } else {
-            frequency.set(prefix, Uint160.from(1));
-        }
-    }
 
     let totalDeviation = 0;
     let highestDeviation = 0;
 
-    // Calculate deviations from the expected frequency
     for (let [prefix, count] of frequency) {
         const actualFreq = count.toInt();
         const deviation = Math.abs(actualFreq - expectedFrequency);
@@ -426,21 +375,15 @@ async function testRandomness2(config = defaultConfig) {
 }
 
 
-async function testRandomness3(config = defaultConfig) {
-    console.log("Test 3");
-
-    const { mintersCount, slotsCount, prefixLength } = config;
+async function testRandomness1(config?: ConfigLike) {
+    const { mintersCount, slotsCount, prefixLength } = await preTest(1, "with random addresses", config);
 
     const minters: Uint160[] = [];
-
     for (let i = 0; i < mintersCount; i++) {
-        const address = Uint160.alloc();
-        address.set([i % 256], 0);
-        minters.push(address);
+        minters.push(hashNumber(i));
     }
 
-    let frequency = new Map<string, Uint160>();
-    const expectedFrequency = slotsCount / 256 ** prefixLength;
+    const frequency = new Map<string, Uint160>();
 
     for (let i = 0; i < slotsCount; i++) {
         const address = findBestKey(minters, hashNumber(i));
@@ -453,31 +396,77 @@ async function testRandomness3(config = defaultConfig) {
         }
     }
 
-    let totalDeviation = 0;
-    let highestDeviation = 0;
+    await calulateResults(frequency, slotsCount, prefixLength);
+}
 
-    for (let [prefix, count] of frequency) {
-        const actualFreq = count.toInt();
-        const deviation = Math.abs(actualFreq - expectedFrequency);
-        totalDeviation += deviation;
+async function testRandomness2(config?: ConfigLike) {
+    const { mintersCount, slotsCount, prefixLength } = await preTest(2, "with pseudo-random selection", config);
 
-        if (deviation > highestDeviation) {
-            highestDeviation = deviation;
+    const minters: Uint160[] = [];
+    for (let i = 0; i < mintersCount; i++) {
+        minters.push(hashNumber(i));
+    }
+
+    const frequency = new Map<string, Uint160>();
+
+    for (let i = 0; i < slotsCount; i++) {
+        const address = findPseudoRandomBestKey(minters, hashNumber(i), i);
+        const prefix = address.slice(0, prefixLength).toHex();
+
+        if (frequency.has(prefix)) {
+            (frequency.get(prefix) as Uint160).iadd(1);
+        } else {
+            frequency.set(prefix, Uint160.from(1));
         }
     }
 
-    console.log("Expexted Frequency:", expectedFrequency);
-    console.log("Highest Deviation:", highestDeviation);
+    await calulateResults(frequency, slotsCount, prefixLength);
+}
+
+
+async function testRandomness3(config?: ConfigLike) {
+    const { mintersCount, slotsCount, prefixLength } = await preTest(3, "with set prefixes for the adresses", config);
+
+    const minters: Uint160[] = [];
+    for (let i = 0; i < mintersCount; i++) {
+        const address = Uint160.alloc();
+        address.set([i % 256], 0);
+        minters.push(address);
+    }
+
+    const frequency = new Map<string, Uint160>();
+
+    for (let i = 0; i < slotsCount; i++) {
+        const address = findBestKey(minters, hashNumber(i));
+        const prefix = address.slice(0, prefixLength).toHex();
+
+        if (frequency.has(prefix)) {
+            (frequency.get(prefix) as Uint160).iadd(1);
+        } else {
+            frequency.set(prefix, Uint160.from(1));
+        }
+    }
+
+    await calulateResults(frequency, slotsCount, prefixLength);
 }
 
 (async () => {
+    
+    /*
     const config = {
-        mintersCount: 256,
-        slotsCount: 3_906,
+        mintersCount: 1,
+        slotsCount: 15.2578125,
         prefixLength: 1,
     };
+    */
 
-    await testRandomness1(config);
-    await testRandomness2(config);
+    const config: ConfigLike = {
+        mintersFactor: 1,
+        slotsFactor: 1,
+        prefixLen: 1,
+    };
+
+    //await testRandomness1(config);
+    //await testRandomness2(config);
     await testRandomness3(config);
 })();
