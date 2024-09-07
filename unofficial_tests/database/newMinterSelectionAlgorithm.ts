@@ -181,7 +181,7 @@ async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: 
 // }
 
 async function main() {
-    const mintersCount = 10_000_000;
+    const mintersCount = 1_000_000;
     const slotsCount = 1;
     const prefixLength = 1;
 
