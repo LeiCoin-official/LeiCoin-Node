@@ -104,7 +104,7 @@ async function main(gen = true, destroy = true) {
 
     if (gen) {
         level = await generateMinterDB(mintersCount);
-        console.log("Generated minter database");
+        console.log(`Generated minter database with ${mintersCount} minters`);
     } else {
         level = await LevelDBUtils.openDB("stake1");
         console.log("Initialized minter database");
