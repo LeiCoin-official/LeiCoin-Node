@@ -8,6 +8,9 @@ import { endTimer, startTimer } from "../testUtils.js";
 import { LevelDBUtils } from "./leveldb_utils.js";
 import crypto from "crypto";
 
+const metaSizeAddress = AddressHex.fromTypeAndBody(PX.META, Uint.from(2, 20));
+const firstMetaAddress = AddressHex.fromTypeAndBody(PX.META, Uint.alloc(20));
+
 async function generateMinterDB(size: number) {
 
     const level = await LevelDBUtils.openDB("stake1");
@@ -29,7 +32,10 @@ async function generateMinterDB(size: number) {
         );
     }
 
+    promises.push(level.put(metaSizeAddress, Uint64.from(size)));
+
     await Promise.all(promises);
+
     return level;
 }
 
@@ -37,10 +43,8 @@ async function getRandomKey(db: LevelDB, stepSize = 256): Promise<Uint> {
     // Step 1: First pass, sample keys to get ranges (every sampleSize-th key)
     const keyRanges: Uint[] = [];
 
-    const firstAddress = AddressHex.fromTypeAndBody(PX.A_0c, Uint.from(0))
-
     return new Promise(async (resolve, reject) => {
-        let stream = db.createKeyStream({gte: firstAddress});
+        let stream = db.createKeyStream({lt: firstMetaAddress});
         let count = 0;
 
         stream.on('data', (key: Uint) => {
@@ -56,7 +60,7 @@ async function getRandomKey(db: LevelDB, stepSize = 256): Promise<Uint> {
             console.log(count)
 
             if (keyRanges.length === 0) {
-                resolve(await getRandomKeyInRange(db, firstAddress, (await db.keys({gte: firstAddress}).all()).length));
+                resolve(await getRandomKeyInRange(db, Uint.from(0), (await db.keys({lt: firstMetaAddress}).all()).length));
             } else {
                 // Step 2: Randomly pick a key range
                 const randomRangeIndex = crypto.randomInt(0, keyRanges.length - 1);
@@ -82,7 +86,7 @@ async function getRandomKeyInRange(db: LevelDB, startKey: Uint, rangeSize: numbe
     const randomOffset = crypto.randomInt(0, rangeSize);
 
     return new Promise((resolve, reject) => {
-        let stream = db.createKeyStream({gte: startKey});
+        let stream = db.createKeyStream({gte: startKey, lt: firstMetaAddress});
 
         stream.on('data', (key: Uint) => {
             // Stop when we reach the random offset within the selected range
@@ -107,14 +111,16 @@ async function selectNextMinter(slot: Uint64, level: LevelDB): Promise<AddressHe
     //     (await level.keys({lte: slotHash, limit: 1}).all())[0]
     // );
 
-    return new Promise((resolve, reject) => {
-
-        const minterAddressesStream = level.createKeyStream({gte: AddressHex.fromTypeAndBody(PX.A_0c, Uint.from(0))});
+    return new Promise(async (resolve, reject) => {
+        const size = await level.get(metaSizeAddress);
+        const slotHash = AddressHex.fromTypeAndBody(PX.A_0e, LCrypt.sha256(slot).slice(0, 20));
+        const randomIndex = slotHash.mod(size);
 
         let count = Uint64.from(0);
+        const minterAddressesStream = level.createKeyStream({lt: firstMetaAddress});
 
         minterAddressesStream.on('data', (key: Uint) => {
-            if (count.eq(slot)) {
+            if (count.eq(randomIndex)) {
                 minterAddressesStream.destroy();
                 resolve(new AddressHex(key));
             }
@@ -180,19 +186,28 @@ async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: 
 
 // }
 
-async function main() {
+async function main(gen = true, destroy = true) {
     const mintersCount = 1_000_000;
-    const slotsCount = 1;
+    const slotsCount = 1
     const prefixLength = 1;
 
-    const level = await generateMinterDB(mintersCount);
-    console.log("Generated minter database");
+    let level: LevelDB;
+
+    if (gen) {
+        level = await generateMinterDB(mintersCount);
+        console.log("Generated minter database");
+    } else {
+        level = await LevelDBUtils.openDB("stake1");
+        console.log("Initialized minter database");
+    }
 
     console.log("Testing randomness of minter selection algorithm");
     await testRandomness(level, slotsCount, prefixLength);
 
     await level.close();
-    //await LevelDBUtils.destroyDB("stake1");
+    if (destroy) {
+        await LevelDBUtils.destroyDB("stake1");
+    }
 }
 
-await main();
+await main(false, false);

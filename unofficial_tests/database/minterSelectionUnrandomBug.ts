@@ -466,7 +466,7 @@ async function testRandomness3(config?: ConfigLike) {
 
     const config: ConfigLike = {
         mintersFactor: 256,
-        slotsFactor: 100_000,
+        slotsFactor: 15.2578125,
         prefixLen: 1
     };
 
