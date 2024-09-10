@@ -9,6 +9,7 @@ import { LCrypt } from "../../src/crypto/index.js";
 import { PX } from "../../src/objects/prefix.js";
 import { LevelDBUtils } from "./leveldb_utils.js";
 import { Dict } from "../../src/utils/dataUtils.js";
+import { gen_minter } from "./generateRandData.js";
 
 async function speedTest(db1: LevelDBUtils.DBs = "stake1", db2?: LevelDBUtils.DBs) {
 
@@ -356,11 +357,14 @@ async function test_minter_randomness(config: {
         
     // }
 
+    let totalDeviation = 0;
     let highestDeviation = 0;
 
     for (const [, count] of sortedResults) {
 
         const deviation = Math.abs(count.toInt() - expectedFrequency);
+
+        totalDeviation += deviation;
 
         if (deviation > highestDeviation) {
             highestDeviation = deviation;
@@ -368,6 +372,7 @@ async function test_minter_randomness(config: {
     }
 
     console.log(green_underline + "test_minter_randomness Results:" + reset);
+    console.log("- Total Deviation:", totalDeviation);
     console.log("- Expexted Frequency:", expectedFrequency);
     console.log("- Highest Deviation:", highestDeviation);
 
@@ -440,6 +445,7 @@ async function test_minter_randomness3(config: {
 
     function sha256(input: number) {
         return LCrypt.sha256(Uint64.from(input)).toHex();
+        //return LCrypt.randomBytes(32).toString("hex")
     }
 
     let frequency = {};
@@ -473,6 +479,54 @@ async function test_minter_randomness3(config: {
     }
 
     console.log(green_underline + "test_minter_randomness3 Results:" + reset);
+    console.log("- Total Deviation:", totalDeviation);
+    console.log("- Expexted Frequency:", expectedFrequency);
+    console.log("- Highest Deviation:", highestDeviation);
+
+}
+
+async function test_minter_randomness3_2(config: {
+    mintersCount: number,
+    slotsCount: number,
+    prefixLength: number
+} = {
+    mintersCount: 65536,
+    slotsCount: 1000000,
+    prefixLength: 1
+}) {
+    const { mintersCount, slotsCount, prefixLength } = config;
+
+    let frequency = {};
+    const expectedFrequency = slotsCount / mintersCount;
+
+    for (let i = 1; i <= slotsCount; i++) {
+        const prefix = Math.floor(Math.random() * slotsCount) % (256 ** prefixLength);
+
+        if (frequency[prefix]) {
+            frequency[prefix]++;
+        } else {
+            frequency[prefix] = 1;
+        }
+    }
+
+    let totalDeviation = 0;
+    let highestDeviation = 0;
+
+    const green_underline = "\x1b[38;2;0;150;0m\x1b[4m";
+    const reset = "\x1b[0m";
+
+    for (let prefix in frequency) {
+        const actualFreq = frequency[prefix];
+        const deviation = Math.abs(actualFreq - expectedFrequency);
+        totalDeviation += deviation;
+
+        if (deviation > highestDeviation) {
+            highestDeviation = deviation;
+        }
+    }
+
+    console.log(green_underline + "test_minter_randomness3_2 Results:" + reset);
+    console.log("- Total Deviation:", totalDeviation);
     console.log("- Expexted Frequency:", expectedFrequency);
     console.log("- Highest Deviation:", highestDeviation);
 
@@ -577,14 +631,14 @@ async function test_minter_randomness4(config: {
 
 
 
-test_minter_randomness({
-    mintersCount: 256,
-    slotsCount: 3906,
-    randomSlotIndexes: false,
-    randomMinters: false,
-    sortedBy: "count",
-    onlyFirstDigits: 1
-});
+// test_minter_randomness({
+//     mintersCount: 256,
+//     slotsCount: 3906,
+//     randomSlotIndexes: false,
+//     randomMinters: false,
+//     sortedBy: "count",
+//     onlyFirstDigits: 1
+// });
 
 // test_minter_randomness2({
 //     mintersCount: 10,
@@ -592,11 +646,24 @@ test_minter_randomness({
 // });
 
 test_minter_randomness3({
-    mintersCount: 256,
-    slotsCount: 3906,
+    // mintersCount: 256,
+    // slotsCount: 3906,
+    mintersCount: 1_000_000,
+    slotsCount: 1_000_000,
     //slotsCount: 512,
-    prefixLength: 1
+    prefixLength: 2
 });
+
+
+test_minter_randomness3_2({
+    // mintersCount: 256,
+    // slotsCount: 3906,
+    mintersCount: 1_000_000,
+    slotsCount: 1_000_000,
+    //slotsCount: 512,
+    prefixLength: 2
+});
+
 
 // test_minter_randomness4({
 //     mintersCount: 256,

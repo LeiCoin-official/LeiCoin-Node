@@ -12,20 +12,16 @@ const metaSizeAddress = AddressHex.fromTypeAndBody(PX.META, Uint.from(2, 20));
 const firstMetaAddress = AddressHex.fromTypeAndBody(PX.META, Uint.alloc(20));
 
 async function generateMinterDB(size: number) {
-
     const level = await LevelDBUtils.openDB("stake1");
-    
-    const validator_preifx = PX.A_0e;
-    const version_Prefix = PX.V_00;
 
     const promises: Promise<void>[] = [];
 
     for (let i = 0; i < size; i++) {
         promises.push(
             level.put(
-                AddressHex.fromTypeAndBody(validator_preifx, Uint.from(LCrypt.randomBytes(20))),
+                AddressHex.fromTypeAndBody(PX.A_0e, Uint.from(LCrypt.randomBytes(20))),
                 Uint.concat([
-                    version_Prefix,
+                    PX.V_00,
                     Uint64.from(32_0000_0000)
                 ])
             )
@@ -113,7 +109,7 @@ async function selectNextMinter(slot: Uint64, level: LevelDB): Promise<AddressHe
 
     return new Promise(async (resolve, reject) => {
         const size = await level.get(metaSizeAddress);
-        const slotHash = AddressHex.fromTypeAndBody(PX.A_0e, LCrypt.sha256(slot).slice(0, 20));
+        const slotHash = LCrypt.sha256(slot);
         const randomIndex = slotHash.mod(size);
 
         let count = Uint64.from(0);
@@ -135,23 +131,29 @@ async function calulateResults(frequency: UintMap<Uint64>, slotsCount: number, p
 
     let totalDeviation = 0;
     let highestDeviation = 0;
+    let highestDeviation_prefix: Uint | undefined;
 
-    for (let [, count] of frequency) {
+    for (let [prefix, count] of frequency) {
         const actualFreq = count.toInt();
         const deviation = Math.abs(actualFreq - expectedFrequency);
         totalDeviation += deviation;
 
         if (deviation > highestDeviation) {
             highestDeviation = deviation;
+            highestDeviation_prefix = prefix;
         }
     }
 
-    console.log("Expected Frequency:", expectedFrequency);
-    console.log("Highest Deviation:", highestDeviation);
+    console.log("- Expected Frequency:", expectedFrequency);
+    console.log("- Total Deviation:", totalDeviation);
+    console.log("- Highest Deviation:", highestDeviation);
+    console.log("- Highest Deviation Prefix:", highestDeviation_prefix?.toHex());
 }
 
 
 async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: number) {
+    console.log("Testing randomness of minter selection algorithm:");
+
     const addresses: AddressHex[] = [];
     
     const startTime = startTimer();
@@ -174,6 +176,41 @@ async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: 
     await calulateResults(frequency, slotsCount, prefixLength);
 }
 
+async function testDBRandomness(level: LevelDB, mintersCount: number, prefixLength: number) {
+    console.log("\nRandomness of Database:");
+
+    const frequency = new UintMap<Uint64>();
+
+    for await (const address of level.keys({lt: firstMetaAddress})) {
+        const prefix = address.slice(1, prefixLength + 1);
+        if (!frequency.has(prefix)) {
+            frequency.set(prefix, Uint64.from(0));
+        } else {
+            frequency.get(prefix)!.iadd(1);
+        }
+    }
+    await calulateResults(frequency, mintersCount, prefixLength);
+}
+
+async function testNumberRandomness(mintersCount: number, slot_count: number, prefixLength: number) {
+    console.log("\nRandomness of Index Generation:");
+
+    const frequency = new UintMap<Uint64>();
+
+    for (let i = 0; i < slot_count; i++) {
+        const slotHash = LCrypt.sha256(Uint64.from(i));
+        const randomIndex = Uint.from(slotHash.mod(mintersCount), prefixLength);
+
+        if (!frequency.has(randomIndex)) {
+            frequency.set(randomIndex, Uint64.from(0));
+        } else {
+            frequency.get(randomIndex)!.iadd(1);
+        }
+    }
+    await calulateResults(frequency, slot_count, prefixLength);
+
+}
+
 // async function testMathRandomness(minters: AddressHex[], slotsCount: number) {
 //     const frequency = new UintMap<Uint64>(minters.map(address => [address.getBody().slice(1, prefixLength), Uint64.from(0)]));
 //     for (const address of minters) {
@@ -187,8 +224,10 @@ async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: 
 // }
 
 async function main(gen = true, destroy = true) {
-    const mintersCount = 1_000_000;
-    const slotsCount = 1
+    const mintersCount = 256;
+    const slotsCount = 3906;
+    // const mintersCount = 1_000_000;
+    // const slotsCount = 1;
     const prefixLength = 1;
 
     let level: LevelDB;
@@ -201,8 +240,9 @@ async function main(gen = true, destroy = true) {
         console.log("Initialized minter database");
     }
 
-    console.log("Testing randomness of minter selection algorithm");
     await testRandomness(level, slotsCount, prefixLength);
+    //await testDBRandomness(level, mintersCount, prefixLength);
+    //await testNumberRandomness(mintersCount, slotsCount, prefixLength);
 
     await level.close();
     if (destroy) {
@@ -210,4 +250,4 @@ async function main(gen = true, destroy = true) {
     }
 }
 
-await main(false, false);
+await main(true, true);
