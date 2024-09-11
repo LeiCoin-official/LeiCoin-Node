@@ -43,7 +43,7 @@ async function run(args: string[]) {
     const msg = `Run at ${new Date().toUTCString()} with minterCount: ${minterCount}, slotCount: ${slotCount}, prefixLength: ${prefixLength}`;
 
     console.log(msg);
-    touchFileIfNotExists("result.log", msg, `\n${msg}`);
+    touchFileIfNotExists("result.log", msg, `\n${msg}\n`);
 
     await Bun.$`${{ raw: cmd }}`.nothrow();
 }
