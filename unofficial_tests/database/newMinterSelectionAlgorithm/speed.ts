@@ -23,13 +23,14 @@ async function main() {
     const mintersCount = parseInt(args[0]) || 1000;
     const slotsCount = parseInt(args[1]) || 1000;
 
+    await LevelDBUtils.destroyDB("stake4");
+
     const level = await generateMinterDB(mintersCount);
     console.log(`Generated minter database with ${mintersCount} minters`);
 
     await testSpeed(level, slotsCount);
 
     await level.close();
-    await LevelDBUtils.destroyDB("stake4");
 }
 
 main()

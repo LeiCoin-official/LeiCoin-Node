@@ -93,7 +93,6 @@ async function testNumberRandomness(mintersCount: number, slot_count: number, pr
 }
 
 async function main(gen = true, destroy = true) {
-
     const args = process.argv.slice(2);
 
     const mintersCount = parseInt(args[0]) || 1000;
@@ -101,6 +100,9 @@ async function main(gen = true, destroy = true) {
     const prefixLength = parseInt(args[2]) | 1;
 
     let level: LevelDB;
+    if (destroy) {
+        await LevelDBUtils.destroyDB("stake1");
+    }
 
     if (gen) {
         level = await generateMinterDB(mintersCount);
@@ -115,9 +117,6 @@ async function main(gen = true, destroy = true) {
     //await testNumberRandomness(mintersCount, slotsCount, prefixLength);
 
     await level.close();
-    if (destroy) {
-        await LevelDBUtils.destroyDB("stake1");
-    }
 }
 
 await main(true, true);
