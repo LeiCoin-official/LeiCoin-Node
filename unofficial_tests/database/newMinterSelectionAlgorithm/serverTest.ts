@@ -39,10 +39,10 @@ async function run(args: string[]) {
 
     let cmd = `bun run ./unofficial_tests/database/newMinterSelectionAlgorithm/randomness.ts ${minterCount} ${slotCount}`;
     cmd += ` 2>&1 | tee -a ${getRelativePath("result.log")}`;
-    const consoleCMD = `\$ ${cmd}`;
+    const msg = `Run at ${new Date().toUTCString()} with minterCount: ${minterCount}, slotCount: ${slotCount}`;
 
-    console.log(consoleCMD);
-    touchFileIfNotExists("result.log", consoleCMD, `\n${consoleCMD}`);
+    console.log(msg);
+    touchFileIfNotExists("result.log", msg, `\n${msg}`);
 
     await Bun.$`${{ raw: cmd }}`.nothrow();
 }
