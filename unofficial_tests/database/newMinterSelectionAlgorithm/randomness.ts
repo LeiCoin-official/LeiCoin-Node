@@ -26,7 +26,6 @@ async function calulateResults(frequency: UintMap<Uint64>, slotsCount: number, p
     }
 
     console.log("- Expected Frequency:", expectedFrequency);
-    console.log("- Total Deviation:", totalDeviation);
     console.log("- Highest Deviation:", highestDeviation);
     console.log("- Highest Deviation Prefix:", highestDeviation_prefix?.toHex());
 }
@@ -100,12 +99,10 @@ async function main(gen = true, destroy = true) {
     const prefixLength = parseInt(args[2]) | 1;
 
     let level: LevelDB;
-    if (destroy) {
-        await LevelDBUtils.destroyDB("stake1");
-    }
 
     if (gen) {
-        level = await generateMinterDB(mintersCount);
+        await LevelDBUtils.destroyDB("stake1");
+        level = await generateMinterDB(mintersCount, "stake1");
         console.log(`Generated minter database with ${mintersCount} minters`);
     } else {
         level = await LevelDBUtils.openDB("stake1");
@@ -117,6 +114,9 @@ async function main(gen = true, destroy = true) {
     //await testNumberRandomness(mintersCount, slotsCount, prefixLength);
 
     await level.close();
+    if (destroy) {
+        await LevelDBUtils.destroyDB("stake1");
+    }
 }
 
 await main(true, true);

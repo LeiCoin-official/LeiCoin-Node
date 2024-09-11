@@ -8,8 +8,8 @@ import { LevelDBUtils } from "../leveldb_utils.js";
 export const metaSizeAddress = AddressHex.fromTypeAndBody(PX.META, Uint.from(2, 20));
 export const firstMetaAddress = AddressHex.fromTypeAndBody(PX.META, Uint.alloc(20));
 
-export async function generateMinterDB(size: number) {
-    const level = await LevelDBUtils.openDB("stake1");
+export async function generateMinterDB(size: number, db: LevelDBUtils.DBs) {
+    const level = await LevelDBUtils.openDB(db);
 
     const promises: Promise<void>[] = [];
 

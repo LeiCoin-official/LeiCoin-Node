@@ -17,20 +17,31 @@ async function testSpeed(level: LevelDB, slotsCount: number) {
     console.log(`Average time per slot: ${(elapsedTime / slotsCount).toFixed(2)}ms`);
 }
 
-async function main() {
+async function main(gen = false, destroy = false) {
     const args = process.argv.slice(2);
 
     const mintersCount = parseInt(args[0]) || 1000;
     const slotsCount = parseInt(args[1]) || 1000;
 
-    await LevelDBUtils.destroyDB("stake4");
+    let level: LevelDB;
 
-    const level = await generateMinterDB(mintersCount);
+    if (gen) {
+        await LevelDBUtils.destroyDB("stake4");
+        level = await generateMinterDB(mintersCount, "stake4");
+        console.log(`Generated minter database with ${mintersCount} minters`);
+    } else {
+        level = await LevelDBUtils.openDB("stake4");
+        console.log("Initialized minter database");
+    }
+
     console.log(`Generated minter database with ${mintersCount} minters`);
 
     await testSpeed(level, slotsCount);
 
     await level.close();
+    if (destroy) {
+        await LevelDBUtils.destroyDB("stake4");
+    }
 }
 
 main()
