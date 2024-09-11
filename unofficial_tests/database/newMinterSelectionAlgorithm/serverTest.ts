@@ -36,10 +36,11 @@ function touchFileIfNotExists(path: string, contentIfNotExists = "", content = "
 async function run(args: string[]) {
     const minterCount = parseInt(args[0]) || 1000;
     const slotCount = parseInt(args[1]) || 1000;
+    const prefixLength = parseInt(args[2]) || 1;
 
-    let cmd = `bun run ./unofficial_tests/database/newMinterSelectionAlgorithm/randomness.ts ${minterCount} ${slotCount}`;
+    let cmd = `bun run ./unofficial_tests/database/newMinterSelectionAlgorithm/randomness.ts ${minterCount} ${slotCount} ${prefixLength}`;
     cmd += ` 2>&1 | tee -a ${getRelativePath("result.log")}`;
-    const msg = `Run at ${new Date().toUTCString()} with minterCount: ${minterCount}, slotCount: ${slotCount}`;
+    const msg = `Run at ${new Date().toUTCString()} with minterCount: ${minterCount}, slotCount: ${slotCount}, prefixLength: ${prefixLength}`;
 
     console.log(msg);
     touchFileIfNotExists("result.log", msg, `\n${msg}`);
