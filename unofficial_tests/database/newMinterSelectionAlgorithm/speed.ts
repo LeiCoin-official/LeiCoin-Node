@@ -44,4 +44,4 @@ async function main(gen = false, destroy = false) {
     }
 }
 
-main()
+await main(true, true);
