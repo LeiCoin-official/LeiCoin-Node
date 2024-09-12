@@ -31,9 +31,9 @@ events.on("leiCoinNodeStartup", () => {
 function selectMinterByIndex(index: number) {
     let sizeCount = 0;
 
-    let lastRange = ;
+    let lastRange = indexes.entries();
 
-    for (const [i, range] of indexes.entries()) {
+    for (const [i, range] of indexes.entries().slice(1)) {
         if (sizeCount + range.size > index) {
             return range.rangeStartingPoint;
         }

@@ -6,7 +6,7 @@ import { Uint, Uint256, Uint64 } from "../binary/uint.js";
 import { AddressHex } from "./address.js";
 import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";
-import Signature from "./signature.js";
+import Signature from "../crypto/signature.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Block {

@@ -1,6 +1,6 @@
 import elliptic from 'elliptic';
 import { FixedUint, Uint64, Uint8 } from "../binary/uint.js";
-import { PX } from './prefix.js';
+import { PX } from '../objects/prefix.js';
 
 export interface EllipticBinarySignature extends elliptic.ec.Signature {
     recoveryParam: number;

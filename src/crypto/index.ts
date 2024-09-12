@@ -1,14 +1,13 @@
 import crypto from "crypto";
-import elliptic from 'elliptic';
-import { Dict } from "../utils/dataUtils.js";
+import { type curve, ec as ellipticCurve } from 'elliptic';
 import { Uint, Uint256 } from "../binary/uint.js";
-import { EllipticBinarySignature, Signature } from "../objects/signature.js";
-import { PrivateKey, PublicKey } from "./cryptoKeys.js";
+import { Signature } from "./signature.js";
+import { KeyPair, PrivateKey, PublicKey, PublicKeyPair, SharedSecret } from "./cryptoKeys.js";
 import { PX } from "../objects/prefix.js";
 
 export class LCrypt {
 
-    static readonly ec = new elliptic.ec("secp256k1");
+    static readonly ec = new ellipticCurve("secp256k1");
 
     static sha256(input: Uint | Buffer) {
         return new Uint256(
@@ -20,9 +19,9 @@ export class LCrypt {
 
     static sign(hash: Uint256, signerType: PX, privateKey: PrivateKey) {
         try {
-            const keyPair = this.ec.keyFromPrivate(privateKey.getRaw());
-            const signature = keyPair.sign(hash.getRaw());
-            return Signature.fromElliptic(signerType, (signature as EllipticBinarySignature));
+            const keyPair = KeyPair.fromPrivate(privateKey);
+            const signature = keyPair.sign(hash);
+            return Signature.fromElliptic(signerType, signature);
         } catch (error: any) {
             return Signature.alloc();
         }
@@ -30,7 +29,7 @@ export class LCrypt {
 
      static getPublicKeyFromPrivateKey(privateKey: PrivateKey) {
         try {
-            return PublicKey.from(this.ec.keyFromPrivate(privateKey.getRaw()).getPublic(true, "array"));
+            return KeyPair.fromPrivate(privateKey).getPublic();
         } catch (error: any) {
             return PublicKey.empty();
         }
@@ -42,37 +41,11 @@ export class LCrypt {
                 hash.getRaw(),
                 signature.getElliptic(),
                 signature.getRecoveryParam()
-            ) as elliptic.curve.base.BasePoint).encode("array", true));
+            ) as curve.base.BasePoint).encode("array", true));
         } catch (error: any) {
             return PublicKey.empty();
         }
     }
-
-     static getPreparedObjectForHashing(obj: Dict<any>, excludedKeys: string[] = []): Dict<any> {
-        const deepSort = (input: any): any => {
-            if (typeof input !== 'object' || input === null) {
-                return input;
-            }
-
-            if (Array.isArray(input)) {
-                return input.map(deepSort);
-            }
-
-            const sortedObj: Dict<any> = {};
-            Object.keys(input)
-                .sort()
-                .forEach(key => {
-                    if (!excludedKeys.includes(key)) {
-                        sortedObj[key] = deepSort(input[key]);
-                    }
-                });
-            return sortedObj;
-        };
-
-        const sortedObj = deepSort(obj);
-        return sortedObj;
-    }
-
 
     static randomBytes(length: number) {
         return crypto.randomBytes(length);
@@ -81,6 +54,41 @@ export class LCrypt {
     static generatePrivateKey() {
         return new PrivateKey(this.ec.genKeyPair().getPrivate().toBuffer());
     }
+
+
+    static genPrivateKeyFromPasswd(passwd: string) {
+        return new PrivateKey(crypto.pbkdf2Sync(
+            passwd,
+            this.sha256(Uint.from(passwd, "utf8")).getRaw(),
+            100000,
+            32,
+            'sha256'
+        ));
+    }
+
+    static createSharedSecret(privateKey: PrivateKey, publicKey: PublicKey) {
+        const sourceKeyPair = KeyPair.fromPrivate(privateKey);
+        const destKeyPair = PublicKeyPair.fromPublic(publicKey);
+        return sourceKeyPair.derive(destKeyPair.getPublic());
+    }
+
+    static encryptData(data: Uint, sharedSecret: Uint256, algorithm = "aes-256-gcm") {
+        const iv = this.randomBytes(16);
+        const cipher = crypto.createCipheriv(algorithm, sharedSecret.getRaw(), iv);
+        const encrypted = Uint.concat([
+            cipher.update(data.getRaw()),
+            cipher.final()
+        ]);
+        return Uint.concat([iv, encrypted]);
+    }
+
+    static decryptData(data: Uint, sharedSecret: Uint256, algorithm = "aes-256-gcm") {
+        const iv = data.slice(0, 16);
+        const encrypted = data.slice(16);
+        const decipher = crypto.createDecipheriv(algorithm, sharedSecret.getRaw(), iv.getRaw());
+        return Uint.concat([decipher.update(encrypted.getRaw()), decipher.final()]);
+    }
+
 }
 
 export default LCrypt;

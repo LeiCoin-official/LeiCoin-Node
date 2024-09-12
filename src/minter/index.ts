@@ -7,7 +7,7 @@ import { Uint256, Uint64 } from "../binary/uint.js";
 import { Blockchain } from "../storage/blockchain.js";
 import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";
-import Signature from "../objects/signature.js";
+import Signature from "../crypto/signature.js";
 import LCrypt from "../crypto/index.js";
 import { MinterCredentials } from "../objects/minter.js";
 import { type Slot } from "../pos/slot.js";

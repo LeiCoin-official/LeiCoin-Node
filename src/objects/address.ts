@@ -3,7 +3,7 @@ import LCrypt from "../crypto/index.js";
 import { FixedUint, Uint, Uint256 } from "../binary/uint.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import { PX } from "./prefix.js";
-import Signature from "./signature.js";
+import Signature from "../crypto/signature.js";
 
 export class SpecificAddress extends FixedUint {
     

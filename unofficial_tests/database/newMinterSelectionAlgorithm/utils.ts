@@ -32,7 +32,42 @@ export async function generateMinterDB(size: number, db: LevelDBUtils.DBs) {
     return level;
 }
 
-async function selectNextMinter1(slot: Uint64, level: LevelDB): Promise<AddressHex> {
+
+class MinterIndexes {
+
+    private static indexes: Array<{
+        firstAddress: AddressHex,
+        size: number
+    }> = [];
+
+    static async init(level: LevelDB) {
+        for (const [i, address] of db.keys()) {
+            const currentRange = Math.round(i / range);
+            // select every n (=range) key
+            if (i % range === 0) {
+                this.indexes[currentRange] = {
+                    rangeStartingPoint: address,
+                    size: 1
+                }
+            }
+            indexes[currentRange].size++;
+        }
+    }
+
+    public next(): Uint64 {
+        const randomIndex = LCrypt.sha256(this.currentIndex).mod(this.size);
+        const index = this.indexes[randomIndex.toInt()];
+
+        this.indexes[randomIndex.toInt()] = this.currentIndex;
+        this.currentIndex = this.currentIndex.add(1);
+
+        return index;
+    }
+
+}
+
+
+async function selectNextMinter(slot: Uint64, level: LevelDB): Promise<AddressHex> {
     const size = await level.get(metaSizeAddress);
     const randomIndex = LCrypt.sha256(slot).mod(size);
 
@@ -48,19 +83,3 @@ async function selectNextMinter1(slot: Uint64, level: LevelDB): Promise<AddressH
     process.exit(1); // Should never reach this point
 }
 
-async function selectNextMinter2(slot: Uint64, level: LevelDB): Promise<AddressHex> {
-    let count = 0;
-    let randomAddress: AddressHex | null = null;
-
-    const minterAddressesStream = level.createKeyStream({lt: firstMetaAddress});
-
-    for await (const key of minterAddressesStream) {
-        count++;
-        if (Math.random() < 1 / count) {
-            randomAddress = new AddressHex(key);
-        }
-    }
-    return randomAddress as AddressHex;
-}
-
-export { selectNextMinter1 as selectNextMinter };
