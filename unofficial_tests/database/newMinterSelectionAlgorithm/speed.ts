@@ -1,15 +1,16 @@
 import { Uint64 } from "../../../src/binary/uint.js";
 import { type LevelDB } from "../../../src/storage/leveldb/index.js";
+import { type LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
 import { endTimer, startTimer } from "../../testUtils.js";
 import { LevelDBUtils } from "../leveldb_utils.js";
-import { generateMinterDB, selectNextMinter } from "./utils.js";
+import { generateMinterDB, indexDB, selectNextMinter } from "./utils.js";
 
-async function testSpeed(level: LevelDB, slotsCount: number) {
+async function testSpeed(level: LevelDB, indexes: LevelIndexes, slotsCount: number) {
     console.log("Testing speed...");
     
     const startTime = startTimer();
     for (let i = 0; i < slotsCount; i++) {
-        await selectNextMinter(Uint64.from(i), level);
+        await selectNextMinter(Uint64.from(i), level, indexes);
     }
     const elapsedTime = endTimer(startTime);
 
@@ -34,9 +35,9 @@ async function main(gen = false, destroy = false) {
         console.log("Initialized minter database");
     }
 
-    console.log(`Generated minter database with ${mintersCount} minters`);
+    const indexes = await indexDB(level);
 
-    await testSpeed(level, slotsCount);
+    await testSpeed(level, indexes, slotsCount);
 
     await level.close();
     if (destroy) {

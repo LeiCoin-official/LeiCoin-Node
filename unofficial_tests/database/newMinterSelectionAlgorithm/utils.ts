@@ -3,6 +3,7 @@ import LCrypt from "../../../src/crypto/index.js";
 import { AddressHex } from "../../../src/objects/address.js";
 import { PX } from "../../../src/objects/prefix.js";
 import { type LevelDB } from "../../../src/storage/leveldb/index.js";
+import { LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
 import { LevelDBUtils } from "../leveldb_utils.js";
 
 export const metaSizeAddress = AddressHex.fromTypeAndBody(PX.META, Uint.from(2, 20));
@@ -33,41 +34,7 @@ export async function generateMinterDB(size: number, db: LevelDBUtils.DBs) {
 }
 
 
-class MinterIndexes {
-
-    private static indexes: Array<{
-        firstAddress: AddressHex,
-        size: number
-    }> = [];
-
-    static async init(level: LevelDB) {
-        for (const [i, address] of db.keys()) {
-            const currentRange = Math.round(i / range);
-            // select every n (=range) key
-            if (i % range === 0) {
-                this.indexes[currentRange] = {
-                    rangeStartingPoint: address,
-                    size: 1
-                }
-            }
-            indexes[currentRange].size++;
-        }
-    }
-
-    public next(): Uint64 {
-        const randomIndex = LCrypt.sha256(this.currentIndex).mod(this.size);
-        const index = this.indexes[randomIndex.toInt()];
-
-        this.indexes[randomIndex.toInt()] = this.currentIndex;
-        this.currentIndex = this.currentIndex.add(1);
-
-        return index;
-    }
-
-}
-
-
-async function selectNextMinter(slot: Uint64, level: LevelDB): Promise<AddressHex> {
+export async function selectNextMinter1(slot: Uint64, level: LevelDB, indexes?: any) {
     const size = await level.get(metaSizeAddress);
     const randomIndex = LCrypt.sha256(slot).mod(size);
 
@@ -83,3 +50,31 @@ async function selectNextMinter(slot: Uint64, level: LevelDB): Promise<AddressHe
     process.exit(1); // Should never reach this point
 }
 
+
+export async function indexDB(level: LevelDB) {
+    const indexes = new LevelIndexes(level, 20, PX.A_0e);
+    await indexes.load();
+    return indexes;
+}
+
+export async function selectNextMinter2(slot: Uint64, level: LevelDB, indexes: LevelIndexes) {
+    const size = await level.get(metaSizeAddress);
+    const randomIndex = LCrypt.sha256(slot).mod(size);
+
+    const { range, offset } = await indexes.getRangeByIndex(Uint64.from(randomIndex));
+
+    const count = Uint64.from(0);
+
+    const minterAddressesStream = level.createKeyStream({gte: range.firstPossibleKey, lte: range.lastPossibleKey});
+    for await (const key of minterAddressesStream) {
+        if (count.eq(offset)) {
+            minterAddressesStream.destroy();
+            return new AddressHex(key);
+        }
+        count.iadd(1);
+    }
+
+    throw new Error("Index is not part of any range. Are the ranges initialized?");
+}
+
+export { selectNextMinter2 as selectNextMinter };

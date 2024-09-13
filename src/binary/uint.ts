@@ -3,7 +3,7 @@ type New<T> = new(input: Uint | Buffer) => T;
 
 export interface BasicUintConstructable<T extends Uint> extends New<T> {
     
-    alloc(length?: number): T;
+    alloc(length?: number, fill?: string | Uint8Array | number): T;
     create(input: Buffer | Uint): T;
 
     from(arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;
@@ -16,7 +16,7 @@ export interface BasicUintConstructable<T extends Uint> extends New<T> {
 
 export interface FixedUintConstructable<T extends FixedUint> extends BasicUintConstructable<T> {
     byteLength: number;
-    alloc(): T;
+    alloc(fill?: string | Uint8Array | number): T;
 }
 
 
@@ -59,9 +59,9 @@ export class Uint {
         return new this(input);
     }
 
-    public static alloc<T>(this: New<T>, length: number): T;
-    public static alloc(length: number) {
-        return new this(Buffer.alloc(length));
+    public static alloc<T>(this: New<T>, length: number, fill?: string | Uint8Array | number): T;
+    public static alloc(length: number, fill?: string | Uint8Array | number) {
+        return new this(Buffer.alloc(length, fill));
     }
 
     public static empty<T>(this: New<T>): T;
@@ -77,7 +77,7 @@ export class Uint {
         let uint: Uint;
         let buffer: Buffer;
         if (typeof input === "number") {
-            uint = this.alloc(arg2 || (Math.floor(input.toString(16).length / 2) + 1));
+            uint = this.alloc(arg2 || Math.ceil(input.toString(16).length / 2));
             uint.iadd(input);
             return uint;
         } else if (typeof input === "string" && arg2 === undefined) {
@@ -297,14 +297,19 @@ export class FixedUint extends Uint {
         super(buffer);
     }
 
-    public static alloc<T>(this: New<T>): T;
-    public static alloc() {
-        return new this(Buffer.alloc(this.byteLength));
-    }
-
     public static create<T>(this: New<T>, input: Uint | Buffer): T;
     public static create(input: Uint | Buffer) {
         return new this(UintUtils.correctByteLengthBuffer((input instanceof Uint ? input.getRaw() : input), this.byteLength));
+    }
+
+    public static alloc<T>(this: New<T>, fill?: string | Uint8Array | number): T;
+    public static alloc(fill?: string | Uint8Array | number) {
+        return new this(Buffer.alloc(this.byteLength, fill));
+    }
+
+    public static empty<T>(this: New<T>): T;
+    public static empty(this: FixedUintConstructable<Uint>) {
+        return this.alloc();
     }
 
     public static from<T>(this: New<T>, arrayBuffer: WithArrayBuffer, byteOffset?: number, length?: number): T;

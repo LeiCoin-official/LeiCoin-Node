@@ -3,9 +3,10 @@ import { Uint, Uint64 } from "../../../src/binary/uint.js";
 import LCrypt from "../../../src/crypto/index.js";
 import { AddressHex } from "../../../src/objects/address.js";
 import type LevelDB from "../../../src/storage/leveldb/index.js";
+import { type LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
 import { endTimer, startTimer } from "../../testUtils.js";
 import { LevelDBUtils } from "../leveldb_utils.js";
-import { firstMetaAddress, generateMinterDB, selectNextMinter } from "./utils.js";
+import { firstMetaAddress, generateMinterDB, indexDB, selectNextMinter } from "./utils.js";
 
 async function calulateResults(frequency: UintMap<Uint64>, slotsCount: number, prefixLength: number) {
     const expectedFrequency = slotsCount / 256 ** prefixLength;
@@ -31,7 +32,7 @@ async function calulateResults(frequency: UintMap<Uint64>, slotsCount: number, p
 }
 
 
-async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: number) {
+async function testRandomness(level: LevelDB, indexes: LevelIndexes, slotsCount: number, prefixLength: number) {
     console.log("Testing randomness of minter selection algorithm:");
 
     const addresses: AddressHex[] = [];
@@ -39,7 +40,7 @@ async function testRandomness(level: LevelDB, slotsCount: number, prefixLength: 
     const startTime = startTimer();
 
     for (let i = 0; i < slotsCount; i++) {
-        addresses[i] = await selectNextMinter(Uint64.from(i), level);
+        addresses[i] = await selectNextMinter(Uint64.from(i), level, indexes);
     }
 
     const elapsedTime = endTimer(startTime);
@@ -96,7 +97,7 @@ async function main(gen = true, destroy = true) {
 
     const mintersCount = parseInt(args[0]) || 1000;
     const slotsCount = parseInt(args[1]) || 1000;
-    const prefixLength = parseInt(args[2]) | 1;
+    const prefixLength = parseInt(args[2]) || 1;
 
     let level: LevelDB;
 
@@ -109,7 +110,9 @@ async function main(gen = true, destroy = true) {
         console.log("Initialized minter database");
     }
 
-    await testRandomness(level, slotsCount, prefixLength);
+    const indexes = await indexDB(level);
+
+    await testRandomness(level, indexes, slotsCount, prefixLength);
     //await testDBRandomness(level, mintersCount, prefixLength);
     //await testNumberRandomness(mintersCount, slotsCount, prefixLength);
 
