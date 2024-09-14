@@ -62,7 +62,9 @@ export class Verification {
     public static async verifyMintedBlock(block: Block | null): Promise<VCode> {
         if (!block) return 12501;
 
-        const currentSlot = POS.getCurrentSlot();
+        const currentSlot = await POS.getCurrentSlot();
+
+        console.log(POS.calulateCurrentSlotIndex());
 
         if (!currentSlot) return 12500;
 

@@ -1,5 +1,9 @@
 import { EventEmitter } from "events";
 import cli from "../cli/cli.js";
+import HTTP_API from "../http_api/index.js";
+import POS from "../pos/index.js";
+import LeiCoinNetNode from "../leicoin-net/index.js";
+import { Blockchain } from "../storage/blockchain.js";
 
 class Utils {
     private static initialized = false;
@@ -31,7 +35,14 @@ class Utils {
     static async gracefulShutdown(exitCode: number = 0) {
         try {
             this.runStatus = exitCode === 0 ? "shutdown" : "shutdown_on_error";
-            this.events.emit("stop_server");
+            
+            await Promise.all([
+                HTTP_API.stop(),
+                POS.stop(),
+                LeiCoinNetNode.stop()
+            ]);
+
+            await Blockchain.stop();
             
             cli.default.info('Shutting down...');
 

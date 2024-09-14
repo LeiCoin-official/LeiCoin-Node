@@ -46,9 +46,7 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API> {
         }
     }
 
-    private static async setupEvents(eventHandler: EventEmitter) {
-        eventHandler.once("stop_server", async() => await this.stop());
-    }
+    private static async setupEvents(eventHandler: EventEmitter) {}
 }
 
 export default HTTP_API;

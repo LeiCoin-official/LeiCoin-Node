@@ -168,5 +168,3 @@ class LocalNodeTestNet {
 
 
 await LocalNodeTestNet.run();
-
-export {};

@@ -4,9 +4,9 @@ import { Uint, Uint64 } from "../../binary/uint.js";
 export class LevelKeyIndexRange {
 
     constructor(
-        private rangeStartingPoint: Uint,
-        private byteLength: number,
-        private prefix: Uint,
+        protected rangeStartingPoint: Uint,
+        protected byteLength: number,
+        protected prefix: Uint,
         public size: Uint64
     ) {}
 
@@ -42,13 +42,20 @@ export class LevelIndexes {
 
     static readonly rangeSize = 256;
 
-    private initialized = false;
+    protected initialized = false;
 
+    /**
+     * Constructs a new instance of the class.
+     * @param level - An instance of LevelDB used for database operations.
+     * @param byteLength - The length in bytes without the prefix for keys.
+     * @param prefix - A Uint representing the prefix for keys (default is an empty Uint).
+     * @param ranges - An array of LevelKeyIndexRange defining the ranges for indexing (default is an empty array).
+     */
     constructor(
-        private readonly level: LevelDB,
-        private readonly byteLength: number,
-        private readonly prefix: Uint = Uint.alloc(0),
-        private readonly ranges: LevelKeyIndexRange[] = []
+        protected readonly level: LevelDB,
+        protected readonly byteLength: number,
+        protected readonly prefix: Uint = Uint.alloc(0),
+        protected readonly ranges: LevelKeyIndexRange[] = []
     ) {}
 
     async load() {
@@ -99,6 +106,15 @@ export class LevelIndexes {
 
     async removeKey(key: Uint) {
         (await this.getRange(key)).size.isub(1);
+    }
+
+    async getTotalSize() {
+        let totalSize = Uint64.from(0);
+
+        for (const range of this.ranges) {
+            totalSize.iadd(range.size);
+        }
+        return totalSize;
     }
 
 }

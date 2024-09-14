@@ -8,14 +8,14 @@ import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
 export class Minter {
 
-    public readonly address: AddressHex;
     private readonly stake: Uint64;
-    public readonly version: PX;
 
-    constructor(address: AddressHex, stake: Uint64, version = PX.V_00) {
-        this.address = address;
+    constructor(
+        readonly address: AddressHex,
+        stake: Uint64,
+        readonly version = PX.V_00
+    ) {
         this.stake = stake.clone();
-        this.version = version;
     }
 
     public getStake() {

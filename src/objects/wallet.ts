@@ -9,16 +9,17 @@ import LCrypt from "../crypto/index.js";
 
 export class Wallet {
 
-    public readonly owner: AddressHex;
     private readonly balance: Uint64;
     private readonly nonce: Uint64;
-    public readonly version: PX;
 
-    constructor(owner: AddressHex, balance: Uint64, nonce: Uint64, version = PX.V_00) {
-        this.owner = owner;
+    constructor(
+        readonly owner: AddressHex,
+        balance: Uint64,
+        nonce: Uint64,
+        readonly version = PX.V_00
+    ) {
         this.balance = balance.clone();
         this.nonce = nonce.clone();
-        this.version = version;
     }
 
     public static createEmptyWallet(owner: AddressHex) {

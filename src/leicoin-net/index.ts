@@ -121,9 +121,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         }
     }
 
-    private static async setupEvents(eventHandler: EventEmitter) {
-        eventHandler.once("stop_server", async() => await this.stop());
-    }
+    private static async setupEvents(eventHandler: EventEmitter) {}
 
 }
 

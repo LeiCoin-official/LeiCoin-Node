@@ -58,7 +58,7 @@ export async function indexDB(level: LevelDB) {
 }
 
 export async function selectNextMinter2(slot: Uint64, level: LevelDB, indexes: LevelIndexes) {
-    const size = await level.get(metaSizeAddress);
+    const size = await indexes.getTotalSize();
     const randomIndex = LCrypt.sha256(slot).mod(size);
 
     const { range, offset } = await indexes.getRangeByIndex(Uint64.from(randomIndex));

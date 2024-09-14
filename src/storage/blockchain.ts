@@ -124,11 +124,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         }
     }
 
-    private static async setupEvents() {
-        utils.events.once("stop_server", async () => {
-            await this.stop();
-        });
-    }
+    private static async setupEvents() {}
 
     static async stop() {
         cli.data.info("Saving blockchain data...");

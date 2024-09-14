@@ -1,7 +1,7 @@
 import { Blockchain } from "../../storage/blockchain.js";
-import { Uint, Uint64 } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
+import { DataUtils } from "../../utils/dataUtils.js";
 
 export default class ChainstateDataCMD extends CLISubCMD {
     public name = "chainstate";
@@ -22,12 +22,7 @@ class ReadCMD extends CLICMD {
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         const chainstate = Blockchain.chainstate.getCompleteChainStateData();
-        cli.cmd.info(JSON.stringify(chainstate, (key, value) => {
-            if (value instanceof Uint) {
-                return value.toHex();
-            }
-            return value;
-        }, 2));
+        cli.cmd.info(DataUtils.stringify(chainstate, null, 2));
     }
 }
 
