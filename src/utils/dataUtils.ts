@@ -1,3 +1,4 @@
+import { Uint, Uint64 } from "../binary/uint";
 
 export type ObjORNull<T> = T | null;
 
@@ -43,11 +44,15 @@ export type Static<
 
 
 
-interface IBasicModuleLike {
+export interface IBasicModuleLike {
+    initialized: boolean;
+
     init(...args: any[]): Promise<void> | void;
     stop(...args: any[]): Promise<void> | void;
 }
-interface IModuleLike extends IBasicModuleLike {
+export interface IModuleLike extends IBasicModuleLike {
+    started: boolean;
+
     start(...args: any[]): Promise<void> | void;
 }
 export type BasicModuleLike<C extends New<InstanceType<C>> | AbstractNew<InstanceType<C>>> = Static<C, IBasicModuleLike>;
@@ -58,7 +63,7 @@ export type ModuleLike<C extends New<InstanceType<C>> | AbstractNew<InstanceType
 export class DataUtils {
 
     // Function to get the current date and time as a formatted string
-    public static getCurrentLogTime() {
+    static getCurrentLogTime() {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -70,7 +75,7 @@ export class DataUtils {
     }
 
     // Define a function to create an instance of a class from a JSON object
-    public static createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
+    static createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
         // Retrieve the constructor of the class
         //const constructor = cls as any;
     
@@ -119,7 +124,7 @@ export class DataUtils {
     }
     */
 
-    public static replaceAtIndex(str: string, searchValue: string, replaceValue: string, index: number) {
+    static replaceAtIndex(str: string, searchValue: string, replaceValue: string, index: number) {
         if (index < 0 || index >= str.length) {
             return str;
         }
@@ -128,6 +133,25 @@ export class DataUtils {
             return str;
         }
         return str.substring(0, nextIndex) + replaceValue + str.substring(nextIndex + searchValue.length);
+    }
+
+    static stringify(obj: any, replacer?: ((key: string, value: any) => any) | null, space?: string | number) {
+        return JSON.stringify(obj, (key: string, value: any) => {
+            
+            if (replacer) {
+                const result = replacer(key, value);
+                if (result) return result;
+            }
+
+            if (value instanceof Uint64) {
+                return value.toBigInt().toString();
+            } else if (value instanceof Uint) {
+                return value.toHex();
+            }
+
+            return value;
+
+        }, space);
     }
 
 }

@@ -1,9 +1,9 @@
 import { type Block } from "../../objects/block.js";
 import { Blockchain } from "../../storage/blockchain.js";
-import { Uint } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
+import { DataUtils } from "../../utils/dataUtils.js";
 
 export default class BlockDBCMD extends CLISubCMD {
     public name = "blockdb";
@@ -31,12 +31,7 @@ class ReadCMD extends CLICMD {
         const blockIndex = args[0];
         const block = Blockchain.blocks.getBlock(blockIndex).data as Block;
         if (block) {
-            cli.cmd.info(JSON.stringify(block, (key, value) => {
-                if (value instanceof Uint) {
-                    return value.toHex();
-                }
-                return value;
-            }, 2));
+            cli.cmd.info(DataUtils.stringify(block, null, 2));
         } else {
             cli.cmd.info(`Block with Index: ${blockIndex} not found!`);
         }

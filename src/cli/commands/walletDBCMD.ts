@@ -2,10 +2,11 @@ import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
 import Wallet from "../../objects/wallet.js";
 import { Blockchain } from "../../storage/blockchain.js";
-import { Uint, Uint64 } from "../../binary/uint.js";
+import { Uint64 } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
+import { DataUtils } from "../../utils/dataUtils.js";
 
 export default class WalletDBCMD extends CLISubCMD {
     public name = "walletdb";
@@ -45,16 +46,10 @@ class ReadCMD extends CLICMD {
         const address = AddressHex.from(args[0]);
         const wallet = await Blockchain.wallets.getWallet(address);
         if (await Blockchain.wallets.existsWallet(address)) {
-            cli.cmd.info(JSON.stringify(wallet, (key, value) => {
-                if (value instanceof Uint64) {
-                    if (key === "balance") {
-                        return (value.toInt() / 100).toFixed(2);
-                    }
-                    return value.toInt();
-                } else if (value instanceof Uint) {
-                    return value.toHex();
+            cli.cmd.info(DataUtils.stringify(wallet, (key, value) => {
+                if (key === "balance") {
+                    return (value.toInt() / 100).toFixed(2);
                 }
-                return value;
             }, 2));
         } else {
             cli.cmd.info("Wallet not found!");

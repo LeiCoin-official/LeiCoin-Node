@@ -13,7 +13,7 @@ const LevelDBEncoder = {
         return val instanceof Uint ? val.getRaw(): val;
     },
     decode: (val: Uint8Array) => {
-        return new Uint(Buffer.from(val));
+        return Uint.from(val);
     }
 }
 
@@ -24,7 +24,7 @@ const RocksDBEncoder = {
         return val instanceof Uint ? val.getRaw(): val;
     },
     decode: (val: Uint8Array) => {
-        return new Uint(Buffer.from(val));
+        return Uint.from(val);
     }
 }
 

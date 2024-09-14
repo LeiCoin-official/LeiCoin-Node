@@ -5,6 +5,8 @@ import { type Uint } from "../../binary/uint.js";
 import POS from "../../pos/index.js";
 import { type Slot } from "../../pos/slot.js";
 import { Pipeline } from "./abstractPipeline.js";
+import cli from "../../cli/cli.js";
+import { VCodes } from "../../verification/codes.js";
 
 export default class BlockPipeline extends Pipeline {
     readonly id = "2096";
@@ -12,10 +14,15 @@ export default class BlockPipeline extends Pipeline {
     async receive(type: LNPPX, data: Uint) {
         const block = Block.fromDecodedHex(data) as Block;
 
-        if (await Verification.verifyMintedBlock(block) !== 12000) return;
+        const verification_result = await Verification.verifyMintedBlock(block);
+
+        if (verification_result !== 12000) {
+            cli.data.info(`Block rejected. Code: ${verification_result}, Message: ${VCodes[verification_result]}`);
+            return;
+        }
 
         this.broadcast(type, data);
-        (POS.getSlot(block.slotIndex) as Slot).processBlock(block);
+        (await POS.getSlot(block.slotIndex) as Slot).processBlock(block);
 
     }
     

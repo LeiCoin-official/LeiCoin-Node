@@ -3,9 +3,9 @@ import { AddressHex } from "../../src/objects/address.js";
 import Transaction from "../../src/objects/transaction.js";
 import Wallet, { SecretWallet } from "../../src/objects/wallet.js";
 import { Blockchain } from "../../src/storage/blockchain.js";
-import { Uint, Uint256, Uint64 } from "../../src/utils/binary.js";
+import { Uint, Uint256, Uint64 } from "../../src/binary/uint.js";
 import { PX } from "../../src/objects/prefix.js";
-import Signature from "../../src/objects/signature.js";
+import Signature from "../../src/crypto/signature.js";
 import Verification from "../../src/verification/index.js";
 import fs from "fs";
 import Block from "../../src/objects/block.js";
@@ -173,7 +173,7 @@ export class TXSpeedTest {
     }
 
     public static async end() {
-        await Blockchain.close();
+        await Blockchain.stop();
 
         fs.rmSync(__dirname + "/blockchain_data", {recursive: true});
         fs.rmSync(__dirname + "/logs", {recursive: true});

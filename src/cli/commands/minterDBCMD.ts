@@ -6,6 +6,7 @@ import { Uint, Uint64 } from "../../binary/uint.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
+import { DataUtils } from "../../utils/dataUtils.js";
 
 export default class MinterDBCMD extends CLISubCMD {
     public name = "minterdb";
@@ -46,16 +47,10 @@ class ReadCMD extends CLICMD {
         const minterAddress = args[0];
         const minter = await Blockchain.minters.getMinter(AddressHex.from(minterAddress));
         if (minter) {
-            cli.cmd.info(JSON.stringify(minter, (key, value) => {
-                if (value instanceof Uint64) {
-                    if (key === "stake") {
-                        return (value.toInt() / 100).toFixed(2);
-                    }
-                    return value.toInt();
-                } else if (value instanceof Uint) {
-                    return value.toHex();
+            cli.cmd.info(DataUtils.stringify(minter, (key, value) => {
+                if (key === "stake") {
+                    return (value.toInt() / 100).toFixed(2);
                 }
-                return value;
             }, 2));
         } else {
             cli.cmd.info("Minter not found!");

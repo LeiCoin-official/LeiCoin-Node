@@ -1,8 +1,9 @@
 import path from "path";
 import fs from "fs";
 import cli from "../cli/cli.js";
-import utils from "../utils/index.js";
+import Utils from "../utils/index.js";
 import { Uint } from "../binary/uint.js";
+import readline from "readline";
 
 class BCUtils {
 
@@ -14,28 +15,28 @@ class BCUtils {
         return '/blockchain_data' + forkpath + subpath;
     }
 
-    public static getBlockchainDataFilePath(subpath: string, fork = "main") {
-        return path.join(utils.procCWD, this.getRelativePath(subpath, fork));
+    static getBlockchainDataFilePath(subpath: string, fork = "main") {
+        return path.join(Utils.procCWD, this.getRelativePath(subpath, fork));
     }
 
-    public static readFile(filePath: string, fork: string) {
+    static readFile(filePath: string, fork: string) {
         return new Uint(fs.readFileSync(this.getBlockchainDataFilePath(filePath, fork), null));
     }
 
-    public static existsPath(fileORDirPath: string, fork: string) {
+    static existsPath(fileORDirPath: string, fork: string) {
         return fs.existsSync(this.getBlockchainDataFilePath(fileORDirPath, fork));
     }
 
-    public static writeFile(filePath: string, fork: string, data: Uint) {
+    static writeFile(filePath: string, fork: string, data: Uint) {
         return fs.writeFileSync(this.getBlockchainDataFilePath(filePath, fork), data.getRaw());
     }
     
-    public static mkDir(directoryPath: string, fork: string) {
+    static mkDir(directoryPath: string, fork: string) {
         return fs.mkdirSync(this.getBlockchainDataFilePath(directoryPath, fork), { recursive: true });
     }
     
     // Function to ensure the existence of a directory
-    public static ensureDirectoryExists(directoryPath: string, fork: string) {
+    static ensureDirectoryExists(directoryPath: string, fork: string) {
         try {
             if (!this.existsPath(directoryPath, fork)) {
                 this.mkDir(directoryPath, fork);
@@ -47,7 +48,7 @@ class BCUtils {
     }
     
     // Function to ensure the existence of a file
-    public static ensureFileExists(
+    static ensureFileExists(
         filePath: string,
         fork: string,
         content: Uint
@@ -66,7 +67,7 @@ class BCUtils {
     
     // // Function to check if a file is empty or contains an empty JSON object or array
     // /** @deprecated Needs recoding */
-    // public static isFileNotEmpty(filePath: string, jsonFormat = '[]') {
+    // static isFileNotEmpty(filePath: string, jsonFormat = '[]') {
     //     try {
     //         const content = fs.readFileSync(this.getBlockchainDataFilePath(filePath), 'utf8');
     //         let jsonData;
@@ -92,7 +93,7 @@ class BCUtils {
     
     // // Function to check if a directory is empty
     // /** @deprecated Needs recoding */
-    // public static isDirectoryNotEmpty(directoryPath: any) {
+    // static isDirectoryNotEmpty(directoryPath: any) {
     //     try {
     //         const fullDirectoryPath = this.getBlockchainDataFilePath(directoryPath);
     //         const files = fs.readdirSync(fullDirectoryPath);
@@ -101,6 +102,31 @@ class BCUtils {
     //         this.ensureDirectoryExists(directoryPath);
     //     }
     // }
+
+    static async readLastNLines(filePath: string, n: number): Promise<string> {
+        try {
+            const fileStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+    
+            const rl = readline.createInterface({
+                input: fileStream,
+                crlfDelay: Infinity
+            });
+        
+            const lines: string[] = [];
+            for await (const line of rl) {
+                if (!line) continue;
+                lines.push(line);
+                if (lines.length > n) {
+                    lines.shift(); // Remove the oldest line when we exceed `n` lines
+                }
+            }
+        
+            return lines.join();
+        } catch (err: any) {
+            throw new Error(`Error reading the last ${n} lines of the file at ${filePath}`);
+        }
+    }
+    
 }
 
 export { BCUtils as BlockchainUtils };

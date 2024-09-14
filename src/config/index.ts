@@ -14,47 +14,46 @@ export interface ConfigLike extends GeneralConfigLike, ENVConfigLike {
 }
 
 
-class Config {
+export class Configs {
 
-    private config: ConfigLike | null = null;
-
-    private static instance: Config;
-
-    public static getInstance() {
-        if (!this.instance) {
-            this.instance = new Config();
-        }
-        return this.instance;
-    }
+    private static processArgs: ProcessArgsLike;
+    private static config: ConfigLike;
 
     private constructor() {}
 
-    public loadConfig() {
-        this.createConfigDir();
-
-        const processArgs = new ProcessArgsParser().parse();
-        const defaultConfig = new GeneralConfigParser().parse();
-        const peersConfig = new PeersConfigParser().parse();
-        const envConfig = new ENVConfigParser().parse();
-
-        if (!defaultConfig || !peersConfig || !envConfig) {
-            utils.gracefulShutdown(1);
-            return;
+    static loadProcessArgs() {
+        if (!this.processArgs) {
+            this.processArgs = new ProcessArgsParser().parse();
         }
+        return this.processArgs;
+    }
 
-        this.config = {
-            ...defaultConfig,
-            ...envConfig,
-            peers: peersConfig,
-            processArgs
-        };
+    static loadFullConfig() {
+        if (!this.config) {
+            this.createConfigDir();
 
-        this.adjustConfigByProcessArgs();
+            const defaultConfig = new GeneralConfigParser().parse();
+            const peersConfig = new PeersConfigParser().parse();
+            const envConfig = new ENVConfigParser().parse();
+    
+            if (!defaultConfig || !peersConfig || !envConfig) {
+                utils.gracefulShutdown(1);
+                return {} as ConfigLike;
+            }
 
+            this.config = {
+                ...defaultConfig,
+                ...envConfig,
+                peers: peersConfig,
+                processArgs: this.loadProcessArgs()
+            };
+    
+            this.adjustConfigByProcessArgs();
+        }
         return this.config;
     }
 
-    private createConfigDir() {
+    private static createConfigDir() {
         const configDir = path.join(utils.procCWD, '/config');
         if (!fs.existsSync(configDir)) {
             fs.mkdirSync(configDir, { recursive: true });
@@ -62,7 +61,7 @@ class Config {
         }
     }
 
-    private adjustConfigByProcessArgs() {
+    private static adjustConfigByProcessArgs() {
         const config = this.config as ConfigLike;
         const pArgs = config.processArgs;
         const netConfig = config.leicoin_net;
@@ -74,5 +73,3 @@ class Config {
 
 }
 
-const config = Config.getInstance().loadConfig() as ConfigLike;
-export default config;

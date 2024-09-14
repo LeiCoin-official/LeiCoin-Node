@@ -1,63 +1,51 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import sendTransactions_router from "./sendTransactions.js";
-import { Server as HTTP_Server } from "http";
 import cli from "../cli/cli.js";
 import EventEmitter from "events";
 import { ModuleLike } from "../utils/dataUtils.js";
+import Elysia from "elysia";
 
-export class HTTP_API implements ModuleLike<typeof HTTP_API>{
-    private static app: express.Express;
-    private static server: HTTP_Server;
+export class HTTP_API implements ModuleLike<typeof HTTP_API> {
+    public static initialized = false;
+    public static started = false;
+    
+    private static app: Elysia;
 
     static async init() {
-        this.app = express();
+        if (this.initialized) return;
+        this.initialized = true;
 
-        this.app.use(cors());
-        this.app.use(bodyParser.json());
-        
-        this.app.use(function(req, res, next) {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            next();
-        });
-        
-        this.app.use('/', (req, res, next) => {
-            res.status(200);
-            res.json({ message: "Online" });
-        });
-        
-        this.app.use('/sendtransactions', sendTransactions_router);
+        this.app = (await import("./routes/main.js")).HTTPRootRouter;
     }
-
 
     static async start(config: {
         host: string,
         port: number,
         eventHandler?: EventEmitter
     }) {
-        this.server = this.app.listen(config.port, config.host, () => {
-            cli.api.info(`API listening on ${config.host}:${config.port}`);
+        if (this.started) return;
+        this.started = true;
+
+        this.app = this.app.listen({
+            port: config.port,
+            hostname: config.host,
         });
+        if (this.app.server) {
+            cli.api.info(`API listening on ${config.host}:${config.port}`);
+        }
         if (config.eventHandler) {
             await this.setupEvents(config.eventHandler);
         }
     }
 
     static async stop() {
-        if (this.server) {
-            this.server.close();
+        if (this.app?.server) {
+            this.app.server.stop();
             cli.api.info("API stopped");
         } else {
             cli.api.error("API could not be stopped, because it is not running");
-            return;
         }
     }
 
-    private static async setupEvents(eventHandler: EventEmitter) {
-        eventHandler.once("stop_server", async() => await this.stop());
-    }
+    private static async setupEvents(eventHandler: EventEmitter) {}
 }
 
 export default HTTP_API;

@@ -1,5 +1,5 @@
 import { AddressHex as AddressHexClass } from "../objects/address.js";
-import { Signature as SignatureClass } from "../objects/signature.js";
+import { Signature as SignatureClass } from "../crypto/signature.js";
 import { Uint256 as Uint256Class, Uint64, Uint8 } from "../binary/uint.js";
 import { PX as PXClass } from "../objects/prefix.js";
 import { Uint } from "../binary/uint.js";
@@ -182,8 +182,8 @@ class AdvancedTypeEncoderFactory {
 
 class CustomEncoder extends DataEncoder {
 
-    readonly prefixLength: number | "unlimited" | null = null;
-    readonly fixedLength: number | null = null;
+    readonly prefixLength?: number | "unlimited";
+    readonly fixedLength?: number;
 
     constructor(
         key: string,

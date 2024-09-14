@@ -3,45 +3,62 @@ import { Uint64 } from "../binary/uint.js";
 import Constants from "../utils/constants.js";
 import utils from "../utils/index.js";
 import Slot from "./slot.js";
-import cron from "node-cron";
 import { UintMap } from "../binary/map.js";
 import { type MinterClient } from "../minter/index.js";
-import { ModuleLike } from "../utils/dataUtils.js";
+import { type ModuleLike } from "../utils/dataUtils.js";
+import { CronJob } from "cron";
 
 export class POS implements ModuleLike<typeof POS> {
+    public static initialized = false;
+    public static started = false;
 
-    private static slotTask: cron.ScheduledTask;
-    static readonly slots: UintMap<Slot> = new UintMap<Slot>();
-    private static currentSlot: Slot | null = null;
+    private static slotTask: CronJob;
+    private static readonly slots: UintMap<Promise<Slot>> = new UintMap();
 
     static readonly minters: MinterClient[] = [];
 
     static async init(minters: MinterClient[]) {
+        if (this.initialized) return;
+        this.initialized = true;
+
         this.minters.push(...minters);
      
-        this.slotTask = cron.schedule('0,5,10,15,20,25,30,35,40,45,50,55 * * * * *', () => {
-            const currentSlotIndex = Uint64.from(POS.calulateCurrentSlotIndex());
-            cli.minter.info(`Starting new slot: ${currentSlotIndex.toBigInt()} at ${new Date().toUTCString()}`);
+        this.slotTask = new CronJob('4,9,14,19,24,29,34,39,44,49,54,59 * * * * *', () => {
+            const nextSlotIndex = Uint64.from(POS.calulateCurrentSlotIndex() + 1);
+
             //this.endSlot(this.currentSlot.index);
-            this.startNewSlot(currentSlotIndex);
+            this.startNewSlot(nextSlotIndex);
+
+            /** @todo Adjust the amount of time this slot will be keeped in memory later when it is decided when a block is considered final and minters are getting paid */
+            this.endSlot(nextSlotIndex.sub(Uint64.from(100)));
         });
 
         this.setupEvents();
     }
 
     static async start() {
+        if (this.started) return;
+        this.started = true;
+
         this.slotTask.start();
+        cli.pos.info("POS started");
     }
 
-    static setupEvents() {
-        utils.events.once("stop_server", () => {
-            this.slotTask.stop();
-        });
-    }
+    static setupEvents() {}
     
-    static stop() {
+    static async stop() {
         this.slotTask.stop();
-        cli.minter.info("POS stopped");
+
+        const currentSlot = await this.getCurrentSlot();
+        if (currentSlot) {
+            this.forceFinishAndDeleteSlot(currentSlot.index);
+            await Promise.all([
+                this.forceFinishAndDeleteSlot(currentSlot.index.sub(1)),
+                this.forceFinishAndDeleteSlot(currentSlot.index.add(1))
+            ]);
+        }
+
+        cli.pos.info("POS stopped");
     }
 
     static calulateCurrentSlotIndex() {
@@ -51,13 +68,20 @@ export class POS implements ModuleLike<typeof POS> {
     }
 
     static async startNewSlot(slotIndex: Uint64) {
-        const newSlot = await Slot.create(slotIndex);
+        const newSlot = Slot.create(slotIndex);
         this.slots.set(slotIndex, newSlot);
-        this.currentSlot = newSlot;
     }
 
     static async endSlot(slotIndex: Uint64) {
         return this.slots.delete(slotIndex);
+    }
+
+    static async forceFinishAndDeleteSlot(slotIndex: Uint64) {
+        const slot = await this.getSlot(slotIndex);
+        if (slot) {
+            slot.slot_finished.resolve();
+            this.endSlot(slotIndex);
+        }
     }
 
     static getSlot(index: Uint64) {
@@ -65,7 +89,7 @@ export class POS implements ModuleLike<typeof POS> {
     }
 
     static getCurrentSlot() {
-        return this.currentSlot;
+        return this.slots.get(Uint64.from(this.calulateCurrentSlotIndex()));
     }
     
 }
