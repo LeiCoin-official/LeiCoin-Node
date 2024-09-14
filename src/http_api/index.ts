@@ -42,7 +42,6 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API> {
             cli.api.info("API stopped");
         } else {
             cli.api.error("API could not be stopped, because it is not running");
-            return;
         }
     }
 

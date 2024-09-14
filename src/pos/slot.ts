@@ -55,7 +55,7 @@ export class Slot {
 
     protected async onBlockNotMinted() {
         if (this.slot_finished.finished || this.blockTimeout.hasFinished()) return;
-        console.log(this.blockTimeout.hasFinished());
+
         this.blockTimeout.cancel();
         this.slot_finished.resolve();
         cli.pos.error(`Minter ${this.minter.toHex()} did not mint a block on Slot ${this.index.toBigInt()}`);

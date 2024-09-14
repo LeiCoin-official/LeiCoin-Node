@@ -56,7 +56,7 @@ export class MinterClient {
 			}
 		}
 
-		cli.minter.info("MinterClients started");
+		cli.minter.info(`MinterClients started. Addresses: ${clients.map(mc => mc.credentials.address.toHex()).join(", ")}`);
 
 		return clients;
 	}

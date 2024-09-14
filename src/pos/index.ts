@@ -33,7 +33,6 @@ export class POS implements ModuleLike<typeof POS> {
             this.endSlot(nextSlotIndex.sub(Uint64.from(100)));
         });
 
-        this.slotTask.start();
         this.setupEvents();
     }
 
@@ -41,8 +40,8 @@ export class POS implements ModuleLike<typeof POS> {
         if (this.started) return;
         this.started = true;
 
-        cli.pos.info("POS started");
         this.slotTask.start();
+        cli.pos.info("POS started");
     }
 
     static setupEvents() {}

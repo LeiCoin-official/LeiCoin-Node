@@ -4,6 +4,7 @@ import HTTP_API from "../http_api/index.js";
 import POS from "../pos/index.js";
 import LeiCoinNetNode from "../leicoin-net/index.js";
 import { Blockchain } from "../storage/blockchain.js";
+import { IModuleLike, ModuleLike } from "./dataUtils.js";
 
 class Utils {
     private static initialized = false;
@@ -37,9 +38,9 @@ class Utils {
             this.runStatus = exitCode === 0 ? "shutdown" : "shutdown_on_error";
             
             await Promise.all([
-                HTTP_API.stop(),
-                POS.stop(),
-                LeiCoinNetNode.stop()
+                this.stopService(HTTP_API),
+                this.stopService(POS),
+                this.stopService(LeiCoinNetNode)
             ]);
 
             await Blockchain.stop();
@@ -51,9 +52,25 @@ class Utils {
                 await cli.close();
                 process.exit(exitCode);
             }, 1000);
-        } catch {
-            process.exit(1);
+        } catch (error: any) {
+            cli.default.error(`Uncaught Exception:\n${error.stack}`);
+            this.forceShutdown();
         }
+    }
+
+    private static async stopService(service: IModuleLike) {
+        try {
+            if (!service.started) return;
+            await service.stop();
+        } catch (error: any) {
+            cli.default.error(`Error stopping service: ${error.message}`);
+        }
+
+    }
+
+    private static forceShutdown() {
+        process.once("SIGTERM", ()=>{});
+        process.exit(1);
     }
 
     private static async uncaughtException(error: Error) {
@@ -62,8 +79,11 @@ class Utils {
     }
 
     private static async unhandledRejection(reason: any) {
-        const error = reason.stack ? reason.stack : reason;
-        cli.default.error(`Unhandled Rejection:\n${error}`);
+        if (reason.stack) {
+            // reason is an error
+            return this.uncaughtException(reason);
+        }
+        cli.default.error(`Unhandled Rejection:\n${reason}`);
         Utils.gracefulShutdown(1);
     }
 
