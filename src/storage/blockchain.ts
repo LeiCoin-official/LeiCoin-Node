@@ -1,9 +1,10 @@
 import BCUtils from "./blockchainUtils.js";
 import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";
-import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
 import { BasicModuleLike } from "../utils/dataUtils.js";
+import { type Block } from "../objects/block.js";
+import fs from "fs";
 
 export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     public static initialized = false;
@@ -37,45 +38,35 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         BCUtils.ensureDirectoryExists('/forks', "main");
     }
 
-    // public async createFork(name: string, parentChain: string, latestBlock: Block) {
-    //     const parentLatestBlock = this.chainstate.getLatestBlockInfo(parentChain);
+    static async createFork(targetChain: string, parentChain: string, baseBlock: Block) {
+        
+        
 
-    //     if (parentChain !== "main") {
-    //         fs.cpSync(BCUtils.getBlockchainDataFilePath("", parentChain), BCUtils.getBlockchainDataFilePath("", name), { recursive: true });
-    //         fs.unlinkSync(BCUtils.getBlockchainDataFilePath(`/blocks/${parentLatestBlock.index}.lcb`, name));
-    //     }
+        const blocksToReset = baseBlock.index;
 
-    //     const forkChain = new Chain(name);
-    //     this.chains[name] = forkChain;
-    //     this.chainstate.setChainState({
-    //         parent: {
-    //             name: parentChain
-    //         },
-    //         // base: {
-    //         //     index: latestBlock.index,
-    //         //     hash: latestBlock.hash,
-    //         // },
-    //         base: latestBlock,
-    //         // previousBlockInfo: {
-    //         //     index: latestBlock.index.sub(1),
-    //         //     hash: latestBlock.previousHash
-    //         // },
-    //         previousBlockInfo: this.blocks.getBlock(latestBlock.index.sub(1).toHex()).data as Block,
-    //         latestBlockInfo: latestBlock
-    //     });
+        if (parentChain !== "main") {
+            fs.cpSync(BCUtils.getBlockchainDataFilePath("", parentChain), BCUtils.getBlockchainDataFilePath("", targetChain), { recursive: true });
+            fs.unlinkSync(BCUtils.getBlockchainDataFilePath(`/blocks/${parentLatestBlock.index}.lcb`, targetChain));
+        }
 
-    //     for (const transactionData of parentLatestBlock.transactions) {
-    //         const senderWallet = await this.chains[parentChain].wallets.getWallet(transactionData.senderAddress);
-    //         const recipientWallet = await this.chains[parentChain].wallets.getWallet(transactionData.recipientAddress);
+        const forkChain = new Chain(targetChain);
+        await forkChain.waitAllinit();
 
-    //         senderWallet.adjustNonce(-1);
-    //         senderWallet.addMoney(transactionData.amount);
-    //         recipientWallet.subtractMoneyIFPossible(transactionData.amount);
+        this.chains[targetChain] = forkChain;
 
-    //         await forkChain.wallets.setWallet(senderWallet);
-    //         await forkChain.wallets.setWallet(recipientWallet);
-    //     }
-    // }
+        for (const transactionData of parentLatestBlock.transactions) {
+            const senderWallet = await this.chains[parentChain].wallets.getWallet(transactionData.senderAddress);
+            const recipientWallet = await this.chains[parentChain].wallets.getWallet(transactionData.recipientAddress);
+
+            senderWallet.adjustNonce(-1);
+            senderWallet.addMoney(transactionData.amount);
+            recipientWallet.subtractMoneyIFPossible(transactionData.amount);
+
+            await forkChain.wallets.setWallet(senderWallet);
+            await forkChain.wallets.setWallet(recipientWallet);
+        }
+
+    }
 
     // public transferForkToMain(fork: string) {
 

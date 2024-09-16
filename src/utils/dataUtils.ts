@@ -143,7 +143,7 @@ export class DataUtils {
                 if (result) return result;
             }
 
-            if (value instanceof Uint64) {
+            if (value instanceof Uint64 && value.getRaw().byteLength === 8) {
                 return value.toBigInt().toString();
             } else if (value instanceof Uint) {
                 return value.toHex();

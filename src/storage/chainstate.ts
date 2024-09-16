@@ -173,7 +173,7 @@ export class Chainstate {
         return this.chainStateData.chains[id];
     }
 
-    public getLatestBlock(chainID = "main"): Block | undefined {
+    public getLatestBlock(chainID = "main") {
         return this.getChainState(chainID)?.latestBlock;
     }
 
@@ -236,5 +236,7 @@ export class Chainstate {
     }
 
 }
+
+export type { ForkChainstateData, ChainstateData };
 
 export default Chainstate;
