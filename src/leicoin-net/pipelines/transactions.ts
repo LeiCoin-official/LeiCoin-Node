@@ -12,7 +12,7 @@ export default class TransactionPipeline extends Pipeline {
 
     async receive(type: LNPPX, data: Uint) {
 
-        const transaction = DataUtils.createInstanceFromJSON(Transaction, data);
+        const transaction = Transaction.fromDecodedHex(data) as Transaction;
     
         if (!(transaction.txid.toHex() in mempool.transactions)) {
     

@@ -56,7 +56,17 @@ export class Transaction {
             if (data && data.version.eq(0)) {
 
                 data.senderAddress = null
-                const instance = DataUtils.createInstanceFromJSON(Transaction, data);
+                const instance = new Transaction(
+                    data.txid,
+                    null as any,
+                    data.recipientAddress,
+                    data.amount,
+                    data.nonce,
+                    data.timestamp,
+                    data.input,
+                    data.signature,
+                    data.version
+                )
 
                 if (withSenderAddress) {
                     instance.senderAddress = AddressHex.fromSignature(data.txid, data.signature);

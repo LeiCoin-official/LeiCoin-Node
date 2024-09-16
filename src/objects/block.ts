@@ -35,7 +35,17 @@ export class Block {
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
-                const block = DataUtils.createInstanceFromJSON(Block, data);
+                const block = new Block(
+                    data.index,
+                    data.slotIndex,
+                    data.hash,
+                    data.previousHash,
+                    data.timestamp,
+                    null as any,
+                    data.signature,
+                    data.transactions,
+                    data.version
+                );
 
                 if (withMinterAddress) {
                     block.minter = AddressHex.fromSignature(block.calculateHash(), data.signature);

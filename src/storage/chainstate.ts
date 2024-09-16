@@ -40,7 +40,12 @@ class ForkChainstateData {
             const data = returnData.data;
         
             if (data) {
-                const forkChainstateData = DataUtils.createInstanceFromJSON(ForkChainstateData, data);
+                const forkChainstateData = new ForkChainstateData(
+                    data.stateHash,
+                    data.parentChain,
+                    data.base,
+                    data.latestBlock
+                )
 
                 if (returnLength) {
                     return {data: forkChainstateData, length: returnData.length};
@@ -102,7 +107,10 @@ class ChainstateData {
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
-                return DataUtils.createInstanceFromJSON(ChainstateData, data);
+                return new ChainstateData(
+                    data.chains,
+                    data.version
+                )
             }
         } catch (err: any) {
             cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.stack}`);

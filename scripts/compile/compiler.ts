@@ -17,6 +17,7 @@ export type PlatformArg = keyof typeof Platforms | "auto";
 class CompilerBuilder {
 
     public sourcemap = true;
+    public minify = true;
     public entrypoint = "./src/index.ts";
     public outfile = "./build/bin/leicoin-node";
     public env: NodeJS.ProcessEnv = {};
@@ -31,6 +32,7 @@ class CompilerBuilder {
         return [
             this.baseCommand,
             (this.sourcemap ? " --sourcemap" : ""),
+            (this.minify ? " --minify" : ""),
             this.entrypoint,
             "--outfile", this.outfile,
             ...Object.entries(this.env).map(([key, value]) => `--define "Bun.env.${key}='${value}'"`)

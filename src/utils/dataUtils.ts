@@ -74,8 +74,13 @@ export class DataUtils {
         return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
     }
 
-    // Define a function to create an instance of a class from a JSON object
+    /**
+     * Define a function to create an instance of a class from a JSON object
+     * @deprecated This function is unsafe to use in production code
+     */
     static createInstanceFromJSON<T>(cls: Constructable<T>, json: any): T {
+        throw new Error("This function is unsafe to use in production code");
+
         // Retrieve the constructor of the class
         //const constructor = cls as any;
     
