@@ -13,7 +13,6 @@ export class BlockDB {
         BCUtils.ensureDirectoryExists('/blocks', this.chain);
     }
 
-    // Function to write a block
     public addBlock(block: Block, overwrite = false) {
         const blockIndex = block.index.toBigInt().toString();
         try {
@@ -33,7 +32,6 @@ export class BlockDB {
         }
     }
 
-    // Function to read a block
     public getBlock(index: Uint64 | string) {
         const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
         try {
@@ -47,6 +45,29 @@ export class BlockDB {
             }
         } catch (err: any) {
             cli.data.error(`Error reading block ${blockIndex}: ${err.stack}.`);
+            return {cb: CB.ERROR};
+        }
+    }
+
+
+    /**
+     * WARNING: Deleting Blocks from a chain is risky and should be done with caution. Dont use this method unless you know what you are doing.
+     */
+    public deleteBlock(index: Uint64 | string, silent = false) {
+        const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
+        try {
+            const blockFilePath = `/blocks/${blockIndex}.lcb`;
+            if (BCUtils.existsPath(blockFilePath, this.chain)) {
+                BCUtils.delFile(blockFilePath, this.chain);
+                return {cb: CB.SUCCESS};
+            } else {
+                if (!silent) {
+                    cli.data.error(`Cant Block ${blockIndex} in Chain: ${this.chain}. Block was not found.`);
+                }
+                return {cb: CB.NONE};
+            }
+        } catch (err: any) {
+            cli.data.error(`Error deleting block ${blockIndex}: ${err.stack}.`);
             return {cb: CB.ERROR};
         }
     }

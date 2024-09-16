@@ -33,7 +33,7 @@ class LocalNodeTestNet {
         console.log("Usage: bun testnet multi-node (setup | init | start)");
         console.log("- setup: Setup the testnet nodes");
         console.log("- init (0|1): Initialize a node and create the terminal");
-        console.log("- start [--clear | -c]: Start the testnet nodes that are waiting to be started");
+        console.log("- start [0|1] [--clear | -c]: Start the testnet nodes that are waiting to be started");
         console.log("- clean: Cleanup the testnet nodes");
     }
 
@@ -117,13 +117,25 @@ class LocalNodeTestNet {
     
     private static async start(args: string[]) {
 
+        let startNode0 = true;
+        let startNode1 = true;
+
+        if (args[0] === "0") {
+            startNode1 = false;
+            args.shift();
+        } else if (args[0] === "1") {
+            startNode0 = false;
+            args.shift();
+        }
+
         if (args[0] === "--clear" || args[0] === "-c") {
-            await this.clearBlockchain();
+            if (startNode0) await this.clearBlockchain(0);
+            if (startNode1) await this.clearBlockchain(1);
         }
 
         await Promise.all([
-            this.sendStartSignal(0),
-            this.sendStartSignal(1)
+            startNode0 ? this.sendStartSignal(0) : null,
+            startNode1 ? this.sendStartSignal(1) : null,
         ]);
         console.log("All nodes started");
     }
@@ -146,17 +158,12 @@ class LocalNodeTestNet {
         });
     }
 
-    private static async clearBlockchain() {
-
-        for (let i = 0; i < 2; i++) {
-            const cwd = `./localtests/testnet-nodes/Node${i}/blockchain_data`;
-            for (const directory of fs.readdirSync(cwd)) {
-                if (directory === "validators") continue;
-                fs.rmSync(`${cwd}/${directory}`, {recursive: true});
-            }
+    private static async clearBlockchain(index: number) {
+        const cwd = `./localtests/testnet-nodes/Node${index}/blockchain_data`;
+        for (const directory of fs.readdirSync(cwd)) {
+            if (directory === "validators") continue;
+            fs.rmSync(`${cwd}/${directory}`, {recursive: true});
         }
-
-
     }
 
     private static async cleanup() {

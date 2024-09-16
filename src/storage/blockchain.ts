@@ -4,7 +4,6 @@ import Chain from "./chain.js";
 import cli from "../cli/cli.js";
 import { BasicModuleLike } from "../utils/dataUtils.js";
 import { type Block } from "../objects/block.js";
-import fs from "fs";
 
 export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     public static initialized = false;
@@ -38,32 +37,36 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         BCUtils.ensureDirectoryExists('/forks', "main");
     }
 
-    static async createFork(targetChain: string, parentChain: string, baseBlock: Block) {
+    static async createFork(targetChainID: string, parentChainID: string, baseBlock: Block) {
         
-        // const parentChain = "main";
+        const parentLatestBlock = this.chainstate.getLatestBlock(parentChainID) as Block;
 
-        const blocksToReset = baseBlock.index;
-
-        if (parentChain !== "main") {
-            fs.cpSync(BCUtils.getBlockchainDataFilePath("", parentChain), BCUtils.getBlockchainDataFilePath("", targetChain), { recursive: true });
-            fs.unlinkSync(BCUtils.getBlockchainDataFilePath(`/blocks/${parentLatestBlock.index}.lcb`, targetChain));
+        if (parentChainID !== "main") {
+            BCUtils.copyChain(parentChainID, targetChainID);
         }
 
-        const forkChain = new Chain(targetChain);
+        const forkChain = new Chain(targetChainID);
         await forkChain.waitAllinit();
 
-        this.chains[targetChain] = forkChain;
+        this.chains[targetChainID] = forkChain;
+        const parentChain = this.chains[parentChainID];
+        
+        for (const blockIndex = parentLatestBlock.index.clone(); blockIndex.gte(baseBlock.index); blockIndex.isub(1)) {
 
-        for (const transactionData of parentLatestBlock.transactions) {
-            const senderWallet = await this.chains[parentChain].wallets.getWallet(transactionData.senderAddress);
-            const recipientWallet = await this.chains[parentChain].wallets.getWallet(transactionData.recipientAddress);
+            for (const transactionData of (parentChain.blocks.getBlock(blockIndex).data as Block).transactions) {
 
-            senderWallet.adjustNonce(-1);
-            senderWallet.addMoney(transactionData.amount);
-            recipientWallet.subtractMoneyIFPossible(transactionData.amount);
-
-            await forkChain.wallets.setWallet(senderWallet);
-            await forkChain.wallets.setWallet(recipientWallet);
+                const senderWallet = await parentChain.wallets.getWallet(transactionData.senderAddress);
+                const recipientWallet = await parentChain.wallets.getWallet(transactionData.recipientAddress);
+    
+                senderWallet.adjustNonce(-1);
+                senderWallet.addMoney(transactionData.amount);
+                recipientWallet.subtractMoneyIFPossible(transactionData.amount);
+    
+                await forkChain.wallets.setWallet(senderWallet);
+                await forkChain.wallets.setWallet(recipientWallet);
+            }
+    
+            forkChain.blocks.deleteBlock(blockIndex, true);
         }
 
     }
