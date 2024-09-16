@@ -40,7 +40,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
 
     static async createFork(targetChain: string, parentChain: string, baseBlock: Block) {
         
-        
+        // const parentChain = "main";
 
         const blocksToReset = baseBlock.index;
 
