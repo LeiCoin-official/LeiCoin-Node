@@ -1,9 +1,9 @@
 import BCUtils from "./blockchainUtils.js";
 import Chainstate from "./chainstate.js";
 import Chain from "./chain.js";
-import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
 import { BasicModuleLike } from "../utils/dataUtils.js";
+import { type Block } from "../objects/block.js";
 
 export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     public static initialized = false;
@@ -37,45 +37,39 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         BCUtils.ensureDirectoryExists('/forks', "main");
     }
 
-    // public async createFork(name: string, parentChain: string, latestBlock: Block) {
-    //     const parentLatestBlock = this.chainstate.getLatestBlockInfo(parentChain);
+    static async createFork(targetChainID: string, parentChainID: string, baseBlock: Block) {
+        
+        const parentLatestBlock = this.chainstate.getLatestBlock(parentChainID) as Block;
 
-    //     if (parentChain !== "main") {
-    //         fs.cpSync(BCUtils.getBlockchainDataFilePath("", parentChain), BCUtils.getBlockchainDataFilePath("", name), { recursive: true });
-    //         fs.unlinkSync(BCUtils.getBlockchainDataFilePath(`/blocks/${parentLatestBlock.index}.lcb`, name));
-    //     }
+        if (parentChainID !== "main") {
+            BCUtils.copyChain(parentChainID, targetChainID);
+        }
 
-    //     const forkChain = new Chain(name);
-    //     this.chains[name] = forkChain;
-    //     this.chainstate.setChainState({
-    //         parent: {
-    //             name: parentChain
-    //         },
-    //         // base: {
-    //         //     index: latestBlock.index,
-    //         //     hash: latestBlock.hash,
-    //         // },
-    //         base: latestBlock,
-    //         // previousBlockInfo: {
-    //         //     index: latestBlock.index.sub(1),
-    //         //     hash: latestBlock.previousHash
-    //         // },
-    //         previousBlockInfo: this.blocks.getBlock(latestBlock.index.sub(1).toHex()).data as Block,
-    //         latestBlockInfo: latestBlock
-    //     });
+        const forkChain = new Chain(targetChainID);
+        await forkChain.waitAllinit();
 
-    //     for (const transactionData of parentLatestBlock.transactions) {
-    //         const senderWallet = await this.chains[parentChain].wallets.getWallet(transactionData.senderAddress);
-    //         const recipientWallet = await this.chains[parentChain].wallets.getWallet(transactionData.recipientAddress);
+        this.chains[targetChainID] = forkChain;
+        const parentChain = this.chains[parentChainID];
+        
+        for (const blockIndex = parentLatestBlock.index.clone(); blockIndex.gte(baseBlock.index); blockIndex.isub(1)) {
 
-    //         senderWallet.adjustNonce(-1);
-    //         senderWallet.addMoney(transactionData.amount);
-    //         recipientWallet.subtractMoneyIFPossible(transactionData.amount);
+            for (const transactionData of (parentChain.blocks.getBlock(blockIndex).data as Block).transactions) {
 
-    //         await forkChain.wallets.setWallet(senderWallet);
-    //         await forkChain.wallets.setWallet(recipientWallet);
-    //     }
-    // }
+                const senderWallet = await parentChain.wallets.getWallet(transactionData.senderAddress);
+                const recipientWallet = await parentChain.wallets.getWallet(transactionData.recipientAddress);
+    
+                senderWallet.adjustNonce(-1);
+                senderWallet.addMoney(transactionData.amount);
+                recipientWallet.subtractMoneyIFPossible(transactionData.amount);
+    
+                await forkChain.wallets.setWallet(senderWallet);
+                await forkChain.wallets.setWallet(recipientWallet);
+            }
+    
+            forkChain.blocks.deleteBlock(blockIndex, true);
+        }
+
+    }
 
     // public transferForkToMain(fork: string) {
 

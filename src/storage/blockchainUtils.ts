@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import cli from "../cli/cli.js";
 import Utils from "../utils/index.js";
-import { Uint } from "../binary/uint.js";
+import { Uint, type Uint64 } from "../binary/uint.js";
 import readline from "readline";
 
 class BCUtils {
@@ -19,28 +19,47 @@ class BCUtils {
         return path.join(Utils.procCWD, this.getRelativePath(subpath, fork));
     }
 
-    static readFile(filePath: string, fork: string) {
-        return new Uint(fs.readFileSync(this.getBlockchainDataFilePath(filePath, fork), null));
-    }
-
     static existsPath(fileORDirPath: string, fork: string) {
         return fs.existsSync(this.getBlockchainDataFilePath(fileORDirPath, fork));
+    }
+
+
+    static readFile(filePath: string, fork: string) {
+        return new Uint(fs.readFileSync(this.getBlockchainDataFilePath(filePath, fork), null));
     }
 
     static writeFile(filePath: string, fork: string, data: Uint) {
         return fs.writeFileSync(this.getBlockchainDataFilePath(filePath, fork), data.getRaw());
     }
     
+    static delFile(filePath: string, fork: string) {
+        return fs.unlinkSync(this.getBlockchainDataFilePath(filePath, fork));
+    }
+
+
     static mkDir(directoryPath: string, fork: string) {
         return fs.mkdirSync(this.getBlockchainDataFilePath(directoryPath, fork), { recursive: true });
     }
+
+    static rmDir(directoryPath: string, fork: string) {
+        return fs.rmdirSync(this.getBlockchainDataFilePath(directoryPath, fork), { recursive: true });
+    }
+
+    
+    static copyChain(sourceChain: string, targetChain: string) {
+        fs.cpSync(this.getBlockchainDataFilePath(sourceChain), this.getBlockchainDataFilePath(targetChain), { recursive: true });
+    }
+    
     
     // Function to ensure the existence of a directory
-    static ensureDirectoryExists(directoryPath: string, fork: string) {
+    static ensureDirectoryExists(directoryPath: string, fork: string, silent?: boolean) {
         try {
             if (!this.existsPath(directoryPath, fork)) {
                 this.mkDir(directoryPath, fork);
-                cli.data.info(`Directory ${this.getRelativePath(directoryPath, fork)} was created because it was missing.`);
+
+                if ((fork === "main" && silent !== true) || silent === false) {
+                    cli.data.info(`Directory ${this.getRelativePath(directoryPath, fork)} was created because it was missing.`);
+                }
             }
         } catch (err: any) {
             cli.data.error(`Error ensuring the existence of a directory at ${this.getRelativePath(directoryPath, fork)}: ${err.stack}`);
@@ -51,13 +70,17 @@ class BCUtils {
     static ensureFileExists(
         filePath: string,
         fork: string,
-        content: Uint
+        content: Uint,
+        silent?: boolean
     ) {
         try {
             this.ensureDirectoryExists(path.dirname(filePath), fork)
             if (!this.existsPath(filePath, fork)) {
                 this.writeFile(filePath, fork, content);
-                cli.data.info(`File ${this.getRelativePath(filePath, fork)} was created because it was missing.`);
+                
+                if ((fork === "main" && silent !== true) || silent === false) {
+                    cli.data.info(`File ${this.getRelativePath(filePath, fork)} was created because it was missing.`);
+                }
             }
 
         } catch (err: any) {

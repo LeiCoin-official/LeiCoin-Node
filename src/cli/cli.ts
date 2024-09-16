@@ -140,7 +140,7 @@ class CLI {
     readonly pos = new Logger("POS", "#0000ff", this.log);
     readonly minter = new Logger("MinterClient", "#00ffff", this.log);
     readonly api = new Logger("API", "#c724b1", this.log);
-    readonly data = new Logger("Data", "#1711df", this.log);
+    readonly data = new Logger("Data", "#FFAD00", this.log);
     readonly cmd = new Logger("CLI", "#ffffff", this.log);
     readonly leicoin_net = new Logger("LeiCoinNet", "#f47fff", this.log);
 

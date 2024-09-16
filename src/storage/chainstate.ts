@@ -40,7 +40,12 @@ class ForkChainstateData {
             const data = returnData.data;
         
             if (data) {
-                const forkChainstateData = DataUtils.createInstanceFromJSON(ForkChainstateData, data);
+                const forkChainstateData = new ForkChainstateData(
+                    data.stateHash,
+                    data.parentChain,
+                    data.base,
+                    data.latestBlock
+                )
 
                 if (returnLength) {
                     return {data: forkChainstateData, length: returnData.length};
@@ -102,7 +107,10 @@ class ChainstateData {
             const data = returnData.data;
         
             if (data && data.version.eq(0)) {
-                return DataUtils.createInstanceFromJSON(ChainstateData, data);
+                return new ChainstateData(
+                    data.chains,
+                    data.version
+                )
             }
         } catch (err: any) {
             cli.data.error(`Error loading ForkChainstateData from Decoded Hex: ${err.stack}`);
@@ -173,7 +181,7 @@ export class Chainstate {
         return this.chainStateData.chains[id];
     }
 
-    public getLatestBlock(chainID = "main"): Block | undefined {
+    public getLatestBlock(chainID = "main") {
         return this.getChainState(chainID)?.latestBlock;
     }
 
@@ -213,7 +221,8 @@ export class Chainstate {
         let previousBlock: Block | null = null;
 
         for (const chain of Object.values(this.getAllChainStates())) {
-            const chainPreviousBlock = Blockchain.blocks.getBlock(block.index.sub(1)).data;
+            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.getBlock(block.index.sub(1)).data; 
+
             if (chainPreviousBlock?.hash.eq(block.previousHash)) {
                 parentChain = chain;
                 previousBlock = chainPreviousBlock;
@@ -224,7 +233,7 @@ export class Chainstate {
         if (!parentChain || !previousBlock)
             return { status: 12532 }; // Previous block not found
 
-        const targetBlock = Blockchain.blocks.getBlock(block.index).data;
+        const targetBlock = Blockchain.chains[parentChain.id].blocks.getBlock(block.index).data;
 
         if (targetBlock) {
             if (targetBlock?.hash.eq(block.hash))
@@ -236,5 +245,7 @@ export class Chainstate {
     }
 
 }
+
+export type { ForkChainstateData, ChainstateData };
 
 export default Chainstate;

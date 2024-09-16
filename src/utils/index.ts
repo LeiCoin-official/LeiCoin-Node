@@ -24,10 +24,10 @@ class Utils {
         }
 
         //process.on("SIGINT", this.gracefulShutdown);
-        process.once("SIGTERM", this.gracefulShutdown);
+        process.once("SIGTERM", Utils.gracefulShutdown);
 
-        process.once("uncaughtException", this.uncaughtException);
-        process.once("unhandledRejection", this.unhandledRejection);
+        process.once("uncaughtException", Utils.uncaughtException);
+        process.once("unhandledRejection", Utils.unhandledRejection);
     }
 
     private static runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
@@ -81,7 +81,7 @@ class Utils {
     private static async unhandledRejection(reason: any) {
         if (reason.stack) {
             // reason is an error
-            return this.uncaughtException(reason);
+            return Utils.uncaughtException(reason);
         }
         cli.default.error(`Unhandled Rejection:\n${reason}`);
         Utils.gracefulShutdown(1);

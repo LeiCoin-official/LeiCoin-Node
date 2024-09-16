@@ -11,23 +11,23 @@ export class WalletDB extends LevelBasedStorage {
 
     protected path = "/wallets";
 
-    public async getWallet(address: AddressHex) {
+    async getWallet(address: AddressHex) {
         const raw_wallet = await this.getData(address);
         if (!raw_wallet) return Wallet.createEmptyWallet(address);
         return Wallet.fromDecodedHex(address, raw_wallet) || Wallet.createEmptyWallet(address);
     }
 
-    public async setWallet(wallet: Wallet) {
+    async setWallet(wallet: Wallet) {
         return this.level.put(wallet.owner, wallet.encodeToHex());
     }
 
-    public async existsWallet(address: AddressHex): Promise<boolean> {
+    async existsWallet(address: AddressHex): Promise<boolean> {
         const raw_wallet = await this.getData(address);
         if (!raw_wallet) return false;
         return Wallet.fromDecodedHex(address, raw_wallet) ? true : false;
     }
 
-    public async addMoneyToWallet(address: AddressHex, amount: Uint64) {
+    async addMoneyToWallet(address: AddressHex, amount: Uint64) {
         const wallet = await this.getWallet(address);
         if (this.chain === "main") {
             for (const [chainName, chain] of Object.entries(Blockchain.chains)) {
@@ -41,7 +41,7 @@ export class WalletDB extends LevelBasedStorage {
         await this.setWallet(wallet);
     }
 
-    public async subtractMoneyFromWallet(address: AddressHex, amount: Uint64, adjustNonce = true) {
+    async subtractMoneyFromWallet(address: AddressHex, amount: Uint64, adjustNonce = true) {
         const wallet = await this.getWallet(address);
         if (this.chain === "main") {
             for (const [chainName, chain] of Object.entries(Blockchain.chains)) {
@@ -58,7 +58,7 @@ export class WalletDB extends LevelBasedStorage {
         await this.setWallet(wallet);
     }
 
-    public async adjustWalletsByBlock(block: Block) {
+    async adjustWalletsByBlock(block: Block) {
         try {
 
             const promises: Promise<void>[] = [];
@@ -79,7 +79,7 @@ export class WalletDB extends LevelBasedStorage {
         }
     }
 
-    public async deleteWallet(address: AddressHex) {
+    async deleteWallet(address: AddressHex) {
         return this.delData(address);
     }
 
