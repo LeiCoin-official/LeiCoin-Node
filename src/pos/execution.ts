@@ -35,7 +35,7 @@ export class Execution {
             await Blockchain.wallets.adjustWalletsByBlock(block);
         }
         
-        cli.pos.success(`Block on Slot ${block.slotIndex.toBigInt()} with hash ${block.hash.toHex()} has been validated, executed and added to Blockchain. Chain: ${targetChain}`);
+        cli.pos.success(`Block on Slot ${block.slotIndex.toBigInt()} has been validated, executed and added to Blockchain. (Hash: ${block.hash.toHex()}, Index ${block.index.toBigInt()}, Target Chain: ${targetChain})`);
     }
 
 }
