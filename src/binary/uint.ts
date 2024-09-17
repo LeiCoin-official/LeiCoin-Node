@@ -29,7 +29,7 @@ export type NumberLike = Uint | number;
 export type BinLike = Uint | Buffer;
 
 
-class UintUtils {
+export class UintUtils {
 
     static correctByteLengthBuffer(buffer: Buffer, correctByteLength: number) {
         if (buffer.byteLength === correctByteLength) {
@@ -111,6 +111,10 @@ export class Uint {
 
     public toHex() {
         return this.buffer.toString("hex");
+    }
+
+    public toString(encoding?: BufferEncoding) {
+        return this.buffer.toString(encoding);
     }
 
     /** Supports only a number up to (2^48)-1 */
