@@ -132,6 +132,7 @@ class LocalNodeTestNet {
 
         if (args[0] === "--binary" || args[0] === "-b") {
             binary = true;
+            args.shift();
         }
 
         if (args[0] === "--clear" || args[0] === "-c") {
