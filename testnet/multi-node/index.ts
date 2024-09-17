@@ -31,7 +31,7 @@ class LocalNodeTestNet {
         console.log("Usage: bun testnet multi-node (setup | init | start)");
         console.log("- setup: Setup the testnet nodes");
         console.log("- init (0|1): Initialize a node and create the terminal");
-        console.log("- start [0|1] [--clear | -c]: Start the testnet nodes that are waiting to be started");
+        console.log("- start [0|1] [-b | --binary] [--clear | -c]: Start the testnet nodes that are waiting to be started");
         console.log("- clean: Cleanup the testnet nodes");
     }
 
@@ -102,7 +102,9 @@ class LocalNodeTestNet {
                 const relative_url = new URL(request.url);
                 switch (relative_url.pathname) {
                     case "/start":
-                        LocalNodeTestNet.startNode(index, server);
+                        const binary = relative_url.searchParams.get("binary") === "true";
+                        console.log(binary);
+                        LocalNodeTestNet.startNode(index, server, binary);
                         return Response.json({success: true});
                     default:
                         return Response.json({success: false});
@@ -118,6 +120,8 @@ class LocalNodeTestNet {
         let startNode0 = true;
         let startNode1 = true;
 
+        let binary = false;
+
         if (args[0] === "0") {
             startNode1 = false;
             args.shift();
@@ -126,30 +130,39 @@ class LocalNodeTestNet {
             args.shift();
         }
 
+        if (args[0] === "--binary" || args[0] === "-b") {
+            binary = true;
+        }
+
         if (args[0] === "--clear" || args[0] === "-c") {
             if (startNode0) await this.clearBlockchain(0);
             if (startNode1) await this.clearBlockchain(1);
         }
 
         await Promise.all([
-            startNode0 ? this.sendStartSignal(0) : null,
-            startNode1 ? this.sendStartSignal(1) : null,
+            startNode0 ? this.sendStartSignal(0, binary) : null,
+            startNode1 ? this.sendStartSignal(1, binary) : null,
         ]);
         console.log("All nodes started");
     }
 
-    private static async sendStartSignal(index: number) {
+    private static async sendStartSignal(index: number, binary: boolean) {
         try {
             const port = 12291 + index;
-            await fetch(`http://127.0.0.1:${port}/start`);
+            await fetch(`http://127.0.0.1:${port}/start?binary=${binary}`);
         } catch (error) {
             console.log(`Node${index} is not initialized yet. Run 'bun testnet multi-node init ${index}' to initialize it.`);
         }
     }
 
-    private static async startNode(index: number, server: Server) {
+    private static async startNode(index: number, server: Server, binary: boolean) {
         const cwd = `./localtests/testnet-nodes/Node${index}`;
-        await Bun.$`bun debug --cwd ${{ raw: cwd }}`
+
+        const cmd = binary ?
+            `./build/bin/leicoin-node` + (process.platform === "win32" ? ".exe" : "") :
+            `bun debug`;
+        
+        await Bun.$`${{ raw: cmd }} --cwd ${{ raw: cwd }}`
         .catch(() => {})
         .finally(() => {
             server.stop();
