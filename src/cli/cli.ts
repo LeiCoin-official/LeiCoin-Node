@@ -4,7 +4,7 @@ import fs from "fs";
 import { dirname as path_dirname } from "path";
 import { Dict } from "../utils/dataUtils.js";
 import { DataUtils } from "../utils/dataUtils.js";
-import CLICMDHandler from "./cliCMDHandler.js";
+import type CLICMDHandler from "./cliCMDHandler.js";
 import { BlockchainUtils } from "../storage/blockchainUtils.js";
 
 /**
