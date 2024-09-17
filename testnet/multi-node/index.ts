@@ -1,9 +1,7 @@
 import fs from "fs";
 import { type GeneralConfigLike } from "../../src/config/general.js";
 import LCrypt from "../../src/crypto/index.js";
-import { AddressHex } from "../../src/objects/address.js";
 import { MinterCredentials } from "../../src/objects/minter.js";
-import { hostname } from "os";
 import { type Server } from "bun";
 
 class LocalNodeTestNet {
