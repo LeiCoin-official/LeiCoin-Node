@@ -75,6 +75,10 @@ export abstract class AbstractBinaryMap<K extends Uint, V> {
         }
     }
 
+    public get size() {
+        return Object.keys(this.store).length;
+    }
+
     public get(key: K) {
         return this.store[key.toHex()];
     }
@@ -108,6 +112,12 @@ export abstract class AbstractBinaryMap<K extends Uint, V> {
         for (const [key, value] of this.entries()) {
             callbackfn.call(thisArg, value, key);
         };
+    }
+
+    public clear() {
+        for (const key of this.keys()) {
+            this.delete(key);
+        }
     }
 
     public get [Symbol.toStringTag]() {

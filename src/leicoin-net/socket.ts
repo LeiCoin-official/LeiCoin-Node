@@ -1,5 +1,5 @@
 import cli from "../cli/cli.js";
-import { Pipelines } from "./pipelines/index.js";
+import { MessageRouter } from "./messaging/index.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, type Uint256 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
@@ -105,7 +105,7 @@ export class LNSocketHandlerFactory {
             }
         
             async data(socket: LNSocket, data: Buffer) {
-                Pipelines.receiveData(data);
+                MessageRouter.receiveData(data);
             }
         
             async drain(socket: LNSocket) {}

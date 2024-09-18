@@ -3,7 +3,7 @@ import { LNSocketHandlerFactory, type BasicLNSocketHandler, type SocketData } fr
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
-import { Pipelines } from "./pipelines/index.js";
+import { MessageRouter } from "./messaging/index.js";
 import { ModuleLike } from "../utils/dataUtils.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
@@ -20,7 +20,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         this.initialized = true;
 
         this.connections = LNConnections.createInstance();
-        Pipelines.registerPipelines();
+        MessageRouter.registerChannels();
         this.socketHandler = LNSocketHandlerFactory.create(this.connections);
     }
 

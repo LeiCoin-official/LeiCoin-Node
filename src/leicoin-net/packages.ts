@@ -1,17 +1,5 @@
 import { Uint } from "../binary/uint.js";
-import { LockedUint } from "../objects/prefix.js";
-
-export class LNPPX extends LockedUint {
-    public static readonly byteLength = 2;
-
-    //static readonly CHALLENGE = NPPX.from("0000")
-    //static readonly CHALLENGE_RESPONSE = NPPX.from("0001")
-
-    static readonly MESSAGE = LNPPX.from("3b66")
-    static readonly BLOCK = LNPPX.from("2096")
-    static readonly TRANSACTION = LNPPX.from("427d")
-
-}
+import { LNMsgType } from "./messaging/messageTypes.js";
 
 // export enum LeiCoinNetDataPackageType 
 //     CHALLENGE = "0000",
@@ -29,13 +17,13 @@ export class LNPPX extends LockedUint {
 // }
 
 interface LeiCoinNetDataPackageLike {
-    type: LNPPX;
+    type: LNMsgType;
     content: Uint;
 }
 
 export class LeiCoinNetDataPackage {
 
-    public static create(type: LNPPX, hexData: Uint) {
+    public static create(type: LNMsgType, hexData: Uint) {
         return Buffer.concat([
             type.getRaw(),
             hexData.getRaw()
@@ -44,7 +32,7 @@ export class LeiCoinNetDataPackage {
 
     public static extract(data: Buffer): LeiCoinNetDataPackageLike {
         return {
-            type: new LNPPX(data.subarray(0, 2)),
+            type: new LNMsgType(data.subarray(0, 2)),
             content: Uint.from(data.subarray(2))
         };
     }

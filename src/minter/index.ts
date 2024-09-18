@@ -11,8 +11,9 @@ import Signature from "../crypto/signature.js";
 import LCrypt from "../crypto/index.js";
 import { MinterCredentials } from "../objects/minter.js";
 import { type Slot } from "../pos/slot.js";
-import { LeiCoinNetDataPackage, LNPPX } from "../leicoin-net/packages.js";
+import { LeiCoinNetDataPackage } from "../leicoin-net/packages.js";
 import { LeiCoinNetNode } from "../leicoin-net/index.js";
+import { LNMsgType } from "../leicoin-net/messaging/messageTypes.js";
 
 export class MinterClient {
 
@@ -82,10 +83,10 @@ export class MinterClient {
 
     async mint(currentSlot: Slot) {
 		const block = await this.createNewBlock(currentSlot.index);
-
+		
 		LeiCoinNetNode.broadcast(
 			LeiCoinNetDataPackage.create(
-				LNPPX.BLOCK,
+				LNMsgType.NEW_BLOCK,
 				block.encodeToHex()
 			)
 		);

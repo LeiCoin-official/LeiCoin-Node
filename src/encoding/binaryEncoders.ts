@@ -157,7 +157,7 @@ class AdvancedTypeEncoderFactory {
         readonly byteLength: number,
         create: (v: Uint) => T,
     }) {
-        return class extends DataEncoder {
+        return class BinaryDataEncoder extends DataEncoder {
 
             readonly prefixLength = type.byteLength;
 

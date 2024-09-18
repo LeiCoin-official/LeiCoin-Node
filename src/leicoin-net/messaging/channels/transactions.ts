@@ -1,16 +1,15 @@
-import mempool from "../../storage/mempool.js";
-import Transaction from "../../objects/transaction.js";
-import cli from "../../cli/cli.js";
-import Verification from "../../verification/index.js"
-import { LeiCoinNetDataPackage, LNPPX } from "../packages.js";
-import { DataUtils } from "../../utils/dataUtils.js";
-import { Uint } from "../../binary/uint.js";
-import { Pipeline } from "./abstractPipeline.js";
+import mempool from "../../../storage/mempool.js";
+import Transaction from "../../../objects/transaction.js";
+import cli from "../../../cli/cli.js";
+import Verification from "../../../verification/index.js"
+import { Uint } from "../../../binary/uint.js";
+import { LNMsgType } from "../messageTypes.js";
+import { MessagingChannel } from "../abstractChannel.js";
 
-export default class TransactionPipeline extends Pipeline {
-    readonly id = "427d";
+export default class NewTransactionChannel extends MessagingChannel {
+    readonly id = LNMsgType.NEW_TRANSACTION;
 
-    async receive(type: LNPPX, data: Uint) {
+    async receive(type: LNMsgType, data: Uint) {
 
         const transaction = Transaction.fromDecodedHex(data) as Transaction;
     
