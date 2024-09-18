@@ -38,7 +38,7 @@ async function run(args: string[]) {
     const slotCount = parseInt(args[1]) || 1000;
     const prefixLength = parseInt(args[2]) || 1;
 
-    let cmd = `bun run ./unofficial_tests/database/newMinterSelectionAlgorithm/randomness.ts ${minterCount} ${slotCount} ${prefixLength}`;
+    let cmd = `bun run ./test_scripts/database/newMinterSelectionAlgorithm/randomness.ts ${minterCount} ${slotCount} ${prefixLength}`;
     cmd += ` 2>&1 | tee -a ${getRelativePath("result.log")}`;
     const msg = `Run at ${new Date().toUTCString()} with minterCount: ${minterCount}, slotCount: ${slotCount}, prefixLength: ${prefixLength}`;
 

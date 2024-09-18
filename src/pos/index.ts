@@ -1,7 +1,6 @@
 import cli from "../cli/cli.js";
 import { Uint64 } from "../binary/uint.js";
 import Constants from "../utils/constants.js";
-import utils from "../utils/index.js";
 import Slot from "./slot.js";
 import { UintMap } from "../binary/map.js";
 import { type MinterClient } from "../minter/index.js";
@@ -30,7 +29,7 @@ export class POS implements ModuleLike<typeof POS> {
             this.startNewSlot(nextSlotIndex);
 
             /** @todo Adjust the amount of time this slot will be keeped in memory later when it is decided when a block is considered final and minters are getting paid */
-            this.endSlot(nextSlotIndex.sub(Uint64.from(100)));
+            this.endSlot(nextSlotIndex.sub(100));
         });
 
         this.setupEvents();
