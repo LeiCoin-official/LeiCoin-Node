@@ -198,6 +198,8 @@ export class Chainstate {
         } else {
             chain.latestBlock = block;
         }
+
+        chain.stateHash.set(chain.calculateHash());
         this.updateChainStateFile();
     }
 
