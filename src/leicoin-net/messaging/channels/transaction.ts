@@ -6,7 +6,7 @@ import { Uint } from "../../../binary/uint.js";
 import { LNMsgType } from "../messageTypes.js";
 import { MessagingChannel } from "../abstractChannel.js";
 
-export default class NewTransactionChannel extends MessagingChannel {
+export class NewTransactionChannel extends MessagingChannel {
     readonly id = LNMsgType.NEW_TRANSACTION;
 
     async receive(type: LNMsgType, data: Uint) {

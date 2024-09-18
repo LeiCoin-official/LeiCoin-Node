@@ -105,7 +105,7 @@ export class LNSocketHandlerFactory {
             }
         
             async data(socket: LNSocket, data: Buffer) {
-                MessageRouter.receiveData(data);
+                MessageRouter.receiveData(data, socket.data.id);
             }
         
             async drain(socket: LNSocket) {}

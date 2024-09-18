@@ -1,6 +1,6 @@
 import Verification from "../../../verification/index.js"
 import Block from "../../../objects/block.js";
-import { type Uint } from "../../../binary/uint.js";
+import { Uint256, type Uint } from "../../../binary/uint.js";
 import POS from "../../../pos/index.js";
 import { type Slot } from "../../../pos/slot.js";
 import { MessagingChannel } from "../abstractChannel.js";
@@ -8,7 +8,7 @@ import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";
 import { LNMsgType } from "../messageTypes.js";
 
-export default class NewBlockPipeline extends MessagingChannel {
+export class NewBlockChannel extends MessagingChannel {
     readonly id = LNMsgType.NEW_BLOCK;
 
     async receive(type: LNMsgType, data: Uint) {
@@ -23,6 +23,17 @@ export default class NewBlockPipeline extends MessagingChannel {
 
         this.broadcast(type, data);
         (await POS.getSlot(block.slotIndex) as Slot).processBlock(block);
+
+    }
+    
+}
+
+export class GetBlocksChannel extends MessagingChannel {
+    readonly id = LNMsgType.GET_BLOCKS;
+
+    async receive(type: LNMsgType, data: Uint, socketID: Uint256) {
+        
+        
 
     }
     
