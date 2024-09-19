@@ -47,7 +47,8 @@
 		"elliptic": "^6.5.5",
 		"elysia": "^1.1.9",
 		"level-read-stream": "^1.1.0",
-		"patch-package": "^8.0.0"
+		"patch-package": "^8.0.0",
+		"reflect-metadata": "^0.2.2"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.1.6",
