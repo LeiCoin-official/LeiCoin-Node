@@ -6,7 +6,7 @@ export class LNConnections {
 
     private static instance: LNConnections;
     
-    static createInstance(connections: UintMap<LNSocket> = new UintMap()) {
+    static getInstance(connections: UintMap<LNSocket> = new UintMap()) {
         if (!this.instance) {
             this.instance = new LNConnections(connections);
         }

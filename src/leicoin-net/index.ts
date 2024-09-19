@@ -19,7 +19,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         if (this.initialized) return;
         this.initialized = true;
 
-        this.connections = LNConnections.createInstance();
+        this.connections = LNConnections.getInstance();
         MessageRouter.registerChannels();
         this.socketHandler = LNSocketHandlerFactory.create(this.connections);
     }
@@ -87,24 +87,18 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     private static async connectToNode(host: string, port: number) {
-        try {
-            const connection = await Bun.connect<SocketData>({
-                hostname: host,
-                port: port,
-                socket: this.socketHandler
-            })
-            this.connections.add(connection);
-        } catch (error: any) {
-            cli.leicoin_net.error(`Failed to connect to ${host}:${port}, Error: ${error.stack}`);
-        }
+        Bun.connect<SocketData>({
+            hostname: host,
+            port: port,
+            socket: this.socketHandler
+        });
     }
 
     static async stop() {
         
         for (const connection of this.connections.values()) {
-            connection.end();
+            connection.close();
         }
-        cli.leicoin_net.info(`Closed ${this.connections.size} connections`);
 
         if (this.server) {
             this.server.stop();
@@ -117,7 +111,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
     static async broadcast(data: Buffer) {
         for (const connection of this.connections.values()) {
-            connection.write(data);
+            connection.send(data);
         }
     }
 

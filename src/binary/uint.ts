@@ -287,10 +287,26 @@ export class Uint {
         return this.buffer.compare(value.buffer);
     }
 
+
     public get [Symbol.toStringTag]() {
         return this.constructor.name;
     }
 
+    public [Symbol.toPrimitive](hint: "string" | "number" | "default") {
+        switch (hint) {
+            case "string": return this.toHex();
+            case "number": return this.toInt();
+            default: return this.toHex();
+        }
+    }
+
+    public [Symbol.for('nodejs.util.inspect.custom')]() {
+        let output = "<" + this.constructor.name + " ";
+        for (let i = 0; i < this.buffer.byteLength; i++) {
+            output += this.buffer[i].toString(16).padStart(2, '0') + ' ';
+        }
+        return output.trim() + ">";
+    }
 }
 
 export class FixedUint extends Uint {
@@ -336,6 +352,7 @@ export class FixedUint extends Uint {
     }
 
 }
+
 
 export class Uint64 extends FixedUint {
 
@@ -397,7 +414,16 @@ export class Uint256 extends Uint64 {
     }
 }
 
+
 export class Uint8 extends FixedUint {
     public static readonly byteLength = 1;
+}
+
+export class Uint16 extends FixedUint {
+    public static readonly byteLength = 2;
+}
+
+export class Uint32 extends FixedUint {
+    public static readonly byteLength = 4;
 }
 

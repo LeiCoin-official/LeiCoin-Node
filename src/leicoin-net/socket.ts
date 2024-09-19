@@ -1,9 +1,11 @@
 import cli from "../cli/cli.js";
 import { MessageRouter } from "./messaging/index.js";
 import type { Socket, SocketHandler } from "bun";
-import { Uint, type Uint256 } from "../binary/uint.js";
+import { Uint, Uint32, type Uint256 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
 import { type LNConnections } from "./connections.js";
+import { LNMsgType } from "./messaging/messageTypes.js";
+import { UintMap } from "../binary/map.js";
 
 // class UnverifiedSocket {
 //     readonly verified: boolean;
@@ -52,66 +54,109 @@ export class SocketData {
     //readonly address: AddressHex;
     readonly host: string;
     readonly port: number;
-    readonly uri: string;
     readonly id: Uint256;
 
-    constructor(host: string, port: number) {
+    constructor(
+        readonly host: string
+        readonly port: number
+    ) {
         this.host = host;
         this.port = port;
-        this.uri = `${host}:${port}`;
-        this.id = LCrypt.sha256(Uint.from(this.uri, "utf8"));
+        this.id = LCrypt.sha256(Uint.from(`${host}:${port}`, "utf8"));
     }
 }
 
-export interface LNSocket extends Socket<SocketData> {
-    write(data: Buffer, byteOffset?: number, byteLength?: number): number;
+// export interface LNSocket extends Socket<SocketData> {
+//     write(data: Buffer, byteOffset?: number, byteLength?: number): number;
+// }
+
+export class Request {
+
+    constructor(
+        readonly type: LNMsgType,
+        readonly requestID: Uint32
+    ) {}
+
 }
 
-export interface BasicLNSocketHandler extends SocketHandler<SocketData> {}
+export class LNSocket {
+
+    readonly activeRequests: UintMap<Request> = new UintMap();
+
+    constructor(protected socket: Socket) {}
+
+    static async connect(host: string, port: number, handler: BasicLNSocketHandler) {
+        try {
+            return new LNSocket(await Bun.connect({
+                hostname: host,
+                port,
+                socket: handler
+            }));
+        } catch (err: any) {
+            cli.leicoin_net.error(`Failed to connect to ${host}:${port}. Error: ${err.name}`);
+            return null;
+        }
+    }
+
+    async send(data: Uint) {
+        return this.socket.write(data.getRaw());
+    }
+    
+    async receive() {
+        
+    }
+
+    async close(lastMessage?: Uint) {
+        return this.socket.end(lastMessage?.getRaw());
+    }
+
+}
+
+export abstract class BasicLNSocketHandler implements SocketHandler<SocketData> {
+    readonly binaryType = "buffer";
+}
 
 export class LNSocketHandlerFactory {
     static create(connections: LNConnections) {
 
-        return new class LNSocketHandler implements BasicLNSocketHandler {
-            readonly binaryType = "buffer";
+        return new class LNSocketHandler extends BasicLNSocketHandler implements SocketHandler<SocketData> {
         
-            async open(socket: LNSocket) {
+            async open(socket: Socket<SocketData>) {
                 connections.add(socket);
                 cli.leicoin_net.info(
                     `A Connection was established with ${socket.data.uri}`
                 );
             }
         
-            async close(socket: LNSocket) {
+            async close(socket: Socket<SocketData>) {
                 connections.remove(socket);
                 cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
             }
-            async end(socket: LNSocket) {
+            async end(socket: Socket<SocketData>) {
                 connections.remove(socket);
                 cli.leicoin_net.info(`Connection to ${socket.data.uri} ended.`);
             }
         
-            async timeout(socket: LNSocket) {
+            async timeout(socket: Socket<SocketData>) {
                 cli.leicoin_net.info(`Connection to ${socket.data.uri} timed out.`);
             }
         
-            async error(socket: LNSocket, error: Error) {
-                cli.leicoin_net.info(`Connection Error: ${error.stack}`);
+            async error(socket: Socket<SocketData>, error: Error) {
+                cli.leicoin_net.error(`Connection Error: ${error.stack}`);
             }
-            async connectError(socket: LNSocket, error: Error) {
-                cli.leicoin_net.info(
-                    `Connection Error: ${error.stack}`
-                );
+            async connectError(socket: Socket<SocketData>, error: Error) {
+                console.log(socket)
+                cli.leicoin_net.error(`Connection Error: ${error.name}`);
             }
         
-            async data(socket: LNSocket, data: Buffer) {
+            async data(socket: Socket<SocketData>, data: Buffer) {
                 MessageRouter.receiveData(data, socket.data.id);
             }
         
-            async drain(socket: LNSocket) {}
+            async drain(socket: Socket<SocketData>) {}
         
             async handshake(
-                socket: LNSocket,
+                socket: Socket<SocketData>,
                 success: boolean,
                 authorizationError: Error | null
             ) {}
