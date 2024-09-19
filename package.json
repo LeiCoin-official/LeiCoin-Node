@@ -35,28 +35,28 @@
 	"homepage": "https://github.com/LeiCraft/LeiCoin-Node#readme",
 	"dependencies": {
 		"@date-fns/utc": "^1.2.0",
-		"@elysiajs/cors": "^1.1.0",
+		"@elysiajs/cors": "^1.1.1",
 		"@noble/secp256k1": "^2.1.0",
 		"ansi-escapes": "^4.3.2",
-		"bun": "^1.1.26",
+		"bun": "^1.1.28",
 		"chalk": "^4.1.2",
 		"classic-level": "^1.4.1",
 		"cron": "^3.1.7",
 		"date-fns": "^3.6.0",
-		"dotenv": "^16.3.1",
-		"elliptic": "^6.5.5",
-		"elysia": "^1.1.9",
+		"dotenv": "^16.4.5",
+		"elliptic": "^6.5.7",
+		"elysia": "^1.1.13",
 		"level-read-stream": "^1.1.0",
 		"patch-package": "^8.0.0",
 		"reflect-metadata": "^0.2.2"
 	},
 	"devDependencies": {
-		"@types/bun": "^1.1.6",
+		"@types/bun": "^1.1.9",
 		"@types/cors": "^2.8.17",
 		"@types/elliptic": "^6.4.18",
-		"@types/node": "^20.10.1",
+		"@types/node": "^20.16.5",
 		"@types/node-cron": "^3.0.11",
 		"@types/readable-stream": "^4.0.15",
-		"typescript": "^5.3.3"
+		"typescript": "^5.6.2"
 	}
 }
