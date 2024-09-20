@@ -1,5 +1,12 @@
 import { Uint } from "../binary/uint.js";
 
+interface LockedUintConstructable {
+    new(buffer: Buffer): LockedUint;
+    from(hexType: string): LockedUint;
+
+    readonly byteLength: number;
+}
+
 class LockedUintConstructError extends Error {
     name = "LockedUintConstructError";
     message = "LockedUint can only be constructed from two digit Strings";
@@ -18,13 +25,13 @@ function lockedErr(...args: any[]): any {
     throw new LockedUintLockedError();
 }
 
-export class LockedUint extends Uint {
+export abstract class LockedUint extends Uint {
     public static readonly byteLength: number;
 
     public static from<T>(this: new(buffer: Buffer) => T, hexType: string): T;
     /** @deprecated If you don't use {@link Prefix.from}(hexType: string) instead, an error will occur! */
     public static from(...args: any[]): any;
-    public static from(input: string) {
+    public static from(this: LockedUintConstructable, input: string) {
         if (typeof input === "string" && input.length === this.byteLength * 2) {
             return new this(Buffer.from(input, "hex"));
         }

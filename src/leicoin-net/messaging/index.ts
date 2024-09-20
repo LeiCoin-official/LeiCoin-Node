@@ -1,16 +1,17 @@
 import { LeiCoinNetDataPackage } from "../packages.js";
 import { CB } from "../../utils/callbacks.js";
-import { NewBlockChannel } from "./channels/block.js";
+import { NewBlockMC } from "./channels/block.js";
 import { NewTransactionChannel } from "./channels/transaction.js";
 import { MessagingChannel, MessagingChannelConstructable } from "./abstractChannel.js";
-import { Uint256 } from "../../binary/uint.js";
+import { Uint, Uint256 } from "../../binary/uint.js";
+import { LNSocket } from "../socket.js";
 
 export class MessageRouter {
 
     private static channels: { [id: string]: MessagingChannel } = {};
 
     static registerChannels() {
-        this.registerChannel(NewBlockChannel);
+        this.registerChannel(NewBlockMC);
         this.registerChannel(NewTransactionChannel);
     }
 
@@ -19,7 +20,7 @@ export class MessageRouter {
         this.channels[channel.id.toHex()] = channel;
     }
 
-    static async receiveData(rawData: Buffer, socketID: Uint256) {
+    static async receiveData(rawData: Uint | Buffer, socket: LNSocket) {
 
         const data = LeiCoinNetDataPackage.extract(rawData);
 

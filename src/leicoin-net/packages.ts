@@ -30,10 +30,10 @@ export class LeiCoinNetDataPackage {
         ]);
     }
 
-    public static extract(data: Buffer): LeiCoinNetDataPackageLike {
+    public static extract(data: Uint | Buffer): LeiCoinNetDataPackageLike {
         return {
             type: new LNMsgType(data.subarray(0, 2)),
-            content: Uint.from(data.subarray(2))
+            content: new Uint(data.subarray(2))
         };
     }
 

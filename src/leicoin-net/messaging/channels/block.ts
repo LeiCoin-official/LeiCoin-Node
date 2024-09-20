@@ -8,7 +8,7 @@ import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";
 import { LNMsgType } from "../messageTypes.js";
 
-export class NewBlockChannel extends MessagingChannel {
+export class NewBlockMC extends MessagingChannel {
     readonly id = LNMsgType.NEW_BLOCK;
 
     async receive(type: LNMsgType, data: Uint) {
@@ -28,7 +28,7 @@ export class NewBlockChannel extends MessagingChannel {
     
 }
 
-export class GetBlocksChannel extends MessagingChannel {
+export class GetBlocksMC extends MessagingChannel {
     readonly id = LNMsgType.GET_BLOCKS;
 
     async receive(type: LNMsgType, data: Uint, socketID: Uint256) {

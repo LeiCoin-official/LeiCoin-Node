@@ -163,6 +163,7 @@ export class Uint {
     }
 
     public slice(start?: number, end?: number) {return this.nci_slice(Uint, start, end)}
+    public subarray(start?: number, end?: number) {return this.slice(start, end)}
     public split(afterBytes: number) {return this.nci_split(Uint, afterBytes)}
 
 
@@ -354,6 +355,19 @@ export class FixedUint extends Uint {
 }
 
 
+export class Uint8 extends FixedUint {
+    public static readonly byteLength = 1;
+}
+
+export class Uint16 extends FixedUint {
+    public static readonly byteLength = 2;
+}
+
+export class Uint32 extends FixedUint {
+    public static readonly byteLength = 4;
+}
+
+
 export class Uint64 extends FixedUint {
 
     public static readonly byteLength = 8;
@@ -396,9 +410,19 @@ export class Uint64 extends FixedUint {
 
 }
 
+
 // @ts-ignore
 export class Uint96 extends Uint64 {
     public static readonly byteLength = 12;
+
+    public toBigInt(): bigint {
+        throw new Error("Method not implemented.");
+    }
+}
+
+// @ts-ignore
+export class Uint128 extends Uint64 {
+    public static readonly byteLength = 16;
 
     public toBigInt(): bigint {
         throw new Error("Method not implemented.");
@@ -412,18 +436,5 @@ export class Uint256 extends Uint64 {
     public toBigInt(): bigint {
         throw new Error("Method not implemented.");
     }
-}
-
-
-export class Uint8 extends FixedUint {
-    public static readonly byteLength = 1;
-}
-
-export class Uint16 extends FixedUint {
-    public static readonly byteLength = 2;
-}
-
-export class Uint32 extends FixedUint {
-    public static readonly byteLength = 4;
 }
 
