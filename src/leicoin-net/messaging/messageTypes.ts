@@ -9,6 +9,8 @@ export class LNMsgType extends LockedUint {
 
 
     static readonly STATUS = LNMsgType.from("1761");
+    
+    static readonly CHALLENGE = LNMsgType.from("77a9");
 
     static readonly NEW_BLOCK = LNMsgType.from("2096");
     static readonly GET_BLOCKS = LNMsgType.from("d372");

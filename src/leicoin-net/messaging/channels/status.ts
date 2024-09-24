@@ -9,7 +9,6 @@ export class StatusMsg {
 
     constructor(
         readonly version: Uint16,
-        readonly host: IPv6Addr,
         readonly port: Port,
         readonly challenge: Uint256
     ) {}
@@ -17,7 +16,6 @@ export class StatusMsg {
     public encodeToHex() {
         return Uint.concat([
             this.version,
-            this.host,
             this.port,
             this.challenge
         ]);
@@ -28,9 +26,8 @@ export class StatusMsg {
 
         return new StatusMsg(
             new Uint16(hexData.slice(0, 2)),
-            new IPv6Addr(hexData.slice(2, 18)),
-            new Port(hexData.slice(18, 20)),
-            new Uint256(hexData.slice(20, 52))
+            new Port(hexData.slice(2, 4)),
+            new Uint256(hexData.slice(4, 36))
         );
     }
 
@@ -60,7 +57,6 @@ export class StatusMC extends MessagingChannel {
         socket.send(
             new StatusMsg(
                 new Uint16(0),
-                IPv6Addr.from(localAddr),
                 new Port(1234),
                 new Uint256(Uint.random(32))
             ).encodeToHex()
