@@ -1,5 +1,5 @@
 import { type TCPSocketListener } from "bun";
-import { LNSocketHandlerFactory, type BasicLNSocketHandler, type SocketData } from "./socket.js";
+import { LNSocketHandlerFactory, type BasicLNSocketHandler, type LNSocket } from "./socket.js";
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
@@ -10,7 +10,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
     public static started = false;
 
-    private static server: TCPSocketListener<SocketData>;
+    private static server: TCPSocketListener<LNSocket>;
 
     private static connections: LNConnections;
     private static socketHandler: BasicLNSocketHandler;
@@ -51,7 +51,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
     private static async startServer(host: string, port: number) {
         try {
-            this.server = Bun.listen<SocketData>({
+            this.server = Bun.listen({
                 hostname: host,
                 port: port,
                 socket: this.socketHandler
@@ -87,15 +87,22 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     private static async connectToNode(host: string, port: number) {
-        Bun.connect<SocketData>({
+        Bun.connect({
             hostname: host,
             port: port,
             socket: this.socketHandler
         });
     }
 
+    static getServerInfo() {
+        return {
+            host: this.server.hostname,
+            port: this.server.port
+        }
+    }
+
     static async stop() {
-        
+
         for (const connection of this.connections.values()) {
             connection.close();
         }
@@ -115,7 +122,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         }
     }
 
-    private static async setupEvents(eventHandler: EventEmitter) {}
+    private static async setupEvents(eventHandler: EventEmitter) { }
 
 }
 

@@ -1,4 +1,5 @@
 import { Uint, Uint16, Uint256 } from "../../../binary/uint.js";
+import LCrypt from "../../../crypto/index.js";
 import { IPv6Addr, Port } from "../../../objects/netinfo.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
@@ -41,7 +42,7 @@ export class StatusMC extends MessagingChannel {
         const status = StatusMsg.fromDecodedHex(data);
 
         if (!status) {
-            return null;
+            return;
         }
 
         if (socket.meta.id.eq(0)) {
@@ -50,18 +51,18 @@ export class StatusMC extends MessagingChannel {
 
     }
 
-    async send(socket: LNSocket) {
-
-        const { host: localAddr, port: localPort } = LeiCoinNetNode.getServerDetails();
+    async send(data: null, socket: LNSocket) {
 
         socket.send(
             new StatusMsg(
-                new Uint16(0),
-                new Port(1234),
-                new Uint256(Uint.random(32))
+                Uint16.from(0),
+                Port.from(LeiCoinNetNode.getServerInfo().port),
+                new Uint256(LCrypt.randomBytes(32))
             ).encodeToHex()
         )
 
     }
 
 }
+
+new StatusMC()

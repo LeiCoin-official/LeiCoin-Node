@@ -4,12 +4,12 @@ import cli from "../../../cli/cli.js";
 import Verification from "../../../verification/index.js"
 import { Uint } from "../../../binary/uint.js";
 import { LNMsgType } from "../messageTypes.js";
-import { MessagingChannel } from "../abstractChannel.js";
+import { BroadcastingChannel } from "../abstractChannel.js";
 
-export class NewTransactionChannel extends MessagingChannel {
+export class NewTransactionChannel extends BroadcastingChannel {
     readonly id = LNMsgType.NEW_TRANSACTION;
 
-    async receive(type: LNMsgType, data: Uint) {
+    async receive(data: Uint) {
 
         const transaction = Transaction.fromDecodedHex(data) as Transaction;
     
@@ -23,7 +23,7 @@ export class NewTransactionChannel extends MessagingChannel {
         
                 cli.leicoin_net.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
 
-                this.broadcast(type, data);
+                this.broadcast(data);
 
             } else {
                 cli.leicoin_net.error(`Transaction with hash ${transaction.txid} is invalid. Error: ${JSON.stringify(validationresult)}`);

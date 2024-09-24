@@ -3,15 +3,16 @@ import Block from "../../../objects/block.js";
 import { Uint256, type Uint } from "../../../binary/uint.js";
 import POS from "../../../pos/index.js";
 import { type Slot } from "../../../pos/slot.js";
-import { MessagingChannel } from "../abstractChannel.js";
+import { BroadcastingChannel, MessagingChannel } from "../abstractChannel.js";
 import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";
 import { LNMsgType } from "../messageTypes.js";
+import { type LNSocket } from "../../socket.js";
 
-export class NewBlockMC extends MessagingChannel {
+export class NewBlockMC extends BroadcastingChannel {
     readonly id = LNMsgType.NEW_BLOCK;
 
-    async receive(type: LNMsgType, data: Uint) {
+    async receive(data: Uint) {
         const block = Block.fromDecodedHex(data) as Block;
 
         const verification_result = await Verification.verifyMintedBlock(block);
@@ -21,7 +22,7 @@ export class NewBlockMC extends MessagingChannel {
             return;
         }
 
-        this.broadcast(type, data);
+        this.broadcast(data);
         (await POS.getSlot(block.slotIndex) as Slot).processBlock(block);
 
     }
@@ -29,12 +30,18 @@ export class NewBlockMC extends MessagingChannel {
 }
 
 export class GetBlocksMC extends MessagingChannel {
+
     readonly id = LNMsgType.GET_BLOCKS;
 
-    async receive(type: LNMsgType, data: Uint, socketID: Uint256) {
+    async receive(data: Uint, socketID: LNSocket) {
         
         
 
     }
+
+    async send(data: Uint, socket: LNSocket) {
+        
+    }
     
 }
+
