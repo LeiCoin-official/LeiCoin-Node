@@ -4,7 +4,7 @@ import HTTP_API from "../http_api/index.js";
 import POS from "../pos/index.js";
 import LeiCoinNetNode from "../leicoin-net/index.js";
 import { Blockchain } from "../storage/blockchain.js";
-import { IModuleLike, ModuleLike } from "./dataUtils.js";
+import { type IModuleLike } from "./dataUtils.js";
 
 class Utils {
     private static initialized = false;

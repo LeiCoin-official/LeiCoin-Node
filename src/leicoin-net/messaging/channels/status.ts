@@ -1,6 +1,6 @@
 import { Uint, Uint16, Uint256 } from "../../../binary/uint.js";
 import LCrypt from "../../../crypto/index.js";
-import { IPv6Addr, Port } from "../../../objects/netinfo.js";
+import { Port } from "../../../objects/netinfo.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
 import { MessagingChannel } from "../abstractChannel.js";
@@ -65,4 +65,3 @@ export class StatusMC extends MessagingChannel {
 
 }
 
-new StatusMC()

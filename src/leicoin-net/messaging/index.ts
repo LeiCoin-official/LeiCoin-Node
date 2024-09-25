@@ -3,7 +3,7 @@ import { CB } from "../../utils/callbacks.js";
 import { NewBlockMC } from "./channels/block.js";
 import { NewTransactionChannel } from "./channels/transaction.js";
 import { MessagingChannel, MessagingChannelConstructable } from "./abstractChannel.js";
-import { Uint, Uint256 } from "../../binary/uint.js";
+import { Uint } from "../../binary/uint.js";
 import { LNSocket } from "../socket.js";
 
 export class MessageRouter {

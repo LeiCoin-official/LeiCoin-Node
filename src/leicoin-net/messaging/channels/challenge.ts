@@ -9,13 +9,16 @@ export class ChallengeMC extends MessagingChannel {
 
     async receive(data: Uint, socket: LNSocket) {
         
+        
+
     }
 
 
-    async send(data: Uint | null, socket: LNSocket) {
+    async send(data: Uint, socket: LNSocket) {
         
+        
+
     }
 
 }
 
-new ChallengeMC()
