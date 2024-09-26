@@ -2,13 +2,15 @@ import { LeiCoinNetDataPackage } from "../packages.js";
 import { CB } from "../../utils/callbacks.js";
 import { NewBlockMC } from "./channels/block.js";
 import { NewTransactionChannel } from "./channels/transaction.js";
-import { MessagingChannel, MessagingChannelConstructable } from "./abstractChannel.js";
+import { type MessagingChannel, type MessagingChannelConstructable } from "./abstractChannel.js";
 import { Uint } from "../../binary/uint.js";
-import { LNSocket } from "../socket.js";
+import { type LNRequest, type LNSocket } from "../socket.js";
+import { UintMap } from "../../binary/map.js";
 
 export class MessageRouter {
 
     private static channels: { [id: string]: MessagingChannel } = {};
+    static globalRequests: UintMap<LNRequest> = new UintMap();
 
     static registerChannels() {
         this.registerChannel(NewBlockMC);
