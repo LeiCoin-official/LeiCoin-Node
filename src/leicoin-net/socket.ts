@@ -30,23 +30,31 @@ export class SocketMetadata {
     }
 }
 
-
 export class LNRequest {
 
-    readonly requestID: Uint32;
     readonly expectedTypes: LNMsgType | LNMsgType[];
 
-    constructor(requestID: Uint32, expectedTypes: LNMsgType[]);
-    constructor(requestID: Uint32, expectedType: LNMsgType);
-    constructor(arg0: Uint32, arg1: LNMsgType | LNMsgType[]) {
-        this.requestID = arg0;
-        this.expectedTypes = Array.isArray(arg1) ? arg1 : [arg1];
+    constructor(requestID: Uint32, type: LNRequest.Type, expectedTypes: LNMsgType[]);
+    constructor(requestID: Uint32, type: LNRequest.Type, expectedType: LNMsgType);
+    constructor(
+        readonly requestID: Uint32,
+        readonly type: LNRequest.Type,
+        arg2: LNMsgType | LNMsgType[]
+    ) {
+        this.expectedTypes = Array.isArray(arg2) ? arg2 : [arg2];
     }
 
     public resolve(data: Uint) {
         
     }
 
+}
+
+export namespace LNRequest {
+    export enum Type {
+        INCOMING,
+        OUTGOING
+    }
 }
 
 export class LNSocket {

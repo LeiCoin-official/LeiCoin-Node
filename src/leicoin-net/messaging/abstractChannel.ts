@@ -1,4 +1,4 @@
-import { Uint256, type Uint } from "../../binary/uint.js";
+import { type Uint } from "../../binary/uint.js";
 import LeiCoinNetNode from "../index.js";
 import { type LNMsgType } from "./messageTypes.js";
 import { LeiCoinNetDataPackage } from "../packages.js";
