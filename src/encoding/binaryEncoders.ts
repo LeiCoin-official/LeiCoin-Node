@@ -6,18 +6,27 @@ import { Uint } from "../binary/uint.js";
 import ObjectEncoding from "./objects.js";
 import { AnyObj } from "../utils/dataUtils.js";
 
+
+interface EncodeableObjInstance {
+    encodeToHex(forHash: boolean): Uint;
+}
+
+interface EncodeableObj {
+    new(...args: any[]): EncodeableObjInstance;
+    prototype: EncodeableObjInstance;
+    fromDecodedHex(hexData: Uint, returnLength: boolean): { data: EncodeableObjInstance, length: number } | EncodeableObjInstance | null;
+}
+
+
 export abstract class DataEncoder {
 
-    public readonly key: string;
-    public readonly hashRemove: boolean;
+    constructor(
+        readonly key: string,
+        readonly hashRemove: boolean
+    ) {}
 
-    constructor(key: string, hashRemove: boolean) {
-        this.key = key;
-        this.hashRemove = hashRemove;
-    }
-
-    public abstract encode(v: any): Uint[] | null;
-    public abstract decode(v: Uint): {
+    abstract encode(v: any): Uint[] | null;
+    abstract decode(v: Uint): {
         data: any,
         length: number
     } | null;
@@ -25,22 +34,14 @@ export abstract class DataEncoder {
 }
 
 class ArrayEncoder extends DataEncoder {
-
-    readonly prefixLength: number | "unlimited";
-    readonly decodeFunc: (hexData: Uint, returnLength: boolean) => any;
-    readonly encodeFunc: (forHash: boolean) => Uint;
     
     constructor(
         key: string,
-        prefixLength: number | "unlimited",
-        encodeFunc: (forHash: boolean) => Uint,
-        decodeFunc: (hexData: Uint, returnLength: boolean) => any,
+        readonly prefixLength: number | "unlimited",
+        readonly targetObject: EncodeableObj,
         hashRemove: boolean
     ) {
         super(key, hashRemove);
-        this.prefixLength = prefixLength;
-        this.encodeFunc = encodeFunc;
-        this.decodeFunc = decodeFunc;
     }
 
     public encode(array: any[]) {
@@ -54,7 +55,7 @@ class ArrayEncoder extends DataEncoder {
         }
 
         for (let item of array) {
-            result.push(this.encodeFunc.call(item, false));
+            result.push(this.targetObject.prototype.encodeToHex.call(item, false));
         }
 
         return result;
@@ -75,7 +76,7 @@ class ArrayEncoder extends DataEncoder {
         let total_arrayLength = prefixLength;
             
         for (let i = 0; i < arrayCount; i++) {
-            const array_item = this.decodeFunc(arrayData, true);
+            const array_item = this.targetObject.fromDecodedHex(arrayData, true) as { data: any, length: number };
             final_array.push(array_item.data);
             arrayData = arrayData.slice(array_item.length);
             total_arrayLength += array_item.length;
@@ -89,23 +90,22 @@ class ArrayEncoder extends DataEncoder {
 
 }
 
-class ObjectEncoder extends DataEncoder  {
+class ObjectEncoder extends DataEncoder {
 
-    readonly encodeFunc: (forHash: boolean) => Uint;
-    readonly decodeFunc: (hexData: Uint, returnLength: boolean) => { data: any, length: number } | null;
-
-    constructor(key: string, encodeFunc: (forHash: boolean) => Uint, decodeFunc: (hexData: Uint, returnLength: boolean) => any, hashRemove: boolean) {
+    constructor(
+        key: string,
+        readonly targetObject: EncodeableObj,
+        hashRemove: boolean
+    ) {
         super(key, hashRemove);
-        this.encodeFunc = encodeFunc;
-        this.decodeFunc = decodeFunc;
     }
 
     public encode(object: AnyObj) {
-        return [this.encodeFunc.call(object, false)];
+        return [this.targetObject.prototype.encodeToHex.call(object, false)];
     }
 
     public decode(hexData: Uint) {
-        return this.decodeFunc(hexData, true);
+        return this.targetObject.fromDecodedHex(hexData, true) as { data: any, length: number };
     }
 }
 
@@ -274,17 +274,15 @@ export namespace BE {
     export const Array = (
         key: string,
         prefixLength: number | "unlimited",
-        encodeFunc: (forHash: boolean) => Uint,
-        decodeFunc: (hexData: Uint, returnLength: boolean) => any,
+        targetObject: EncodeableObj,
         hashRemove = false
-    ) => new ArrayEncoder(key, prefixLength, encodeFunc, decodeFunc, hashRemove);
+    ) => new ArrayEncoder(key, prefixLength, targetObject, hashRemove);
 
     export const Object = (
         key: string,
-        encodeFunc: (forHash: boolean) => Uint,
-        decodeFunc: (hexData: Uint, returnLength: boolean) => any,
+        targetObject: EncodeableObj,
         hashRemove = false
-    ) => new ObjectEncoder(key, encodeFunc, decodeFunc, hashRemove);
+    ) => new ObjectEncoder(key, targetObject, hashRemove);
 
     export const Custom = (
         key: string,

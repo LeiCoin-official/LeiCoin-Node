@@ -50,7 +50,7 @@ export class Block {
                     block.minter = AddressHex.fromSignature(block.calculateHash(), data.signature);
                 }
 
-                if (returnLength) {
+                if (returnData.length) {
                     return {data: block, length: returnData.length};
                 }
                 return block;
@@ -70,7 +70,7 @@ export class Block {
         BE.Hash("previousHash"),
         BE.BigInt("timestamp"),
         BE.Signature("signature", true),
-        BE.Array("transactions", 2, Transaction.prototype.encodeToHex, Transaction.fromDecodedHex)
+        BE.Array("transactions", 2, Transaction)
     ]
 
     public calculateHash() {

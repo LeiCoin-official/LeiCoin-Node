@@ -70,7 +70,7 @@ export class Transaction {
                     instance.senderAddress = AddressHex.fromSignature(data.txid, data.signature);
                 }
 
-                if (returnLength) {
+                if (returnData.length) {
                     return {data: instance, length: returnData.length};
                 }
                 return instance;

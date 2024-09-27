@@ -63,7 +63,7 @@ export class LNSocket {
 
     constructor(
         protected socket: Socket<any>,
-        readonly activeRequests: UintMap<LNRequest> = new UintMap()
+        readonly activeRequests: Uint32[]
     ) {}
 
     static async connect(host: string, port: number, handler: BasicLNSocketHandler) {
@@ -85,9 +85,21 @@ export class LNSocket {
         );
     }
     
+
+    /** @todo Data should be an object that */ 
+    async request(data: any) {
+        return new Promise<Uint>((resolve) => {
+            const requestID = new Uint32(LCrypt.randomBytes(4))
+            this.activeRequests.push(requestID);
+
+
+
+        });
+    }
+
     async receive(data: Uint | Buffer) {
         
-        MessageRouter.receiveData(data, socket.data.id);
+        // MessageRouter.receiveData(data, this);
 
     }
 

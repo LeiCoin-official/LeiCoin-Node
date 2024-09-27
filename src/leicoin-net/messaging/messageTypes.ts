@@ -22,3 +22,7 @@ export class LNMsgType extends LockedUint {
 
 }
 
+export abstract class MsgObject {
+    
+}
+

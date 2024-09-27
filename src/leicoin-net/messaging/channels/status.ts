@@ -1,5 +1,4 @@
-import { Uint, Uint16, Uint256 } from "../../../binary/uint.js";
-import LCrypt from "../../../crypto/index.js";
+import { Uint, Uint16 } from "../../../binary/uint.js";
 import { Port } from "../../../objects/netinfo.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
@@ -20,7 +19,7 @@ export class StatusMsg {
         ]);
     }
     
-    public static fromDecodedHex(hexData: Uint) {
+    static fromDecodedHex(hexData: Uint) {
         if (hexData.getLen() !== 4) return null;
 
         return new StatusMsg(

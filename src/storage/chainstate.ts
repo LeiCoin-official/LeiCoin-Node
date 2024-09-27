@@ -47,7 +47,7 @@ class ForkChainstateData {
                     data.latestBlock
                 )
 
-                if (returnLength) {
+                if (returnData.length) {
                     return {data: forkChainstateData, length: returnData.length};
                 }
                 return forkChainstateData;
@@ -66,8 +66,8 @@ class ForkChainstateData {
     private static encodingSettings: DataEncoder[] = [
         BE.Hash("stateHash", true),
         BE.Hash("parentChain"),
-        BE.Object("base", Block.prototype.encodeToHex, Block.fromDecodedHex),
-        BE.Object("latestBlock", Block.prototype.encodeToHex, Block.fromDecodedHex)
+        BE.Object("base", Block),
+        BE.Object("latestBlock", Block)
     ]
 
 }
@@ -125,7 +125,7 @@ class ChainstateData {
 
     private static encodingSettings: DataEncoder[] = [
         BE.PX("version"),
-        BE.Array("chains", 2, ForkChainstateData.prototype.encodeToHex, ForkChainstateData.fromDecodedHex)
+        BE.Array("chains", 2, ForkChainstateData)
     ]
 
 }

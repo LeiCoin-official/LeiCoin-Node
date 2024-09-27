@@ -1,8 +1,8 @@
+import fs from "fs";
 import { describe, test, expect } from "bun:test";
 import Transaction from "../src/objects/transaction.js";
 import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
-import fs from "fs";
 import Signature from "../src/crypto/signature.js";
 import { Uint256, Uint64 } from "../src/binary/uint.js";
 import { AddressHex } from "../src/objects/address.js";
