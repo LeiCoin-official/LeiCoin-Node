@@ -62,7 +62,7 @@ export {
 
 export abstract class AbstractBinaryMap<K extends Uint, V> {
     
-    private readonly store: Dict<V> = {};
+    protected readonly store: Dict<V> = {};
 
     constructor(
         protected readonly CLS: BasicUintConstructable<K>,
