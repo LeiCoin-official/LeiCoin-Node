@@ -5,11 +5,18 @@ import { NewTransactionChannel } from "./channels/transaction.js";
 import { BasicMessagingChannel, type MessagingChannel, type MessagingChannelConstructable } from "./abstractChannel.js";
 import { Uint } from "../../binary/uint.js";
 import { type LNRequest, type LNSocket } from "../socket.js";
-import { UintMap } from "../../binary/map.js";
+import { AbstractBinaryMap, UintMap } from "../../binary/map.js";
+import { LNMsgType } from "./messageTypes.js";
+
+class MessagingChannelMap<V extends BasicMessagingChannel = BasicMessagingChannel> extends AbstractBinaryMap<LNMsgType, V> {
+    constructor(entries?: readonly (readonly [LNMsgType, V])[]) {
+        super(LNMsgType, entries);
+    }
+}
 
 export class MessageRouter {
 
-    private static channels: { [id: string]: BasicMessagingChannel } = {};
+    private static channels: MessagingChannelMap = new MessagingChannelMap();
     static globalRequests: UintMap<LNRequest> = new UintMap();
 
     static registerChannels() {
@@ -19,7 +26,11 @@ export class MessageRouter {
 
     private static registerChannel(CLS: MessagingChannelConstructable) {
         const channel = new CLS();
-        this.channels[channel.id.toHex()] = channel;
+        this.channels.set(channel.id, channel);
+    }
+
+    static getChannel(id: LNMsgType) {
+        return this.channels.get(id);
     }
 
     static async receiveData(rawData: Uint | Buffer, socket: LNSocket) {

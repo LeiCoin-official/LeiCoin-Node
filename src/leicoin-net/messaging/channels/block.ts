@@ -23,7 +23,7 @@ export class NewBlockMC extends BroadcastingChannel {
         }
 
         this.broadcast(data);
-        (await POS.getSlot(block.slotIndex) as Slot).processBlock(block);
+        (await POS.getSlot(block.slotIndex)).processBlock(block);
 
     }
     

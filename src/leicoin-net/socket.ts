@@ -6,6 +6,7 @@ import { type LNConnections } from "./connections.js";
 import { LNMsgType, LNRequestMsg } from "./messaging/messageTypes.js";
 import { Deferred } from "../utils/deferred.js";
 import { UintMap } from "../binary/map.js";
+import MessageRouter from "./messaging/index.js";
 
 export class SocketMetadata {
     constructor(
@@ -97,9 +98,9 @@ export class LNSocket {
     }
 
     async receive(data: Uint | Buffer) {
-        // MessageRouter.receiveData(data, this);
+        const type = new LNMsgType(data.subarray(0, 2));
 
-
+        const channel = MessageRouter.getChannel(type);
 
     }
 
