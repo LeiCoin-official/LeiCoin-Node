@@ -82,14 +82,14 @@ export class Transaction {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
-        BE.Hash("txid", true),
-        BE.Address("recipientAddress"),
+        BE(PX, "version"),
+        BE(Uint256, "txid", true),
+        BE(AddressHex, "recipientAddress"),
         BE.BigInt("amount"),
         BE.BigInt("nonce"),
         BE.BigInt("timestamp"),
         BE.Custom("input", { type: "prefix", val: "unlimited" }),
-        BE.Signature("signature", true)
+        BE(Signature, "signature", true)
     ]
 
     public calculateHash() {

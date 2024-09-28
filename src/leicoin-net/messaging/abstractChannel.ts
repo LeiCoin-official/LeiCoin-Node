@@ -4,9 +4,9 @@ import { type LNMsgType } from "./messageTypes.js";
 import { LeiCoinNetDataPackage } from "../packages.js";
 import { type LNSocket } from "../socket.js";
 
-export type MessagingChannelConstructable<T extends MessagingChannel = MessagingChannel> = new() => T;
+export type MessagingChannelConstructable<T extends BasicMessagingChannel = BasicMessagingChannel> = new() => T;
 
-abstract class BasicMessagingChannel {
+export abstract class BasicMessagingChannel {
     abstract readonly id: LNMsgType;
     abstract receive(data: Uint, socket: LNSocket): Promise<void>;
 }

@@ -6,7 +6,7 @@ import Block from "../objects/block.js";
 import { PX } from "../objects/prefix.js";
 import { Uint, Uint256 } from "../binary/uint.js";
 import { CB } from "../utils/callbacks.js";
-import { DataUtils, Dict } from "../utils/dataUtils.js";
+import { Dict } from "../utils/dataUtils.js";
 import BCUtils from "./blockchainUtils.js";
 import { Blockchain } from "./blockchain.js";
 
@@ -64,8 +64,8 @@ class ForkChainstateData {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.Hash("stateHash", true),
-        BE.Hash("parentChain"),
+        BE(Uint256, "stateHash", true),
+        BE(Uint256, "parentChain"),
         BE.Object("base", Block),
         BE.Object("latestBlock", Block)
     ]
@@ -124,7 +124,7 @@ class ChainstateData {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
+        BE(PX, "version"),
         BE.Array("chains", 2, ForkChainstateData)
     ]
 

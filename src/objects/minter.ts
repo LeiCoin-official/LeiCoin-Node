@@ -45,7 +45,7 @@ export class Minter {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
+        BE(PX, "version"),
         //{key: "address"},
         BE.BigInt("stake")
     ]

@@ -1,7 +1,4 @@
-import { AddressHex as AddressHexClass } from "../objects/address.js";
-import { Signature as SignatureClass } from "../crypto/signature.js";
-import { Uint256 as Uint256Class, Uint64, Uint8 } from "../binary/uint.js";
-import { PX as PXClass } from "../objects/prefix.js";
+import { FixedUint, Uint64, Uint8 } from "../binary/uint.js";
 import { Uint } from "../binary/uint.js";
 import ObjectEncoding from "./objects.js";
 import { AnyObj } from "../utils/dataUtils.js";
@@ -15,6 +12,12 @@ interface EncodeableObj {
     new(...args: any[]): EncodeableObjInstance;
     prototype: EncodeableObjInstance;
     fromDecodedHex(hexData: Uint, returnLength: boolean): { data: EncodeableObjInstance, length: number } | EncodeableObjInstance | null;
+}
+
+
+interface FixedUintConstructor<T extends FixedUint> {
+    readonly byteLength: number;
+    create: (v: Uint | Buffer) => T;
 }
 
 
@@ -151,33 +154,30 @@ class BoolEncoder extends DataEncoder {
     }
 }
 
-class AdvancedTypeEncoderFactory {
+class FixedUintEncoder<T extends FixedUint> extends DataEncoder {
 
-    static create<T extends Uint>(type: {
-        readonly byteLength: number,
-        create: (v: Uint) => T,
-    }) {
-        return class BinaryDataEncoder extends DataEncoder {
-
-            readonly prefixLength = type.byteLength;
-
-            public encode(v: Uint) {
-                return [v];
-            }
-
-            public decode(hexData: Uint) {
-                const hexValue = hexData.slice(0, this.prefixLength);
-                if (hexValue.getLen() !== this.prefixLength) {
-                    return null;
-                }
-                return {
-                    data: type.create(hexValue),
-                    length: hexValue.getLen()
-                };
-            }
-        }
+    constructor(
+        private readonly CLS: FixedUintConstructor<T>,
+        key: string,
+        hashRemove: boolean
+    ) {
+        super(key, hashRemove);
     }
 
+    public encode(v: Uint) {
+        return [v];
+    }
+
+    public decode(hexData: Uint) {
+        const hexValue = hexData.slice(0, this.CLS.byteLength);
+        if (hexValue.getLen() !== this.CLS.byteLength) {
+            return null;
+        }
+        return {
+            data: this.CLS.create(hexValue),
+            length: hexValue.getLen()
+        };
+    }
 }
 
 class CustomEncoder extends DataEncoder {
@@ -256,20 +256,13 @@ class CustomEncoder extends DataEncoder {
 
 }
 
-const AddressEncoder = AdvancedTypeEncoderFactory.create(AddressHexClass);
-const SignatureEncoder = AdvancedTypeEncoderFactory.create(SignatureClass);
-const Uint256Encoder = AdvancedTypeEncoderFactory.create(Uint256Class);
-const PXEncoder = AdvancedTypeEncoderFactory.create(PXClass);
+export function BE<T extends FixedUint>(CLS: FixedUintConstructor<T>, key: string, hashRemove = false) {
+    return new FixedUintEncoder(CLS, key, hashRemove);
+}
 
 export namespace BE {
     export const BigInt = (key: string, hashRemove = false) => new BigIntEncoder(key, hashRemove);
     export const Bool = (key: string, hashRemove = false) => new BoolEncoder(key, hashRemove);
-
-    export const Address = (key: string, hashRemove = false) => new AddressEncoder(key, hashRemove);
-    export const Signature = (key: string, hashRemove = false) => new SignatureEncoder(key, hashRemove);
-    export const Uint256 = (key: string, hashRemove = false) => new Uint256Encoder(key, hashRemove);
-    export const Hash = Uint256;
-    export const PX = (key: string, hashRemove = false) => new PXEncoder(key, hashRemove);
 
     export const Array = (
         key: string,

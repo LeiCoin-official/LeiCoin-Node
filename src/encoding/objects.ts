@@ -44,7 +44,7 @@ export class ObjectEncoding {
         ];
     }
     
-    public static encode(object: AnyObj, keyConfigs: DataEncoder[], forHash: boolean) {
+    public static encode(object: AnyObj, keyConfigs: readonly DataEncoder[], forHash: boolean) {
         try {
             const hexData: Uint[] = [];
 
@@ -68,10 +68,10 @@ export class ObjectEncoding {
         }
     }
     
-    public static decode(hexData: Uint, keyConfigs: DataEncoder[], returnLength: true): OEDecodeResult<OEDecodeWithLengthResult>;
-    public static decode(hexData: Uint, keyConfigs: DataEncoder[], returnLength?: false): OEDecodeResult<OEDecodeStandardResult>;
-    public static decode(hexData: Uint, keyConfigs: DataEncoder[], returnLength: boolean): OEDecodeResult<OEDecodeUnknownResult>;
-    public static decode(hexData: Uint, keyConfigs: DataEncoder[], returnLength = false) {
+    public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength: true): OEDecodeResult<OEDecodeWithLengthResult>;
+    public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength?: false): OEDecodeResult<OEDecodeStandardResult>;
+    public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength: boolean): OEDecodeResult<OEDecodeUnknownResult>;
+    public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength = false) {
         try {
             const final_data: Dict<any> = {};
             let current_length = 0;

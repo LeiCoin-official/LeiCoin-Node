@@ -1,20 +1,11 @@
 import cli from "../cli/cli.js";
-import { MessageRouter } from "./messaging/index.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256, Uint32 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
 import { type LNConnections } from "./connections.js";
-import { LNMsgType } from "./messaging/messageTypes.js";
+import { LNMsgType, LNRequestMsg } from "./messaging/messageTypes.js";
+import { Deferred } from "../utils/deferred.js";
 import { UintMap } from "../binary/map.js";
-import Schedule from "../utils/schedule.js";
-
-
-// type SocketData = UnverifiedSocket | VerifiedSocket;
-
-// export interface LNSocket extends Socket<SocketData> {
-//     write(data: Buffer, byteOffset?: number, byteLength?: number): number;
-// }
-
 
 export class SocketMetadata {
     constructor(
@@ -32,30 +23,32 @@ export class SocketMetadata {
 
 export class LNRequest {
 
-    readonly expectedTypes: LNMsgType | LNMsgType[];
+    readonly expectedTypes: LNMsgType[];
 
-    constructor(requestID: Uint32, type: LNRequest.Type, expectedTypes: LNMsgType[]);
-    constructor(requestID: Uint32, type: LNRequest.Type, expectedType: LNMsgType);
     constructor(
-        readonly requestID: Uint32,
-        readonly type: LNRequest.Type,
-        arg2: LNMsgType | LNMsgType[]
+        expectedTypes: LNMsgType[] | LNMsgType,
+        readonly requestID: Uint32 = new Uint32(LCrypt.randomBytes(4)),
+        readonly result: Deferred<Uint> = new Deferred()
     ) {
-        this.expectedTypes = Array.isArray(arg2) ? arg2 : [arg2];
+        this.expectedTypes = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
     }
 
     public resolve(data: Uint) {
-        
+        /**
+         * @todo Check if the data is of the expected type and more error handling
+         * @todo Implement a timeout for the request
+         */
+        this.result.resolve(data);
     }
 
 }
 
-export namespace LNRequest {
-    export enum Type {
-        INCOMING,
-        OUTGOING
-    }
-}
+// export namespace LNRequest {
+//     export enum Type {
+//         INCOMING,
+//         OUTGOING
+//     }
+// }
 
 export class LNSocket {
 
@@ -63,7 +56,7 @@ export class LNSocket {
 
     constructor(
         protected socket: Socket<any>,
-        readonly activeRequests: Uint32[]
+        readonly activeRequests: UintMap<LNRequest> = new UintMap()
     ) {}
 
     static async connect(host: string, port: number, handler: BasicLNSocketHandler) {
@@ -87,19 +80,26 @@ export class LNSocket {
     
 
     /** @todo Data should be an object that */ 
-    async request(data: any) {
+    async request(data: LNRequestMsg) {
         return new Promise<Uint>((resolve) => {
-            const requestID = new Uint32(LCrypt.randomBytes(4))
-            this.activeRequests.push(requestID);
+            const request = new LNRequest(data.type);
+            this.activeRequests.set(request.requestID, request);
 
+            this.send(Uint.concat([
+                data.type,
+                request.requestID,
+                data.encodeToHex()
+            ]));
 
-
+            const response = request.result.awaitResult();
+            resolve(response);
         });
     }
 
     async receive(data: Uint | Buffer) {
-        
         // MessageRouter.receiveData(data, this);
+
+
 
     }
 

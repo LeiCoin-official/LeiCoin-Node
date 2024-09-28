@@ -1,5 +1,5 @@
 import ObjectEncoding from "../encoding/objects.js";
-import { NumberLike, Uint, Uint64 } from "../binary/uint.js";
+import { NumberLike, Uint, Uint256, Uint64 } from "../binary/uint.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
@@ -45,7 +45,7 @@ export class Wallet {
     }
 
     protected static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
+        BE(PX, "version"),
         BE.BigInt("balance"),
         BE.BigInt("nonce")
     ]
@@ -126,8 +126,8 @@ export class SecretWallet extends Wallet {
     }
 
     protected static SencodingSettings: DataEncoder[] = [
-        BE.PX("version"),
-        BE.Uint256("privateKey"),
+        BE(PX, "version"),
+        BE(Uint256, "privateKey"),
         BE.BigInt("balance"),
         BE.BigInt("nonce")
     ]

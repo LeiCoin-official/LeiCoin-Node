@@ -1,32 +1,33 @@
 import { Uint, Uint16 } from "../../../binary/uint.js";
+import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
+import { Dict } from "../../../utils/dataUtils.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
 import { MessagingChannel } from "../abstractChannel.js";
-import { LNMsgType } from "../messageTypes.js";
+import { LNMsgObject, LNMsgType } from "../messageTypes.js";
 
-export class StatusMsg {
+export class StatusMsg extends LNMsgObject {
+
+    static readonly type = LNMsgType.STATUS;
 
     constructor(
         readonly version: Uint16,
         readonly port: Port
-    ) {}
-
-    public encodeToHex() {
-        return Uint.concat([
-            this.version,
-            this.port
-        ]);
-    }
+    ) {super()}
     
-    static fromDecodedHex(hexData: Uint) {
-        if (hexData.getLen() !== 4) return null;
-
+    protected static fromDict(obj: Dict<any>) {
         return new StatusMsg(
-            new Uint16(hexData.slice(0, 2)),
-            new Port(hexData.slice(2, 4))
-        );
+            obj.version,
+            obj.port
+        )
     }
+
+    protected static readonly encodingSettings: DataEncoder[] = [
+        ...super.encodingSettings,
+        BE(Uint16, "version"),
+        BE(Port, "port")
+    ]
 
 }
 

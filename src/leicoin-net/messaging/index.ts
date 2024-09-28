@@ -2,14 +2,14 @@ import { LeiCoinNetDataPackage } from "../packages.js";
 import { CB } from "../../utils/callbacks.js";
 import { NewBlockMC } from "./channels/block.js";
 import { NewTransactionChannel } from "./channels/transaction.js";
-import { type MessagingChannel, type MessagingChannelConstructable } from "./abstractChannel.js";
+import { BasicMessagingChannel, type MessagingChannel, type MessagingChannelConstructable } from "./abstractChannel.js";
 import { Uint } from "../../binary/uint.js";
 import { type LNRequest, type LNSocket } from "../socket.js";
 import { UintMap } from "../../binary/map.js";
 
 export class MessageRouter {
 
-    private static channels: { [id: string]: MessagingChannel } = {};
+    private static channels: { [id: string]: BasicMessagingChannel } = {};
     static globalRequests: UintMap<LNRequest> = new UintMap();
 
     static registerChannels() {
@@ -26,7 +26,7 @@ export class MessageRouter {
 
         const data = LeiCoinNetDataPackage.extract(rawData);
 
-        const channel: MessagingChannel | undefined = this.channels[data.type.toHex()];
+        const channel: BasicMessagingChannel | undefined = this.channels[data.type.toHex()];
 
         if (!channel) {
             return { cb: CB.NONE, message: `Unknown Data Type: ${data.type}` };
@@ -34,7 +34,7 @@ export class MessageRouter {
 
         
 
-        await channel.receive(data.type, data.content, socketID);
+        await channel.receive(data.content, socket);
 
     }
 

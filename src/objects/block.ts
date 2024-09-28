@@ -63,13 +63,13 @@ export class Block {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
+        BE(PX,"version"),
         BE.BigInt("index"),
         BE.BigInt("slotIndex"),
-        BE.Hash("hash", true),
-        BE.Hash("previousHash"),
+        BE(Uint256, "hash", true),
+        BE(Uint256, "previousHash"),
         BE.BigInt("timestamp"),
-        BE.Signature("signature", true),
+        BE(Signature,"signature", true),
         BE.Array("transactions", 2, Transaction)
     ]
 

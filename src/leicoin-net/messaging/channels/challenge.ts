@@ -1,20 +1,33 @@
 import { Uint, Uint256, Uint32 } from "../../../binary/uint.js";
+import { DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { LNSocket } from "../../socket.js";
 import { MessagingChannel } from "../abstractChannel.js";
-import { LNMsgType } from "../messageTypes.js";
+import { LNMsgType, LNRequestMsg } from "../messageTypes.js";
 
-export class ChallengeMsg {
-    constructor(readonly challenge: Uint256) {}
+export class ChallengeMsg extends LNRequestMsg {
+
+    constructor(
+        requestID: Uint32,
+        readonly challenge: Uint256
+    ) {
+        super(requestID);
+    }
 
     public encodeToHex() {
         return this.challenge;
     }
 
-    public static fromDecodedHex(hexData: Uint) {
+    protected static fromDict(obj: Dict<any>) {
         return new ChallengeMsg(
-            new Uint256(hexData.slice(0, 32))
-        );
+            obj.requestID,
+            obj.challenge
+        )
     }
+
+    protected static readonly encodingSettings: DataEncoder[] = [
+        BE(Uint32, "requestID"),
+        BE(Uint256, "challenge")
+    ]
 }
 
 export class ChallengeMC extends MessagingChannel {
@@ -23,7 +36,7 @@ export class ChallengeMC extends MessagingChannel {
     async receive(data: Uint, socket: LNSocket) {
 
         const requestID = new Uint32(data.slice(0, 4));
-        if ()
+        //if ()
 
     }
 
@@ -33,7 +46,7 @@ export class ChallengeMC extends MessagingChannel {
 
     async send(data: Uint, socket: LNSocket) {
 
-        if ()
+        //if ()
 
     }
 }
