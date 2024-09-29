@@ -1,7 +1,7 @@
 import { LeiCoinNetDataPackage } from "../packages.js";
 import { CB } from "../../utils/callbacks.js";
-import { NewBlockMC } from "./channels/block.js";
-import { NewTransactionChannel } from "./channels/transaction.js";
+import { NewBlockMC } from "./messages/block.js";
+import { NewTransactionChannel } from "./messages/transaction.js";
 import { BasicMessagingChannel, type MessagingChannel, type MessagingChannelConstructable } from "./abstractChannel.js";
 import { Uint } from "../../binary/uint.js";
 import { type LNRequest, type LNSocket } from "../socket.js";
@@ -12,6 +12,10 @@ class MessagingChannelMap<V extends BasicMessagingChannel = BasicMessagingChanne
     constructor(entries?: readonly (readonly [LNMsgType, V])[]) {
         super(LNMsgType, entries);
     }
+}
+
+export class LNMsgRegistry {
+    private static 
 }
 
 export class MessageRouter {

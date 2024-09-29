@@ -2,7 +2,6 @@ import Verification from "../../../verification/index.js"
 import Block from "../../../objects/block.js";
 import { type Uint } from "../../../binary/uint.js";
 import POS from "../../../pos/index.js";
-import { type Slot } from "../../../pos/slot.js";
 import { BroadcastingChannel, MessagingChannel } from "../abstractChannel.js";
 import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";

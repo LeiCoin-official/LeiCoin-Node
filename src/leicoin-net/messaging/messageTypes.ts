@@ -1,6 +1,6 @@
 import { Uint32, type Uint } from "../../binary/uint.js";
 import cli from "../../cli/cli.js";
-import { type DataEncoder } from "../../encoding/binaryEncoders.js";
+import { BE, type DataEncoder } from "../../encoding/binaryEncoders.js";
 import ObjectEncoding from "../../encoding/objects.js";
 import { LockedUint } from "../../objects/prefix.js";
 import { Dict } from "../../utils/dataUtils.js";
@@ -27,15 +27,10 @@ export class LNMsgType extends LockedUint {
 
 }
 
-export abstract class LNMsgObject {
-    static readonly type: LNMsgType;
 
-    get type() {
-        return (this.constructor as typeof LNMsgObject).type;
-    }
-
+abstract class LNAbstractMsg {
     public encodeToHex() {
-        return ObjectEncoding.encode(this, (this.constructor as typeof LNMsgObject).encodingSettings, false).data;
+        return ObjectEncoding.encode(this, (this.constructor as typeof LNAbstractMsg).encodingSettings, false).data;
     }
 
     static fromDecodedHex<T>(this: T, hexData: Uint): T | null;
@@ -51,31 +46,73 @@ export abstract class LNMsgObject {
         return null;
     }
 
-    protected static fromDict(obj: Dict<any>): LNMsgObject {
+    protected static fromDict(obj: Dict<any>): LNAbstractMsg {
         throw new Error("Method not implemented.");
     }
 
     protected static readonly encodingSettings: readonly DataEncoder[] = [];
 }
 
-export abstract class LNRequestMsg extends LNMsgObject {
 
-    constructor(readonly requestID: Uint32) {
-        super()
+export class LNStandartMsg extends LNAbstractMsg {
+    constructor(
+        readonly type: LNMsgType,
+        readonly data: LNMsgData
+    ) {super()}
+
+    protected static fromDict(obj: Dict<any>) {
+        return new LNStandartMsg(
+            obj.type,
+            obj.data
+        );
     }
 
-    static isRequest(msg: LNMsgObject) {
-        if ((msg as LNRequestMsg).requestID) {
-            return true;
-        }
-        return false;
+    protected static readonly encodingSettings: readonly DataEncoder[] = [
+        BE(LNMsgType, "type"),
+        BE(LNMsgData, "data")
+    ];
+}
+
+export class LNRequestMsg extends LNStandartMsg {
+
+    constructor(
+        type: LNMsgType,
+        requestID: Uint32,
+        data: LNMsgData,
+    ) {
+        super(type, data);
     }
 
-    protected static readonly encodingSettings: readonly DataEncoder[] = [];
+    protected static fromDict(obj: Dict<any>) {
+        return new LNRequestMsg(
+            obj.type,
+            obj.requestID,
+            obj.data
+        );
+    }
+
+    protected static readonly encodingSettings: readonly DataEncoder[] = [
+        BE(LNMsgType, "type"),
+        BE(Uint32, "requestID"),
+        BE(LNMsgData, "data")
+    ];
 
 }
 
-export interface LNMsgObjectConstructor {
-    new(...args: any[]): LNMsgObject;
-    fromDecodedHex(hexData: Uint): LNMsgObject | null;
+
+export abstract class LNMsgData extends LNAbstractMsg {
+    static readonly type: LNMsgType;
+
+    get type() {
+        return (this.constructor as typeof LNMsgData).type;
+    }
 }
+
+export interface LNMsgDataConstructor {
+    new(...args: any[]): LNMsgData;
+    fromDecodedHex(hexData: Uint): LNMsgData | null;
+}
+
+
+
+

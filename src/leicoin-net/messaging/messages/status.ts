@@ -5,9 +5,9 @@ import { Dict } from "../../../utils/dataUtils.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
 import { MessagingChannel } from "../abstractChannel.js";
-import { LNMsgObject, LNMsgType } from "../messageTypes.js";
+import { LNMsgData, LNMsgType } from "../messageTypes.js";
 
-export class StatusMsg extends LNMsgObject {
+export class StatusMsg extends LNMsgData {
 
     static readonly type = LNMsgType.STATUS;
 
@@ -24,40 +24,39 @@ export class StatusMsg extends LNMsgObject {
     }
 
     protected static readonly encodingSettings: DataEncoder[] = [
-        ...super.encodingSettings,
         BE(Uint16, "version"),
         BE(Port, "port")
     ]
 
 }
 
-export class StatusMC extends MessagingChannel {
-    readonly id = LNMsgType.STATUS;
+export namespace StatusMsg {
+    export class Handler extends MessagingChannel {
+        readonly id = LNMsgType.STATUS;
 
-    async receive(data: Uint, socket: LNSocket) {
-        
-        const status = StatusMsg.fromDecodedHex(data);
-
-        if (!status) {
-            return;
-        }
-
-        if (socket.meta.id.eq(0)) {
+        async receive(data: Uint, socket: LNSocket) {
             
+            const status = StatusMsg.fromDecodedHex(data);
+    
+            if (!status) {
+                return;
+            }
+    
+            if (socket.meta.id.eq(0)) {
+                
+            }
+    
         }
-
+    
+        async send(data: null, socket: LNSocket) {
+    
+            socket.send(
+                new StatusMsg(
+                    Uint16.from(0),
+                    Port.from(LeiCoinNetNode.getServerInfo().port)
+                ).encodeToHex()
+            )
+    
+        }
     }
-
-    async send(data: null, socket: LNSocket) {
-
-        socket.send(
-            new StatusMsg(
-                Uint16.from(0),
-                Port.from(LeiCoinNetNode.getServerInfo().port)
-            ).encodeToHex()
-        )
-
-    }
-
 }
-
