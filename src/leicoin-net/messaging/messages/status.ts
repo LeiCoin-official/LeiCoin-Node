@@ -9,8 +9,6 @@ import { LNMsgData, LNMsgType } from "../messageTypes.js";
 
 export class StatusMsg extends LNMsgData {
 
-    static readonly type = LNMsgType.STATUS;
-
     constructor(
         readonly version: Uint16,
         readonly port: Port
@@ -31,7 +29,8 @@ export class StatusMsg extends LNMsgData {
 }
 
 export namespace StatusMsg {
-    export class Handler extends MessagingChannel {
+    export const TYPE = LNMsgType.STATUS;
+    export const Handler = new class Handler extends MessagingChannel {
         readonly id = LNMsgType.STATUS;
 
         async receive(data: Uint, socket: LNSocket) {

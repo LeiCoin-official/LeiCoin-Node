@@ -7,6 +7,7 @@ import { Uint } from "../../binary/uint.js";
 import { type LNRequest, type LNSocket } from "../socket.js";
 import { AbstractBinaryMap, UintMap } from "../../binary/map.js";
 import { LNMsgType } from "./messageTypes.js";
+import { StatusMsg } from "./messages/status.js";
 
 class MessagingChannelMap<V extends BasicMessagingChannel = BasicMessagingChannel> extends AbstractBinaryMap<LNMsgType, V> {
     constructor(entries?: readonly (readonly [LNMsgType, V])[]) {
@@ -14,8 +15,8 @@ class MessagingChannelMap<V extends BasicMessagingChannel = BasicMessagingChanne
     }
 }
 
-export class LNMsgRegistry {
-    private static 
+export namespace LNMsgRegistry {
+    SATUS: StatusMsg
 }
 
 export class MessageRouter {
