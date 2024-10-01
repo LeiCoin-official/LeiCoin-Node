@@ -2,9 +2,7 @@ import { Uint, Uint64 } from "../binary/uint";
 
 export type ObjORNull<T> = T | null;
 
-export interface Dict<T> {
-    [key: string | number]: T;
-}
+export type Dict<T, K extends string | number = string | number> = Record<K, T>;
 
 export interface AnyObj extends Dict<any> {}
 

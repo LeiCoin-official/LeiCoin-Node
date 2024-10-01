@@ -3,8 +3,8 @@ import cli from "../../cli/cli.js";
 import { BE, type DataEncoder } from "../../encoding/binaryEncoders.js";
 import ObjectEncoding from "../../encoding/objects.js";
 import { LockedUint } from "../../objects/prefix.js";
-import { Dict } from "../../utils/dataUtils.js";
-import { BasicMessagingChannel } from "./abstractChannel.js";
+import { type Dict } from "../../utils/dataUtils.js";
+import { type LNBasicMsgHandler } from "./abstractChannel.js";
 
 /**
  * Stores the message types used in the LeiCoin network
@@ -12,20 +12,6 @@ import { BasicMessagingChannel } from "./abstractChannel.js";
  */
 export class LNMsgType extends LockedUint {
     public static readonly byteLength = 2;
-}
-
-export namespace LNMsgType {
-    export const STATUS = LNMsgType.from("1761");
-    
-    export const CHALLENGE = LNMsgType.from("77a9");
-
-    export const NEW_BLOCK = LNMsgType.from("2096");
-    export const GET_BLOCKS = LNMsgType.from("d372");
-
-    export const NEW_TRANSACTION = LNMsgType.from("8356");
-    export const GET_TRANSACTIONS = LNMsgType.from("09aa");
-
-    export const GET_CHAINSTATE = LNMsgType.from("1f76");
 }
 
 
@@ -55,31 +41,73 @@ abstract class LNAbstractMsg {
 }
 
 
-export class LNStandartMsg extends LNAbstractMsg {
+interface LNMsgContentConstructor<T extends LNMsgContent = LNMsgContent> {
+    new(...args: any[]): T;
+    fromDecodedHex(hexData: Uint): T | null;
+}
+
+export interface LNMsgInfo extends LNMsgContentConstructor {
+    readonly TYPE: LNMsgType;
+    readonly Handler: LNBasicMsgHandler;
+}
+
+export abstract class LNMsgContent extends LNAbstractMsg {}
+
+
+export class LNStandartMsg<T extends LNMsgContent> {
     constructor(
         readonly type: LNMsgType,
-        readonly data: LNMsgData
-    ) {super()}
+        readonly data: T
+    ) {}
 
-    protected static fromDict(obj: Dict<any>) {
+    public encodeToHex() {
+        return ObjectEncoding.encode(
+            this,
+            (this.constructor as typeof LNStandartMsg).getEncodingSettings(
+                (this.data.constructor as LNMsgContentConstructor<T>)
+            ),
+            false
+        ).data;
+    }
+
+    static fromDecodedHex<T extends LNMsgContent, CT extends LNStandartMsg<T>>(this: new() => CT, hexData: Uint, CLS: LNMsgContentConstructor<T>): CT | null;
+    static fromDecodedHex(hexData: Uint, CLS: LNMsgContentConstructor) {
+        try {
+            const data = ObjectEncoding.decode(hexData, this.getEncodingSettings(CLS)).data;
+            if (data) {
+                return this.fromDict<typeof CLS.prototype>(data);
+            }
+        } catch (err: any) {
+            cli.data.error(`Error loading ${this.name} from Decoded Hex: ${err.stack}`);
+        }
+        return null;
+    }
+
+    protected static fromDict<T extends LNMsgContent>(obj: Dict<any>) {
         return new LNStandartMsg(
             obj.type,
-            obj.data
+            obj.data as T
         );
     }
 
-    protected static readonly encodingSettings: readonly DataEncoder[] = [
+    protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
         BE(LNMsgType, "type"),
-        BE(LNMsgData, "data")
     ];
+
+    protected static getEncodingSettings<T extends LNMsgContentConstructor>(CLS: T): readonly DataEncoder[] {
+        return [
+            ...this.baseEncodingSettings,
+            BE.Object("data", CLS)
+        ]
+    }
 }
 
-export class LNRequestMsg extends LNStandartMsg {
+export class LNRequestMsg<T extends LNMsgContent> extends LNStandartMsg<T> {
 
     constructor(
         type: LNMsgType,
-        requestID: Uint32,
-        data: LNMsgData,
+        readonly requestID: Uint32,
+        data: T,
     ) {
         super(type, data);
     }
@@ -92,29 +120,10 @@ export class LNRequestMsg extends LNStandartMsg {
         );
     }
 
-    protected static readonly encodingSettings: readonly DataEncoder[] = [
+    protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
         BE(LNMsgType, "type"),
         BE(Uint32, "requestID"),
-        BE(LNMsgData, "data")
     ];
 
 }
-
-
-export abstract class LNMsgData extends LNAbstractMsg {
-    static readonly TYPE: LNMsgType;
-    static readonly Handler: BasicMessagingChannel;
-
-    get type() {
-        return (this.constructor as typeof LNMsgData).TYPE;
-    }
-}
-
-export interface LNMsgDataConstructor {
-    new(...args: any[]): LNMsgData;
-    fromDecodedHex(hexData: Uint): LNMsgData | null;
-}
-
-
-
 

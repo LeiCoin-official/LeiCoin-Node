@@ -91,6 +91,11 @@ export class ObjectEncoding {
             if (returnLength) {
                 return { cb: CB.SUCCESS, data: final_data, length: current_length };
             }
+
+            if (hexData.getLen() !== current_length) {
+                // Buffer underflow or overflow
+                return { cb: CB.ERROR };
+            }
         
             return { cb: CB.SUCCESS, data: final_data };
 

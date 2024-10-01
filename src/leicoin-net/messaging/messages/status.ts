@@ -4,10 +4,10 @@ import { Port } from "../../../objects/netinfo.js";
 import { Dict } from "../../../utils/dataUtils.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
-import { MessagingChannel } from "../abstractChannel.js";
-import { LNMsgData, LNMsgType } from "../messageTypes.js";
+import { LNMsgHandler } from "../abstractChannel.js";
+import { LNMsgContent, LNMsgType } from "../messageTypes.js";
 
-export class StatusMsg extends LNMsgData {
+export class StatusMsg extends LNMsgContent {
 
     constructor(
         readonly version: Uint16,
@@ -29,10 +29,10 @@ export class StatusMsg extends LNMsgData {
 }
 
 export namespace StatusMsg {
-    export const TYPE = LNMsgType.STATUS;
-    export const Handler = new class Handler extends MessagingChannel {
-        readonly id = LNMsgType.STATUS;
+    export const TYPE = LNMsgType.from("1761"); // STATUS
 
+    export const Handler = new class Handler extends LNMsgHandler {
+        readonly id = TYPE;
         async receive(data: Uint, socket: LNSocket) {
             
             const status = StatusMsg.fromDecodedHex(data);

@@ -1,23 +1,42 @@
 import { LeiCoinNetDataPackage } from "../packages.js";
 import { CB } from "../../utils/callbacks.js";
-import { NewBlockMC } from "./messages/block.js";
-import { NewTransactionChannel } from "./messages/transaction.js";
-import { BasicMessagingChannel, type MessagingChannel, type MessagingChannelConstructable } from "./abstractChannel.js";
+import { LNBasicMsgHandler, type LNMsgHandlerConstructable } from "./abstractChannel.js";
 import { Uint } from "../../binary/uint.js";
 import { type LNRequest, type LNSocket } from "../socket.js";
 import { AbstractBinaryMap, UintMap } from "../../binary/map.js";
-import { LNMsgType } from "./messageTypes.js";
+import { type LNMsgInfo, LNMsgType } from "./messageTypes.js";
+import { type Dict } from "../../utils/dataUtils.js";
 import { StatusMsg } from "./messages/status.js";
+import { ChallengeMsg } from "./messages/challenge.js";
+import { GetBlocksMsg, NewBlockMsg } from "./messages/block.js";
+import { GetTransactionsMsg, NewTransactionMsg } from "./messages/transaction.js";
+import { GetChainstateMsg } from "./messages/chainstate.js";
 
-class MessagingChannelMap<V extends BasicMessagingChannel = BasicMessagingChannel> extends AbstractBinaryMap<LNMsgType, V> {
+class LNMsgUtils {
+    static createLNMsgRegistry<T extends Dict<LNMsgInfo, string>>(registry: T) {
+        return registry as Readonly<T>;
+    }
+}
+
+class MessagingChannelMap<V extends LNBasicMsgHandler = LNBasicMsgHandler> extends AbstractBinaryMap<LNMsgType, V> {
     constructor(entries?: readonly (readonly [LNMsgType, V])[]) {
         super(LNMsgType, entries);
     }
 }
 
-export namespace LNMsgRegistry {
-    SATUS: StatusMsg
-}
+export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry({
+    STATUS: StatusMsg,
+
+    CHALLENGE: ChallengeMsg,
+
+    NEW_BLOCK: NewBlockMsg,
+    GET_BLOCKS: GetBlocksMsg,
+
+    NEW_TRANSACTION: NewTransactionMsg,
+    GET_TRANSACTIONS: GetTransactionsMsg,
+
+    GET_CHAINSTATE: GetChainstateMsg,
+});
 
 export class MessageRouter {
 
@@ -25,24 +44,24 @@ export class MessageRouter {
     static globalRequests: UintMap<LNRequest> = new UintMap();
 
     static registerChannels() {
-        this.registerChannel(NewBlockMC);
-        this.registerChannel(NewTransactionChannel);
+        // this.registerChannel(NewBlockMC);
+        // this.registerChannel(NewTransactionChannel);
     }
 
-    private static registerChannel(CLS: MessagingChannelConstructable) {
+    private static registerChannel(CLS: LNMsgHandlerConstructable) {
         const channel = new CLS();
         this.channels.set(channel.id, channel);
     }
 
-    static getChannel(id: LNMsgType) {
-        return this.channels.get(id);
+    static getMsgInfo(id: LNMsgType) {
+        return Object.values(LNMsgRegistry).find((msg) => msg.TYPE.eq(id));
     }
 
     static async receiveData(rawData: Uint | Buffer, socket: LNSocket) {
 
         const data = LeiCoinNetDataPackage.extract(rawData);
 
-        const channel: BasicMessagingChannel | undefined = this.channels[data.type.toHex()];
+        const channel: LNBasicMsgHandler | undefined = this.channels[data.type.toHex()];
 
         if (!channel) {
             return { cb: CB.NONE, message: `Unknown Data Type: ${data.type}` };

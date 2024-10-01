@@ -1,9 +1,9 @@
 import { describe, test, expect } from "bun:test";
 import { Uint64, Uint } from "../src/binary/uint.js";
 
-describe('binary_testing', () => {
+describe("binary_testing", () => {
 
-    test('addition_and_subtraction', () => {
+    test("addition_and_subtraction", () => {
 
         const uint = Uint64.from("00000000000000ff", "hex");
 
@@ -23,7 +23,7 @@ describe('binary_testing', () => {
         expect(uint.getRaw().toString("hex")).toBe("00000000000000ff");
     });
 
-    test('comparing', () => {
+    test("comparing", () => {
 
         const uint = Uint64.from("00000000000000ff", "hex");
 

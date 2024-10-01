@@ -1,10 +1,10 @@
 import { Uint, Uint256, Uint32 } from "../../../binary/uint.js";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { LNSocket } from "../../socket.js";
-import { MessagingChannel } from "../abstractChannel.js";
-import { LNMsgData, LNMsgType } from "../messageTypes.js";
+import { LNMsgHandler } from "../abstractChannel.js";
+import { LNMsgContent, LNMsgType } from "../messageTypes.js";
 
-export class ChallengeMsg extends LNMsgData {
+export class ChallengeMsg extends LNMsgContent {
 
     constructor(
         readonly challenge: Uint256
@@ -21,23 +21,27 @@ export class ChallengeMsg extends LNMsgData {
     ]
 }
 
-export class ChallengeMC extends MessagingChannel {
-    readonly id = LNMsgType.CHALLENGE;
+export namespace ChallengeMsg {
+    export const TYPE = LNMsgType.from("77a9"); // CHALLENGE
 
-    async receive(data: Uint, socket: LNSocket) {
+    export const Handler = new class Handler extends LNMsgHandler {
+        readonly id = TYPE;
 
-        const requestID = new Uint32(data.slice(0, 4));
-        //if ()
+        async receive(data: Uint, socket: LNSocket) {
 
-    }
+            const requestID = new Uint32(data.slice(0, 4));
+            //if ()
 
-    async receiveRequest(data: Uint, socket: LNSocket) {
-        
-    }
+        }
 
-    async send(data: Uint, socket: LNSocket) {
+        async receiveRequest(data: Uint, socket: LNSocket) {
+            
+        }
 
-        //if ()
+        async send(data: Uint, socket: LNSocket) {
 
+            //if ()
+
+        }
     }
 }
