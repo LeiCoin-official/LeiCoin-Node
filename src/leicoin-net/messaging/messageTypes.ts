@@ -70,7 +70,11 @@ export class LNStandartMsg<T extends LNMsgContent> {
         ).data;
     }
 
-    static fromDecodedHex<T extends LNMsgContent, CT extends LNStandartMsg<T>>(this: new() => CT, hexData: Uint, CLS: LNMsgContentConstructor<T>): CT | null;
+    static fromDecodedHex<T extends LNMsgContent, CT extends LNStandartMsg<T>>(
+        this: new(type: LNMsgType, data: T) => CT,
+        hexData: Uint,
+        CLS: new (...args: any[]) => T
+    ): CT | null;
     static fromDecodedHex(hexData: Uint, CLS: LNMsgContentConstructor) {
         try {
             const data = ObjectEncoding.decode(hexData, this.getEncodingSettings(CLS)).data;

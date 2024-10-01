@@ -100,10 +100,9 @@ export class LNSocket {
     async receive(data: Uint) {
         const type = new LNMsgType(data.slice(0, 2));
 
-        const msg = MessageRouter.getMsgInfo(type);
+        const msg = MessageRouter.getMsgInfo(type) as LNMsgInfo;
 
-        LNStandartMsg.fromDecodedHex(data, LNMsgRegistry.CHALLENGE)
-
+        const msgData = LNStandartMsg.fromDecodedHex(data, msg)?.data;
     }
 
     async close(lastMessage?: Uint) {
