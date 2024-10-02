@@ -75,9 +75,18 @@ export class LNStandartMsg<T extends LNMsgContent> {
         hexData: Uint,
         CLS: new (...args: any[]) => T
     ): CT | null;
-    static fromDecodedHex(hexData: Uint, CLS: LNMsgContentConstructor) {
+    static fromDecodedHex<CT extends LNStandartMsg<LNMsgContent>>(
+        this: new(type: LNMsgType, data: LNMsgContent) => CT,
+        hexData: Uint,
+        CLS?: "auto"
+    ): CT | null;
+
+    static fromDecodedHex(hexData: Uint, CLS: LNMsgContentConstructor | any = "auto") {
         try {
-            const data = ObjectEncoding.decode(hexData, this.getEncodingSettings(CLS)).data;
+            const autoTypeChecking = CLS === "auto";
+            
+
+            const data = ObjectEncoding.decode(hexData, this.getEncodingSettings(CLS), autoTypeChecking).data;
             if (data) {
                 return this.fromDict<typeof CLS.prototype>(data);
             }
