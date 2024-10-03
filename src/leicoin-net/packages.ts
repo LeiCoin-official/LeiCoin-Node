@@ -1,7 +1,7 @@
 import { Uint } from "../binary/uint.js";
 import { LNMsgType } from "./messaging/messageTypes.js";
 
-// export enum LeiCoinNetDataPackageType 
+// export enum LeiCoinNetDataPackageType {
 //     CHALLENGE = "0000",
 //     CHALLENGE_RESULT = "0001",
 

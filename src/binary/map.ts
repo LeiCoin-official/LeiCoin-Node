@@ -64,7 +64,7 @@ export abstract class AbstractBinaryMap<K extends Uint, V> {
     
     protected readonly store: Dict<V> = {};
 
-    constructor(
+    protected constructor(
         protected readonly CLS: BasicUintConstructable<K>,
         entries?: readonly (readonly [K, V])[]
     ) {
@@ -75,57 +75,87 @@ export abstract class AbstractBinaryMap<K extends Uint, V> {
         }
     }
 
-    public get size() {
+    protected get size() {
         return Object.keys(this.store).length;
     }
 
-    public get(key: K) {
+    protected get(key: K) {
         return this.store[key.toHex()];
     }
 
-    public set(key: K, value: V) {
+    protected set(key: K, value: V) {
         return this.store[key.toHex()] = value;
     }
 
-    public delete(key: K) {
+    protected delete(key: K) {
         return delete this.store[key.toHex()];
     }
 
-    public has(key: K) {
+    protected has(key: K) {
         return key.toHex() in this.store;
     }
 
-    public [Symbol.iterator]() {
-        return this.entries();
-    }
-    public entries() {
+    protected entries() {
         return new BMapEntriesIterator(this.CLS, Object.entries(this.store).values());
     }
-    public keys() {
+    protected keys() {
         return new BMapKeysIterator(this.CLS, Object.keys(this.store).values());
     }
-    public values() {
+    protected values() {
         return new BMapValuesIterator(Object.values(this.store).values());
     }
 
-    public forEach(callbackfn: (value: V, key: K) => void, thisArg?: any) {
+    protected forEach(callbackfn: (value: V, key: K) => void, thisArg?: any) {
         for (const [key, value] of this.entries()) {
             callbackfn.call(thisArg, value, key);
         };
     }
 
-    public clear() {
+    protected clear() {
         for (const key of this.keys()) {
             this.delete(key);
         }
     }
 
-    public get [Symbol.toStringTag]() {
+    protected getStringTag() {
         return this.constructor.name;
     }
 }
 
-export class UintMap<V> extends AbstractBinaryMap<Uint, V> {
+export abstract class BasicBinaryMap<K extends Uint, V> extends AbstractBinaryMap<K, V> {
+
+    constructor(
+        protected readonly CLS: BasicUintConstructable<K>,
+        entries?: readonly (readonly [K, V])[]
+    ) {
+        super(CLS, entries);
+    }
+
+    public get size() { return super.size; }
+
+    public get(key: K) { return super.get(key); }
+
+    public set(key: K, value: V) { return super.set(key, value); }
+
+    public delete(key: K) { return super.delete(key); }
+
+    public has(key: K) { return super.has(key); }
+
+    public [Symbol.iterator]() { return this.entries(); }
+    public entries() { return super.entries(); }
+    public keys() { return super.keys(); }
+    public values() { return super.values(); }
+
+    public forEach(callbackfn: (value: V, key: K) => void, thisArg?: any) {
+        super.forEach(callbackfn, thisArg);
+    }
+
+    public clear() { super.clear(); }
+
+    public get [Symbol.toStringTag]() { return this.getStringTag(); }
+}
+
+export class UintMap<V> extends BasicBinaryMap<Uint, V> {
     constructor(entries?: readonly (readonly [Uint, V])[]) {
         super(Uint, entries);
     }

@@ -1,7 +1,7 @@
 import { Uint, Uint16 } from "../../../binary/uint.js";
-import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
+import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
-import { Dict } from "../../../utils/dataUtils.js";
+import { type Dict } from "../../../utils/dataUtils.js";
 import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";

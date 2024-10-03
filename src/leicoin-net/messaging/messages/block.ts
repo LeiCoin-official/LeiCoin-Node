@@ -9,7 +9,7 @@ import { LNMsgContent, LNMsgType } from "../messageTypes.js";
 import { type LNSocket } from "../../socket.js";
 
 export class NewBlockMsg extends LNMsgContent {
-    
+
 }
 
 export namespace NewBlockMsg {
@@ -40,7 +40,7 @@ export class GetBlocksMsg extends LNMsgContent {
 }
 
 export namespace GetBlocksMsg {
-    export const TYPE = LNMsgType.from("d372"); // GET_BLOCKS1
+    export const TYPE = LNMsgType.from("d372"); // GET_BLOCKS
 
     export const Handler = new class Handler extends LNMsgHandler {
         readonly id = TYPE;

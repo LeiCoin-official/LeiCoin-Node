@@ -3,11 +3,19 @@ import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256, Uint32 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
 import { type LNConnections } from "./connections.js";
-import { LNMsgInfo, LNMsgType, LNRequestMsg, LNStandartMsg } from "./messaging/messageTypes.js";
+import { LNMsgType } from "./messaging/messageTypes.js";
 import { Deferred } from "../utils/deferred.js";
-import { UintMap } from "../binary/map.js";
-import MessageRouter, { LNMsgRegistry } from "./messaging/index.js";
-export class SocketData {}
+import { AbstractBinaryMap, UintMap } from "../binary/map.js";
+import { LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
+import { LNActiveRequests } from "./requests.js";
+
+// export namespace LNRequest {
+//     export enum Type {
+//         INCOMING,
+//         OUTGOING
+//     }
+// }
+
 export class SocketMetadata {
     constructor(
         public verified = false,
@@ -22,34 +30,6 @@ export class SocketMetadata {
     }
 }
 
-export class LNRequest {
-
-    readonly expectedTypes: LNMsgType[];
-
-    constructor(
-        expectedTypes: LNMsgType[] | LNMsgType,
-        readonly requestID: Uint32 = new Uint32(LCrypt.randomBytes(4)),
-        readonly result: Deferred<Uint> = new Deferred()
-    ) {
-        this.expectedTypes = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
-    }
-
-    public resolve(data: Uint) {
-        /**
-         * @todo Check if the data is of the expected type and more error handling
-         * @todo Implement a timeout for the request
-         */
-        this.result.resolve(data);
-    }
-
-}
-
-// export namespace LNRequest {
-//     export enum Type {
-//         INCOMING,
-//         OUTGOING
-//     }
-// }
 
 export class LNSocket {
 
@@ -57,7 +37,7 @@ export class LNSocket {
 
     constructor(
         protected socket: Socket<any>,
-        readonly activeRequests: UintMap<LNRequest> = new UintMap()
+        readonly activeRequests: LNActiveRequests = new LNActiveRequests()
     ) {}
 
     static async connect(host: string, port: number, handler: BasicLNSocketHandler) {
@@ -83,26 +63,29 @@ export class LNSocket {
     /** @todo Data should be an object that */ 
     async request(data: LNRequestMsg) {
         return new Promise<Uint>((resolve) => {
-            const request = new LNRequest(data.type);
-            this.activeRequests.set(request.requestID, request);
+            const req = this.activeRequests.add(data);
 
-            this.send(Uint.concat([
-                data.type,
-                request.requestID,
-                data.encodeToHex()
-            ]));
+            this.send(data.encodeToHex());
 
-            const response = request.result.awaitResult();
+            const response = req.result.awaitResult();
             resolve(response);
         });
     }
 
-    async receive(data: Uint) {
-        const type = new LNMsgType(data.slice(0, 2));
+    async receive(rawData: Uint) {
+        const msg = LNStandartMsg.fromDecodedHex(rawData);
+        if (!msg) return;
 
-        const msg = MessageRouter.getMsgInfo(type) as LNMsgInfo;
-
-        const msgData = LNStandartMsg.fromDecodedHex(data, msg)?.data;
+        if (msg instanceof LNRequestMsg) {
+            const request = this.activeRequests.get(msg.requestID);
+            if (request) {
+                // Is Incoming Request
+                request.resolve(msg.data);
+            } else {
+                // Is Outgoing Request
+                
+            }
+        }
     }
 
     async close(lastMessage?: Uint) {
