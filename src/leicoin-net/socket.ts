@@ -3,7 +3,7 @@ import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256, Uint32 } from "../binary/uint.js";
 import LCrypt from "../crypto/index.js";
 import { type LNConnections } from "./connections.js";
-import { LNMsgType } from "./messaging/messageTypes.js";
+import { type LNMsgContent, LNMsgType } from "./messaging/messageTypes.js";
 import { Deferred } from "../utils/deferred.js";
 import { AbstractBinaryMap, UintMap } from "../binary/map.js";
 import { LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
@@ -53,9 +53,10 @@ export class LNSocket {
         }
     }
 
-    async send(data: Uint | Buffer) {
+    async send(data: LNStandartMsg | Uint) {
         return this.socket.write(
-            data instanceof Uint ? data.getRaw() : data
+            data instanceof LNStandartMsg ? data.encodeToHex().getRaw() :
+            data.getRaw()
         );
     }
     
@@ -77,13 +78,13 @@ export class LNSocket {
         if (!msg) return;
 
         if (msg instanceof LNRequestMsg) {
-            const request = this.activeRequests.get(msg.requestID);
+            const request = this.activeRequests.get((msg as LNRequestMsg).requestID);
             if (request) {
-                // Is Incoming Request
+                // Is Request Response
                 request.resolve(msg.data);
             } else {
-                // Is Outgoing Request
-                
+                // Is Incoming Request
+                (msg as LNRequestMsg).data.getHandler().receive(msg.data, this);
             }
         }
     }

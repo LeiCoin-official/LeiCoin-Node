@@ -3,14 +3,22 @@ import cli from "../../cli/cli.js";
 import LCrypt from "../../crypto";
 import { BE, type DataEncoder } from "../../encoding/binaryEncoders";
 import ObjectEncoding from "../../encoding/objects.js";
-import MessageRouter from "./index.js";
+import { MessageRouter } from "./index.js";
 import { type LNMsgContent, type LNMsgContentConstructor, LNMsgType } from "./messageTypes.js";
 
-export class LNStandartMsg<T extends LNMsgContent> {
+export class LNStandartMsg<T extends LNMsgContent = LNMsgContent> {
     constructor(
         readonly type: LNMsgType,
         readonly data: T
     ) {}
+
+    static create<T extends LNMsgContent>(data: T) {
+        return new LNStandartMsg(
+            data.getTypeID(),
+            data
+        );
+    }
+
 
     public encodeToHex() {
         return ObjectEncoding.encode(

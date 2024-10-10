@@ -3,7 +3,9 @@ import { LNSocketHandlerFactory, type BasicLNSocketHandler, type LNSocket } from
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
-import { ModuleLike } from "../utils/dataUtils.js";
+import { type ModuleLike } from "../utils/dataUtils.js";
+import { type LNStandartMsg } from "./messaging/netPackets.js";
+import { type Uint } from "../binary/uint.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
@@ -114,7 +116,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         cli.leicoin_net.info(`LeiCoinNet-Node stopped`);
     }
 
-    static async broadcast(data: Buffer) {
+    static async broadcast(data: LNStandartMsg | Uint) {
         for (const connection of this.connections.values()) {
             connection.send(data);
         }
