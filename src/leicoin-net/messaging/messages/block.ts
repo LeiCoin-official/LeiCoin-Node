@@ -44,6 +44,7 @@ export namespace NewBlockMsg {
     } as LNBroadcastingMsgHandler;
 }
 
+
 export class GetBlocksMsg extends LNMsgContent {
 
 }
@@ -52,6 +53,8 @@ export namespace GetBlocksMsg {
     export const TYPE = LNMsgType.from("d372"); // GET_BLOCKS
 
     export const Handler = new class Handler extends LNMsgHandler {
+        readonly acceptedMgs = "REQUEST";
+        
         async receive(data: GetBlocksMsg, socket: LNSocket) {
             return null;
         }

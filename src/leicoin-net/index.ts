@@ -1,5 +1,5 @@
 import { type TCPSocketListener } from "bun";
-import { LNSocketHandlerFactory, type BasicLNSocketHandler, type LNSocket } from "./socket.js";
+import { LNSocket, LNSocketHandlerFactory, type BasicLNSocketHandler } from "./socket.js";
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
@@ -63,7 +63,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
     /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
     private static async initPeers(peers: readonly string[]) {
-        const promises: Promise<void>[] = [];
+        const promises: Promise<any>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections
         for (const targetData of peers) {
@@ -80,18 +80,10 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
                 continue;
             }
 
-            promises.push(this.connectToNode(host, port));
+            promises.push(LNSocket.connect(host, port, this.socketHandler));
         }
 
         await Promise.all(promises);
-    }
-
-    private static async connectToNode(host: string, port: number) {
-        Bun.connect({
-            hostname: host,
-            port: port,
-            socket: this.socketHandler
-        });
     }
 
     static getServerInfo() {

@@ -6,11 +6,15 @@ export type LNMsgHandlerConstructable<T extends LNBasicMsgHandler = LNBasicMsgHa
 export type LNMsgHandlerResponse = Promise<LNMsgContent | null>;
 
 export abstract class LNBasicMsgHandler {
+    abstract readonly acceptedMgs: "DEFAULT" | "REQUEST" | "BROADCAST";
     abstract receive(data: LNMsgContent, socket: LNSocket): LNMsgHandlerResponse;
 }
 
-export abstract class LNMsgHandler extends LNBasicMsgHandler {}
+export abstract class LNMsgHandler extends LNBasicMsgHandler {
+    abstract readonly acceptedMgs: "DEFAULT" | "REQUEST";
+}
 
 export abstract class LNBroadcastingMsgHandler extends LNBasicMsgHandler {
+    readonly acceptedMgs = "BROADCAST";
     abstract receive(data: LNMsgContent): LNMsgHandlerResponse;
 }

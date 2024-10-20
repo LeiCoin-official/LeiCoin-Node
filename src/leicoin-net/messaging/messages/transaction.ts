@@ -62,6 +62,7 @@ export namespace GetTransactionsMsg {
     export const TYPE = LNMsgType.from("09aa"); // GET_TRANSACTIONS
     
     export const Handler = new class Handler extends LNMsgHandler {
+        readonly acceptedMgs = "REQUEST";
         
         async receive(data: GetTransactionsMsg, socket: LNSocket) {
             return null;

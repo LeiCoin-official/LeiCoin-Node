@@ -25,8 +25,8 @@ export class ENVConfigParser {
                 dotenv.config({ path: envFilePath });
                 const envData: ENVConfigLike = {};
                 /* only load env vars into config that are in the env file
-                for (let key in Bun.env) {
-                    envData[key] = Bun.env[key];
+                for (let key in process.env) {
+                    envData[key] = process.env[key];
                 }
                 */
                 return envData;

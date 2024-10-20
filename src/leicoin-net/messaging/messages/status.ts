@@ -31,6 +31,7 @@ export namespace StatusMsg {
     export const TYPE = LNMsgType.from("1761"); // STATUS
 
     export const Handler = new class Handler extends LNMsgHandler {
+        readonly acceptedMgs = "REQUEST";
 
         async receive(data: StatusMsg, socket: LNSocket) {
 

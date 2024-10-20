@@ -35,7 +35,7 @@ class CompilerBuilder {
             (this.minify ? " --minify" : ""),
             this.entrypoint,
             "--outfile", this.outfile,
-            ...Object.entries(this.env).map(([key, value]) => `--define "Bun.env.${key}='${value}'"`)
+            ...Object.entries(this.env).map(([key, value]) => `--define "process.env.${key}='${value}'"`)
         ].join(" ");
     }
 

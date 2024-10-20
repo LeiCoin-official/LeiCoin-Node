@@ -25,6 +25,8 @@ export namespace ChallengeMsg {
     export const TYPE = LNMsgType.from("77a9"); // CHALLENGE
 
     export const Handler = new class Handler extends LNMsgHandler {
+        readonly acceptedMgs = "REQUEST";
+
         async receive(data: ChallengeMsg, socket: LNSocket) {
             return null;
         }

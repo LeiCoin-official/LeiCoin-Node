@@ -85,7 +85,7 @@ export class MinterClient {
     async mint(currentSlot: Slot) {
 		const block = await this.createNewBlock(currentSlot.index);
 		
-		LeiCoinNetNode.broadcast(LNStandartMsg.create(new NewBlockMsg(block)));
+		LeiCoinNetNode.broadcast(new LNStandartMsg(new NewBlockMsg(block)));
 
 		currentSlot.processBlock(block);
 		

@@ -6,19 +6,14 @@ import ObjectEncoding from "../../encoding/objects.js";
 import { MessageRouter } from "./index.js";
 import { type LNMsgContent, type LNMsgContentConstructor, LNMsgType } from "./messageTypes.js";
 
+
 export class LNStandartMsg<T extends LNMsgContent = LNMsgContent> {
-    constructor(
-        readonly type: LNMsgType,
-        readonly data: T
-    ) {}
 
-    static create<T extends LNMsgContent>(data: T) {
-        return new LNStandartMsg(
-            data.getTypeID(),
-            data
-        );
+    readonly type: LNMsgType;
+
+    constructor(readonly data: T) {
+        this.type = data.getTypeID();
     }
-
 
     public encodeToHex() {
         return ObjectEncoding.encode(
@@ -31,12 +26,12 @@ export class LNStandartMsg<T extends LNMsgContent = LNMsgContent> {
     }
 
     static fromDecodedHex<T extends LNMsgContent, CT extends LNStandartMsg<T>>(
-        this: new(type: LNMsgType, data: T) => CT,
+        this: new(data: T) => CT,
         hexData: Uint,
         CLS: new (...args: any[]) => T
     ): CT | null;
     static fromDecodedHex<CT extends LNStandartMsg<LNMsgContent>>(
-        this: new(type: LNMsgType, data: LNMsgContent) => CT,
+        this: new(data: LNMsgContent) => CT,
         hexData: Uint,
         CLS?: "auto"
     ): CT | null;
@@ -59,10 +54,7 @@ export class LNStandartMsg<T extends LNMsgContent = LNMsgContent> {
     }
 
     protected static fromDict<T extends LNMsgContent>(obj: Dict<any>) {
-        return new LNStandartMsg(
-            obj.type,
-            obj.data as T
-        );
+        return new LNStandartMsg(obj.data as T);
     }
 
     protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
@@ -77,30 +69,19 @@ export class LNStandartMsg<T extends LNMsgContent = LNMsgContent> {
     }
 }
 
+
 export class LNRequestMsg<T extends LNMsgContent = LNMsgContent> extends LNStandartMsg<T> {
 
-    constructor(
-        type: LNMsgType,
-        readonly requestID: Uint32,
-        data: T,
-    ) {
-        super(type, data);
+    constructor(readonly requestID: Uint32, data: T) {
+        super(data);
     }
 
     static create<T extends LNMsgContent>(data: T) {
-        return new LNRequestMsg(
-            data.getTypeID(),
-            new Uint32(LCrypt.randomBytes(4)),
-            data
-        );
+        return new LNRequestMsg(new Uint32(LCrypt.randomBytes(4)), data);
     }
 
     protected static fromDict(obj: Dict<any>) {
-        return new LNRequestMsg(
-            obj.type,
-            obj.requestID,
-            obj.data
-        );
+        return new LNRequestMsg(obj.requestID, obj.data);
     }
 
     protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
@@ -109,3 +90,15 @@ export class LNRequestMsg<T extends LNMsgContent = LNMsgContent> extends LNStand
     ];
 
 }
+
+
+export class LNBroadcastMsg<T extends LNMsgContent = LNMsgContent> extends LNStandartMsg<T> {
+    constructor(data: T) {
+        super(data);
+    }
+
+    protected static fromDict(obj: Dict<any>) {
+        return new LNBroadcastMsg(obj.data);
+    }
+}
+
