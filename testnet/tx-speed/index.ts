@@ -1,7 +1,7 @@
 
 async function run() {
-    Bun.env.CUSTOM_CWD = __dirname;
-    Bun.env.NO_CLI = "true";
+    process.env.CUSTOM_CWD = __dirname;
+    process.env.NO_CLI = "true";
 
     const utils = (await import("../../src/utils/index.js")).default;
 

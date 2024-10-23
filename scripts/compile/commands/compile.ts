@@ -16,7 +16,7 @@ class CompileUtils {
             const version = await this.getPackageJSONVersion()
             return [version, false];
         }
-        const argv_version = args[0] || Bun.env.BUN_VERSION;
+        const argv_version = args[0] || process.env.BUN_VERSION;
         const version = argv_version || await this.getPackageJSONVersion();
 
         if (!version) {

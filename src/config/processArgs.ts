@@ -54,7 +54,7 @@ export class ProcessArgsParser {
     public parse(): ArgsLike {
 
         const parsedArgs: ArgsLike<any> = {} as any;
-        const process_argv = Bun.argv.slice(2);
+        const process_argv = process.argv.slice(2);
         const providedArgs: string[] = [];
 
         let argIndex = 0;

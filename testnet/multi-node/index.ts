@@ -15,7 +15,7 @@ class LocalNodeTestNet {
 
     static async run() {
 
-        const args = Bun.argv.slice(2);
+        const args = process.argv.slice(2);
 
         const cmd = this.commands[args[0]];
 

@@ -2,7 +2,6 @@ import { Uint, Uint16 } from "../../../binary/uint.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";
-import LeiCoinNetNode from "../../index.js";
 import { type LNSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
 import { LNMsgContent, LNMsgType } from "../messageTypes.js";
@@ -32,30 +31,21 @@ export namespace StatusMsg {
     export const TYPE = LNMsgType.from("1761"); // STATUS
 
     export const Handler = new class Handler extends LNMsgHandler {
-        readonly id = TYPE;
-        async receive(data: Uint, socket: LNSocket) {
-            
-            const status = StatusMsg.fromDecodedHex(data);
-    
-            if (!status) {
-                return;
+        readonly acceptedMgs = "REQUEST";
+
+        async receive(data: StatusMsg, socket: LNSocket) {
+
+            if (!data) {
+                return null;
             }
     
             if (socket.meta.id.eq(0)) {
                 
             }
-    
+            
+            return null;
+
         }
-    
-        async send(data: null, socket: LNSocket) {
-    
-            socket.send(
-                new StatusMsg(
-                    Uint16.from(0),
-                    Port.from(LeiCoinNetNode.getServerInfo().port)
-                ).encodeToHex()
-            )
-    
-        }
+
     }
 }

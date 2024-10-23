@@ -19,8 +19,8 @@ class Utils {
         if (this.initialized) return;
         this.initialized = true;
         
-        if (Bun.env.CUSTOM_CWD) {
-            process.chdir(Bun.env.CUSTOM_CWD);
+        if (process.env.CUSTOM_CWD) {
+            process.chdir(process.env.CUSTOM_CWD);
         }
 
         //process.on("SIGINT", this.gracefulShutdown);

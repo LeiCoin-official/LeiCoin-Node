@@ -1,23 +1,20 @@
-import { type Uint } from "../../binary/uint.js";
-import LeiCoinNetNode from "../index.js";
-import { type LNMsgType } from "./messageTypes.js";
-import { LeiCoinNetDataPackage } from "../packages.js";
 import { type LNSocket } from "../socket.js";
+import { type LNMsgContent } from "./messageTypes.js";
 
 export type LNMsgHandlerConstructable<T extends LNBasicMsgHandler = LNBasicMsgHandler> = new() => T;
 
+export type LNMsgHandlerResponse = Promise<LNMsgContent | null>;
+
 export abstract class LNBasicMsgHandler {
-    abstract readonly id: LNMsgType;
-    abstract receive(data: Uint, socket: LNSocket): Promise<void>;
+    abstract readonly acceptedMgs: "DEFAULT" | "REQUEST" | "BROADCAST";
+    abstract receive(data: LNMsgContent, socket: LNSocket): LNMsgHandlerResponse;
 }
 
 export abstract class LNMsgHandler extends LNBasicMsgHandler {
-    abstract send(data: Uint | null, socket: LNSocket): Promise<void>;
+    abstract readonly acceptedMgs: "DEFAULT" | "REQUEST";
 }
 
 export abstract class LNBroadcastingMsgHandler extends LNBasicMsgHandler {
-    abstract receive(data: Uint): Promise<void>;
-    async broadcast(data: Uint) {
-        await LeiCoinNetNode.broadcast(LeiCoinNetDataPackage.create(this.id, data));
-    }
+    readonly acceptedMgs = "BROADCAST";
+    abstract receive(data: LNMsgContent): LNMsgHandlerResponse;
 }

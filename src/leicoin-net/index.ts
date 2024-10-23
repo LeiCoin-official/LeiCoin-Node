@@ -1,9 +1,11 @@
 import { type TCPSocketListener } from "bun";
-import { LNSocketHandlerFactory, type BasicLNSocketHandler, type LNSocket } from "./socket.js";
+import { LNSocket, LNSocketHandlerFactory, type BasicLNSocketHandler } from "./socket.js";
 import cli from "../cli/cli.js";
 import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
-import { ModuleLike } from "../utils/dataUtils.js";
+import { type ModuleLike } from "../utils/dataUtils.js";
+import { type LNStandartMsg } from "./messaging/netPackets.js";
+import { type Uint } from "../binary/uint.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
@@ -61,7 +63,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
     /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
     private static async initPeers(peers: readonly string[]) {
-        const promises: Promise<void>[] = [];
+        const promises: Promise<any>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections
         for (const targetData of peers) {
@@ -78,18 +80,10 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
                 continue;
             }
 
-            promises.push(this.connectToNode(host, port));
+            promises.push(LNSocket.connect(host, port, this.socketHandler));
         }
 
         await Promise.all(promises);
-    }
-
-    private static async connectToNode(host: string, port: number) {
-        Bun.connect({
-            hostname: host,
-            port: port,
-            socket: this.socketHandler
-        });
     }
 
     static getServerInfo() {
@@ -114,7 +108,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         cli.leicoin_net.info(`LeiCoinNet-Node stopped`);
     }
 
-    static async broadcast(data: Buffer) {
+    static async broadcast(data: LNStandartMsg | Uint) {
         for (const connection of this.connections.values()) {
             connection.send(data);
         }
