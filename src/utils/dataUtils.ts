@@ -1,4 +1,4 @@
-import { Uint, Uint64 } from "../binary/uint";
+import { Uint, Uint64 } from "low-level";
 
 export type ObjORNull<T> = T | null;
 
