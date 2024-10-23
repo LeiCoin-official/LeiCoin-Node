@@ -1,8 +1,8 @@
 import Transaction from "../objects/transaction.js";
 import Block from "../objects/block.js";
 import { CB } from "../utils/callbacks.js";
-import { Uint256 } from "low-level/uint";
-import { UintMap } from "../binary/map.js";
+import { Uint256 } from "low-level";
+import { UintMap } from "low-level";
 
 class Mempool {                                                                                                                                                                                                         
 

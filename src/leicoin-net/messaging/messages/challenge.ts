@@ -1,4 +1,4 @@
-import { Uint, Uint256, Uint32 } from "low-level/uint";
+import { Uint, Uint256, Uint32 } from "low-level";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type LNSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";

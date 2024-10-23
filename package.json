@@ -46,7 +46,7 @@
 		"elliptic": "^6.5.7",
 		"elysia": "^1.1.16",
 		"level-read-stream": "^1.1.0",
-		"low-level": "^1.0.0",
+		"low-level": "1.0.5",
 		"patch-package": "^8.0.0",
 		"reflect-metadata": "^0.2.2"
 	},

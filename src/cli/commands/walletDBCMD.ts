@@ -2,7 +2,7 @@ import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
 import Wallet from "../../objects/wallet.js";
 import { Blockchain } from "../../storage/blockchain.js";
-import { Uint64 } from "low-level/uint";
+import { Uint64 } from "low-level";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";

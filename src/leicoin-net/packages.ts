@@ -1,4 +1,4 @@
-import { Uint } from "low-level/uint";
+import { Uint } from "low-level";
 import { LNMsgType } from "./messaging/messageTypes.js";
 
 // export enum LeiCoinNetDataPackageType {

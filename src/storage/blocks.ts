@@ -2,7 +2,7 @@ import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Block from "../objects/block.js";
 import BCUtils from "./blockchainUtils.js";
-import { Uint64 } from "low-level/uint";
+import { Uint64 } from "low-level";
 
 export class BlockDB {
     

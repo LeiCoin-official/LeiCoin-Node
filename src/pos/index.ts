@@ -1,8 +1,7 @@
 import cli from "../cli/cli.js";
-import { Uint64 } from "low-level/uint";
+import { Uint64, UintMap } from "low-level";
 import Constants from "../utils/constants.js";
 import Slot from "./slot.js";
-import { UintMap } from "../binary/map.js";
 import { type MinterClient } from "../minter/index.js";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import { CronJob } from "cron";

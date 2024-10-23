@@ -1,5 +1,5 @@
-import { AbstractBinaryMap } from "../binary/map.js";
-import { Uint256 } from "low-level/uint";
+import { AbstractBinaryMap } from "low-level";
+import { Uint256 } from "low-level";
 import { type LNSocket } from "./socket.js";
 
 export class LNConnections extends AbstractBinaryMap<Uint256, LNSocket> {

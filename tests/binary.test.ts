@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { Uint64, Uint } from "low-level/uint";
+import { Uint64, Uint } from "low-level";
 
 describe("binary_testing", () => {
 

@@ -1,5 +1,5 @@
 import { type ec as ellipticCurve } from "elliptic";
-import { FixedUint, Uint, Uint256 } from "low-level/uint";
+import { FixedUint, Uint, Uint256 } from "low-level";
 import LCrypt from "./index.js";
 import Signature, { EllipticBinarySignature } from "./signature.js";
 

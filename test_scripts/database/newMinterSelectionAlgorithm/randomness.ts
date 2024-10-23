@@ -1,5 +1,5 @@
-import { UintMap } from "../../../src/binary/map.js";
-import { Uint, Uint64 } from "low-level/uint";
+import { UintMap } from "low-level";
+import { Uint, Uint64 } from "low-level";
 import LCrypt from "../../../src/crypto/index.js";
 import { AddressHex } from "../../../src/objects/address.js";
 import type LevelDB from "../../../src/storage/leveldb/index.js";

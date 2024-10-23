@@ -1,6 +1,6 @@
 import { AddressHex } from "../objects/address.js";
 import { type Block } from "../objects/block.js";
-import { type Uint64 } from "low-level/uint";
+import { type Uint64 } from "low-level";
 import Verification, { BlockValidationResult } from "../verification/index.js";
 import { Execution } from "./execution.js";
 import { Blockchain } from "../storage/blockchain.js";

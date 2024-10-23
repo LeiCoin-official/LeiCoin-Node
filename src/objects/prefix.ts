@@ -1,4 +1,4 @@
-import { Uint } from "low-level/uint";
+import { Uint } from "low-level";
 
 interface LockedUintConstructable {
     new(buffer: Buffer): LockedUint;

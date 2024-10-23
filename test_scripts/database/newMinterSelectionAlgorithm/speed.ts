@@ -1,4 +1,4 @@
-import { Uint64 } from "low-level/uint";
+import { Uint64 } from "low-level";
 import { type LevelDB } from "../../../src/storage/leveldb/index.js";
 import { type LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
 import { endTimer, startTimer } from "../../testUtils.js";

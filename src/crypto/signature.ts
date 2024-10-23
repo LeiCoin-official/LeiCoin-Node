@@ -1,5 +1,5 @@
 import elliptic from 'elliptic';
-import { FixedUint, Uint64, Uint8, UintUtils } from "low-level/uint";
+import { FixedUint, Uint64, Uint8, UintUtils } from "low-level";
 import { PX } from '../objects/prefix.js';
 
 export interface EllipticBinarySignature extends elliptic.ec.Signature {

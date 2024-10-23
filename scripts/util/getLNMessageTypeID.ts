@@ -1,4 +1,4 @@
-import { Uint } from "low-level/uint"
+import { Uint } from "low-level"
 import LCrypt from "../../src/crypto/index.js"
 
 function getMessageTypeID(name: string) {

@@ -2,7 +2,7 @@ import mempool from "../../../storage/mempool.js";
 import Transaction from "../../../objects/transaction.js";
 import cli from "../../../cli/cli.js";
 import Verification from "../../../verification/index.js"
-import { Uint } from "low-level/uint";
+import { Uint } from "low-level";
 import { LNMsgContent, LNMsgType } from "../messageTypes.js";
 import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
 import { Dict } from "../../../utils/dataUtils.js";

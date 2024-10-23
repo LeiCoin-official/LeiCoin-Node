@@ -5,7 +5,7 @@ import { LNConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import { type LNStandartMsg } from "./messaging/netPackets.js";
-import { type Uint } from "low-level/uint";
+import { type Uint } from "low-level";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;

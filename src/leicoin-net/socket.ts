@@ -1,6 +1,6 @@
 import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
-import { Uint, Uint256 } from "low-level/uint";
+import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
 import { type LNConnections } from "./connections.js";
 import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";

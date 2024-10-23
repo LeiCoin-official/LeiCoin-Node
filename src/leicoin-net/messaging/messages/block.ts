@@ -1,6 +1,6 @@
 import Verification from "../../../verification/index.js"
 import Block from "../../../objects/block.js";
-import { type Uint } from "low-level/uint";
+import { type Uint } from "low-level";
 import POS from "../../../pos/index.js";
 import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
 import cli from "../../../cli/cli.js";
