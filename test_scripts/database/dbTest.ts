@@ -2,7 +2,7 @@ import { ClassicLevel } from "classic-level";
 import LevelDB from "../../src/storage/leveldb/index.js";
 import { shuffleArray } from '../cryptoUtils.js';
 import { startTimer, endTimer } from "../testUtils.js";
-import { Uint, Uint256, Uint64 } from "../../src/binary/uint.js";
+import { Uint, Uint256, Uint64 } from "low-level/uint";
 import { UintMap } from "../../src/binary/map.js";
 import { AddressHex } from "../../src/objects/address.js";
 import { LCrypt } from "../../src/crypto/index.js";

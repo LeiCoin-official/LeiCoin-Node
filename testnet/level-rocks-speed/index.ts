@@ -1,4 +1,4 @@
-import { Uint } from "../../src/binary/uint.js";
+import { Uint } from "low-level/uint";
 import { LevelDB, RocksDB } from "./dbs.js";
 
 

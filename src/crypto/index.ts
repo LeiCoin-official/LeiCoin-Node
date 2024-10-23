@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { type curve, ec as ellipticCurve } from 'elliptic';
-import { Uint, Uint256 } from "../binary/uint.js";
+import { Uint, Uint256 } from "low-level/uint";
 import { Signature } from "./signature.js";
 import { KeyPair, PrivateKey, PublicKey, PublicKeyPair, SharedSecret } from "./cryptoKeys.js";
 import { PX } from "../objects/prefix.js";

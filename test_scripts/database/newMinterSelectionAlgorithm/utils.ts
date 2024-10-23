@@ -1,4 +1,4 @@
-import { Uint, Uint64 } from "../../../src/binary/uint.js";
+import { Uint, Uint64 } from "low-level/uint";
 import LCrypt from "../../../src/crypto/index.js";
 import { AddressHex } from "../../../src/objects/address.js";
 import { PX } from "../../../src/objects/prefix.js";

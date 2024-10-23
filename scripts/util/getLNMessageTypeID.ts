@@ -1,5 +1,5 @@
-import { Uint } from '../../src/binary/uint.js'
-import LCrypt from '../../src/crypto/index.js'
+import { Uint } from "low-level/uint"
+import LCrypt from "../../src/crypto/index.js"
 
 function getMessageTypeID(name: string) {
     return LCrypt.sha256(Uint.from(name.toLowerCase(), "utf8")).slice(-2)

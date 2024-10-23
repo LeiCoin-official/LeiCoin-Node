@@ -1,5 +1,5 @@
 import LevelDB from "./index.js";
-import { Uint, Uint64 } from "../../binary/uint.js";
+import { Uint, Uint64 } from "low-level/uint";
 
 export class LevelKeyIndexRange {
 

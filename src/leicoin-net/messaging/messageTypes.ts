@@ -1,4 +1,4 @@
-import { type Uint } from "../../binary/uint.js";
+import { type Uint } from "low-level/uint";
 import cli from "../../cli/cli.js";
 import { type DataEncoder } from "../../encoding/binaryEncoders.js";
 import ObjectEncoding from "../../encoding/objects.js";

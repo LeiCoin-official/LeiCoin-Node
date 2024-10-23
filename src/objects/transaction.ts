@@ -2,7 +2,7 @@ import LCrypt from "../crypto/index.js";
 import ObjectEncoding from "../encoding/objects.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
-import { Uint, Uint256, Uint64 } from "../binary/uint.js";
+import { Uint, Uint256, Uint64 } from "low-level/uint";
 import Signature from "../crypto/signature.js";
 import { PX } from "./prefix.js";
 import { MinterCredentials } from "./minter.js";

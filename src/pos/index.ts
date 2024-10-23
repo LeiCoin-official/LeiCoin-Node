@@ -1,5 +1,5 @@
 import cli from "../cli/cli.js";
-import { Uint64 } from "../binary/uint.js";
+import { Uint64 } from "low-level/uint";
 import Constants from "../utils/constants.js";
 import Slot from "./slot.js";
 import { UintMap } from "../binary/map.js";

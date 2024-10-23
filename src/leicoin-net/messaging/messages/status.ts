@@ -1,4 +1,4 @@
-import { Uint, Uint16 } from "../../../binary/uint.js";
+import { Uint, Uint16 } from "low-level/uint";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";

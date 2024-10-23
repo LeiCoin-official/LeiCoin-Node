@@ -1,4 +1,4 @@
-import { type Uint, Uint32 } from "../../binary/uint.js";
+import { type Uint, Uint32 } from "low-level/uint";
 import cli from "../../cli/cli.js";
 import LCrypt from "../../crypto";
 import { BE, type DataEncoder } from "../../encoding/binaryEncoders";

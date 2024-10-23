@@ -1,5 +1,5 @@
 import { AbstractBinaryMap } from "../binary/map.js";
-import { type Uint, Uint32 } from "../binary/uint.js";
+import { type Uint, Uint32 } from "low-level/uint";
 import { Deferred } from "../utils/deferred.js";
 import { type LNMsgType } from "./messaging/messageTypes.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";

@@ -1,4 +1,4 @@
-import { Uint } from "../binary/uint.js";
+import { Uint } from "low-level/uint";
 import { CB } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/dataUtils.js";
 import { DataEncoder } from "./binaryEncoders.js";

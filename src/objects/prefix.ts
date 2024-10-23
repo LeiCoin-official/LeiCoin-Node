@@ -1,4 +1,4 @@
-import { Uint } from "../binary/uint.js";
+import { Uint } from "low-level/uint";
 
 interface LockedUintConstructable {
     new(buffer: Buffer): LockedUint;

@@ -1,5 +1,5 @@
-import { FixedUint, Uint64, Uint8 } from "../binary/uint.js";
-import { Uint } from "../binary/uint.js";
+import { FixedUint, Uint64, Uint8 } from "low-level/uint";
+import { Uint } from "low-level/uint";
 import ObjectEncoding from "./objects.js";
 import { AnyObj } from "../utils/dataUtils.js";
 

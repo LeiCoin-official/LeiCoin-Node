@@ -3,7 +3,7 @@ import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import cli from "../cli/cli.js";
 import Verification from "../verification/index.js";
-import { Uint256, Uint64 } from "../binary/uint.js";
+import { Uint256, Uint64 } from "low-level/uint";
 import { Blockchain } from "../storage/blockchain.js";
 import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";

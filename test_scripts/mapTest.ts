@@ -1,5 +1,5 @@
 import { UintMap } from "../src/binary/map.js";
-import { Uint } from "../src/binary/uint.js";
+import { Uint } from "low-level/uint";
 
 function test_selection() {
 

@@ -7,8 +7,7 @@
 	"scripts": {
 		"setup": "bun run ./scripts/setup && bun run patches",
 		"patches": "patch-package",
-		"clean:win": "cmd /C \"rmdir /Q /S node_modules\" ",
-		"clean:linux": "rm -r node_modules",
+		"clean": "rm -rf node_modules",
 		"test": "bun test",
 		"testnet": "bun run ./testnet",
 		"debug": "bun run ./src/index.ts",
@@ -47,6 +46,7 @@
 		"elliptic": "^6.5.7",
 		"elysia": "^1.1.16",
 		"level-read-stream": "^1.1.0",
+		"low-level": "^1.0.0",
 		"patch-package": "^8.0.0",
 		"reflect-metadata": "^0.2.2"
 	},
@@ -55,7 +55,6 @@
 		"@types/cors": "^2.8.17",
 		"@types/elliptic": "^6.4.18",
 		"@types/node": "^22.7.3",
-		"@types/node-cron": "^3.0.11",
 		"@types/readable-stream": "^4.0.15",
 		"typescript": "^5.6.2"
 	}

@@ -1,4 +1,4 @@
-import { Uint128, Uint16, Uint32, Uint96 } from "../binary/uint.js";
+import { Uint128, Uint16, Uint32, Uint96 } from "low-level/uint";
 import { LockedUint } from "./prefix.js";
 
 export class IPv4Addr extends LockedUint {

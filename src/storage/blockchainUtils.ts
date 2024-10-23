@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import cli from "../cli/cli.js";
 import Utils from "../utils/index.js";
-import { Uint, type Uint64 } from "../binary/uint.js";
+import { Uint, type Uint64 } from "low-level/uint";
 import readline from "readline";
 
 class BCUtils {
