@@ -3,7 +3,7 @@ import cli from "../../cli/cli.js";
 import LCrypt from "../../crypto";
 import { BE, type DataEncoder } from "../../encoding/binaryEncoders";
 import ObjectEncoding from "../../encoding/objects.js";
-import MessageRouter from "./index.js";
+import { MessageRouter } from "./index.js";
 import { type LNMsgContent, type LNMsgContentConstructor, LNMsgType } from "./messageTypes.js";
 
 export class LNStandartMsg<T extends LNMsgContent> {
