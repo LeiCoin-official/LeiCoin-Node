@@ -122,17 +122,12 @@ export abstract class BasicLNSocketHandler implements SocketHandler<LNSocket> {
 
 export class LNSocketHandlerFactory {
     static create(connections: LNConnections) {
-        return new (class LNSocketHandler
-            extends BasicLNSocketHandler
-            implements SocketHandler<LNSocket>
-        {
+        return new class LNSocketHandler extends BasicLNSocketHandler implements SocketHandler<LNSocket> {
             async open(socket: Socket<LNSocket>) {
                 socket.data = new LNSocket(socket);
 
                 connections.add(socket.data);
-                cli.leicoin_net.info(
-                    `A Connection was established with ${socket.data.meta.uri}`
-                );
+                cli.leicoin_net.info(`A Connection was established with ${socket.data.meta.uri}`);
             }
 
             async close(socket: Socket<LNSocket>) {
@@ -147,9 +142,7 @@ export class LNSocketHandlerFactory {
             }
 
             async timeout(socket: Socket<LNSocket>) {
-                cli.leicoin_net.info(
-                    `Connection to ${socket.data.meta.uri} timed out.`
-                );
+                cli.leicoin_net.info(`Connection to ${socket.data.meta.uri} timed out.`);
             }
 
             async error(socket: Socket<LNSocket>, error: Error) {
@@ -167,6 +160,6 @@ export class LNSocketHandlerFactory {
                 success: boolean,
                 authorizationError: Error | null
             ) {}
-        })();
+        }();
     }
 }
