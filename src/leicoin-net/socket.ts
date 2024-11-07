@@ -7,13 +7,6 @@ import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPack
 import { LNActiveRequests } from "./requests.js";
 import { type LNBroadcastingMsgHandler } from "./messaging/abstractChannel.js";
 
-// export namespace LNRequest {
-//     export enum Type {
-//         INCOMING,
-//         OUTGOING
-//     }
-// }
-
 export class SocketMetadata {
     constructor(
         public verified = false,
