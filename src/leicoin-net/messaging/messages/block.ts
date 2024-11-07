@@ -4,11 +4,11 @@ import POS from "../../../pos/index.js";
 import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
 import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";
-import { LNMsgContent, LNMsgType } from "../messageTypes.js";
+import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 import { type LNSocket } from "../../socket.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 
-export class NewBlockMsg extends LNMsgContent {
+export class NewBlockMsg extends LNAbstractMsgBody {
 
     constructor(readonly block: Block) {super()}
 
@@ -44,7 +44,7 @@ export namespace NewBlockMsg {
 }
 
 
-export class GetBlocksMsg extends LNMsgContent {
+export class GetBlocksMsg extends LNAbstractMsgBody {
 
 }
 

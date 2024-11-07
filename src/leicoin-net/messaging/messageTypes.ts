@@ -15,9 +15,19 @@ export class LNMsgType extends LockedUint {
 }
 
 
-abstract class LNAbstractMsg {
+export abstract class LNAbstractMsgBody {
+
+    public getTypeID() {
+        return (this.constructor as LNMsgInfo).TYPE;
+    }
+
+    public getHandler() {
+        return (this.constructor as LNMsgInfo).Handler;
+    }
+
+    
     public encodeToHex() {
-        return ObjectEncoding.encode(this, (this.constructor as typeof LNAbstractMsg).encodingSettings, false).data;
+        return ObjectEncoding.encode(this, (this.constructor as typeof LNAbstractMsgBody).encodingSettings, false).data;
     }
 
     static fromDecodedHex<T>(this: T, hexData: Uint): T | null;
@@ -33,7 +43,7 @@ abstract class LNAbstractMsg {
         return null;
     }
 
-    protected static fromDict(obj: Dict<any>): LNAbstractMsg {
+    protected static fromDict(obj: Dict<any>): LNAbstractMsgBody {
         throw new Error("Method not implemented.");
     }
 
@@ -41,26 +51,13 @@ abstract class LNAbstractMsg {
 }
 
 
-export interface LNMsgContentConstructor<T extends LNMsgContent = LNMsgContent> {
+export interface LNMsgBodyConstructor<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
     new(...args: any[]): T;
     fromDecodedHex(hexData: Uint): T | null;
 }
 
-export interface LNMsgInfo extends LNMsgContentConstructor {
+export interface LNMsgInfo extends LNMsgBodyConstructor {
     readonly TYPE: LNMsgType;
     readonly Handler: LNBasicMsgHandler;
 }
-
-export abstract class LNMsgContent extends LNAbstractMsg {
-
-    public getTypeID() {
-        return (this.constructor as LNMsgInfo).TYPE;
-    }
-
-    public getHandler() {
-        return (this.constructor as LNMsgInfo).Handler;
-    }
-    
-}
-
 

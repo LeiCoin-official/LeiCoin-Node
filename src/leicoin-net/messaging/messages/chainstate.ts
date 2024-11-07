@@ -1,8 +1,8 @@
 import { type LNSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
-import { LNMsgContent, LNMsgType } from "../messageTypes.js";
+import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 
-export class GetChainstateMsg extends LNMsgContent {
+export class GetChainstateMsg extends LNAbstractMsgBody {
     
 }
 

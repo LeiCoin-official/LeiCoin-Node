@@ -1,13 +1,13 @@
 import { type LNSocket } from "../socket.js";
-import { type LNMsgContent } from "./messageTypes.js";
+import { type LNAbstractMsgBody } from "./messageTypes.js";
 
 export type LNMsgHandlerConstructable<T extends LNBasicMsgHandler = LNBasicMsgHandler> = new() => T;
 
-export type LNMsgHandlerResponse = Promise<LNMsgContent | null>;
+export type LNMsgHandlerResponse = Promise<LNAbstractMsgBody | null>;
 
 export abstract class LNBasicMsgHandler {
     abstract readonly acceptedMgs: "DEFAULT" | "REQUEST" | "BROADCAST";
-    abstract receive(data: LNMsgContent, socket: LNSocket): LNMsgHandlerResponse;
+    abstract receive(data: LNAbstractMsgBody, socket: LNSocket): LNMsgHandlerResponse;
 }
 
 export abstract class LNMsgHandler extends LNBasicMsgHandler {
@@ -16,5 +16,5 @@ export abstract class LNMsgHandler extends LNBasicMsgHandler {
 
 export abstract class LNBroadcastingMsgHandler extends LNBasicMsgHandler {
     readonly acceptedMgs = "BROADCAST";
-    abstract receive(data: LNMsgContent): LNMsgHandlerResponse;
+    abstract receive(data: LNAbstractMsgBody): LNMsgHandlerResponse;
 }

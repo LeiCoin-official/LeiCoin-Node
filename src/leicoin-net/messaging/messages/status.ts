@@ -4,9 +4,9 @@ import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";
 import { type LNSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
-import { LNMsgContent, LNMsgType } from "../messageTypes.js";
+import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 
-export class StatusMsg extends LNMsgContent {
+export class StatusMsg extends LNAbstractMsgBody {
 
     constructor(
         readonly version: Uint16,

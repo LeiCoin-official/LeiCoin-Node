@@ -3,13 +3,13 @@ import Transaction from "../../../objects/transaction.js";
 import cli from "../../../cli/cli.js";
 import Verification from "../../../verification/index.js"
 import { Uint } from "low-level";
-import { LNMsgContent, LNMsgType } from "../messageTypes.js";
+import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
 import { Dict } from "../../../utils/dataUtils.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type LNSocket } from "../../socket.js";
 
-export class NewTransactionMsg extends LNMsgContent {
+export class NewTransactionMsg extends LNAbstractMsgBody {
     
     constructor(readonly transaction: Transaction) {super()}
     
@@ -56,7 +56,7 @@ export namespace NewTransactionMsg {
     }
 }
 
-export class GetTransactionsMsg extends LNMsgContent {}
+export class GetTransactionsMsg extends LNAbstractMsgBody {}
 
 export namespace GetTransactionsMsg {
     export const TYPE = LNMsgType.from("09aa"); // GET_TRANSACTIONS

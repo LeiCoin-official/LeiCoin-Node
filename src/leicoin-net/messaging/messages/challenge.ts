@@ -2,9 +2,9 @@ import { Uint, Uint256, Uint32 } from "low-level";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type LNSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
-import { LNMsgContent, LNMsgType } from "../messageTypes.js";
+import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 
-export class ChallengeMsg extends LNMsgContent {
+export class ChallengeMsg extends LNAbstractMsgBody {
 
     constructor(
         readonly challenge: Uint256
