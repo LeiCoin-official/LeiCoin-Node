@@ -1,37 +1,28 @@
 import { AbstractBinaryMap } from "low-level";
 import { Uint256 } from "low-level";
-import { type LNSocket } from "./socket.js";
+import { type PeerSocket } from "./socket.js";
 
-export class LNConnections extends AbstractBinaryMap<Uint256, LNSocket> {
+abstract class AbstractPeerConnectionsMap extends AbstractBinaryMap<Uint256, PeerSocket> {
 
-    private static instance: LNConnections;
-    
-    static getInstance(connections?: [Uint256, LNSocket][]) {
-        if (!this.instance) {
-            this.instance = new LNConnections(connections);
-        }
-        return this.instance;
+    constructor(entries?: [Uint256, PeerSocket][]) {
+        super(Uint256, entries);
     }
-    
-    private constructor(
-        connections?: [Uint256, LNSocket][]
-    ) { super(Uint256, connections); }
 
     public get size() { return super.size; }
 
-    public add(socket: LNSocket) {
-        super.set(socket.meta.id, socket);
+    public add(socket: PeerSocket) {
+        super.set(socket.uuid, socket);
     }
 
-    public get(id: Uint256) { return super.get(id); }
+    public get(uuid: Uint256) { return super.get(uuid); }
 
-    public remove(id: Uint256): boolean;
-    public remove(socket: LNSocket): boolean;
-    public remove(arg0: Uint256 | LNSocket) {
+    public remove(uuid: Uint256): boolean;
+    public remove(socket: PeerSocket): boolean;
+    public remove(arg0: Uint256 | PeerSocket) {
         if (arg0 instanceof Uint256) {
             return super.delete(arg0);
         }
-        return super.delete(arg0.meta.id);
+        return super.delete(arg0.uuid);
     }
     
     public getAll() {
@@ -44,3 +35,29 @@ export class LNConnections extends AbstractBinaryMap<Uint256, LNSocket> {
     public values() { return super.values(); }
 
 }
+
+export class PeerConnections extends AbstractPeerConnectionsMap {
+
+    readonly queue: PeerConnectionsQueue;
+
+    constructor(entries?: [Uint256, PeerSocket][], queueEntries?: PeerConnectionsQueue) {
+        super(entries);
+        this.queue = queueEntries || new PeerConnectionsQueue();
+    }
+
+    public moveFromQueue(uuid: Uint256) {
+        const socket = this.queue.get(uuid);
+        if (socket) {
+            this.add(socket);
+            this.queue.remove(uuid);
+        }
+    }
+
+}
+
+
+export class PeerConnectionsQueue extends AbstractPeerConnectionsMap {
+    
+    
+}
+

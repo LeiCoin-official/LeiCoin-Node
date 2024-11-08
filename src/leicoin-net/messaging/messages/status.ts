@@ -2,7 +2,7 @@ import { Uint, Uint16 } from "low-level";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";
-import { type LNSocket } from "../../socket.js";
+import { type PeerSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
 import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 
@@ -33,13 +33,13 @@ export namespace StatusMsg {
     export const Handler = new class Handler extends LNMsgHandler {
         readonly acceptedMgs = "REQUEST";
 
-        async receive(data: StatusMsg, socket: LNSocket) {
+        async receive(data: StatusMsg, socket: PeerSocket) {
 
             if (!data) {
                 return null;
             }
     
-            if (socket.meta.id.eq(0)) {
+            if (socket.uuid.eq(0)) {
                 
             }
             
