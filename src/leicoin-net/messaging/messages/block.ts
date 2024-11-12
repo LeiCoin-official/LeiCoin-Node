@@ -5,7 +5,7 @@ import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
 import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";
 import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
-import { type LNSocket } from "../../socket.js";
+import { type PeerSocket } from "../../socket.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 
 export class NewBlockMsg extends LNAbstractMsgBody {
@@ -54,7 +54,7 @@ export namespace GetBlocksMsg {
     export const Handler = new class Handler extends LNMsgHandler {
         readonly acceptedMgs = "REQUEST";
         
-        async receive(data: GetBlocksMsg, socket: LNSocket) {
+        async receive(data: GetBlocksMsg, socket: PeerSocket) {
             return null;
         }
     }

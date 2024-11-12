@@ -2,32 +2,25 @@ import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
-import { type LNConnections } from "./connections.js";
+import { type PeerConnections } from "./connections.js";
 import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
 import { LNActiveRequests } from "./requests.js";
 import { type LNBroadcastingMsgHandler } from "./messaging/abstractChannel.js";
 
-export class SocketMetadata {
-    constructor(
-        public verified = false,
-        public host = "",
-        public port = 0,
-        public id = Uint256.empty(),
-        public challenge = new Uint256(LCrypt.randomBytes(32))
-    ) {}
 
-    get uri() {
-        return `${this.host}:${this.port}`;
-    }
-}
-
-export class LNSocket {
-    readonly meta: SocketMetadata = new SocketMetadata();
+export class PeerSocket {
+    readonly host: string;
+    public port = 0;
+    readonly uuid = new Uint256(LCrypt.randomBytes(32));
+    readonly challenge = new Uint256(LCrypt.randomBytes(32));
+    public verified = false;
 
     constructor(
-        protected socket: Socket<any>,
+        protected readonly tcpSocket: Socket<any>,
         readonly activeRequests: LNActiveRequests = new LNActiveRequests()
-    ) {}
+    ) {
+        this.host = tcpSocket.remoteAddress;
+    }
 
     static async connect(
         host: string,
@@ -46,8 +39,12 @@ export class LNSocket {
         }
     }
 
+    get uri() {
+        return `${this.host}:${this.port}`;
+    }
+
     async send(data: LNStandartMsg | Uint) {
-        return this.socket.write(
+        return this.tcpSocket.write(
             data instanceof LNStandartMsg
                 ? data.encodeToHex().getRaw()
                 : data.getRaw()
@@ -102,55 +99,49 @@ export class LNSocket {
     }
 
     async close(lastMessage?: Uint) {
-        return this.socket.end(lastMessage?.getRaw());
+        return this.tcpSocket.end(lastMessage?.getRaw());
     }
 }
 
 
-export abstract class BasicLNSocketHandler implements SocketHandler<LNSocket> {
+export abstract class BasicLNSocketHandler implements SocketHandler<PeerSocket> {
     readonly binaryType = "buffer";
 }
 
 export class LNSocketHandlerFactory {
-    static create(connections: LNConnections) {
-        return new class LNSocketHandler extends BasicLNSocketHandler implements SocketHandler<LNSocket> {
-            async open(socket: Socket<LNSocket>) {
-                socket.data = new LNSocket(socket);
+    static create(connections: PeerConnections) {
+        return new class LNSocketHandler extends BasicLNSocketHandler implements SocketHandler<PeerSocket> {
+            async open(socket: Socket<PeerSocket>) {
+                socket.data = new PeerSocket(socket);
 
                 connections.add(socket.data);
-                cli.leicoin_net.info(`A Connection was established with ${socket.data.meta.uri}`);
+                cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
             }
 
-            async close(socket: Socket<LNSocket>) {
+            async close(socket: Socket<PeerSocket>) {
                 connections.remove(socket.data);
-                cli.leicoin_net.info(
-                    `Connection to ${socket.data.meta.uri} closed.`
-                );
+                cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
             }
-            async end(socket: Socket<LNSocket>) {
+            async end(socket: Socket<PeerSocket>) {
                 connections.remove(socket.data);
-                cli.leicoin_net.info(`Connection to ${socket.data.meta.uri} ended.`);
+                cli.leicoin_net.info(`${socket.data.uri} has ended the connection.`);
             }
 
-            async timeout(socket: Socket<LNSocket>) {
-                cli.leicoin_net.info(`Connection to ${socket.data.meta.uri} timed out.`);
+            async timeout(socket: Socket<PeerSocket>) {
+                cli.leicoin_net.info(`Connection to ${socket.data.uri} timed out.`);
             }
 
-            async error(socket: Socket<LNSocket>, error: Error) {
+            async error(socket: Socket<PeerSocket>, error: Error) {
                 cli.leicoin_net.error(`Connection Error: ${error.stack}`);
             }
 
-            async data(socket: Socket<LNSocket>, data: Buffer) {
+            async data(socket: Socket<PeerSocket>, data: Buffer) {
                 socket.data.receive(new Uint(data));
             }
 
-            async drain(socket: Socket<LNSocket>) {}
+            async drain(socket: Socket<PeerSocket>) {}
 
-            async handshake(
-                socket: Socket<LNSocket>,
-                success: boolean,
-                authorizationError: Error | null
-            ) {}
+            async handshake(socket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}
         }();
     }
 }

@@ -1,7 +1,7 @@
 import { type TCPSocketListener } from "bun";
-import { LNSocket, LNSocketHandlerFactory, type BasicLNSocketHandler } from "./socket.js";
+import { PeerSocket, LNSocketHandlerFactory, type BasicLNSocketHandler } from "./socket.js";
 import cli from "../cli/cli.js";
-import { LNConnections } from "./connections.js";
+import { PeerConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import { type LNStandartMsg } from "./messaging/netPackets.js";
@@ -11,16 +11,16 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
     public static started = false;
 
-    private static server: TCPSocketListener<LNSocket>;
+    private static server: TCPSocketListener<PeerSocket>;
 
-    private static connections: LNConnections;
+    private static connections: PeerConnections;
     private static socketHandler: BasicLNSocketHandler;
 
     static async init() {
         if (this.initialized) return;
         this.initialized = true;
 
-        this.connections = LNConnections.getInstance();
+        this.connections = new PeerConnections();
         this.socketHandler = LNSocketHandlerFactory.create(this.connections);
     }
 
@@ -80,7 +80,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
                 continue;
             }
 
-            promises.push(LNSocket.connect(host, port, this.socketHandler));
+            promises.push(PeerSocket.connect(host, port, this.socketHandler));
         }
 
         await Promise.all(promises);

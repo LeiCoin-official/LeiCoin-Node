@@ -1,6 +1,6 @@
 import { Uint, Uint256, Uint32 } from "low-level";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
-import { type LNSocket } from "../../socket.js";
+import { type PeerSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
 import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 
@@ -27,7 +27,7 @@ export namespace ChallengeMsg {
     export const Handler = new class Handler extends LNMsgHandler {
         readonly acceptedMgs = "REQUEST";
 
-        async receive(data: ChallengeMsg, socket: LNSocket) {
+        async receive(data: ChallengeMsg, socket: PeerSocket) {
             return null;
         }
     }

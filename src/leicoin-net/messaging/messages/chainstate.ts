@@ -1,4 +1,4 @@
-import { type LNSocket } from "../../socket.js";
+import { type PeerSocket } from "../../socket.js";
 import { LNMsgHandler } from "../abstractChannel.js";
 import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 
@@ -12,7 +12,7 @@ export namespace GetChainstateMsg {
     export const Handler: LNMsgHandler = new class Handler extends LNMsgHandler {
         readonly acceptedMgs = "REQUEST";
 
-        async receive(data: GetChainstateMsg, socket: LNSocket) {
+        async receive(data: GetChainstateMsg, socket: PeerSocket) {
             return null;
         }
     }

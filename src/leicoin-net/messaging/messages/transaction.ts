@@ -7,7 +7,7 @@ import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
 import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
 import { Dict } from "../../../utils/dataUtils.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
-import { type LNSocket } from "../../socket.js";
+import { type PeerSocket } from "../../socket.js";
 
 export class NewTransactionMsg extends LNAbstractMsgBody {
     
@@ -64,7 +64,7 @@ export namespace GetTransactionsMsg {
     export const Handler = new class Handler extends LNMsgHandler {
         readonly acceptedMgs = "REQUEST";
         
-        async receive(data: GetTransactionsMsg, socket: LNSocket) {
+        async receive(data: GetTransactionsMsg, socket: PeerSocket) {
             return null;
             
         }
