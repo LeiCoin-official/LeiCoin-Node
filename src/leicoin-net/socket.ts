@@ -2,10 +2,10 @@ import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
-import { type PeerConnections } from "./connections.js";
 import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
 import { LNActiveRequests } from "./requests.js";
 import { type LNBroadcastingMsgHandler } from "./messaging/abstractChannel.js";
+import LeiCoinNetNode from "./index.js";
 
 
 export class PeerSocket {
@@ -24,14 +24,13 @@ export class PeerSocket {
 
     static async connect(
         host: string,
-        port: number,
-        handler: BasicLNSocketHandler
+        port: number
     ) {
         try {
             await Bun.connect({
                 hostname: host,
                 port,
-                socket: handler,
+                socket: new LNClientSocketHandler(),
             });
         } catch (err: any) {
             cli.leicoin_net.error(`Failed to connect to ${host}:${port}. Error: ${err.name}`);
@@ -105,43 +104,56 @@ export class PeerSocket {
 
 
 export abstract class BasicLNSocketHandler implements SocketHandler<PeerSocket> {
+
     readonly binaryType = "buffer";
+
+    protected static instance: BasicLNSocketHandler;
+
+    constructor() {
+        const CLS = this.constructor as typeof BasicLNSocketHandler;
+        if (CLS.instance) {
+            CLS.instance = this;
+        }
+        return CLS.instance;
+    }
+
+    async open(socket: Socket<PeerSocket>) {
+        socket.data = new PeerSocket(socket);
+
+        LeiCoinNetNode.connections.queue.add(socket.data);
+        cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
+    }
+
+    async close(socket: Socket<PeerSocket>) {
+        LeiCoinNetNode.connections.remove(socket.data);
+        cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
+    }
+    async end(socket: Socket<PeerSocket>) {
+        LeiCoinNetNode.connections.remove(socket.data);
+        cli.leicoin_net.info(`${socket.data.uri} has ended the connection.`);
+    }
+
+    async timeout(socket: Socket<PeerSocket>) {
+        cli.leicoin_net.info(`Connection to ${socket.data.uri} timed out.`);
+    }
+
+    async error(socket: Socket<PeerSocket>, error: Error) {
+        cli.leicoin_net.error(`Connection Error: ${error.stack}`);
+    }
+
+    async data(socket: Socket<PeerSocket>, data: Buffer) {
+        socket.data.receive(new Uint(data));
+    }
+
+    async drain(socket: Socket<PeerSocket>) {}
+
+    async handshake(socket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}
 }
 
-export class LNSocketHandlerFactory {
-    static create(connections: PeerConnections) {
-        return new class LNSocketHandler extends BasicLNSocketHandler implements SocketHandler<PeerSocket> {
-            async open(socket: Socket<PeerSocket>) {
-                socket.data = new PeerSocket(socket);
+export class LNServerSocketHandler extends BasicLNSocketHandler {
 
-                connections.add(socket.data);
-                cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
-            }
+}
 
-            async close(socket: Socket<PeerSocket>) {
-                connections.remove(socket.data);
-                cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
-            }
-            async end(socket: Socket<PeerSocket>) {
-                connections.remove(socket.data);
-                cli.leicoin_net.info(`${socket.data.uri} has ended the connection.`);
-            }
+export class LNClientSocketHandler extends BasicLNSocketHandler {
 
-            async timeout(socket: Socket<PeerSocket>) {
-                cli.leicoin_net.info(`Connection to ${socket.data.uri} timed out.`);
-            }
-
-            async error(socket: Socket<PeerSocket>, error: Error) {
-                cli.leicoin_net.error(`Connection Error: ${error.stack}`);
-            }
-
-            async data(socket: Socket<PeerSocket>, data: Buffer) {
-                socket.data.receive(new Uint(data));
-            }
-
-            async drain(socket: Socket<PeerSocket>) {}
-
-            async handshake(socket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}
-        }();
-    }
 }

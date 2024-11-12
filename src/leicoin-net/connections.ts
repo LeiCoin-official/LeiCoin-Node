@@ -39,7 +39,7 @@ abstract class AbstractPeerConnectionsMap extends AbstractBinaryMap<Uint256, Pee
 
 export class PeerConnections extends AbstractPeerConnectionsMap {
 
-    private readonly queue: PeerConnectionsQueue;
+    readonly queue: PeerConnectionsQueue;
 
     constructor(entries?: [Uint256, PeerSocket][], queueEntries?: PeerConnectionsQueue) {
         super(entries);
