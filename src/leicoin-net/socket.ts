@@ -41,9 +41,7 @@ export class LNSocket {
                 socket: handler,
             });
         } catch (err: any) {
-            cli.leicoin_net.error(
-                `Failed to connect to ${host}:${port}. Error: ${err.name}`
-            );
+            cli.leicoin_net.error(`Failed to connect to ${host}:${port}. Error: ${err.name}`);
             return null;
         }
     }
