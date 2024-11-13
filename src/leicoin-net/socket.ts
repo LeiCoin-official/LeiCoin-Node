@@ -24,6 +24,7 @@ export class PeerSocket {
         readonly activeRequests: LNActiveRequests = new LNActiveRequests()
     ) {
         this.host = tcpSocket.remoteAddress;
+        this.host = tcpSocket.remotePort;
     }
 
     static async connect(
