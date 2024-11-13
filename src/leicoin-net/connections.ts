@@ -18,7 +18,6 @@ abstract class AbstractPeerConnectionsMap extends AbstractBinaryMap<Uint256, Pee
 
     public remove(uuid: Uint256): boolean;
     public remove(socket: PeerSocket): boolean;
-    public remove(arg0: Uint256 | PeerSocket): boolean;
     public remove(arg0: Uint256 | PeerSocket) {
         if (arg0 instanceof Uint256) {
             return super.delete(arg0);
@@ -48,10 +47,9 @@ export class PeerConnections extends AbstractPeerConnectionsMap {
 
     public remove(uuid: Uint256, alsoRemoveFromQueue?: boolean): boolean;
     public remove(socket: PeerSocket, alsoRemoveFromQueue?: boolean): boolean;
-    public remove(arg0: Uint256 | PeerSocket, alsoRemoveFromQueue?: boolean): boolean;
     public remove(arg0: Uint256 | PeerSocket, alsoRemoveFromQueue = true) {
-        const result1 = super.remove(arg0);
-        const result2 = alsoRemoveFromQueue ? this.queue.remove(arg0) : false;
+        const result1 = super.remove(arg0 as any);
+        const result2 = alsoRemoveFromQueue ? this.queue.remove(arg0 as any) : false;
         return result1 || result2;
     }
 

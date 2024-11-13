@@ -1,11 +1,12 @@
 import { type TCPSocketListener } from "bun";
-import { LNClientSocketHandler, PeerSocket } from "./socket.js";
+import { LNServerSocketHandler, PeerSocket } from "./socket.js";
 import cli from "../cli/cli.js";
 import { PeerConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import { type LNStandartMsg } from "./messaging/netPackets.js";
 import { type Uint } from "low-level";
+import Utils from "../utils/index.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
@@ -52,10 +53,11 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
             this.server = Bun.listen({
                 hostname: host,
                 port: port,
-                socket: new LNClientSocketHandler()
+                socket: new LNServerSocketHandler()
             });
         } catch (error: any) {
             cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);
+            Utils.gracefulShutdown(1);
         }
     }
 

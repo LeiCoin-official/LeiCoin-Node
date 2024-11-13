@@ -11,7 +11,7 @@ export class POS implements ModuleLike<typeof POS> {
     public static started = false;
 
     private static slotTask: CronJob;
-    private static readonly slots: UintMap<Promise<Slot>> = new UintMap();
+    private static readonly slots = new UintMap<Promise<Slot>>();
 
     static readonly minters: MinterClient[] = [];
 

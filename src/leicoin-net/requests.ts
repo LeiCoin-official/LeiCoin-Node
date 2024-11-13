@@ -1,7 +1,7 @@
 import { AbstractBinaryMap } from "low-level";
 import { type Uint, Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
-import { type LNMsgType } from "./messaging/messageTypes.js";
+import type { LNAbstractMsgBody, LNMsgType } from "./messaging/messageTypes.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";
 
 class LNActiveRequest {
@@ -11,7 +11,7 @@ class LNActiveRequest {
     constructor(
         readonly requestID: Uint32,
         expectedTypes: LNMsgType[] | LNMsgType,
-        readonly result: Deferred<Uint> = new Deferred()
+        protected readonly result = new Deferred<LNAbstractMsgBody>()
     ) {
         this.expectedTypes = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
     }
@@ -23,12 +23,16 @@ class LNActiveRequest {
         );
     }
 
-    public resolve(data: Uint) {
+    public resolve(data: LNAbstractMsgBody) {
         /**
          * @todo Check if the data is of the expected type and more error handling
          * @todo Implement a timeout for the request
          */
         this.result.resolve(data);
+    }
+
+    public awaitResult() {
+        return this.result.awaitResult();
     }
 
     public toCompactData() {
@@ -40,13 +44,13 @@ class LNActiveRequest {
 class LNActiveRequestCompactData {
     constructor(
         readonly expectedTypes: LNMsgType[],
-        readonly result: Deferred<Uint>
+        readonly result: Deferred<LNAbstractMsgBody>
     ) {}
 }
 
 
 export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestCompactData> {
-    constructor(entries?: readonly (readonly [Uint32, LNActiveRequest])[]) {
+    constructor(entries?: readonly (readonly [Uint32, LNActiveRequestCompactData])[]) {
         super(Uint32, entries);
     }
 
@@ -61,6 +65,7 @@ export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestC
         return req;
     }
 
+    // @ts-ignore
     public get(id: Uint32) {
         const data = super.get(id);
         return new LNActiveRequest(id, data.expectedTypes, data.result);

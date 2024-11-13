@@ -97,6 +97,7 @@ export class LevelIndexes {
             totalOffset.iadd(range.size);
         }
 
+        /** @todo Better Error Handling: Error shoudl not run when there are no Minter in the DB */
         throw new Error("Index is not part of any range. Are the ranges initialized?");
     }
 

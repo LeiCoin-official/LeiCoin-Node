@@ -103,7 +103,6 @@ class LocalNodeTestNet {
                 switch (relative_url.pathname) {
                     case "/start":
                         const binary = relative_url.searchParams.get("binary") === "true";
-                        console.log(binary);
                         LocalNodeTestNet.startNode(index, server, binary);
                         return Response.json({success: true});
                     default:

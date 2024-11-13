@@ -1,7 +1,7 @@
 import { AddressHex } from "../objects/address.js";
 import { type Block } from "../objects/block.js";
 import { type Uint64 } from "low-level";
-import Verification, { BlockValidationResult } from "../verification/index.js";
+import Verification from "../verification/index.js";
 import { Execution } from "./execution.js";
 import { Blockchain } from "../storage/blockchain.js";
 import cli from "../cli/cli.js";
@@ -24,8 +24,8 @@ export class Slot {
         readonly minter: AddressHex,
     ) {
         this.slot_finished = new Deferred();
-        this.blockTimeout = new Schedule(async() => await this.onBlockNotMinted(), 6000);
         new Schedule(async() => await this.onSlotStart(), 1000);
+        this.blockTimeout = new Schedule(async() => await this.onBlockNotMinted(), 6000);
     }
 
     static async create(index: Uint64) {
@@ -54,7 +54,7 @@ export class Slot {
     }
 
     protected async onBlockNotMinted() {
-        if (this.slot_finished.isResolved() || this.blockTimeout.hasFinished()) return;
+        if (this.slot_finished.isResolved()) return;
 
         this.slot_finished.resolve();
         cli.pos.error(`Minter ${this.minter.toHex()} did not mint a block on Slot ${this.index.toBigInt()}`);

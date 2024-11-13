@@ -26,12 +26,12 @@ export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
     }
 
     static fromDecodedHex<T extends LNAbstractMsgBody, CT extends LNStandartMsg<T>>(
-        this: new(data: T) => CT,
+        this: new(...args: any[]) => CT,
         hexData: Uint,
         CLS: new (...args: any[]) => T
     ): CT | null;
     static fromDecodedHex<CT extends LNStandartMsg<LNAbstractMsgBody>>(
-        this: new(data: LNAbstractMsgBody) => CT,
+        this: new(...args: any[]) => CT,
         hexData: Uint,
         CLS?: "auto"
     ): CT | null;

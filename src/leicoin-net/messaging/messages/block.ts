@@ -38,7 +38,7 @@ export namespace NewBlockMsg {
         }
 
         private async handleBlock(block: Block) {
-            (await POS.getSlot(block.slotIndex)).processBlock(block);
+            (await POS.getSlot(block.slotIndex))?.processBlock(block);
         }
     } as LNBroadcastingMsgHandler;
 }
