@@ -1,11 +1,13 @@
 import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
-import { Uint, Uint256 } from "low-level";
+import { Uint, Uint16, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
 import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
 import { LNActiveRequests } from "./requests.js";
 import { type LNBroadcastingMsgHandler } from "./messaging/abstractChannel.js";
 import LeiCoinNetNode from "./index.js";
+import { StatusMsg } from "./messaging/messages/status.js";
+import { Port } from "../objects/netinfo.js";
 
 
 export class PeerSocket {
@@ -27,11 +29,22 @@ export class PeerSocket {
         port: number
     ) {
         try {
-            await Bun.connect({
-                hostname: host,
-                port,
-                socket: new LNClientSocketHandler(),
-            });
+            const socket = new PeerSocket(
+                await Bun.connect({
+                    hostname: host,
+                    port,
+                    socket: new LNClientSocketHandler(),
+                })
+            );
+
+            /** @todo Implment Protocol Versioning Later which will replace Uint16.from(0) */
+            socket.send(new LNStandartMsg(
+                new StatusMsg(
+                    Uint16.from(0),
+                    Port.from(LeiCoinNetNode.getServerInfo().port)
+                )
+            ));
+
         } catch (err: any) {
             cli.leicoin_net.error(`Failed to connect to ${host}:${port}. Error: ${err.name}`);
             return null;
@@ -117,12 +130,7 @@ export abstract class BasicLNSocketHandler implements SocketHandler<PeerSocket> 
         return CLS.instance;
     }
 
-    async open(socket: Socket<PeerSocket>) {
-        socket.data = new PeerSocket(socket);
 
-        LeiCoinNetNode.connections.queue.add(socket.data);
-        cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
-    }
 
     async close(socket: Socket<PeerSocket>) {
         LeiCoinNetNode.connections.remove(socket.data);
@@ -152,8 +160,20 @@ export abstract class BasicLNSocketHandler implements SocketHandler<PeerSocket> 
 
 export class LNServerSocketHandler extends BasicLNSocketHandler {
 
+    /** @todo implement timount for first message after connection open */
+    async open(socket: Socket<PeerSocket>) {
+        socket.data = new PeerSocket(socket);
+
+        LeiCoinNetNode.connections.queue.add(socket.data);
+        cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
+    }
+
 }
 
 export class LNClientSocketHandler extends BasicLNSocketHandler {
+
+    async open(socket: Socket<PeerSocket>) {
+        cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
+    }
 
 }
