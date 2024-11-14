@@ -4,7 +4,7 @@ import { type DataEncoder } from "../../encoding/binaryEncoders.js";
 import ObjectEncoding from "../../encoding/objects.js";
 import { LockedUint } from "../../objects/prefix.js";
 import { type Dict } from "../../utils/dataUtils.js";
-import { type LNBasicMsgHandler } from "./abstractChannel.js";
+import { type LNBasicMsgHandler } from "./abstractMsgHandler.js";
 
 /**
  * Stores the message types used in the LeiCoin network

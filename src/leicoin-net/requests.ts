@@ -1,7 +1,7 @@
 import { AbstractBinaryMap } from "low-level";
 import { type Uint, Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
-import type { LNAbstractMsgBody, LNMsgType } from "./messaging/messageTypes.js";
+import type { LNAbstractMsgBody, LNMsgType } from "./messaging/abstractMsg.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";
 
 class LNActiveRequest {
@@ -68,6 +68,7 @@ export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestC
     // @ts-ignore
     public get(id: Uint32) {
         const data = super.get(id);
+        if (!data) return;
         return new LNActiveRequest(id, data.expectedTypes, data.result);
     }
 }

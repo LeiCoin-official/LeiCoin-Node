@@ -1,6 +1,6 @@
 import { type PeerSocket } from "../../socket.js";
-import { LNMsgHandler } from "../abstractChannel.js";
-import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
+import { LNMsgHandler } from "../abstractMsgHandler.js";
+import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
 
 export class GetChainstateMsg extends LNAbstractMsgBody {
     

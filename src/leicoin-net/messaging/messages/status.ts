@@ -3,8 +3,8 @@ import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";
 import { type PeerSocket } from "../../socket.js";
-import { LNMsgHandler } from "../abstractChannel.js";
-import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
+import { LNMsgHandler } from "../abstractMsgHandler.js";
+import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
 
 export class StatusMsg extends LNAbstractMsgBody {
 

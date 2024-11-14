@@ -1,10 +1,10 @@
 import Verification from "../../../verification/index.js"
 import Block from "../../../objects/block.js";
 import POS from "../../../pos/index.js";
-import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
+import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractMsgHandler.js";
 import cli from "../../../cli/cli.js";
 import { VCodes } from "../../../verification/codes.js";
-import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
+import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
 import { type PeerSocket } from "../../socket.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 

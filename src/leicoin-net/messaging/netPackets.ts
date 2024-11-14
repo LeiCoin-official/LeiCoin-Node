@@ -4,7 +4,7 @@ import LCrypt from "../../crypto";
 import { BE, type DataEncoder } from "../../encoding/binaryEncoders";
 import ObjectEncoding from "../../encoding/objects.js";
 import { MessageRouter } from "./index.js";
-import { type LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgType } from "./messageTypes.js";
+import { type LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgType } from "./abstractMsg.js";
 
 
 export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {

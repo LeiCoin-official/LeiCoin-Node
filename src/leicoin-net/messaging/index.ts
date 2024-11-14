@@ -1,4 +1,4 @@
-import { type LNMsgInfo, LNMsgType } from "./messageTypes.js";
+import { type LNMsgInfo, LNMsgType } from "./abstractMsg.js";
 import { type Dict } from "../../utils/dataUtils.js";
 import { StatusMsg } from "./messages/status.js";
 import { ChallengeMsg } from "./messages/challenge.js";
@@ -27,6 +27,7 @@ export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry({
     GET_CHAINSTATE: GetChainstateMsg,
 });
 
+/** @tode Find a new Name for MessageRouter that is more accurate */
 export class MessageRouter {
 
     static globalRequests: LNActiveRequests = new LNActiveRequests();

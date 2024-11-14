@@ -1,5 +1,5 @@
 import { type TCPSocketListener } from "bun";
-import { LNServerSocketHandler, PeerSocket } from "./socket.js";
+import { LNSocketHandler, PeerSocket } from "./socket.js";
 import cli from "../cli/cli.js";
 import { PeerConnections } from "./connections.js";
 import { type EventEmitter } from "events";
@@ -51,9 +51,8 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     private static async startServer(host: string, port: number) {
         try {
             this.server = Bun.listen({
-                hostname: host,
-                port: port,
-                socket: new LNServerSocketHandler()
+                hostname: host, port,
+                socket: LNSocketHandler.Server
             });
         } catch (error: any) {
             cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);

@@ -1,5 +1,5 @@
 import { type PeerSocket } from "../socket.js";
-import { type LNAbstractMsgBody } from "./messageTypes.js";
+import { type LNAbstractMsgBody } from "./abstractMsg.js";
 
 export type LNMsgHandlerConstructable<T extends LNBasicMsgHandler = LNBasicMsgHandler> = new() => T;
 

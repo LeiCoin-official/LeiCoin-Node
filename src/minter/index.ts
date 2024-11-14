@@ -12,7 +12,7 @@ import LCrypt from "../crypto/index.js";
 import { MinterCredentials } from "../objects/minter.js";
 import { type Slot } from "../pos/slot.js";
 import { LeiCoinNetNode } from "../leicoin-net/index.js";
-import { LNMsgType } from "../leicoin-net/messaging/messageTypes.js";
+import { LNMsgType } from "../leicoin-net/messaging/abstractMsg.js";
 import { NewBlockMsg } from "../leicoin-net/messaging/messages/block.js";
 import { LNStandartMsg } from "../leicoin-net/messaging/netPackets.js";
 

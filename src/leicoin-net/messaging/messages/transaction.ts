@@ -3,8 +3,8 @@ import Transaction from "../../../objects/transaction.js";
 import cli from "../../../cli/cli.js";
 import Verification from "../../../verification/index.js"
 import { Uint } from "low-level";
-import { LNAbstractMsgBody, LNMsgType } from "../messageTypes.js";
-import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractChannel.js";
+import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
+import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractMsgHandler.js";
 import { Dict } from "../../../utils/dataUtils.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type PeerSocket } from "../../socket.js";
