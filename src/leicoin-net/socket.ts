@@ -13,6 +13,7 @@ import { MessageRouter } from "./messaging/index.js";
 
 
 export class PeerSocket {
+
     readonly host: string;
     readonly port: number;
     readonly uuid = new Uint256(LCrypt.randomBytes(32));
