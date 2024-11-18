@@ -13,7 +13,7 @@ import { MessageRouter } from "./messaging/index.js";
 
 
 export class PeerSocket {
-
+    
     readonly host: string;
     readonly port: number;
     readonly uuid = new Uint256(LCrypt.randomBytes(32));
@@ -22,6 +22,7 @@ export class PeerSocket {
 
     constructor(
         protected readonly tcpSocket: Socket<any>,
+        readonly type: "INCOMING" | "OUTGOING",
         readonly activeRequests: LNActiveRequests = new LNActiveRequests()
     ) {
         this.host = tcpSocket.remoteAddress;
@@ -131,6 +132,7 @@ export namespace LNSocketHandler {
     abstract class BasicSocketHandler implements SocketHandler<PeerSocket> {
 
         readonly binaryType = "buffer";
+        protected abstract readonly handlesConnections: "INCOMING" | "OUTGOING";
     
         protected static instance: BasicSocketHandler;
     
@@ -144,7 +146,7 @@ export namespace LNSocketHandler {
     
         /** @todo implement timount for first message after connection open */
         async open(socket: Socket<PeerSocket>) {
-            socket.data = new PeerSocket(socket);
+            socket.data = new PeerSocket(socket, this.handlesConnections);
         
             LeiCoinNetNode.connections.queue.add(socket.data);
             cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
@@ -179,9 +181,13 @@ export namespace LNSocketHandler {
     export type Basic = BasicSocketHandler;
 
     
-    export const Server = new class LNServerSocketHandler extends BasicSocketHandler {}
+    export const Server: BasicSocketHandler = new class LNServerSocketHandler extends BasicSocketHandler {
+        protected readonly handlesConnections = "INCOMING";
+    }
     
-    export const Client = new class LNClientSocketHandler extends BasicSocketHandler {}
+    export const Client: BasicSocketHandler = new class LNClientSocketHandler extends BasicSocketHandler {
+        protected readonly handlesConnections = "OUTGOING";
+    }
 
 }
 

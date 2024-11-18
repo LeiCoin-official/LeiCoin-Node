@@ -1,6 +1,7 @@
-import { Uint } from "low-level";
+import { type Uint } from "low-level";
 import LeiCoinNetNode from "./index.js";
 import { type LNStandartMsg } from "./messaging/netPackets";
+import { type PeerSocket } from "./socket.js";
 
 
 export class LNController {
@@ -9,6 +10,16 @@ export class LNController {
         for (const connection of LeiCoinNetNode.connections.values()) {
             connection.send(data);
         }
+    }
+
+}
+
+export class PeerSocketController {
+
+    static async checkConnection(socket: PeerSocket) {
+
+        
+
     }
 
 }
