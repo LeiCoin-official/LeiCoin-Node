@@ -1,4 +1,4 @@
-import { startTimer, endTimer } from './testUtils.js';
+import { startTimer, getElapsedTime } from './utils/testUtils.js';
 import { sha256 } from './cryptoUtils.js';
 import crypto from "crypto";
 
@@ -64,7 +64,7 @@ function test1() {
         array1.push(BigNum.add(r, r2), BigNum.subtract(r, r2), BigNum.multiply(r, r2), BigNum.divide(r, r2), BigNum.mod(r, r2));
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
 
     console.log(array1);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
@@ -82,7 +82,7 @@ function test2() {
         hash = sha256(bytes);
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
 
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
     

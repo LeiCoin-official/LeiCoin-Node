@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { startTimer, endTimer } from "./testUtils.js";
+import { startTimer, getElapsedTime } from "./utils/testUtils.js";
 import { Uint, Uint256, Uint64 } from "../build/src/utils/binary.js";
 import Crypto from "../build/src/crypto/index.js";
 import { AddressHex } from "../build/src/objects/address.js";
@@ -116,9 +116,9 @@ async function selectNextValidators(seedHash) {
             }
             nextHash = Crypto.sha256(Uint.concat([nextHash, seedHash]));
         }
-        elapsedTime = endTimer(startTime);
+        elapsedTime = getElapsedTime(startTime);
     }
-    elapsedTime = endTimer(startTime);
+    elapsedTime = getElapsedTime(startTime);
     await level.close();
     return [validators, elapsedTime, using_first_validators];
 }
@@ -132,7 +132,7 @@ async function testGetValidators(func = getValidators) {
 
     const validators = await func(level);
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
 
     level.close();
 

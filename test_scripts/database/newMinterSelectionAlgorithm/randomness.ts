@@ -4,7 +4,7 @@ import LCrypt from "../../../src/crypto/index.js";
 import { AddressHex } from "../../../src/objects/address.js";
 import type LevelDB from "../../../src/storage/leveldb/index.js";
 import { type LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
-import { endTimer, startTimer } from "../../testUtils.js";
+import { getElapsedTime, startTimer } from "../../utils/testUtils.js";
 import { LevelDBUtils } from "../leveldb_utils.js";
 import { firstMetaAddress, generateMinterDB, indexDB, selectNextMinter } from "./utils.js";
 
@@ -43,7 +43,7 @@ async function testRandomness(level: LevelDB, indexes: LevelIndexes, slotsCount:
         addresses[i] = await selectNextMinter(Uint64.from(i), level, indexes);
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
 
     console.log(`Tested ${slotsCount} slots in ${elapsedTime.toFixed(1)}ms`);
     console.log(`Average time per slot: ${(elapsedTime / slotsCount).toFixed(2)}ms`);

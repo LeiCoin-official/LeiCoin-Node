@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { startTimer, endTimer, shuffleArray, sha256, getNextValidator } from './randtest.js';
+import { startTimer, getElapsedTime, shuffleArray, sha256, getNextValidator } from './randtest.js';
 
 
 const inputString = sha256(crypto.randomBytes(32).toString('hex'));
@@ -16,7 +16,7 @@ const startTime = startTimer();
 
 const r1 = getNextValidator(inputString, arrayToSort);
 
-const elapsedTime = endTimer(startTime);
+const elapsedTime = getElapsedTime(startTime);
 
 const r2 = getNextValidator(inputString, shuffledArray);
 

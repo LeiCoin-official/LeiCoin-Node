@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { startTimer, endTimer, SpecialObject } from "./randtest.js";
+import { startTimer, getElapsedTime, SpecialObject } from "./randtest.js";
 import fs from "fs";
 
 /*
@@ -22,7 +22,7 @@ async function two() {
 
 	await Promise.all(promises);
 
-	const elapsedTime2 = endTimer(startTime2);
+	const elapsedTime2 = getElapsedTime(startTime2);
 
 	console.log("Elapsed time 2:", elapsedTime2 / 1000, "seconds");
 
@@ -52,7 +52,7 @@ async function one() {
 
 	await Promise.all(promises);
 
-	const elapsedTime = endTimer(startTime);
+	const elapsedTime = getElapsedTime(startTime);
 
 	console.log("Elapsed time 1:", elapsedTime / 1000, "seconds");
 
@@ -128,7 +128,7 @@ for (let i = 0; i < 1_000_000; i++) {
 	obj[("lc0x" + crypto.randomBytes(19).toString("hex"))] = i;
 }
 
-const elapsedTime1 = endTimer(startTime1);
+const elapsedTime1 = getElapsedTime(startTime1);
 
 
 const startTime2 = startTimer();
@@ -136,14 +136,14 @@ const startTime2 = startTimer();
 const sortedObj = sortObjectAlphabetical(obj);
 const arrayObj = Object.entries(sortedObj);
 
-const elapsedTime2 = endTimer(startTime2);
+const elapsedTime2 = getElapsedTime(startTime2);
 
 const startTime3 = startTimer();
 
 const sortedObj2 = sortObjectAlphabetical2(obj);
 const arrayObj2 = Object.entries(sortedObj2);
 
-const elapsedTime3 = endTimer(startTime3);
+const elapsedTime3 = getElapsedTime(startTime3);
 
 //specialObj.insert(1_000_001, "lc0x" + crypto.randomBytes(19).toString("hex"));
 

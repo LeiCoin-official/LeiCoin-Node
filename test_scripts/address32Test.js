@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { sha256 } from "./cryptoUtils.js";
-import { startTimer, endTimer } from "./testUtils.js"
+import { startTimer, getElapsedTime } from "./utils/testUtils.js"
 
 const leiCoinAddress32Chars = '123456789abcdefghjklmnpqrstuvwyz';
 //const leiCoinAddress32Chars = '0123456789abcdefghijklmnopqrstuv';
@@ -41,7 +41,7 @@ function test1() {
         bool2 = ((address32.length === 32) === bool2);
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
 
     console.log(bool, bool2);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
@@ -96,7 +96,7 @@ function test3() {
         hexAddress = address32ToHex(address32);
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
 
     console.log(originalHexAddress === hexAddress)
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");

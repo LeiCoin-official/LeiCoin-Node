@@ -1,4 +1,4 @@
-import { startTimer, endTimer } from './testUtils.js';
+import { startTimer, getElapsedTime } from './utils/testUtils.js';
 import elliptic from 'elliptic';
 const { ec: EC } = elliptic;
 import crypto from 'crypto';
@@ -78,7 +78,7 @@ async function asyncMain() {
 
     await Promise.all(promises);
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time 1:", elapsedTime / 1000, "seconds");
 
 }
@@ -91,7 +91,7 @@ async function syncMain() {
         await gen();
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time 2:", elapsedTime / 1000, "seconds");
 
 }
@@ -105,7 +105,7 @@ function main() {
         gen();
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time 3:", elapsedTime / 1000, "seconds");
 
 }
@@ -221,7 +221,7 @@ async function test5(amount = 1_000) {
             address = AddressHex.fromSignature(hash, signature);
         }
 
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log("Address", address);
         console.log("Elapsed time 1:", elapsedTime / 1000, "seconds");
 
@@ -235,7 +235,7 @@ async function test5(amount = 1_000) {
             publicKey = Crypto.getPublicKeyFromSignature(hash, signature);
         }
 
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log("Public Key", publicKey);
         console.log("Elapsed time 2:", elapsedTime / 1000, "seconds");
 

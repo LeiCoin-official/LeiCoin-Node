@@ -1,7 +1,7 @@
 import { ClassicLevel } from "classic-level";
 import LevelDB from "../../src/storage/leveldb/index.js";
 import { shuffleArray } from '../cryptoUtils.js';
-import { startTimer, endTimer } from "../testUtils.js";
+import { startTimer, getElapsedTime } from "../utils/testUtils.js";
 import { Uint, Uint256, Uint64 } from "low-level";
 import { UintMap } from "low-level";
 import { AddressHex } from "../../src/objects/address.js";
@@ -19,7 +19,7 @@ async function speedTest(db1: LevelDBUtils.DBs = "stake1", db2?: LevelDBUtils.DB
         await level.open();
         const startTime = startTimer();
         const keys = await level.keys().all();
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
 
         //console.log(await level.get(keys[2]));
         //console.log(Validator.fromDecodedHex(await level.get(keys[2])));
@@ -70,9 +70,9 @@ async function selectNextValidators_old(db: LevelDBUtils.DBs, seedHash: Uint256)
             }
             nextHash = LCrypt.sha256(nextHash);
         }
-        elapsedTime = endTimer(startTime);
+        elapsedTime = getElapsedTime(startTime);
     }
-    elapsedTime = endTimer(startTime);
+    elapsedTime = getElapsedTime(startTime);
     await level.close();
     return [validators, elapsedTime, using_first_validators];
 }
@@ -112,9 +112,9 @@ async function selectNextValidators(db: LevelDBUtils.DBs, seedHash: Uint256): Pr
             }
             nextHash = LCrypt.sha256(Uint.concat([nextHash, seedHash]));
         }
-        elapsedTime = endTimer(startTime);
+        elapsedTime = getElapsedTime(startTime);
     }
-    elapsedTime = endTimer(startTime);
+    elapsedTime = getElapsedTime(startTime);
     await level.close();
     return [validators, elapsedTime, using_first_validators];
 }
@@ -185,7 +185,7 @@ async function test1(db: LevelDBUtils.DBs = "stake1", func = selectNextValidator
         nextHash = LCrypt.sha256(LCrypt.randomBytes(32));
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     if (returnTime) {
         return elapsedTime;
     }
@@ -254,7 +254,7 @@ async function test4() {
         index ++;
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Rounds:", index);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 }
@@ -616,7 +616,7 @@ async function test_minter_randomness4(config: {
         uint = Uint.concat([uint1, uint2]);
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log(uint);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 

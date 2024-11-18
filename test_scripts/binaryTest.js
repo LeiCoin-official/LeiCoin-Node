@@ -1,4 +1,4 @@
-import { endTimer, startTimer } from "./testUtils.js";
+import { getElapsedTime, startTimer } from "./utils/testUtils.js";
 import { sha256 } from "./cryptoUtils.js"
 import { Uint, Uint256, Uint64, Uint8 } from "../build/src/utils/binary.js"
 import crypto from "crypto";
@@ -144,7 +144,7 @@ async function testbinaryMath1() {
         myNum = Buffer.from(encoded.toString(16), "hex");
     }    
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
 }
@@ -162,7 +162,7 @@ async function testbinaryMath2() {
     }    
 
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
 }
@@ -190,7 +190,7 @@ async function test1() {
     }    
 
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log(bool);
     console.log("Elapsed time 1:", elapsedTime / 1000, "seconds");
 
@@ -210,7 +210,7 @@ async function test2() {
     
         console.log(bytes);
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log("Elapsed time 2_1:", elapsedTime / 1000, "seconds");
     
     })();
@@ -226,7 +226,7 @@ async function test2() {
         }
     
         console.log(bytes);
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log("Elapsed time 2_2:", elapsedTime / 1000, "seconds");
     
     })();
@@ -244,7 +244,7 @@ async function test3() {
             number.add(100_000_000_000);
         }
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log(number.buffer.toString("hex"));
         console.log("Elapsed time 3_1:", elapsedTime / 1000, "seconds");
 
@@ -260,7 +260,7 @@ async function test3() {
             number = (BigInt(number) + BigInt(100_000_000_000)).toString();
         }
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log(BigInt(number).toString(16).padStart(16, "0"));
         console.log("Elapsed time 3_2:", elapsedTime / 1000, "seconds");
     
@@ -276,7 +276,7 @@ async function test3() {
             number += BigInt(100_000_000_000);
         }
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log(number.toString(16).padStart(16, "0"));
         console.log("Elapsed time 3_3:", elapsedTime / 1000, "seconds");
     
@@ -293,7 +293,7 @@ async function test3() {
             number.add(number2);
         }
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log(number.buffer.toString("hex"));
         console.log("Elapsed time 3_4:", elapsedTime / 1000, "seconds");
     
@@ -331,7 +331,7 @@ async function test5() {
             number = Uint64.create(buffer);
         }
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log(number.buffer.toString("hex"));
         console.log("Elapsed time 5_1:", elapsedTime / 1000, "seconds");
     
@@ -348,7 +348,7 @@ async function test5() {
             number = new Uint64(buffer);
         }
     
-        const elapsedTime = endTimer(startTime);
+        const elapsedTime = getElapsedTime(startTime);
         console.log(number.buffer.toString("hex"));
         console.log("Elapsed time 5_2:", elapsedTime / 1000, "seconds");
     
@@ -379,7 +379,7 @@ async function test6() {
 
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log(bool);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
@@ -407,7 +407,7 @@ async function test7() {
 
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log(bool);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
@@ -435,7 +435,7 @@ async function test8() {
 
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log(bool);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 

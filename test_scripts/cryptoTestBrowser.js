@@ -2,7 +2,7 @@ import { webcrypto } from 'node:crypto';
 // @ts-ignore
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 import * as ec from '@noble/secp256k1';
-import { startTimer, endTimer } from './testUtils.js';
+import { startTimer, getElapsedTime } from './utils/testUtils.js';
 import crypto from 'crypto';
 
 //const privKey = ed.utils.randomPrivateKey();
@@ -63,7 +63,7 @@ async function asyncMain() {
 
     await Promise.all(promises);
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
 }
@@ -76,7 +76,7 @@ function main() {
         gen();
     }
 
-    const elapsedTime = endTimer(startTime);
+    const elapsedTime = getElapsedTime(startTime);
     console.log("Elapsed time:", elapsedTime / 1000, "seconds");
 
 }
