@@ -1,13 +1,11 @@
 import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
-import { Uint, Uint16, Uint256 } from "low-level";
+import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
 import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
 import { LNActiveRequests } from "./requests.js";
 import { type LNBroadcastingMsgHandler } from "./messaging/abstractMsgHandler.js";
 import LeiCoinNetNode from "./index.js";
-import { StatusMsg } from "./messaging/messages/status.js";
-import { Port } from "../objects/netinfo.js";
 import type { LNMsgType, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 
@@ -39,14 +37,6 @@ export class PeerSocket {
                 hostname: host, port,
                 socket: LNSocketHandler.Client,
             })).data;
-
-            /** @todo Implment Protocol Versioning Later which will replace Uint16.from(0) */
-            socket.send(new LNStandartMsg(
-                new StatusMsg(
-                    Uint16.from(0),
-                    Port.from(LeiCoinNetNode.getServerInfo().port)
-                )
-            ));
 
             return socket;
 

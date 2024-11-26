@@ -31,18 +31,14 @@ export namespace StatusMsg {
     export const TYPE = LNMsgType.from("1761"); // STATUS
 
     export const Handler = new class Handler extends LNMsgHandler {
-        readonly acceptedMgs = "REQUEST";
+        readonly acceptedMgs = "DEFAULT";
 
         async receive(data: StatusMsg, socket: PeerSocket) {
 
             if (!data) {
                 return null;
             }
-    
-            if (socket.uuid.eq(0)) {
-                
-            }
-            
+
             return null;
 
         }
