@@ -4,12 +4,12 @@ import LCrypt from "../../crypto";
 import { BE, type DataEncoder } from "../../encoding/binaryEncoders";
 import ObjectEncoding from "../../encoding/objects.js";
 import { MessageRouter } from "./index.js";
-import { type LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgType } from "./abstractMsg.js";
+import { type LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgID } from "./abstractMsg.js";
 
 
 export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
 
-    readonly type: LNMsgType;
+    readonly type: LNMsgID;
 
     constructor(readonly data: T) {
         this.type = data.getTypeID();
@@ -39,7 +39,7 @@ export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
     static fromDecodedHex(hexData: Uint, arg1: LNMsgBodyConstructor | any = "auto") {
         try {
             const autoTypeChecking = arg1 === "auto";
-            const CLS: LNMsgBodyConstructor | undefined = autoTypeChecking ? MessageRouter.getMsgInfo(new LNMsgType(hexData.slice(0, 2))) : arg1;
+            const CLS: LNMsgBodyConstructor | undefined = autoTypeChecking ? MessageRouter.getMsgInfo(new LNMsgID(hexData.slice(0, 2))) : arg1;
             
             if (!CLS) return null;
 
@@ -58,7 +58,7 @@ export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
     }
 
     protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
-        BE(LNMsgType, "type"),
+        BE(LNMsgID, "type"),
     ];
 
     protected static getEncodingSettings<T extends LNMsgBodyConstructor>(CLS: T): readonly DataEncoder[] {
@@ -70,12 +70,18 @@ export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
 }
 
 
-export class LNRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNStandartMsg<T> {
-
+abstract class LNBasicRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNStandartMsg<T> {
     constructor(readonly requestID: Uint32, data: T) {
         super(data);
     }
 
+    protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
+        BE(LNMsgID, "type"),
+        BE(Uint32, "requestID"),
+    ];
+}
+
+export class LNRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNBasicRequestMsg<T> {
     static create<T extends LNAbstractMsgBody>(data: T) {
         return new LNRequestMsg(new Uint32(LCrypt.randomBytes(4)), data);
     }
@@ -83,12 +89,12 @@ export class LNRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> exten
     protected static fromDict(obj: Dict<any>) {
         return new LNRequestMsg(obj.requestID, obj.data);
     }
+}
 
-    protected static readonly baseEncodingSettings: readonly DataEncoder[] = [
-        BE(LNMsgType, "type"),
-        BE(Uint32, "requestID"),
-    ];
-
+export class LNResponseMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNBasicRequestMsg<T> {
+    protected static fromDict(obj: Dict<any>) {
+        return new LNResponseMsg(obj.requestID, obj.data);
+    }
 }
 
 

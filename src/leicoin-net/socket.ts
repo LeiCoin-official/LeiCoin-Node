@@ -2,12 +2,13 @@ import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
-import { LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets.js";
+import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/netPackets.js";
 import { LNActiveRequests } from "./requests.js";
-import { type LNBroadcastingMsgHandler } from "./messaging/abstractMsgHandler.js";
+import type { LNMsgRequestHandler, LNBroadcastingMsgHandler, LNMsgDefaultHandler } from "./messaging/abstractMsgHandler.js";
 import LeiCoinNetNode from "./index.js";
-import type { LNMsgType, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
+import type { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
+import { LNController, PeerSocketController } from "./controller.js";
 
 
 export class PeerSocket {
@@ -26,6 +27,8 @@ export class PeerSocket {
         this.host = tcpSocket.remoteAddress;
         /** @todo Change this to `this.port = tcpSocket.remotePort;` when Bun has implemented scoket.remotePort */
         this.port = 0;
+
+        tcpSocket.data = this;
     }
 
     static async connect(
@@ -69,33 +72,39 @@ export class PeerSocket {
     }
 
     async receive(rawData: Uint) {
-        const handler = MessageRouter.getMsgInfo(rawData.slice(0, 2) as LNMsgType)?.Handler;
+        const handler = MessageRouter.getMsgInfo(rawData.slice(0, 2) as LNMsgID)?.Handler;
         if (!handler) return;
 
-        switch (handler.acceptedMgs) {
+        switch (handler.type) {
 
             case "DEFAULT": {
                 const msg = LNStandartMsg.fromDecodedHex(rawData);
                 if (!msg) return;
 
-                handler.receive(msg.data, this);
+                (handler as LNMsgDefaultHandler).receive(msg.data, this);
                 return;
             }
             case "REQUEST": {
                 const msg = LNRequestMsg.fromDecodedHex(rawData);
                 if (!msg) return;
 
-                const request = this.activeRequests.get((msg as LNRequestMsg).requestID);
-                if (request) {
-                    // Is Request Response
-                    request.resolve(msg.data);
+                if (!this.activeRequests.has(msg.requestID)) {
                     return;
                 }
-    
-                // Is Incoming Request
-                const response = await handler.receive(msg.data, this);
+
+                const response = await (handler as LNMsgRequestHandler).receive(msg.data, this);
                 if (response) {
-                    this.send(new LNRequestMsg(msg.requestID, response));
+                    this.send(new LNResponseMsg(msg.requestID, response));
+                }
+                return;
+            }
+            case "RESPONSE": {
+                const msg = LNResponseMsg.fromDecodedHex(rawData);
+                if (!msg) return;
+
+                const request = this.activeRequests.get((msg as LNResponseMsg).requestID);
+                if (request) {
+                    request.resolve(msg.data);
                 }
                 return;
             }
@@ -105,7 +114,7 @@ export class PeerSocket {
 
                 const cb = await (handler as LNBroadcastingMsgHandler).receive(msg.data);
                 if (cb) {
-                    this.send(new LNBroadcastMsg(cb));
+                    LNController.broadcast(new LNBroadcastMsg(cb));
                 }
                 return;
             }
@@ -135,11 +144,13 @@ export namespace LNSocketHandler {
         }
     
         /** @todo implement timount for first message after connection open */
-        async open(socket: Socket<PeerSocket>) {
-            socket.data = new PeerSocket(socket, this.handlesConnections);
+        async open(tcpSocket: Socket<PeerSocket>) {
+            const socket = new PeerSocket(tcpSocket, this.handlesConnections);
         
-            LeiCoinNetNode.connections.queue.add(socket.data);
-            cli.leicoin_net.info(`A Connection was established with ${socket.data.uri}`);
+            LeiCoinNetNode.connections.queue.add(socket);
+            cli.leicoin_net.info(`A Connection was established with ${socket.uri}`);
+
+            PeerSocketController.onConnectionInit(socket);
         }
     
         async close(socket: Socket<PeerSocket>) {

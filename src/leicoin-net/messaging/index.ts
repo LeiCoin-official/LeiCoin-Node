@@ -1,4 +1,4 @@
-import { type LNMsgInfo, LNMsgType } from "./abstractMsg.js";
+import { type LNMsgInfo, LNMsgID } from "./abstractMsg.js";
 import { type Dict } from "../../utils/dataUtils.js";
 import { StatusMsg } from "./messages/status.js";
 import { ChallengeMsg } from "./messages/challenge.js";
@@ -30,10 +30,10 @@ export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry({
 /** @tode Find a new Name for MessageRouter that is more accurate */
 export class MessageRouter {
 
-    static globalRequests: LNActiveRequests = new LNActiveRequests();
+    // static globalRequests: LNActiveRequests = new LNActiveRequests();
 
-    static getMsgInfo(id: LNMsgType): LNMsgInfo | undefined {
-        return Object.values(LNMsgRegistry).find((msg) => msg.TYPE.eq(id));
+    static getMsgInfo(id: LNMsgID): LNMsgInfo | undefined {
+        return Object.values(LNMsgRegistry).find((msg) => msg.ID.eq(id));
     }
 
 }

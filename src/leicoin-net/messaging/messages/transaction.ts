@@ -3,8 +3,8 @@ import Transaction from "../../../objects/transaction.js";
 import cli from "../../../cli/cli.js";
 import Verification from "../../../verification/index.js"
 import { Uint } from "low-level";
-import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
-import { LNBroadcastingMsgHandler, LNMsgHandler } from "../abstractMsgHandler.js";
+import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
+import { LNBroadcastingMsgHandler, LNMsgRequestHandler } from "../abstractMsgHandler.js";
 import { Dict } from "../../../utils/dataUtils.js";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type PeerSocket } from "../../socket.js";
@@ -24,7 +24,7 @@ export class NewTransactionMsg extends LNAbstractMsgBody {
 }
 
 export namespace NewTransactionMsg {
-    export const TYPE = LNMsgType.from("8356"); // NEW_TRANSACTION
+    export const ID = LNMsgID.from("8356"); // NEW_TRANSACTION
     
     export const Handler = new class Handler extends LNBroadcastingMsgHandler {
 
@@ -59,17 +59,11 @@ export namespace NewTransactionMsg {
 export class GetTransactionsMsg extends LNAbstractMsgBody {}
 
 export namespace GetTransactionsMsg {
-    export const TYPE = LNMsgType.from("09aa"); // GET_TRANSACTIONS
+    export const ID = LNMsgID.from("09aa"); // GET_TRANSACTIONS
     
-    export const Handler = new class Handler extends LNMsgHandler {
-        readonly acceptedMgs = "REQUEST";
-        
+    export const Handler = new class Handler extends LNMsgRequestHandler {
         async receive(data: GetTransactionsMsg, socket: PeerSocket) {
             return null;
-            
-        }
-        
-        async send(data: Uint) {
             
         }
     }

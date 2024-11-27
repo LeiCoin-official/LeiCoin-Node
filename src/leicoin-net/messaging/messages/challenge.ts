@@ -1,8 +1,8 @@
-import { Uint, Uint256, Uint32 } from "low-level";
+import { Uint256 } from "low-level";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type PeerSocket } from "../../socket.js";
-import { LNMsgHandler } from "../abstractMsgHandler.js";
-import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
+import { LNMsgRequestHandler } from "../abstractMsgHandler.js";
+import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 
 export class ChallengeMsg extends LNAbstractMsgBody {
 
@@ -22,11 +22,9 @@ export class ChallengeMsg extends LNAbstractMsgBody {
 }
 
 export namespace ChallengeMsg {
-    export const TYPE = LNMsgType.from("77a9"); // CHALLENGE
+    export const ID = LNMsgID.from("77a9"); // CHALLENGE
 
-    export const Handler = new class Handler extends LNMsgHandler {
-        readonly acceptedMgs = "REQUEST";
-
+    export const Handler = new class Handler extends LNMsgRequestHandler {
         async receive(data: ChallengeMsg, socket: PeerSocket) {
             return null;
         }

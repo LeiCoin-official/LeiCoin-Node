@@ -1,16 +1,16 @@
 import { AbstractBinaryMap } from "low-level";
 import { type Uint, Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
-import type { LNAbstractMsgBody, LNMsgType } from "./messaging/abstractMsg.js";
+import type { LNAbstractMsgBody, LNMsgID } from "./messaging/abstractMsg.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";
 
 class LNActiveRequest {
 
-    readonly expectedTypes: LNMsgType[];
+    readonly expectedTypes: LNMsgID[];
 
     constructor(
         readonly requestID: Uint32,
-        expectedTypes: LNMsgType[] | LNMsgType,
+        expectedTypes: LNMsgID[] | LNMsgID,
         protected readonly result = new Deferred<LNAbstractMsgBody>()
     ) {
         this.expectedTypes = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
@@ -43,7 +43,7 @@ class LNActiveRequest {
 
 class LNActiveRequestCompactData {
     constructor(
-        readonly expectedTypes: LNMsgType[],
+        readonly expectedTypes: LNMsgID[],
         readonly result: Deferred<LNAbstractMsgBody>
     ) {}
 }
@@ -70,6 +70,10 @@ export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestC
         const data = super.get(id);
         if (!data) return;
         return new LNActiveRequest(id, data.expectedTypes, data.result);
+    }
+
+    public has(id: Uint32) {
+        return super.has(id);
     }
 }
 

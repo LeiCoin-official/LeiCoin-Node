@@ -10,7 +10,7 @@ import { type LNBasicMsgHandler } from "./abstractMsgHandler.js";
  * Stores the message types used in the LeiCoin network
  * The IDs a deffined hashing the message type name and selecting the last 2 bytes
  */
-export class LNMsgType extends LockedUint {
+export class LNMsgID extends LockedUint {
     public static readonly byteLength = 2;
 }
 
@@ -18,7 +18,7 @@ export class LNMsgType extends LockedUint {
 export abstract class LNAbstractMsgBody {
 
     public getTypeID() {
-        return (this.constructor as LNMsgInfo).TYPE;
+        return (this.constructor as LNMsgInfo).ID;
     }
 
     public getHandler() {
@@ -57,7 +57,7 @@ export interface LNMsgBodyConstructor<T extends LNAbstractMsgBody = LNAbstractMs
 }
 
 export interface LNMsgInfo extends LNMsgBodyConstructor {
-    readonly TYPE: LNMsgType;
+    readonly ID: LNMsgID;
     readonly Handler: LNBasicMsgHandler;
 }
 

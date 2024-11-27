@@ -1,10 +1,10 @@
-import { Uint, Uint16 } from "low-level";
+import { Uint16 } from "low-level";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";
+import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
+import { LNMsgDefaultHandler } from "../abstractMsgHandler.js";
 import { type PeerSocket } from "../../socket.js";
-import { LNMsgHandler } from "../abstractMsgHandler.js";
-import { LNAbstractMsgBody, LNMsgType } from "../abstractMsg.js";
 
 export class StatusMsg extends LNAbstractMsgBody {
 
@@ -28,20 +28,11 @@ export class StatusMsg extends LNAbstractMsgBody {
 }
 
 export namespace StatusMsg {
-    export const TYPE = LNMsgType.from("1761"); // STATUS
+    export const ID = LNMsgID.from("1761"); // STATUS
 
-    export const Handler = new class Handler extends LNMsgHandler {
-        readonly acceptedMgs = "DEFAULT";
-
+    export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: StatusMsg, socket: PeerSocket) {
-
-            if (!data) {
-                return null;
-            }
-
             return null;
-
         }
-
     }
 }
