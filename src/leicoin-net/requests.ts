@@ -1,10 +1,10 @@
 import { AbstractBinaryMap } from "low-level";
-import { type Uint, Uint32 } from "low-level";
+import { Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
-import type { LNAbstractMsgBody, LNMsgID } from "./messaging/abstractMsg.js";
+import type { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";
 
-class LNActiveRequest {
+export class LNActiveRequest {
 
     constructor(
         readonly requestID: Uint32,

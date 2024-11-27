@@ -88,7 +88,8 @@ export class PeerSocket {
                 const msg = LNRequestMsg.fromDecodedHex(rawData);
                 if (!msg) return;
 
-                if (!this.activeRequests.has(msg.requestID)) {
+                // Reserved Space for internal use
+                if (msg.requestID.lte(0xff) || this.activeRequests.has(msg.requestID)) {
                     return;
                 }
 

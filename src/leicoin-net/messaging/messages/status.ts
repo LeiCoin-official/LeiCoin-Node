@@ -1,4 +1,4 @@
-import { Uint16 } from "low-level";
+import { Uint16, Uint32 } from "low-level";
 import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Port } from "../../../objects/netinfo.js";
 import { type Dict } from "../../../utils/dataUtils.js";
@@ -32,6 +32,15 @@ export namespace StatusMsg {
 
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: StatusMsg, socket: PeerSocket) {
+            
+            const response = socket.activeRequests.get(Uint32.from(0));
+
+            if (!response) {
+                return null;
+            }
+
+            response.resolve(data);
+
             return null;
         }
     }

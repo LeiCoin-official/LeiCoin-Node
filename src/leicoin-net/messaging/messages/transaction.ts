@@ -50,7 +50,7 @@ export namespace NewTransactionMsg {
             }
         
             //cli.ws_client_message.error(`Transaction with hash ${transaction.txid} is invalid.`);
-            return null;
+            return data;
         }
 
     }

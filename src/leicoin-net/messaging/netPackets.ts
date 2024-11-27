@@ -83,7 +83,15 @@ abstract class LNBasicRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody
 
 export class LNRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNBasicRequestMsg<T> {
     static create<T extends LNAbstractMsgBody>(data: T) {
-        return new LNRequestMsg(new Uint32(LCrypt.randomBytes(4)), data);
+        // Reserved Space for internal use
+        
+        let randomID: Uint32;
+        while (true) {
+            randomID = new Uint32(LCrypt.randomBytes(4));
+            if (randomID.gt(0xff)) break;
+        }
+
+        return new LNRequestMsg(randomID, data);
     }
 
     protected static fromDict(obj: Dict<any>) {
