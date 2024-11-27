@@ -6,21 +6,13 @@ import { LNRequestMsg } from "./messaging/netPackets.js";
 
 class LNActiveRequest {
 
-    readonly expectedTypes: LNMsgID[];
-
     constructor(
         readonly requestID: Uint32,
-        expectedTypes: LNMsgID[] | LNMsgID,
         protected readonly result = new Deferred<LNAbstractMsgBody>()
-    ) {
-        this.expectedTypes = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
-    }
+    ) {}
 
     static fromRequestMsg(msg: LNRequestMsg) {
-        return new LNActiveRequest(
-            msg.requestID,
-            msg.type
-        );
+        return new LNActiveRequest(msg.requestID);
     }
 
     public resolve(data: LNAbstractMsgBody) {
@@ -36,16 +28,13 @@ class LNActiveRequest {
     }
 
     public toCompactData() {
-        return new LNActiveRequestCompactData(this.expectedTypes, this.result);
+        return new LNActiveRequestCompactData(this.result);
     }
 
 }
 
 class LNActiveRequestCompactData {
-    constructor(
-        readonly expectedTypes: LNMsgID[],
-        readonly result: Deferred<LNAbstractMsgBody>
-    ) {}
+    constructor(readonly result: Deferred<LNAbstractMsgBody>) {}
 }
 
 
@@ -69,7 +58,7 @@ export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestC
     public get(id: Uint32) {
         const data = super.get(id);
         if (!data) return;
-        return new LNActiveRequest(id, data.expectedTypes, data.result);
+        return new LNActiveRequest(id, data.result);
     }
 
     public has(id: Uint32) {

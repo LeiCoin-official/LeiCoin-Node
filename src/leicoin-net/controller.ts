@@ -4,6 +4,7 @@ import { type LNBroadcastMsg, LNStandartMsg } from "./messaging/netPackets";
 import { type PeerSocket } from "./socket.js";
 import { Port } from "../objects/netinfo.js";
 import { StatusMsg } from "./messaging/messages/status.js";
+import { LNActiveRequests } from "./requests.js";
 
 
 export class LNController {
@@ -55,6 +56,8 @@ export class PeerSocketController {
     private static async onOutgoingConnectionInit(socket: PeerSocket) {
 
         await this.sendStatusMsg(socket);
+
+        new LNActiveRequest
 
         // await recived status message;
 
