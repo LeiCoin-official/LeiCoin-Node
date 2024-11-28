@@ -29,25 +29,35 @@ export class PeerSocketController {
         ));
     }
 
+    private static checkRemoteStatus(remoteStatus: StatusMsg) {
+        if (
+            /** @todo Implment Protocol Versioning Later which will replace remoteStatus.version.eq(0) */
+            remoteStatus.version.eq(0)
+        ) {
+            return true;
+        }
+        return false;
+    }
 
     static async onConnectionInit(socket: PeerSocket) {
-
         switch (socket.type) {
             case "INCOMING":
-                await this.onIncomingConnectionInit(socket);
-                break;
+                return this.onIncomingConnectionInit(socket);
             case "OUTGOING":
-                await this.onOutgoingConnectionInit(socket);
-                break;
+                return this.onOutgoingConnectionInit(socket);
         }
-
     }
 
     private static async onIncomingConnectionInit(socket: PeerSocket) {
 
-        // await recived status message;
-        
+        const request = new LNActiveRequest(Uint32.from(0));
+        socket.activeRequests.add(request);
+        const remoteStatus = await request.awaitResult() as StatusMsg;
 
+        if (!this.checkRemoteStatus(remoteStatus)) {
+            socket.close();
+            return;
+        }
 
         await this.sendStatusMsg(socket);
 
@@ -57,10 +67,14 @@ export class PeerSocketController {
 
         await this.sendStatusMsg(socket);
 
-        socket.activeRequests.add(new LNActiveRequest(Uint32.from(0)));
+        const request = new LNActiveRequest(Uint32.from(0));
+        socket.activeRequests.add(request);
+        const remoteStatus = await request.awaitResult() as StatusMsg;
 
-        // await recived status message;
-
+        if (!this.checkRemoteStatus(remoteStatus)) {
+            socket.close();
+            return;
+        }        
 
     }
 

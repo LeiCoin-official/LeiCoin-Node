@@ -10,14 +10,50 @@ import type { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
 
+class Node<T> {
+    constructor(
+        public data: T,
+        public next: Node<T> | null = null
+    ) {}
+}
+
+class ReceiveQueue {
+
+    private head: Node<Uint> | null = null;
+    private tail: Node<Uint> | null = null;
+
+    enqueue(data: Uint) {
+        const newNode = new Node(data);
+        if (!this.tail) {
+            this.head = this.tail = newNode;
+        } else {
+            this.tail.next = newNode;
+            this.tail = newNode;
+        }
+    }
+
+    dequeue(): Uint | null {
+        if (!this.head) return null;
+        const data = this.head.data;
+        this.head = this.head.next;
+        if (!this.head) this.tail = null;
+        return data;
+    }
+
+    isEmpty(): boolean {
+        return this.head === null;
+    }
+}
 
 export class PeerSocket {
     
     readonly host: string;
     readonly port: number;
     readonly uuid = new Uint256(LCrypt.randomBytes(32));
+    
     readonly challenge = new Uint256(LCrypt.randomBytes(32));
-    public verified = false;
+
+    public state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
 
     constructor(
         protected readonly tcpSocket: Socket<any>,
@@ -53,6 +89,7 @@ export class PeerSocket {
         return `${this.host}:${this.port}`;
     }
 
+
     async send(data: LNStandartMsg | Uint) {
         return this.tcpSocket.write(
             data instanceof LNStandartMsg
@@ -70,6 +107,12 @@ export class PeerSocket {
         const response = await req.awaitResult();
         return response as T;
     }
+    
+
+    async addToReceiveQueue(rawData: Uint) {
+
+    }
+
 
     async receive(rawData: Uint) {
         const handler = MessageRouter.getMsgInfo(rawData.slice(0, 2) as LNMsgID)?.Handler;
@@ -155,11 +198,15 @@ export namespace LNSocketHandler {
         }
     
         async close(socket: Socket<PeerSocket>) {
+            socket.data.state = "CLOSED";
             LeiCoinNetNode.connections.remove(socket.data);
+
             cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
         }
         async end(socket: Socket<PeerSocket>) {
+            socket.data.state = "CLOSED";
             LeiCoinNetNode.connections.remove(socket.data);
+
             cli.leicoin_net.info(`${socket.data.uri} has ended the connection.`);
         }
     
