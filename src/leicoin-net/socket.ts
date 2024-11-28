@@ -9,41 +9,8 @@ import LeiCoinNetNode from "./index.js";
 import type { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
+import { Queue } from "../utils/linkedlist.js";
 
-class Node<T> {
-    constructor(
-        public data: T,
-        public next: Node<T> | null = null
-    ) {}
-}
-
-class ReceiveQueue {
-
-    private head: Node<Uint> | null = null;
-    private tail: Node<Uint> | null = null;
-
-    enqueue(data: Uint) {
-        const newNode = new Node(data);
-        if (!this.tail) {
-            this.head = this.tail = newNode;
-        } else {
-            this.tail.next = newNode;
-            this.tail = newNode;
-        }
-    }
-
-    dequeue(): Uint | null {
-        if (!this.head) return null;
-        const data = this.head.data;
-        this.head = this.head.next;
-        if (!this.head) this.tail = null;
-        return data;
-    }
-
-    isEmpty(): boolean {
-        return this.head === null;
-    }
-}
 
 export class PeerSocket {
     
@@ -53,7 +20,9 @@ export class PeerSocket {
     
     readonly challenge = new Uint256(LCrypt.randomBytes(32));
 
-    public state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
+    private _state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
+
+    private _receiveQueue = new Queue<Uint>();
 
     constructor(
         protected readonly tcpSocket: Socket<any>,
@@ -89,6 +58,19 @@ export class PeerSocket {
         return `${this.host}:${this.port}`;
     }
 
+    set state(state: "READY" | "VERIFIED" | "CLOSED") {
+        if (state === "READY" && this._state === "OPENING") {
+            for (const data of this._receiveQueue) {
+                this.receive(data);
+                this._receiveQueue.dequeue();
+            }
+        }
+        this._state = state;
+    }
+    get state(): typeof this._state {
+        return this._state;
+    }
+
 
     async send(data: LNStandartMsg | Uint) {
         return this.tcpSocket.write(
@@ -110,7 +92,10 @@ export class PeerSocket {
     
 
     async addToReceiveQueue(rawData: Uint) {
-
+        if (this.state === "OPENING") {
+            this._receiveQueue.enqueue(rawData);
+        }
+        return this.receive(rawData);
     }
 
 
@@ -219,7 +204,7 @@ export namespace LNSocketHandler {
         }
     
         async data(socket: Socket<PeerSocket>, data: Buffer) {
-            socket.data.receive(new Uint(data));
+            socket.data.addToReceiveQueue(new Uint(data));
         }
     
         async drain(socket: Socket<PeerSocket>) {}
