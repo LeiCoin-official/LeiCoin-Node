@@ -26,7 +26,7 @@ function main() {
         const name = args[1];
         const id = getMessageTypeID(name);
 
-        console.log(`static readonly ${args[1].toUpperCase()} = LNMsgID.from("${id.toHex()}");`);
+        console.log(`export const ID = LNMsgID.from("${id.toHex()}"); // ${args[1].toUpperCase()}`);
 
     } else {
         console.log(getMessageTypeID(args[0]).toHex());

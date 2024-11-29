@@ -5,7 +5,7 @@ import { ChallengeMsg } from "./messages/challenge.js";
 import { GetBlocksMsg, NewBlockMsg } from "./messages/block.js";
 import { GetTransactionsMsg, NewTransactionMsg } from "./messages/transaction.js";
 import { GetChainstateMsg } from "./messages/chainstate.js";
-import { LNActiveRequests } from "../requests.js";
+import { OneTimeRequestMsg } from "./messages/oneTimeRequest.js";
 
 class LNMsgUtils {
     static createLNMsgRegistry<T extends Dict<LNMsgInfo, string>>(registry: T) {
@@ -18,6 +18,8 @@ export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry({
 
     CHALLENGE: ChallengeMsg,
 
+    // ONE_TIME_REQUEST: OneTimeRequestMsg,
+
     NEW_BLOCK: NewBlockMsg,
     GET_BLOCKS: GetBlocksMsg,
 
@@ -29,8 +31,6 @@ export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry({
 
 /** @tode Find a new Name for MessageRouter that is more accurate */
 export class MessageRouter {
-
-    // static globalRequests: LNActiveRequests = new LNActiveRequests();
 
     static getMsgInfo(id: LNMsgID): LNMsgInfo | undefined {
         return Object.values(LNMsgRegistry).find((msg) => msg.ID.eq(id));

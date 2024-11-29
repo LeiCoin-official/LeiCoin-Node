@@ -30,7 +30,7 @@ export abstract class LNAbstractMsgBody {
         return ObjectEncoding.encode(this, (this.constructor as typeof LNAbstractMsgBody).encodingSettings, false).data;
     }
 
-    static fromDecodedHex<T>(this: T, hexData: Uint): T | null;
+    static fromDecodedHex<T extends LNAbstractMsgBody>(this: new (...args: any[]) => T, hexData: Uint): T | null;
     static fromDecodedHex(hexData: Uint) {
         try {
             const data = ObjectEncoding.decode(hexData, this.encodingSettings).data;

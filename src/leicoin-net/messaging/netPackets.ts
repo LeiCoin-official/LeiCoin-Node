@@ -40,7 +40,6 @@ export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
         try {
             const autoTypeChecking = arg1 === "auto";
             const CLS: LNMsgBodyConstructor | undefined = autoTypeChecking ? MessageRouter.getMsgInfo(new LNMsgID(hexData.slice(0, 2))) : arg1;
-            
             if (!CLS) return null;
 
             const data = ObjectEncoding.decode(hexData, this.getEncodingSettings(CLS), autoTypeChecking).data;
@@ -62,10 +61,7 @@ export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
     ];
 
     protected static getEncodingSettings<T extends LNMsgBodyConstructor>(CLS: T): readonly DataEncoder[] {
-        return [
-            ...this.baseEncodingSettings,
-            BE.Object("data", CLS)
-        ]
+        return [...this.baseEncodingSettings, BE.Object("data", CLS)];
     }
 }
 
