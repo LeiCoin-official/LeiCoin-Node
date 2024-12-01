@@ -1,8 +1,9 @@
 import { Uint256, Uint32 } from "low-level";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { type PeerSocket } from "../../socket.js";
-import { LNMsgDefaultHandler, LNMsgRequestHandler } from "../abstractMsgHandler.js";
+import { LNMsgDefaultHandler } from "../abstractMsgHandler.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
+import LCrypt from "../../../crypto/index.js";
 
 export class ChallengeMsg extends LNAbstractMsgBody {
 
@@ -12,10 +13,7 @@ export class ChallengeMsg extends LNAbstractMsgBody {
     ) {super()}
 
     protected static fromDict(obj: Dict<any>) {
-        return new ChallengeMsg(
-            obj.id,
-            obj.challenge
-        )
+        return new ChallengeMsg(obj.id, obj.challenge);
     }
 
     protected static readonly encodingSettings: DataEncoder[] = [
@@ -27,12 +25,13 @@ export class ChallengeMsg extends LNAbstractMsgBody {
 export namespace ChallengeMsg {
     export const ID = LNMsgID.from("77a9"); // CHALLENGE
 
-    export const Handler = new class Handler extends LNMsgRequestHandler {
+    export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: ChallengeMsg, socket: PeerSocket) {
-            return null;
+            return;
         }
     }
 }
+
 
 export class ChallengeREQMsg extends LNAbstractMsgBody {
 
@@ -40,8 +39,12 @@ export class ChallengeREQMsg extends LNAbstractMsgBody {
         readonly id: Uint32
     ) {super()}
 
+    public create() {
+        return new ChallengeREQMsg(new Uint32(LCrypt.randomBytes(4)));
+    }
+
     protected static fromDict(obj: Dict<any>) {
-        return new ChallengeREQMsg(obj.id)
+        return new ChallengeREQMsg(obj.id);
     }
 
     protected static readonly encodingSettings: DataEncoder[] = [
@@ -55,7 +58,8 @@ export namespace ChallengeREQMsg {
 
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: ChallengeMsg, socket: PeerSocket) {
-            return null;
+            return;
         }
     }
 }
+

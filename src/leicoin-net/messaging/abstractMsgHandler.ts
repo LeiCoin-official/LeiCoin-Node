@@ -14,7 +14,7 @@ export enum LNMsgHandlerTypes {
  * 
  * When null is returned, no response will be sent
  */
-export type LNMsgHandlerResponse = Promise<LNAbstractMsgBody | null>;
+export type LNMsgHandlerResponse = LNAbstractMsgBody | null;
 
 export abstract class LNBasicMsgHandler {
     abstract readonly type: keyof typeof LNMsgHandlerTypes;
@@ -22,12 +22,12 @@ export abstract class LNBasicMsgHandler {
 
 export abstract class LNMsgDefaultHandler {
     readonly type = "DEFAULT";
-    abstract receive(data: LNAbstractMsgBody, socket: PeerSocket): LNMsgHandlerResponse;
+    abstract receive(data: LNAbstractMsgBody, socket: PeerSocket): Promise<void>;
 }
 
 export abstract class LNMsgRequestHandler extends LNBasicMsgHandler {
     readonly type = "REQUEST";
-    abstract receive(data: LNAbstractMsgBody, socket: PeerSocket): LNMsgHandlerResponse;
+    abstract receive(data: LNAbstractMsgBody, socket: PeerSocket): Promise<LNMsgHandlerResponse>;
 }
 
 export abstract class LNMsgResponseHandler {
@@ -36,7 +36,7 @@ export abstract class LNMsgResponseHandler {
 
 export abstract class LNBroadcastingMsgHandler extends LNBasicMsgHandler {
     readonly type = "BROADCAST";
-    abstract receive(data: LNAbstractMsgBody): LNMsgHandlerResponse;
+    abstract receive(data: LNAbstractMsgBody): Promise<LNMsgHandlerResponse>;
 }
 
 

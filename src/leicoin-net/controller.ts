@@ -1,10 +1,11 @@
 import { type Uint, Uint16, Uint32 } from "low-level";
 import LeiCoinNetNode from "./index.js";
-import { type LNBroadcastMsg, LNStandartMsg } from "./messaging/netPackets";
+import { type LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets";
 import { type PeerSocket } from "./socket.js";
 import { Port } from "../objects/netinfo.js";
 import { StatusMsg } from "./messaging/messages/status.js";
 import { LNActiveRequest } from "./requests.js";
+import { ChallengeREQMsg } from "./messaging/messages/challenge.js";
 
 
 export class LNController {
@@ -59,6 +60,8 @@ export class PeerSocketController {
 
         if (socket.type === "INCOMING") {
             await this.sendStatusMsg(socket);
+            
+            socket.send(new LNStandartMsg(new ChallengeREQMsg());
         }
 
         
