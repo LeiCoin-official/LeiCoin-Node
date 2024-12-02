@@ -6,7 +6,7 @@ export class Schedule {
 
     constructor(task: () => void, ms: number) {
         this.timeout = setTimeout(() => {
-            this.cancel();
+            this.finished = true;
             task();
         }, ms);
     }

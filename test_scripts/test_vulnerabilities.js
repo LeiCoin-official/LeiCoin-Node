@@ -17,5 +17,5 @@ function calculateAddressHacking(length = 38n) {
 
 }
 
-calculateAddressHacking(38n);
+//calculateAddressHacking(38n);
 calculateAddressHacking(40n);

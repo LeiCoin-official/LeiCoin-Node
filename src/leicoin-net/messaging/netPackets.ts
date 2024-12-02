@@ -96,8 +96,8 @@ export class LNRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> exten
 }
 
 export class LNResponseMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNBasicRequestMsg<T> {
-    protected static fromDict(obj: Dict<any>) {
-        return new LNResponseMsg(obj.requestID, obj.data);
+    protected static fromDict<T extends LNAbstractMsgBody>(obj: Dict<any>) {
+        return new LNResponseMsg(obj.requestID, obj.data as T);
     }
 }
 

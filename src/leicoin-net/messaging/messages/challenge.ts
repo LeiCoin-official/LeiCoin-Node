@@ -5,6 +5,14 @@ import { LNMsgDefaultHandler } from "../abstractMsgHandler.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import LCrypt from "../../../crypto/index.js";
 
+
+export class ChallengeMsgStore {
+
+    
+
+}
+
+
 export class ChallengeMsg extends LNAbstractMsgBody {
 
     constructor(
@@ -39,7 +47,7 @@ export class ChallengeREQMsg extends LNAbstractMsgBody {
         readonly id: Uint32
     ) {super()}
 
-    public create() {
+    static create() {
         return new ChallengeREQMsg(new Uint32(LCrypt.randomBytes(4)));
     }
 

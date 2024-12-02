@@ -30,8 +30,9 @@ export class PeerSocketController {
         ));
     }
 
-    private static checkRemoteStatus(remoteStatus: StatusMsg) {
+    private static checkRemoteStatus(remoteStatus: StatusMsg | undefined) {
         if (
+            remoteStatus &&
             /** @todo Implment Protocol Versioning Later which will replace remoteStatus.version.eq(0) */
             remoteStatus.version.eq(0)
         ) {
@@ -41,6 +42,11 @@ export class PeerSocketController {
     }
 
     static async onConnectionInit(socket: PeerSocket) {
+        await this.verifyRemoteStatus(socket);
+        socket.send(new LNStandartMsg(ChallengeREQMsg.create()));
+    }
+
+    private static async verifyRemoteStatus(socket: PeerSocket) {
 
         if (socket.type === "OUTGOING") {
             await this.sendStatusMsg(socket);
@@ -51,7 +57,8 @@ export class PeerSocketController {
 
         socket.state = "READY";
 
-        const remoteStatus = await request.awaitResult() as StatusMsg;
+        const remoteStatus = (await request.awaitResult()).data as StatusMsg;
+        socket.activeRequests.delete(request.id);
 
         if (!this.checkRemoteStatus(remoteStatus)) {
             socket.close();
@@ -60,29 +67,8 @@ export class PeerSocketController {
 
         if (socket.type === "INCOMING") {
             await this.sendStatusMsg(socket);
-            
-            socket.send(new LNStandartMsg(new ChallengeREQMsg());
         }
 
-        
-        // switch (socket.type) {
-        //     case "INCOMING":
-        //         return this.onIncomingConnectionInit(socket);
-        //     case "OUTGOING":
-        //         return this.onOutgoingConnectionInit(socket);
-        // }
-    }
-
-    private static async onIncomingConnectionInit(socket: PeerSocket) {
-
-
-
-    }
-
-    private static async onOutgoingConnectionInit(socket: PeerSocket) {
-
-        
-        
     }
 
 }
