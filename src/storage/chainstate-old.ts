@@ -4,7 +4,7 @@ import cli from "../cli/cli.js";
 import BCUtils from "./blockchainUtils.js";
 import EncodingUtils from "../encoding/index.js";
 import Block from "../objects/block.js"
-import { Uint, Uint256, Uint64 } from "../binary/uint.js";
+import { Uint, Uint256, Uint64 } from "low-level";
 
 export interface SingleChainstateData {
     parent: {

@@ -16,7 +16,7 @@ class CompileUtils {
             const version = await this.getPackageJSONVersion()
             return [version, false];
         }
-        const argv_version = args[0] || Bun.env.BUN_VERSION;
+        const argv_version = args[0] || process.env.BUN_VERSION;
         const version = argv_version || await this.getPackageJSONVersion();
 
         if (!version) {
@@ -50,12 +50,13 @@ export const CompileAutoCMD = new class CompileAutoCMD extends Command {
 }();
 
 export const CompileToTargetCMD = new class CompileToTargetCMD extends Command {
-    async run(args: string[]) {
-        const platform = args[0] as PlatformArg;
+    async run(args: string[], parent_args: string[]) {
+        const platform = parent_args[0] as PlatformArg;
         if (Object.keys(Platforms).some(p => p === platform) === false) {
             console.log(`Invalid platform: ${platform}`);
+            return;
         }
         const version_settings = await CompileUtils.getTargetVersion(args);
-        await new Compiler(args[0] as PlatformArg, ...version_settings).build();
+        await new Compiler(platform, ...version_settings).build();
     }
 }();

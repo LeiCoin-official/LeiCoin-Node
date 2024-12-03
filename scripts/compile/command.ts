@@ -1,6 +1,6 @@
 
 export abstract class Command {
-    abstract run(args: string[]): Promise<void>;
+    abstract run(args: string[], parent_args: string[]): Promise<void>;
 }
 
 export abstract class SubCommand extends Command {

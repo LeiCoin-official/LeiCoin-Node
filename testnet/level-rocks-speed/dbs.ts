@@ -1,6 +1,6 @@
 import { ClassicLevel, DatabaseOptions } from "classic-level";
 import LevelUP from "levelup";
-import { Uint } from "../../src/binary/uint.js";
+import { Uint } from "low-level";
 import { CodecOptions } from "level-codec";
 import EncodingDown from "encoding-down";
 import RocksDBDown from "rocksdb";

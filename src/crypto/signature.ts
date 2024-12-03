@@ -1,5 +1,5 @@
 import elliptic from 'elliptic';
-import { FixedUint, Uint256, Uint64, Uint8, UintUtils } from "../binary/uint.js";
+import { FixedUint, Uint64, Uint8, UintUtils } from "low-level";
 import { PX } from '../objects/prefix.js';
 
 export interface EllipticBinarySignature extends elliptic.ec.Signature {
@@ -12,8 +12,8 @@ export class Signature extends FixedUint {
     public static fromElliptic(signerType: PX, signature: EllipticBinarySignature) {
         return this.concat([
             signerType,
-            UintUtils.correctByteLengthBuffer(signature.r.toBuffer(), 32),
-            UintUtils.correctByteLengthBuffer(signature.s.toBuffer(), 32),
+            UintUtils.fixBufferByteLength(signature.r.toBuffer(), 32),
+            UintUtils.fixBufferByteLength(signature.s.toBuffer(), 32),
             Uint8.from(signature.recoveryParam)
         ]);
     }

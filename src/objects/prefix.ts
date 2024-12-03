@@ -1,64 +1,72 @@
-import { Uint } from "../binary/uint.js";
+import { Uint } from "low-level";
 
-class PrefixConstructError extends Error {
-    name = "PrefixConstructError";
-    message = "Prefix Uints can only be constructed from two digit Strings";
+interface LockedUintConstructable {
+    new(buffer: Buffer): LockedUint;
+    from(hexType: string): LockedUint;
+
+    readonly byteLength: number;
 }
 
-class PrefixLockedError extends Error {
-    name = "PrefixLockedError";
-    message = "Prefix Uints are Locked and cannot be modified";
+class LockedUintConstructError extends Error {
+    name = "LockedUintConstructError";
+    message = "LockedUint can only be constructed from two digit Strings";
+}
+
+class LockedUintLockedError extends Error {
+    name = "LockedUintLockedError";
+    message = "LockedUint are Locked and cannot be modified";
 };
 
 function constructErr(): any {
-    throw new PrefixConstructError();
+    throw new LockedUintConstructError();
 }
 
 function lockedErr(...args: any[]): any {
-    throw new PrefixLockedError();
+    throw new LockedUintLockedError();
 }
 
-export class LockedUint extends Uint {
+export abstract class LockedUint extends Uint {
     public static readonly byteLength: number;
 
     public static from<T>(this: new(buffer: Buffer) => T, hexType: string): T;
     /** @deprecated If you don't use {@link Prefix.from}(hexType: string) instead, an error will occur! */
     public static from(...args: any[]): any;
-    public static from(input: string) {
+    public static from(this: LockedUintConstructable, input: string) {
         if (typeof input === "string" && input.length === this.byteLength * 2) {
             return new this(Buffer.from(input, "hex"));
         }
         constructErr();
     }
 
-    protected static _from(input: string) {}
-
-    /** @deprecated Don't try to construct a Prefix with alloc(), an error will occur! */
+    /** @deprecated Don't try to construct a LockedUint with alloc(), an error will occur! */
     public static alloc(): any {constructErr()};
-    /** @deprecated Don't try to construct a Prefix with empty(), an error will occur! */
+    /** @deprecated Don't try to construct a LockedUint with empty(), an error will occur! */
     public static empty(): any {constructErr()};
+    /** @deprecated Don't try to construct a LockedUint with concat(), an error will occur! */
+    public static concat(): any {constructErr()};
 
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public set(): any {lockedErr()};
 
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public appendData(): any {lockedErr()};
 
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public iadd(): any {lockedErr()};
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public add(): any {lockedErr()};
 
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public isub() {lockedErr()};
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public sub(): any {lockedErr()};
 
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public idiv(): any {lockedErr()};
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public div(): any {lockedErr()};
-    /** @deprecated Don't try to modify a Prefix, an error will occur! */
+    /** @deprecated Don't try to modify a LockedUint, an error will occur! */
     public mod(): any {lockedErr()};
 
 }

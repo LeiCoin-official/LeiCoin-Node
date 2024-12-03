@@ -1,6 +1,6 @@
 import { AddressHex } from "../../objects/address.js";
 import { type IEncoding } from "level-transcoder";
-import { BasicUintConstructable, Uint, Uint256, Uint64 } from "../../binary/uint.js";
+import { BasicUintConstructable, Uint, Uint256, Uint64 } from "low-level";
 
 export interface LevelDBEncoderLike<T extends Uint> extends IEncoding<Uint, Uint8Array, T> {
     readonly encode: (val: Uint | Uint8Array) => Uint8Array;

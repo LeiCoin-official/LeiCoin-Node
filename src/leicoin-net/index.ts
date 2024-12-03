@@ -1,27 +1,24 @@
 import { type TCPSocketListener } from "bun";
-import { LNSocketHandlerFactory, type BasicLNSocketHandler, type SocketData } from "./socket.js";
+import { LNSocketHandler, PeerSocket } from "./socket.js";
 import cli from "../cli/cli.js";
-import { LNConnections } from "./connections.js";
+import { PeerConnections } from "./connections.js";
 import { type EventEmitter } from "events";
-import { Pipelines } from "./pipelines/index.js";
-import { ModuleLike } from "../utils/dataUtils.js";
+import { type ModuleLike } from "../utils/dataUtils.js";
+import Utils from "../utils/index.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
     public static started = false;
 
-    private static server: TCPSocketListener<SocketData>;
+    private static server: TCPSocketListener<PeerSocket>;
 
-    private static connections: LNConnections;
-    private static socketHandler: BasicLNSocketHandler;
+    static connections: PeerConnections;
 
     static async init() {
         if (this.initialized) return;
         this.initialized = true;
 
-        this.connections = LNConnections.createInstance();
-        Pipelines.registerPipelines();
-        this.socketHandler = LNSocketHandlerFactory.create(this.connections);
+        this.connections = new PeerConnections();
     }
 
     static async start(config: {
@@ -51,19 +48,19 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
     private static async startServer(host: string, port: number) {
         try {
-            this.server = Bun.listen<SocketData>({
-                hostname: host,
-                port: port,
-                socket: this.socketHandler
+            this.server = Bun.listen({
+                hostname: host, port,
+                socket: LNSocketHandler.Server
             });
         } catch (error: any) {
             cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);
+            Utils.gracefulShutdown(1);
         }
     }
 
     /** @param peers Array of strings in the format "host:port" if no port is provided, the default port is 12200 */
     private static async initPeers(peers: readonly string[]) {
-        const promises: Promise<void>[] = [];
+        const promises: Promise<any>[] = [];
 
         // Connect to other peer nodes and create peer-to-peer connections
         for (const targetData of peers) {
@@ -79,32 +76,35 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
                 cli.leicoin_net.error(`Invalid Connection Data: ${targetData}`);
                 continue;
             }
+            
+            async function saveConnect(host: string, port: number) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                const socket = await PeerSocket.connect(host, port);
+                if (!socket) {
+                    cli.leicoin_net.error(`Failed to connect to ${host}:${port}.`);
+                    return Promise.resolve();
+                }
+                return socket;
+            }
 
-            promises.push(this.connectToNode(host, port));
+            promises.push(saveConnect(host, port));
         }
 
         await Promise.all(promises);
     }
 
-    private static async connectToNode(host: string, port: number) {
-        try {
-            const connection = await Bun.connect<SocketData>({
-                hostname: host,
-                port: port,
-                socket: this.socketHandler
-            })
-            this.connections.add(connection);
-        } catch (error: any) {
-            cli.leicoin_net.error(`Failed to connect to ${host}:${port}, Error: ${error.stack}`);
+    static getServerInfo() {
+        return {
+            host: this.server.hostname,
+            port: this.server.port
         }
     }
 
     static async stop() {
-        
+
         for (const connection of this.connections.values()) {
-            connection.end();
+            connection.close();
         }
-        cli.leicoin_net.info(`Closed ${this.connections.size} connections`);
 
         if (this.server) {
             this.server.stop();
@@ -115,13 +115,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         cli.leicoin_net.info(`LeiCoinNet-Node stopped`);
     }
 
-    static async broadcast(data: Buffer) {
-        for (const connection of this.connections.values()) {
-            connection.write(data);
-        }
-    }
-
-    private static async setupEvents(eventHandler: EventEmitter) {}
+    private static async setupEvents(eventHandler: EventEmitter) { }
 
 }
 

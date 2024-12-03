@@ -4,7 +4,7 @@ import HTTP_API from "../http_api/index.js";
 import POS from "../pos/index.js";
 import LeiCoinNetNode from "../leicoin-net/index.js";
 import { Blockchain } from "../storage/blockchain.js";
-import { IModuleLike, ModuleLike } from "./dataUtils.js";
+import { type IModuleLike } from "./dataUtils.js";
 
 class Utils {
     private static initialized = false;
@@ -19,8 +19,8 @@ class Utils {
         if (this.initialized) return;
         this.initialized = true;
         
-        if (Bun.env.CUSTOM_CWD) {
-            process.chdir(Bun.env.CUSTOM_CWD);
+        if (process.env.CUSTOM_CWD) {
+            process.chdir(process.env.CUSTOM_CWD);
         }
 
         //process.on("SIGINT", this.gracefulShutdown);

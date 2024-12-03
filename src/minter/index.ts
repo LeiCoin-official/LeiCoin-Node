@@ -3,7 +3,7 @@ import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 import cli from "../cli/cli.js";
 import Verification from "../verification/index.js";
-import { Uint256, Uint64 } from "../binary/uint.js";
+import { Uint256, Uint64 } from "low-level";
 import { Blockchain } from "../storage/blockchain.js";
 import Block from "../objects/block.js";
 import mempool from "../storage/mempool.js";
@@ -11,8 +11,9 @@ import Signature from "../crypto/signature.js";
 import LCrypt from "../crypto/index.js";
 import { MinterCredentials } from "../objects/minter.js";
 import { type Slot } from "../pos/slot.js";
-import { LeiCoinNetDataPackage, LNPPX } from "../leicoin-net/packages.js";
-import { LeiCoinNetNode } from "../leicoin-net/index.js";
+import { NewBlockMsg } from "../leicoin-net/messaging/messages/block.js";
+import { LNStandartMsg } from "../leicoin-net/messaging/netPackets.js";
+import { LNController } from "../leicoin-net/controller.js";
 
 export class MinterClient {
 
@@ -82,13 +83,8 @@ export class MinterClient {
 
     async mint(currentSlot: Slot) {
 		const block = await this.createNewBlock(currentSlot.index);
-
-		LeiCoinNetNode.broadcast(
-			LeiCoinNetDataPackage.create(
-				LNPPX.BLOCK,
-				block.encodeToHex()
-			)
-		);
+		
+		LNController.broadcast(new LNStandartMsg(new NewBlockMsg(block)));
 
 		currentSlot.processBlock(block);
 		

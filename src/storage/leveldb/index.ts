@@ -1,6 +1,6 @@
 import { DatabaseOptions, ClassicLevel } from "classic-level";
 import { LevelDBEncoders } from "./encoders.js";
-import { Uint } from "../../binary/uint.js";
+import { Uint } from "low-level";
 import { EntryStream, KeyStream, ReadStreamOptions, ValueStream } from "level-read-stream";
 import type { AbstractIteratorOptions, AbstractKeyIteratorOptions, AbstractValueIteratorOptions } from "abstract-level";
 

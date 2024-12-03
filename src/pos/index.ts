@@ -1,9 +1,7 @@
 import cli from "../cli/cli.js";
-import { Uint64 } from "../binary/uint.js";
+import { Uint64, UintMap } from "low-level";
 import Constants from "../utils/constants.js";
-import utils from "../utils/index.js";
 import Slot from "./slot.js";
-import { UintMap } from "../binary/map.js";
 import { type MinterClient } from "../minter/index.js";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import { CronJob } from "cron";
@@ -13,7 +11,7 @@ export class POS implements ModuleLike<typeof POS> {
     public static started = false;
 
     private static slotTask: CronJob;
-    private static readonly slots: UintMap<Promise<Slot>> = new UintMap();
+    private static readonly slots = new UintMap<Promise<Slot>>();
 
     static readonly minters: MinterClient[] = [];
 
@@ -30,7 +28,7 @@ export class POS implements ModuleLike<typeof POS> {
             this.startNewSlot(nextSlotIndex);
 
             /** @todo Adjust the amount of time this slot will be keeped in memory later when it is decided when a block is considered final and minters are getting paid */
-            this.endSlot(nextSlotIndex.sub(Uint64.from(100)));
+            this.endSlot(nextSlotIndex.sub(100));
         });
 
         this.setupEvents();

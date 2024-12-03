@@ -1,44 +1,30 @@
-import { UintMap } from "../binary/map.js";
-import { Uint } from "../binary/uint.js";
-import { SocketData, type LNSocket } from "./socket.js";
+import { BasicBinaryMap } from "low-level";
+import { Uint256 } from "low-level";
+import { type PeerSocket } from "./socket.js";
 
-export class LNConnections {
+abstract class AbstractPeerConnectionsMap {
 
-    private static instance: LNConnections;
-    
-    static createInstance(connections: UintMap<LNSocket> = new UintMap()) {
-        if (!this.instance) {
-            this.instance = new LNConnections(connections);
+    private readonly store: BasicBinaryMap<Uint256, PeerSocket>;
+
+    constructor(entries?: [Uint256, PeerSocket][]) {
+        this.store = new BasicBinaryMap<Uint256, PeerSocket>(Uint256, entries);
+    }
+
+    public get size() { return this.store.size; }
+
+    public add(socket: PeerSocket) {
+        this.store.set(socket.uuid, socket);
+    }
+
+    public get(uuid: Uint256) { return this.store.get(uuid); }
+
+    public remove(uuid: Uint256): boolean;
+    public remove(socket: PeerSocket): boolean;
+    public remove(arg0: Uint256 | PeerSocket) {
+        if (arg0 instanceof Uint256) {
+            return this.store.delete(arg0);
         }
-        return this.instance;
-    }
-    
-    private constructor(
-        protected readonly connections: UintMap<LNSocket>
-    ) {}
-
-    public get size() {
-        return this.connections.size;
-    }
-
-    public add(socket: LNSocket) {
-        if (!socket.data) {
-            socket.data = new SocketData(socket.remoteAddress, socket.localPort);
-        }
-        this.connections.set(socket.data.id, socket);
-    }
-
-    public get(id: Uint) {
-        return this.connections.get(id);
-    }
-
-    public remove(id: Uint): boolean;
-    public remove(socket: LNSocket): boolean;
-    public remove(arg0: Uint | LNSocket) {
-        if (arg0 instanceof Uint) {
-            return this.connections.delete(arg0);
-        }
-        return this.connections.delete(arg0.data.id);
+        return this.store.delete(arg0.uuid);
     }
     
     public getAll() {
@@ -46,8 +32,39 @@ export class LNConnections {
     }
 
     public [Symbol.iterator]() { return this.entries(); }
-    public entries() { return this.connections.entries(); }
-    public keys() { return this.connections.keys(); }
-    public values() { return this.connections.values(); }
+    public entries() { return this.store.entries(); }
+    public keys() { return this.store.keys(); }
+    public values() { return this.store.values(); }
 
 }
+
+export class PeerConnections extends AbstractPeerConnectionsMap {
+
+    readonly queue: PeerConnectionsQueue;
+
+    constructor(entries?: [Uint256, PeerSocket][], queueEntries?: PeerConnectionsQueue) {
+        super(entries);
+        this.queue = queueEntries || new PeerConnectionsQueue();
+    }
+
+    public remove(uuid: Uint256, alsoRemoveFromQueue?: boolean): boolean;
+    public remove(socket: PeerSocket, alsoRemoveFromQueue?: boolean): boolean;
+    public remove(arg0: Uint256 | PeerSocket, alsoRemoveFromQueue = true) {
+        const result1 = super.remove(arg0 as any);
+        const result2 = alsoRemoveFromQueue ? this.queue.remove(arg0 as any) : false;
+        return result1 || result2;
+    }
+
+    public moveFromQueue(uuid: Uint256) {
+        const socket = this.queue.get(uuid);
+        if (socket) {
+            this.add(socket);
+            this.queue.remove(uuid);
+        }
+    }
+
+}
+
+
+export class PeerConnectionsQueue extends AbstractPeerConnectionsMap {}
+

@@ -23,7 +23,7 @@ const CompileCMD = new class CompileCMD extends SubCommand {
         const cmd_name = args[0] as string | undefined;
 
         if (!cmd_name) {
-            return this.registry["auto"].run([]);
+            return this.registry["auto"].run([], []);
         }
 
         const cmd = this.registry[cmd_name] as SubCommand | undefined;
@@ -34,7 +34,7 @@ const CompileCMD = new class CompileCMD extends SubCommand {
             return;
         }
 
-        return cmd.run(args.slice(1));
+        return cmd.run(args.slice(1), args.slice(0, 1));
     }
 
 }();

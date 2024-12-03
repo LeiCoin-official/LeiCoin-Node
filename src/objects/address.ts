@@ -1,6 +1,6 @@
 import { PrivateKey, PublicKey } from "../crypto/cryptoKeys.js";
 import LCrypt from "../crypto/index.js";
-import { FixedUint, Uint, Uint256 } from "../binary/uint.js";
+import { FixedUint, Uint, Uint256 } from "low-level";
 import { DataUtils } from "../utils/dataUtils.js";
 import { PX } from "./prefix.js";
 import Signature from "../crypto/signature.js";

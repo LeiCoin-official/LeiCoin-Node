@@ -4,9 +4,9 @@ import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 import ObjectEncoding from "../encoding/objects.js";
 import Block from "../objects/block.js";
 import { PX } from "../objects/prefix.js";
-import { Uint, Uint256 } from "../binary/uint.js";
+import { Uint, Uint256 } from "low-level";
 import { CB } from "../utils/callbacks.js";
-import { DataUtils, Dict } from "../utils/dataUtils.js";
+import { Dict } from "../utils/dataUtils.js";
 import BCUtils from "./blockchainUtils.js";
 import { Blockchain } from "./blockchain.js";
 
@@ -47,7 +47,7 @@ class ForkChainstateData {
                     data.latestBlock
                 )
 
-                if (returnLength) {
+                if (returnData.length) {
                     return {data: forkChainstateData, length: returnData.length};
                 }
                 return forkChainstateData;
@@ -64,10 +64,10 @@ class ForkChainstateData {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.Hash("stateHash", true),
-        BE.Hash("parentChain"),
-        BE.Object("base", Block.prototype.encodeToHex, Block.fromDecodedHex),
-        BE.Object("latestBlock", Block.prototype.encodeToHex, Block.fromDecodedHex)
+        BE(Uint256, "stateHash", true),
+        BE(Uint256, "parentChain"),
+        BE.Object("base", Block),
+        BE.Object("latestBlock", Block)
     ]
 
 }
@@ -124,8 +124,8 @@ class ChainstateData {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
-        BE.Array("chains", 2, ForkChainstateData.prototype.encodeToHex, ForkChainstateData.fromDecodedHex)
+        BE(PX, "version"),
+        BE.Array("chains", 2, ForkChainstateData)
     ]
 
 }
@@ -198,6 +198,8 @@ export class Chainstate {
         } else {
             chain.latestBlock = block;
         }
+
+        chain.stateHash.set(chain.calculateHash());
         this.updateChainStateFile();
     }
 

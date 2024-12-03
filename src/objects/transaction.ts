@@ -1,10 +1,8 @@
 import LCrypt from "../crypto/index.js";
 import ObjectEncoding from "../encoding/objects.js";
-import utils from "../utils/index.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
-import { DataUtils } from "../utils/dataUtils.js";
-import { Uint, Uint256, Uint64 } from "../binary/uint.js";
+import { Uint, Uint256, Uint64 } from "low-level";
 import Signature from "../crypto/signature.js";
 import { PX } from "./prefix.js";
 import { MinterCredentials } from "./minter.js";
@@ -72,7 +70,7 @@ export class Transaction {
                     instance.senderAddress = AddressHex.fromSignature(data.txid, data.signature);
                 }
 
-                if (returnLength) {
+                if (returnData.length) {
                     return {data: instance, length: returnData.length};
                 }
                 return instance;
@@ -84,14 +82,14 @@ export class Transaction {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
-        BE.Hash("txid", true),
-        BE.Address("recipientAddress"),
+        BE(PX, "version"),
+        BE(Uint256, "txid", true),
+        BE(AddressHex, "recipientAddress"),
         BE.BigInt("amount"),
         BE.BigInt("nonce"),
         BE.BigInt("timestamp"),
         BE.Custom("input", { type: "prefix", val: "unlimited" }),
-        BE.Signature("signature", true)
+        BE(Signature, "signature", true)
     ]
 
     public calculateHash() {

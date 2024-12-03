@@ -11,7 +11,7 @@ export default class Main {
 
     private static initialized = false;
 
-    static readonly version = Bun.env.LEICOIN_NODE_VERSION || "DEV";
+    static readonly version = process.env.LEICOIN_NODE_VERSION || "DEV";
 
     private static environment: "full" | "cli" | "command";
 

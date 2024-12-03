@@ -2,15 +2,15 @@ import { describe, test, expect } from "bun:test";
 import Transaction from "../src/objects/transaction.js";
 import Wallet from "../src/objects/wallet.js";
 import Block from "../src/objects/block.js";
-import fs from "fs";
 import Signature from "../src/crypto/signature.js";
-import { Uint256, Uint64 } from "../src/binary/uint.js";
+import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "../src/objects/address.js";
 import { PrivateKey } from "../src/crypto/cryptoKeys.js";
 import Minter, { MinterCredentials } from "../src/objects/minter.js";
+import { ChainstateData } from "../src/storage/chainstate.js";
 
-describe('encoding_testing', () => {
-    test('block_enoding_and_decoding', () => {
+describe("encoding_testing", () => {
+    test("block_enoding_and_decoding", () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
@@ -33,20 +33,7 @@ describe('encoding_testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(block));
     });
-    /*test('block_enoding_and_decoding_with_file', () => {
-
-        const block = Block.createNewBlock();
-
-        const location = "./blockchain_data/tests/blocks/0.lcb";
-        
-        fs.writeFileSync(location, block.encodeToHex(), {encoding: "hex"});
-        const decoded = Block.fromDecodedHex(fs.readFileSync(location, "hex"));
-
-        fs.writeFileSync("./blockchain_data/tests/blocks/0.json", JSON.stringify(block));
-
-        expect(JSON.stringify(decoded)).toBe(JSON.stringify(block));
-    });*/
-    test('transaction_enoding_and_decoding', () => {
+    test("transaction_enoding_and_decoding", () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
         const mc = new MinterCredentials(PrivateKey.empty(), address);
@@ -58,7 +45,7 @@ describe('encoding_testing', () => {
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(tx));
     });
-    test('minter_enoding_and_decoding', () => {
+    test("minter_enoding_and_decoding", () => {
 
         const address = AddressHex.from("0e7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
@@ -73,7 +60,7 @@ describe('encoding_testing', () => {
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(minter));
 
     });
-    test('wallet_enoding_and_decoding', () => {
+    test("wallet_enoding_and_decoding", () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
         

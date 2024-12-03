@@ -1,5 +1,5 @@
 import LevelDB from "./index.js";
-import { Uint, Uint64 } from "../../binary/uint.js";
+import { Uint, Uint64 } from "low-level";
 
 export class LevelKeyIndexRange {
 
@@ -97,6 +97,7 @@ export class LevelIndexes {
             totalOffset.iadd(range.size);
         }
 
+        /** @todo Better Error Handling: Error shoudl not run when there are no Minter in the DB */
         throw new Error("Index is not part of any range. Are the ranges initialized?");
     }
 

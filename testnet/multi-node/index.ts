@@ -15,7 +15,7 @@ class LocalNodeTestNet {
 
     static async run() {
 
-        const args = Bun.argv.slice(2);
+        const args = process.argv.slice(2);
 
         const cmd = this.commands[args[0]];
 
@@ -103,7 +103,6 @@ class LocalNodeTestNet {
                 switch (relative_url.pathname) {
                     case "/start":
                         const binary = relative_url.searchParams.get("binary") === "true";
-                        console.log(binary);
                         LocalNodeTestNet.startNode(index, server, binary);
                         return Response.json({success: true});
                     default:

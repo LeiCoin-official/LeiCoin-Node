@@ -5,7 +5,10 @@ export class Schedule {
     private finished = false;
 
     constructor(task: () => void, ms: number) {
-        this.timeout = setTimeout(task, ms);
+        this.timeout = setTimeout(() => {
+            this.finished = true;
+            task();
+        }, ms);
     }
 
     public cancel() {

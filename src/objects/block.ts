@@ -1,7 +1,7 @@
 import { Transaction } from "./transaction.js";
 import cli from "../cli/cli.js";
 import LCrypt from "../crypto/index.js";
-import { Uint, Uint256, Uint64 } from "../binary/uint.js";
+import { Uint, Uint256, Uint64 } from "low-level";
 import { AddressHex } from "./address.js";
 import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";
@@ -50,7 +50,7 @@ export class Block {
                     block.minter = AddressHex.fromSignature(block.calculateHash(), data.signature);
                 }
 
-                if (returnLength) {
+                if (returnData.length) {
                     return {data: block, length: returnData.length};
                 }
                 return block;
@@ -63,14 +63,14 @@ export class Block {
     }
 
     private static encodingSettings: DataEncoder[] = [
-        BE.PX("version"),
+        BE(PX,"version"),
         BE.BigInt("index"),
         BE.BigInt("slotIndex"),
-        BE.Hash("hash", true),
-        BE.Hash("previousHash"),
+        BE(Uint256, "hash", true),
+        BE(Uint256, "previousHash"),
         BE.BigInt("timestamp"),
-        BE.Signature("signature", true),
-        BE.Array("transactions", 2, Transaction.prototype.encodeToHex, Transaction.fromDecodedHex)
+        BE(Signature,"signature", true),
+        BE.Array("transactions", 2, Transaction)
     ]
 
     public calculateHash() {
