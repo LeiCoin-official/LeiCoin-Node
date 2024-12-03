@@ -30,12 +30,17 @@ export abstract class LNAbstractMsgBody {
         return ObjectEncoding.encode(this, (this.constructor as typeof LNAbstractMsgBody).encodingSettings, false).data;
     }
 
-    static fromDecodedHex<T extends LNAbstractMsgBody>(this: new (...args: any[]) => T, hexData: Uint): T | null;
-    static fromDecodedHex(hexData: Uint) {
+    static fromDecodedHex<T extends LNAbstractMsgBody>(this: new (...args: any[]) => T, hexData: Uint, returnLength?: false): T | null;
+    static fromDecodedHex<T extends LNAbstractMsgBody>(this: new (...args: any[]) => T, hexData: Uint, returnLength: true): { data: T, length: number } | null;
+    static fromDecodedHex<T extends LNAbstractMsgBody>(this: new (...args: any[]) => T, hexData: Uint, returnLength: boolean): T | null;
+    static fromDecodedHex(hexData: Uint, returnLength = false): any {
         try {
-            const data = ObjectEncoding.decode(hexData, this.encodingSettings).data;
-            if (data) {
-                return this.fromDict(data);
+            const result = ObjectEncoding.decode(hexData, this.encodingSettings, returnLength);
+            if (result.data) {
+                if (returnLength) {
+                    return { data: this.fromDict(result.data), length: result.length };
+                }
+                return this.fromDict(result.data);
             }
         } catch (err: any) {
             cli.data.error(`Error loading ${this.name} from Decoded Hex: ${err.stack}`);
@@ -53,7 +58,7 @@ export abstract class LNAbstractMsgBody {
 
 export interface LNMsgBodyConstructor<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
     new(...args: any[]): T;
-    fromDecodedHex(hexData: Uint): T | null;
+    fromDecodedHex(hexData: Uint, returnLength: boolean): T | null;
 }
 
 export interface LNMsgInfo extends LNMsgBodyConstructor {

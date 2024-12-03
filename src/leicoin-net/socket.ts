@@ -22,7 +22,7 @@ export class PeerSocket {
 
     private _state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
 
-    private _receiveQueue = new Queue<Uint>();
+    private _receiveQueue: Queue<Uint> | null = new Queue<Uint>();
 
     constructor(
         protected readonly tcpSocket: Socket<any>,
@@ -41,16 +41,25 @@ export class PeerSocket {
         port: number,
         skipStatusCheck = false
     ) {
-        const socket = (await Bun.connect({
-            hostname: host, port,
-            socket: LNSocketHandler.Client,
-        })).data;
+        try {
+            const socket = (await Bun.connect({
+                hostname: host, port,
+                socket: LNSocketHandler.Client,
+            })).data;
+            socket.port = port;
 
-        if (!skipStatusCheck) {
-            await PeerSocketController.onConnectionInit(socket);
+            cli.leicoin_net.info(`A Connection was established with ${socket.uri}. Connection Type: ${socket.type}`);
+
+            if (skipStatusCheck) {
+                socket.state = "READY";
+            } else {
+                await PeerSocketController.accomplishHandshake(socket);
+            }
+
+            return socket;
+        } catch (error: any) {
+            return null;
         }
-
-        return socket;
     }
 
     get uri() {
@@ -58,11 +67,12 @@ export class PeerSocket {
     }
 
     set state(state: "READY" | "VERIFIED" | "CLOSED") {
-        if (state === "READY" && this._state === "OPENING") {
+        if (state === "READY" && this._state === "OPENING" && this._receiveQueue) {
             for (const data of this._receiveQueue) {
                 this.receive(data);
                 this._receiveQueue.dequeue();
             }
+            this._receiveQueue = null;
         }
         this._state = state;
     }
@@ -104,8 +114,8 @@ export class PeerSocket {
     
 
     async addToReceiveQueue(rawData: Uint) {
-        if (this.state === "OPENING") {
-            this._receiveQueue.enqueue(rawData);
+        if (this.state === "OPENING" && this._receiveQueue) {
+            return this._receiveQueue.enqueue(rawData);
         }
         return this.receive(rawData);
     }
@@ -162,8 +172,10 @@ export class PeerSocket {
         }
     }
 
-    async close(lastMessage?: Uint) {
-        return this.tcpSocket.end(lastMessage?.getRaw());
+    async close(lastMessage?: Uint | null, reason?: string) {
+        const cb = this.tcpSocket.end(lastMessage?.getRaw());
+        cli.leicoin_net.info(`Connection to ${this.uri} closed.${reason ? ` Reason: ${reason}` : ""}`);
+        return cb;
     }
 }
 
@@ -172,7 +184,6 @@ export namespace LNSocketHandler {
     abstract class BasicSocketHandler implements SocketHandler<PeerSocket> {
 
         readonly binaryType = "buffer";
-        protected abstract readonly handlesConnections: "INCOMING" | "OUTGOING";
     
         protected static instance: BasicSocketHandler;
     
@@ -184,19 +195,14 @@ export namespace LNSocketHandler {
             return CLS.instance;
         }
     
-        /** @todo implement timount for first message after connection open */
         async open(tcpSocket: Socket<PeerSocket>) {
-            const socket = new PeerSocket(tcpSocket, this.handlesConnections);
-        
+            const socket = new PeerSocket(tcpSocket, tcpSocket.listener ? "INCOMING" : "OUTGOING");
             LeiCoinNetNode.connections.queue.add(socket);
-            cli.leicoin_net.info(`A Connection was established with ${socket.uri}`);
         }
     
         async close(tcpSocket: Socket<PeerSocket>) {
             tcpSocket.data.state = "CLOSED";
             LeiCoinNetNode.connections.remove(tcpSocket.data);
-
-            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} closed.`);
         }
         async end(tcpSocket: Socket<PeerSocket>) {
             tcpSocket.data.state = "CLOSED";
@@ -226,18 +232,20 @@ export namespace LNSocketHandler {
 
     
     export const Server: BasicSocketHandler = new class LNServerSocketHandler extends BasicSocketHandler {
-        protected readonly handlesConnections = "INCOMING";
-
+        
         async open(tcpSocket: Socket<PeerSocket>) {
             await super.open(tcpSocket);
+            cli.leicoin_net.info(`A Connection was established with ${tcpSocket.data.uri}. Connection Type: ${tcpSocket.data.type}`);
+            PeerSocketController.accomplishHandshake(tcpSocket.data);
+        }
 
-            PeerSocketController.onConnectionInit(tcpSocket.data);
+        async close(tcpSocket: Socket<PeerSocket>): Promise<void> {
+            await super.close(tcpSocket);
+            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} closed.`);
         }
     }
     
-    export const Client: BasicSocketHandler = new class LNClientSocketHandler extends BasicSocketHandler {
-        protected readonly handlesConnections = "OUTGOING";
-    }
+    export const Client: BasicSocketHandler = new class LNClientSocketHandler extends BasicSocketHandler {}
 
 }
 

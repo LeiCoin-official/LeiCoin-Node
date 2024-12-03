@@ -33,10 +33,10 @@ export namespace StatusMsg {
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: StatusMsg, socket: PeerSocket) {
 
-            const response = socket.activeRequests.get(Uint32.from(0));
-            if (!response) return;
+            const req = socket.activeRequests.get(Uint32.from(0));
+            if (!req) return;
 
-            response.resolve(data);
+            req.resolve(data);
             return;
         }
     }

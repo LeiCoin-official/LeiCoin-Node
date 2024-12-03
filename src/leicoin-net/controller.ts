@@ -5,7 +5,7 @@ import { PeerSocket } from "./socket.js";
 import { Port } from "../objects/netinfo.js";
 import { StatusMsg } from "./messaging/messages/status.js";
 import { LNActiveRequest } from "./requests.js";
-import { ChallengeMsg, ChallengeREQMsg } from "./messaging/messages/challenge.js";
+import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messaging/messages/challenge.js";
 
 
 export class LNController {
@@ -40,14 +40,7 @@ export class PeerSocketController {
         return false;
     }
 
-    static async onConnectionInit(socket: PeerSocket) {
-        await this.accomplishHandshake(socket);
-        if (socket.type === "INCOMING") {
-            
-        }
-    }
-
-    private static async accomplishHandshake(socket: PeerSocket) {
+    static async accomplishHandshake(socket: PeerSocket) {
 
         if (socket.type === "OUTGOING") {
             await this.sendStatusMsg(socket);
@@ -59,9 +52,10 @@ export class PeerSocketController {
 
         const remoteStatus = (await request.awaitResult()).data;
         socket.activeRequests.delete(request.id);
-
-        if (!remoteStatus || !this.verifyRemoteStatus(remoteStatus)) {
-            socket.close();
+        
+        if ((!remoteStatus || !this.verifyRemoteStatus(remoteStatus))) {
+            if (socket.state as any === "CLOSED") return;
+            socket.close(null, "Remote Status does not match or request has failed / timed out");
             return;
         }
 
@@ -79,26 +73,24 @@ export class PeerSocketController {
 
     private static async challengeClient(socket: PeerSocket, remotePort: number) {
         const request_msg = LNRequestMsg.create(new ChallengeREQMsg());
-        const request = socket.request<ChallengeMsg>(request_msg);
+        const request = socket.request<ChallengeResponseMsg>(request_msg);
 
-        let client: PeerSocket;
-        try {
-            client = await PeerSocket.connect(socket.host, remotePort, true);
-        } catch (e) {
-            socket.close();
+        const client = await PeerSocket.connect(socket.host, remotePort, true);
+        if (!client) {
+            socket.close(null, "Failed to open connection to challenge client");
             return;
         }
 
         const challenge_msg = ChallengeMsg.create(request_msg.requestID);
         await client.send(challenge_msg);
-        client.close();
+        client.close(null, "Challenge sent successfully");
 
         const response = await request;
 
         if (response.status === 0 && response.data?.challenge.eq(challenge_msg.challenge)) {
             socket.state = "VERIFIED";
         } else {
-            socket.close();
+            socket.close(null, "Challenge failed: Remote did not respond with the correct challenge or timed out");
         }
     }
 

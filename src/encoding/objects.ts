@@ -68,8 +68,8 @@ export class ObjectEncoding {
         }
     }
     
-    public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength: true): OEDecodeResult<OEDecodeWithLengthResult>;
     public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength?: false): OEDecodeResult<OEDecodeStandardResult>;
+    public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength: true): OEDecodeResult<OEDecodeWithLengthResult>;
     public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength: boolean): OEDecodeResult<OEDecodeUnknownResult>;
     public static decode(hexData: Uint, keyConfigs: readonly DataEncoder[], returnLength = false) {
         try {
