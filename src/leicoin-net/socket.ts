@@ -74,6 +74,9 @@ export class PeerSocket {
             }
             this._receiveQueue = null;
         }
+        if (state === "VERIFIED") {
+            LeiCoinNetNode.connections.moveFromQueue(this.uuid);
+        }
         this._state = state;
     }
     get state(): typeof this._state {
