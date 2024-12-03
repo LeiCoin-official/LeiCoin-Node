@@ -1,3 +1,4 @@
+import { type Uint32 } from "low-level";
 import { type PeerSocket } from "../socket.js";
 import { type LNAbstractMsgBody } from "./abstractMsg.js";
 
@@ -27,7 +28,7 @@ export abstract class LNMsgDefaultHandler {
 
 export abstract class LNMsgRequestHandler extends LNBasicMsgHandler {
     readonly type = "REQUEST";
-    abstract receive(data: LNAbstractMsgBody, socket: PeerSocket): Promise<LNMsgHandlerResponse>;
+    abstract receive(data: LNAbstractMsgBody, socket: PeerSocket, requestID: Uint32): Promise<LNMsgHandlerResponse>;
 }
 
 export abstract class LNMsgResponseHandler {

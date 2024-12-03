@@ -1,28 +1,30 @@
-import { AbstractBinaryMap } from "low-level";
+import { BasicBinaryMap } from "low-level";
 import { Uint256 } from "low-level";
 import { type PeerSocket } from "./socket.js";
 
-abstract class AbstractPeerConnectionsMap extends AbstractBinaryMap<Uint256, PeerSocket> {
+abstract class AbstractPeerConnectionsMap {
+
+    private readonly store: BasicBinaryMap<Uint256, PeerSocket>;
 
     constructor(entries?: [Uint256, PeerSocket][]) {
-        super(Uint256, entries);
+        this.store = new BasicBinaryMap<Uint256, PeerSocket>(Uint256, entries);
     }
 
-    public get size() { return super.size; }
+    public get size() { return this.store.size; }
 
     public add(socket: PeerSocket) {
-        super.set(socket.uuid, socket);
+        this.store.set(socket.uuid, socket);
     }
 
-    public get(uuid: Uint256) { return super.get(uuid); }
+    public get(uuid: Uint256) { return this.store.get(uuid); }
 
     public remove(uuid: Uint256): boolean;
     public remove(socket: PeerSocket): boolean;
     public remove(arg0: Uint256 | PeerSocket) {
         if (arg0 instanceof Uint256) {
-            return super.delete(arg0);
+            return this.store.delete(arg0);
         }
-        return super.delete(arg0.uuid);
+        return this.store.delete(arg0.uuid);
     }
     
     public getAll() {
@@ -30,9 +32,9 @@ abstract class AbstractPeerConnectionsMap extends AbstractBinaryMap<Uint256, Pee
     }
 
     public [Symbol.iterator]() { return this.entries(); }
-    public entries() { return super.entries(); }
-    public keys() { return super.keys(); }
-    public values() { return super.values(); }
+    public entries() { return this.store.entries(); }
+    public keys() { return this.store.keys(); }
+    public values() { return this.store.values(); }
 
 }
 

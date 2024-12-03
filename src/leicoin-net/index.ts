@@ -76,8 +76,17 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
                 cli.leicoin_net.error(`Invalid Connection Data: ${targetData}`);
                 continue;
             }
+            
+            function saveConnect(host: string, port: number) {
+                try {
+                    return PeerSocket.connect(host, port);
+                } catch (err: any) {
+                    cli.leicoin_net.error(`Failed to connect to ${host}:${port}. Error: ${err.name}`);
+                    return Promise.resolve();
+                }
+            }
 
-            promises.push(PeerSocket.connect(host, port));
+            promises.push(saveConnect(host, port));
         }
 
         await Promise.all(promises);

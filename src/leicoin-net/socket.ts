@@ -6,7 +6,7 @@ import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./me
 import { LNActiveRequests, LNResponseData } from "./requests.js";
 import type { LNMsgRequestHandler, LNBroadcastingMsgHandler, LNMsgDefaultHandler } from "./messaging/abstractMsgHandler.js";
 import LeiCoinNetNode from "./index.js";
-import type { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
+import { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
 import { Queue } from "../utils/linkedlist.js";
@@ -15,7 +15,7 @@ import { Queue } from "../utils/linkedlist.js";
 export class PeerSocket {
     
     readonly host: string;
-    readonly port: number;
+    public port: number;
     readonly uuid = new Uint256(LCrypt.randomBytes(32));
     
     readonly challenge = new Uint256(LCrypt.randomBytes(32));
@@ -38,20 +38,19 @@ export class PeerSocket {
 
     static async connect(
         host: string,
-        port: number
+        port: number,
+        skipStatusCheck = false
     ) {
-        try {
-            const socket = (await Bun.connect({
-                hostname: host, port,
-                socket: LNSocketHandler.Client,
-            })).data;
+        const socket = (await Bun.connect({
+            hostname: host, port,
+            socket: LNSocketHandler.Client,
+        })).data;
 
-            return socket;
-
-        } catch (err: any) {
-            cli.leicoin_net.error(`Failed to connect to ${host}:${port}. Error: ${err.name}`);
-            return null;
+        if (!skipStatusCheck) {
+            await PeerSocketController.onConnectionInit(socket);
         }
+
+        return socket;
     }
 
     get uri() {
@@ -72,22 +71,35 @@ export class PeerSocket {
     }
 
 
-    async send(data: LNStandartMsg | Uint) {
-        return this.tcpSocket.write(
-            data instanceof LNStandartMsg
-                ? data.encodeToHex().getRaw()
-                : data.getRaw()
-        );
+    async send(data: LNAbstractMsgBody | LNStandartMsg | Uint) {
+        let raw: Uint;
+        if (data instanceof LNAbstractMsgBody) {
+            raw = new LNStandartMsg(data).encodeToHex();
+        } else if (data instanceof LNStandartMsg) {
+            raw = data.encodeToHex();
+        } else {
+            raw = data;
+        }
+
+        return this.tcpSocket.write(raw.getRaw());
     }
 
-    /** @todo Data should be an object that */
-    async request<T extends LNAbstractMsgBody>(data: LNRequestMsg<T>) {
-        this.send(data.encodeToHex());
+    async request<O extends LNAbstractMsgBody, I extends LNAbstractMsgBody = LNAbstractMsgBody>(data: LNRequestMsg<I> | I): Promise<LNResponseData<O>> {
+        let reqmsg: LNRequestMsg<I>;
+        if (data instanceof LNAbstractMsgBody) {
+            reqmsg = LNRequestMsg.create(data);
+        } else {
+            reqmsg = data;
+        }
 
-        const req = this.activeRequests.add(data);
+        this.send(reqmsg.encodeToHex());
+
+        const req = this.activeRequests.add<O>(reqmsg);
 
         const response = await req.awaitResult();
-        return response as LNResponseData<T>;
+        this.activeRequests.delete(req.id);
+
+        return response;
     }
     
 
@@ -121,7 +133,7 @@ export class PeerSocket {
                     return;
                 }
 
-                const response = await (handler as LNMsgRequestHandler).receive(msg.data, this);
+                const response = await (handler as LNMsgRequestHandler).receive(msg.data, this, msg.requestID);
                 if (response) {
                     this.send(new LNResponseMsg(msg.requestID, response));
                 }
@@ -178,38 +190,36 @@ export namespace LNSocketHandler {
         
             LeiCoinNetNode.connections.queue.add(socket);
             cli.leicoin_net.info(`A Connection was established with ${socket.uri}`);
-
-            PeerSocketController.onConnectionInit(socket);
         }
     
-        async close(socket: Socket<PeerSocket>) {
-            socket.data.state = "CLOSED";
-            LeiCoinNetNode.connections.remove(socket.data);
+        async close(tcpSocket: Socket<PeerSocket>) {
+            tcpSocket.data.state = "CLOSED";
+            LeiCoinNetNode.connections.remove(tcpSocket.data);
 
-            cli.leicoin_net.info(`Connection to ${socket.data.uri} closed.`);
+            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} closed.`);
         }
-        async end(socket: Socket<PeerSocket>) {
-            socket.data.state = "CLOSED";
-            LeiCoinNetNode.connections.remove(socket.data);
+        async end(tcpSocket: Socket<PeerSocket>) {
+            tcpSocket.data.state = "CLOSED";
+            LeiCoinNetNode.connections.remove(tcpSocket.data);
 
-            cli.leicoin_net.info(`${socket.data.uri} has ended the connection.`);
+            cli.leicoin_net.info(`${tcpSocket.data.uri} has ended the connection.`);
         }
     
-        async timeout(socket: Socket<PeerSocket>) {
-            cli.leicoin_net.info(`Connection to ${socket.data.uri} timed out.`);
+        async timeout(tcpSocket: Socket<PeerSocket>) {
+            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} timed out.`);
         }
     
-        async error(socket: Socket<PeerSocket>, error: Error) {
+        async error(tcpSocket: Socket<PeerSocket>, error: Error) {
             cli.leicoin_net.error(`Connection Error: ${error.stack}`);
         }
     
-        async data(socket: Socket<PeerSocket>, data: Buffer) {
-            socket.data.addToReceiveQueue(new Uint(data));
+        async data(tcpSocket: Socket<PeerSocket>, data: Buffer) {
+            tcpSocket.data.addToReceiveQueue(new Uint(data));
         }
     
-        async drain(socket: Socket<PeerSocket>) {}
+        async drain(tcpSocket: Socket<PeerSocket>) {}
     
-        async handshake(socket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}
+        async handshake(tcpSocket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}
     }
 
     export type Basic = BasicSocketHandler;
@@ -217,6 +227,12 @@ export namespace LNSocketHandler {
     
     export const Server: BasicSocketHandler = new class LNServerSocketHandler extends BasicSocketHandler {
         protected readonly handlesConnections = "INCOMING";
+
+        async open(tcpSocket: Socket<PeerSocket>) {
+            await super.open(tcpSocket);
+
+            PeerSocketController.onConnectionInit(tcpSocket.data);
+        }
     }
     
     export const Client: BasicSocketHandler = new class LNClientSocketHandler extends BasicSocketHandler {

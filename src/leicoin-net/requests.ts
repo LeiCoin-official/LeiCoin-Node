@@ -1,4 +1,4 @@
-import { AbstractBinaryMap, Uint32 } from "low-level";
+import { BasicBinaryMap, Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
 import { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";
@@ -32,7 +32,7 @@ export class LNActiveRequest<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
         }, 5_000)
     ) {}
 
-    static fromRequestMsg<T extends LNAbstractMsgBody>(msg: LNRequestMsg<T>) {
+    static fromRequestMsg<T extends LNAbstractMsgBody>(msg: LNRequestMsg) {
         return new LNActiveRequest<T>(msg.requestID);
     }
 
@@ -67,35 +67,37 @@ class LNActiveRequestCompactData {
     ) {}
 }
 
-export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestCompactData> {
-    constructor(entries?: readonly (readonly [Uint32, LNActiveRequestCompactData])[]) {
-        super(Uint32, entries);
+export class LNActiveRequests {
+
+    private readonly store: BasicBinaryMap<Uint32, LNActiveRequestCompactData>;
+
+    constructor(entries?: [Uint32, LNActiveRequestCompactData][]) {
+        this.store = new BasicBinaryMap(Uint32, entries);
     }
 
-    public get size() { return super.size; }
+    public get size() { return this.store.size; }
 
-    public add<T extends LNAbstractMsgBody>(req: LNRequestMsg<T> | LNActiveRequest<T>): LNActiveRequest<T> {
+    public add<T extends LNAbstractMsgBody>(req: LNRequestMsg | LNActiveRequest<T>): LNActiveRequest<T> {
         if (req instanceof LNRequestMsg) {
             return this.add(LNActiveRequest.fromRequestMsg<T>(req));
         }
 
-        super.set(req.id, req.toCompactData());
+        this.store.set(req.id, req.toCompactData());
         return req;
     }
 
-    // @ts-ignore
     public get(id: Uint32) {
-        const data = super.get(id);
+        const data = this.store.get(id);
         if (!data) return;
         return new LNActiveRequest(id, data.result, data.timeout);
     }
 
     public has(id: Uint32) {
-        return super.has(id);
+        return this.store.has(id);
     }
 
     public delete(id: Uint32) {
-        return super.delete(id);
+        return this.store.delete(id);
     }
 }
 
