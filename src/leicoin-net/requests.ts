@@ -1,8 +1,9 @@
 import { AbstractBinaryMap, Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
-import type { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
+import { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { LNRequestMsg } from "./messaging/netPackets.js";
 import Schedule from "../utils/schedule.js";
+import { ErrorResponseMsg } from "./messaging/messages/error.js";
 
 class LNSucessResponse<T extends LNAbstractMsgBody> {
     constructor(
@@ -18,26 +19,35 @@ class LNErrorResponse {
     ) {}
 }
 
-type LNResponseData<T extends LNAbstractMsgBody = LNAbstractMsgBody> = LNSucessResponse<T> | LNErrorResponse;
+export type LNResponseData<T extends LNAbstractMsgBody = LNAbstractMsgBody> = LNSucessResponse<T> | LNErrorResponse;
 
 
-export class LNActiveRequest {
+export class LNActiveRequest<T extends LNAbstractMsgBody = LNAbstractMsgBody> {
 
     constructor(
         readonly id: Uint32,
-        protected readonly result = new Deferred<LNResponseData>(),
+        protected readonly result = new Deferred<LNResponseData<T>>(),
         protected readonly timeout = new Schedule(() => {
             this.resolve(new LNErrorResponse(1));
         }, 5_000)
     ) {}
 
-    static fromRequestMsg(msg: LNRequestMsg) {
-        return new LNActiveRequest(msg.requestID);
+    static fromRequestMsg<T extends LNAbstractMsgBody>(msg: LNRequestMsg<T>) {
+        return new LNActiveRequest<T>(msg.requestID);
     }
 
-    public resolve(response: LNResponseData) {
+    public resolve(response: LNResponseData | LNAbstractMsgBody) {
         this.timeout.cancel();
-        this.result.resolve(response);
+
+        if (response instanceof LNAbstractMsgBody) {
+            if (response instanceof ErrorResponseMsg) {
+                response = new LNErrorResponse(response.id.toInt());
+            } else {
+                response = new LNSucessResponse(0, response);
+            }
+        }
+
+        this.result.resolve(response as LNResponseData<T>);
     }
 
     public awaitResult() {
@@ -64,9 +74,9 @@ export class LNActiveRequests extends AbstractBinaryMap<Uint32, LNActiveRequestC
 
     public get size() { return super.size; }
 
-    public add(req: LNRequestMsg | LNActiveRequest): LNActiveRequest {
+    public add<T extends LNAbstractMsgBody>(req: LNRequestMsg<T> | LNActiveRequest<T>): LNActiveRequest<T> {
         if (req instanceof LNRequestMsg) {
-            return this.add(LNActiveRequest.fromRequestMsg(req));
+            return this.add(LNActiveRequest.fromRequestMsg<T>(req));
         }
 
         super.set(req.id, req.toCompactData());

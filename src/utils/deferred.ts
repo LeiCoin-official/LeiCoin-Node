@@ -1,7 +1,7 @@
 
 export class Deferred<T = void> {
 
-    protected _resolve: ((value: T | PromiseLike<T>) => void) | null = null;
+    protected _resolve: ((value: any) => void) | null = null;
     protected _reject: ((reason?: any) => void) | null = null;
 
     protected readonly promise: Promise<T>;

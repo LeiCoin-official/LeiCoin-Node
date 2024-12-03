@@ -1,6 +1,6 @@
 import { type Uint, Uint16, Uint32 } from "low-level";
 import LeiCoinNetNode from "./index.js";
-import { type LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets";
+import { type LNBroadcastMsg, LNStandartMsg } from "./messaging/netPackets";
 import { type PeerSocket } from "./socket.js";
 import { Port } from "../objects/netinfo.js";
 import { StatusMsg } from "./messaging/messages/status.js";
@@ -30,7 +30,7 @@ export class PeerSocketController {
         ));
     }
 
-    private static checkRemoteStatus(remoteStatus: StatusMsg | undefined) {
+    private static verifyRemoteStatus(remoteStatus: StatusMsg | undefined) {
         if (
             remoteStatus &&
             /** @todo Implment Protocol Versioning Later which will replace remoteStatus.version.eq(0) */
@@ -42,25 +42,24 @@ export class PeerSocketController {
     }
 
     static async onConnectionInit(socket: PeerSocket) {
-        await this.verifyRemoteStatus(socket);
+        await this.accomplishHandshake(socket);
         socket.send(new LNStandartMsg(ChallengeREQMsg.create()));
     }
 
-    private static async verifyRemoteStatus(socket: PeerSocket) {
+    private static async accomplishHandshake(socket: PeerSocket) {
 
         if (socket.type === "OUTGOING") {
             await this.sendStatusMsg(socket);
         }
 
-        const request = new LNActiveRequest(Uint32.from(0));
-        socket.activeRequests.add(request);
+        const request = socket.activeRequests.add(new LNActiveRequest<StatusMsg>(Uint32.from(0)));
 
         socket.state = "READY";
 
-        const remoteStatus = (await request.awaitResult()).data as StatusMsg;
+        const remoteStatus = (await request.awaitResult()).data;
         socket.activeRequests.delete(request.id);
 
-        if (!this.checkRemoteStatus(remoteStatus)) {
+        if (!this.verifyRemoteStatus(remoteStatus)) {
             socket.close();
             return;
         }

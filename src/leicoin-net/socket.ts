@@ -3,7 +3,7 @@ import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
 import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/netPackets.js";
-import { LNActiveRequests } from "./requests.js";
+import { LNActiveRequests, LNResponseData } from "./requests.js";
 import type { LNMsgRequestHandler, LNBroadcastingMsgHandler, LNMsgDefaultHandler } from "./messaging/abstractMsgHandler.js";
 import LeiCoinNetNode from "./index.js";
 import type { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
@@ -87,7 +87,7 @@ export class PeerSocket {
         const req = this.activeRequests.add(data);
 
         const response = await req.awaitResult();
-        return response as T;
+        return response as LNResponseData<T>;
     }
     
 

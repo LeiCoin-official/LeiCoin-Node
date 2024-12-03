@@ -54,7 +54,7 @@ export namespace OneTimeRequestMsg {
 
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: OneTimeRequestMsg, socket: PeerSocket) {
-            return null;
+            return;
         }
     }
 
