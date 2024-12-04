@@ -1,0 +1,16 @@
+name: Test
+description: Run tests on the codebase.
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Environment
+      uses: ./.github/actions/setup
+
+    - name: Run tests
+      run: bun test
