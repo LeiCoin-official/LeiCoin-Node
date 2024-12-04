@@ -37,8 +37,7 @@ export class RunCMD extends CLICMD {
         const flags = this.flagParser.parse(args);
         if (typeof flags === "string") {
             cli.default.error(flags);
-            Utils.gracefulShutdown(1);
-            return;
+            Utils.gracefulShutdown(1); return;
         }
 
         Main.environment = "runtime";

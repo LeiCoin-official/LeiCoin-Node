@@ -37,6 +37,8 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API> {
     }
 
     static async stop() {
+        if (!this.started) return;
+
         if (this.app?.server) {
             this.app.server.stop();
             cli.api.info("API stopped");

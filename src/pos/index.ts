@@ -45,6 +45,7 @@ export class POS implements ModuleLike<typeof POS> {
     static setupEvents() {}
     
     static async stop() {
+        if (!this.started) return;
         this.slotTask.stop();
 
         const currentSlot = await this.getCurrentSlot();

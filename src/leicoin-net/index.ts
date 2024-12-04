@@ -98,6 +98,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     }
 
     static async stop() {
+        if (!this.started) return;
 
         for (const connection of this.connections.values()) {
             connection.close();

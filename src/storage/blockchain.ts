@@ -121,6 +121,8 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     private static async setupEvents() {}
 
     static async stop() {
+        if (!this.initialized) return
+
         cli.data.info("Saving blockchain data...");
 
         await Promise.all(
