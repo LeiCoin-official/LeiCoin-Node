@@ -9,7 +9,7 @@ import { PrivateKey } from "../src/crypto/cryptoKeys.js";
 import Minter, { MinterCredentials } from "../src/objects/minter.js";
 import { ChainstateData } from "../src/storage/chainstate.js";
 
-describe("encoding_testing", () => {
+describe("encoding", () => {
     test("block_enoding_and_decoding", () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");

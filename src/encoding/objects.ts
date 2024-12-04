@@ -37,7 +37,7 @@ export class ObjectEncoding {
     }
 
     public static decodeLengthFromUnlimited(hexData: Uint) {
-        const base15Length = EncodingUtils.splitWithTail(hexData.toHex().toUpperCase(), "F", 1)[0];
+        const base15Length = EncodingUtils.splitNTimes(hexData.toHex().toUpperCase(), "F", 1)[0];
         return [
             parseInt(base15Length, 15),
             Math.ceil((base15Length.length + 1) / 2)

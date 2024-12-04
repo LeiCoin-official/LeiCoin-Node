@@ -10,7 +10,7 @@ import CLIUtils from "../cliUtils.js";
 export default class CryptoCMD extends CLISubCMD {
     public name = "crypto";
     public description = "Crypto commands";
-    public usage = "crypto <command> [args]";
+    public usage = "crypto <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new GenKeyPairCMD());

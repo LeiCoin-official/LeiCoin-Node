@@ -6,10 +6,17 @@ import { DataUtils } from "../../utils/dataUtils.js";
 export default class ChainstateDataCMD extends CLISubCMD {
     public name = "chainstate";
     public description = "Manage the local Chainstate";
-    public usage = "chainstate <command> [args]";
+    public usage = "chainstate <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
+    }
+
+    async run(args: string[], parent_args: string[]) {
+        await Blockchain.init();
+        await Blockchain.waitAllChainsInit();
+
+        super.run(args, parent_args);
     }
 
 }

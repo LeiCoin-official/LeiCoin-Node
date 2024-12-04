@@ -5,11 +5,12 @@ import CLIUtils from "./cliUtils.js";
 
 export abstract class CLICMD {
 
-    public abstract name: string;
-    public abstract description: string;
-    public abstract usage: string;
+    readonly abstract name: string;
+    readonly abstract description: string;
+    readonly abstract usage: string;
+    readonly environment: "all" | "runtime" | "shell" = "all";
 
-    public abstract run(args: string[], parent_args: string[]): Promise<void>;
+    abstract run(args: string[], parent_args: string[]): Promise<void>;
 
 }
 
@@ -35,6 +36,7 @@ export abstract class CLISubCMD extends CLICMD {
                            ` - ${parent_args_str}help: Show available commands`;
 
         for (const cmd of Object.values(this.registry)) {
+            if (!CLIUtils.canRunInCurrentEnvironment(cmd)) continue;
             help_message += `\n - ${parent_args_str}${cmd.name}: ${cmd.description}`;
         }
 
@@ -65,7 +67,7 @@ export abstract class CLISubCMD extends CLICMD {
         if (command_name === "help") return await this.run_help(parent_args);
 
         const cmd = this.registry[command_name];
-        if (!cmd) return await this.run_notFound(command_name, parent_args);
+        if (!cmd || !CLIUtils.canRunInCurrentEnvironment(cmd)) return await this.run_notFound(command_name, parent_args);
 
         if (args[0] === "--help") return await this.run_sub_help(cmd, parent_args);
 

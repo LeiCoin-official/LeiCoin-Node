@@ -1,32 +1,22 @@
 import utils from "../utils/index.js";
-import { ProcessArgsLike, ProcessArgsParser } from "./processArgs.js";
 import { GeneralConfigLike, GeneralConfigParser } from "./general.js";
 import { ENVConfigLike, ENVConfigParser } from "./dotenv.js";
 import { PeersConfigParser } from "./peers.js";
 import fs from "fs";
 import path from "path";
 import cli from "../cli/cli.js";
-
+import type { NodeStartupFlags } from "../cli/commands/runCMD.js";
 
 export interface ConfigLike extends GeneralConfigLike, ENVConfigLike {
     peers: string[];
-    processArgs: ProcessArgsLike;
 }
 
 
 export class Configs {
 
-    private static processArgs: ProcessArgsLike;
     private static config: ConfigLike;
 
     private constructor() {}
-
-    static loadProcessArgs() {
-        if (!this.processArgs) {
-            this.processArgs = new ProcessArgsParser().parse();
-        }
-        return this.processArgs;
-    }
 
     static loadFullConfig() {
         if (!this.config) {
@@ -44,11 +34,9 @@ export class Configs {
             this.config = {
                 ...defaultConfig,
                 ...envConfig,
-                peers: peersConfig,
-                processArgs: this.loadProcessArgs()
+                peers: peersConfig
             };
-    
-            this.adjustConfigByProcessArgs();
+
         }
         return this.config;
     }
@@ -61,14 +49,13 @@ export class Configs {
         }
     }
 
-    private static adjustConfigByProcessArgs() {
-        const config = this.config as ConfigLike;
-        const pArgs = config.processArgs;
-        const netConfig = config.leicoin_net;
-        // Check for internal-port and extract the value
+    static adjustConfigByProcessArgs(processFlags: NodeStartupFlags) {
+        const pArgs = processFlags;
+        const netConfig = this.config.leicoin_net;
+
         if (pArgs["--port"]) netConfig.port = pArgs["--port"];
         if (pArgs["--host"]) netConfig.host = pArgs["--host"];
-        if (pArgs["--experimental"]) config.experimental = pArgs["--experimental"];
+        if (pArgs["--experimental"]) this.config.experimental = pArgs["--experimental"];
     }
 
 }
