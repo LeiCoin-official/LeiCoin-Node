@@ -6,6 +6,7 @@ import { Port } from "../objects/netinfo.js";
 import { StatusMsg } from "./messaging/messages/status.js";
 import { LNActiveRequest } from "./requests.js";
 import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messaging/messages/challenge.js";
+import cli from "../cli/cli.js";
 
 
 export class LNController {
@@ -54,13 +55,8 @@ export class PeerSocketController {
         socket.activeRequests.delete(request.id);
         
         if ((!remoteStatus || !this.verifyRemoteStatus(remoteStatus))) {
-            if (socket.state as any === "CLOSED") return;
             socket.close(null, "Remote Status does not match or request has failed / timed out");
             return;
-        }
-
-        if (socket.type === "OUTGOING") {
-            socket.state = "VERIFIED";
         }
 
         if (socket.type === "INCOMING") {
@@ -83,12 +79,14 @@ export class PeerSocketController {
 
         const challenge_msg = ChallengeMsg.create(request_msg.requestID);
         await client.send(challenge_msg);
-        client.close(null, "Challenge sent successfully");
 
         const response = await request;
 
+        client.close(null, true);
+
         if (response.status === 0 && response.data?.challenge.eq(challenge_msg.challenge)) {
             socket.state = "VERIFIED";
+            cli.leicoin_net.info(`Connection with ${socket.uri} has been verified`);
         } else {
             socket.close(null, "Challenge failed: Remote did not respond with the correct challenge or timed out");
         }

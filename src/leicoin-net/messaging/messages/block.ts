@@ -29,7 +29,8 @@ export namespace NewBlockMsg {
             const verification_result = await Verification.verifyMintedBlock(data.block);
     
             if (verification_result !== 12000) {
-                cli.data.info(`Block rejected. Code: ${verification_result}, Message: ${VCodes[verification_result]}`);
+                /** @todo CLI Debug Mode for log messages like this */
+                //cli.data.info(`Block rejected. Code: ${verification_result}, Message: ${VCodes[verification_result]}`);
                 return null;
             }
 

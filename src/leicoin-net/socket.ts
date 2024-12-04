@@ -48,11 +48,10 @@ export class PeerSocket {
             })).data;
             socket.port = port;
 
-            cli.leicoin_net.info(`A Connection was established with ${socket.uri}. Connection Type: ${socket.type}`);
-
             if (skipStatusCheck) {
                 socket.state = "READY";
             } else {
+                cli.leicoin_net.info(`A Connection was established with ${socket.uri}. Connection Type: ${socket.type}`);
                 await PeerSocketController.accomplishHandshake(socket);
             }
 
@@ -175,9 +174,16 @@ export class PeerSocket {
         }
     }
 
-    async close(lastMessage?: Uint | null, reason?: string) {
+    async close(lastMessage?: Uint | null): Promise<void | number>;
+    async close(lastMessage: Uint | null, reason: string): Promise<void | number>;
+    async close(lastMessage: Uint | null, silent: boolean): Promise<void | number>;
+    async close(lastMessage?: Uint | null, arg1?: string | boolean) {
+        if (this.state === "CLOSED") return;
         const cb = this.tcpSocket.end(lastMessage?.getRaw());
-        cli.leicoin_net.info(`Connection to ${this.uri} closed.${reason ? ` Reason: ${reason}` : ""}`);
+
+        if (arg1 !== true) {
+            cli.leicoin_net.info(`Connection to ${this.uri} closed.${arg1 ? ` Reason: ${arg1}` : ""}`);
+        }
         return cb;
     }
 }
@@ -242,10 +248,6 @@ export namespace LNSocketHandler {
             PeerSocketController.accomplishHandshake(tcpSocket.data);
         }
 
-        async close(tcpSocket: Socket<PeerSocket>): Promise<void> {
-            await super.close(tcpSocket);
-            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} closed.`);
-        }
     }
     
     export const Client: BasicSocketHandler = new class LNClientSocketHandler extends BasicSocketHandler {}
