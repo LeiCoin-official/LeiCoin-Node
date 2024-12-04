@@ -7,12 +7,15 @@ on:
       version:
         description: 'Release version Format: x.y.z-[alpha|beta|pre].n'
         required: true
+        type: string
       release_name:
         description: 'Release title'
-        required: true
+        required: 
+        type: string
       release_notes:
         description: 'Release notes or changelog'
         required: true
+        type: string
       prerelease:
         description: 'Is this a pre-release?'
         required: false
