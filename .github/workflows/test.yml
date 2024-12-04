@@ -2,6 +2,7 @@ name: Test
 description: Run tests on the codebase.
 
 on:
+  workflow_dispatch:
   workflow_call:
 
 jobs:
