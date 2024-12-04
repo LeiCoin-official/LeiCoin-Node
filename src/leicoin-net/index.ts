@@ -30,20 +30,17 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
         if (this.started) return;
         this.started = true;
 
-        const tasks: Promise<void>[] = [];
-
-        tasks.push(
-            this.startServer(config.host, config.port),
+        await this.startServer(config.host, config.port);
+        
+        const tasks: Promise<void>[] = [
             this.initPeers(config.peers)
-        );
+        ];
 
         if (config.eventHandler) {
             tasks.push(this.setupEvents(config.eventHandler));
         }
 
         await Promise.all(tasks);
-
-        cli.leicoin_net.info(`LeiCoinNet-Node started on ${config.host}:${config.port}`);
     }
 
     private static async startServer(host: string, port: number) {
@@ -52,6 +49,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
                 hostname: host, port,
                 socket: LNSocketHandler.Server
             });
+            cli.leicoin_net.info(`LeiCoinNet-Node started on ${host}:${port}`);
         } catch (error: any) {
             cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);
             Utils.gracefulShutdown(1);
@@ -78,7 +76,6 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
             }
             
             async function saveConnect(host: string, port: number) {
-                await new Promise(resolve => setTimeout(resolve, 500));
                 const socket = await PeerSocket.connect(host, port);
                 if (!socket) {
                     cli.leicoin_net.error(`Failed to connect to ${host}:${port}.`);

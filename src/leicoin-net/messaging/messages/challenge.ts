@@ -6,6 +6,7 @@ import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import LCrypt from "../../../crypto/index.js";
 import { Deferred } from "../../../utils/deferred.js";
 import Schedule from "../../../utils/schedule.js";
+import cli from "../../../cli/cli.js";
 
 class ChallengeMsgStoreItem {
     constructor(
@@ -76,7 +77,7 @@ export namespace ChallengeMsg {
             const challenge = ChallengeMsgStore.get(data.requestID);
             if (challenge) {
                 challenge.resolve(data.challenge);
-                socket.close(null, "Challenge completed");
+                socket.close(null, false);
                 return;
             }
         }
@@ -102,6 +103,10 @@ export namespace ChallengeREQMsg {
             if (!result) {
                 return null;
             }
+
+            socket.state = "VERIFIED";
+            cli.leicoin_net.info(`Connection with ${socket.uri} has been verified`);
+
             return new ChallengeResponseMsg(result);
         }
     }
