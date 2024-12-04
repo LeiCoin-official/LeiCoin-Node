@@ -1,0 +1,32 @@
+name: Build
+description: Build binaries and upload artifacts.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Release version Format: x.y.z-[alpha|beta|pre].n'
+        required: true
+
+jobs:
+  
+  test:
+    uses: ./.github/workflows/test.yml
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Setup Environment
+      uses: ./.github/actions/setup
+
+    - name: Build binaries
+      run: bun compile all ${{ inputs.version }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: binaries
+        path: build/bin/*
+        retention-days: 1  # Set to 1 day for temporary storage
