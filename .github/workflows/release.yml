@@ -23,6 +23,8 @@ jobs:
   
   build:
     uses: ./.github/workflows/build.yml
+    with:
+      version: ${{ github.event.inputs.version }}
 
   release:
     needs: build
