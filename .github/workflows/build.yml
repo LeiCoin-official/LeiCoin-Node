@@ -7,6 +7,7 @@ on:
       version:
         description: 'Release version Format: x.y.z-[alpha|beta|pre].n'
         required: true
+        type: string
 
 jobs:
   
