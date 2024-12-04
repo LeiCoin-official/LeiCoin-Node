@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Setup Environment
-      uses: ./.github/actions/setup
+      uses: ./.github/workflows/setup
 
     - name: Run tests
       run: bun test
