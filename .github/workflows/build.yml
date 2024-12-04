@@ -19,7 +19,7 @@ jobs:
     steps:
 
     - name: Setup Environment
-      uses: ./.github/actions/setup
+      uses: ./.github/workflows/setup
 
     - name: Build binaries
       run: bun compile all ${{ inputs.version }}
