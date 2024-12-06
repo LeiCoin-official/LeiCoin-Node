@@ -1,10 +1,11 @@
-import { type PeerSocket } from "../../socket.js";
 import { LNMsgRequestHandler, LNMsgResponseHandler } from "../abstractMsgHandler.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { ForkChainstateData } from "../../../storage/chainstate.js";
 import { Dict } from "../../../utils/dataUtils.js";
 import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
 import { Blockchain } from "../../../storage/blockchain.js";
+import { ErrorResponseMsg } from "./error.js";
+import { NetworkSyncManager } from "../../chain-sync.js";
 
 export class GetChainstateMsg extends LNAbstractMsgBody {}
 
@@ -13,12 +14,19 @@ export namespace GetChainstateMsg {
     export const ID = LNMsgID.from("1f76");
     
     export const Handler = new class Handler extends LNMsgRequestHandler {
-        async receive(data: GetChainstateMsg, socket: PeerSocket) {
+        async receive() {
+
+            if (NetworkSyncManager.state !== "synchronized") {
+                // @todo Better error handling later with explicit error codes
+                return ErrorResponseMsg.fromCode(1);
+            }
+
             const cs = Blockchain.chainstate.getChainState("main");
             if (cs) {
                 return new ChainstateMsg(cs);
             }
-            return null;
+
+            return ErrorResponseMsg.fromCode(1);
         }
     }
 }
@@ -38,6 +46,6 @@ export class ChainstateMsg extends LNAbstractMsgBody {
 
 export namespace ChainstateMsg {
     export const Name = "CHAINSTATE";
-    export const ID = LNMsgID.from("1f77");
+    export const ID = LNMsgID.from("ffab");
     export const Handler = new class Handler extends LNMsgResponseHandler {}
 }

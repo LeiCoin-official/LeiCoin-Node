@@ -77,7 +77,7 @@ export class ChainstateData {
     public readonly chains: Dict<ForkChainstateData> = {};
     public readonly version: PX;
 
-    constructor(chains: ForkChainstateData[], version: PX) {
+    private constructor(chains: ForkChainstateData[], version: PX) {
         for (const chain of chains) {
             this.chains[chain.id] = chain;
         }
