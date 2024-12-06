@@ -1,5 +1,5 @@
 import BCUtils from "./blockchainUtils.js";
-import Chainstate from "./chainstate.js";
+import { Chainstate } from "./chainstate.js";
 import Chain from "./chain.js";
 import cli from "../cli/cli.js";
 import { BasicModuleLike } from "../utils/dataUtils.js";

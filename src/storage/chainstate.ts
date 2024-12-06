@@ -11,7 +11,7 @@ import BCUtils from "./blockchainUtils.js";
 import { Blockchain } from "./blockchain.js";
 
 
-class ForkChainstateData {
+export class ForkChainstateData {
     public readonly id: string;
     public readonly stateHash: Uint256;
     public readonly parentChain: Uint256;
@@ -73,7 +73,7 @@ class ForkChainstateData {
 }
 
 
-class ChainstateData {
+export class ChainstateData {
     public readonly chains: Dict<ForkChainstateData> = {};
     public readonly version: PX;
 
@@ -248,6 +248,3 @@ export class Chainstate {
 
 }
 
-export type { ForkChainstateData, ChainstateData };
-
-export default Chainstate;
