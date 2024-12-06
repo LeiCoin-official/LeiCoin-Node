@@ -1,6 +1,6 @@
 import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
-import Minter from "../../objects/minter.js";
+import MinterData from "../../objects/minter.js";
 import { Blockchain } from "../../storage/blockchain.js";
 import { Uint, Uint64 } from "low-level";
 import cli from "../cli.js";
@@ -77,7 +77,7 @@ class InsertCMD extends CLICMD {
             return;
         }
 
-        const minter = new Minter(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
+        const minter = new MinterData(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
         await Blockchain.minters.setMinter(minter);
         cli.cmd.info("Minter inserted!");
     }

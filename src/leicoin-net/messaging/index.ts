@@ -1,35 +1,52 @@
 import { type LNMsgInfo, LNMsgID } from "./abstractMsg.js";
-import { type Dict } from "../../utils/dataUtils.js";
+import { ObjectiveArray, type Dict } from "../../utils/dataUtils.js";
 import { StatusMsg } from "./messages/status.js";
 import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messages/challenge.js";
 import { GetBlocksMsg, NewBlockMsg } from "./messages/block.js";
 import { GetTransactionsMsg, NewTransactionMsg } from "./messages/transaction.js";
-import { GetChainstateMsg } from "./messages/chainstate.js";
+import { ChainstateMsg, GetChainstateMsg } from "./messages/chainstate.js";
 import { OneTimeRequestMsg } from "./messages/oneTimeRequest.js";
 
+
+type LNMsgRegistry<I extends readonly LNMsgInfo[], T = ObjectiveArray<I>> = {
+    // @ts-ignore
+    [K in T[keyof T]["Name"]]: Extract<
+        T[keyof T],
+        { Name: K }
+    >;
+};
+
 class LNMsgUtils {
-    static createLNMsgRegistry<T extends Dict<LNMsgInfo, string>>(registry: T) {
-        return registry as Readonly<T>;
+    static createLNMsgRegistry<T extends readonly LNMsgInfo[]>(msgs: T) {
+        const registry: Dict<LNMsgInfo> = {};
+        for (const msg of msgs) {
+            registry[msg.name] = msg;
+        }
+        return registry as LNMsgRegistry<T>;
     }
 }
 
-export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry({
-    STATUS: StatusMsg,
 
-    CHALLENGE: ChallengeMsg,
-    CHALLENGE_REQ: ChallengeREQMsg,
-    CHALLENGE_RESPONSE: ChallengeResponseMsg,
+export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry([
+    StatusMsg,
 
     // ONE_TIME_REQUEST: OneTimeRequestMsg,
 
-    NEW_BLOCK: NewBlockMsg,
-    GET_BLOCKS: GetBlocksMsg,
+    ChallengeMsg,
+    ChallengeREQMsg,
+    ChallengeResponseMsg,
 
-    NEW_TRANSACTION: NewTransactionMsg,
-    GET_TRANSACTIONS: GetTransactionsMsg,
+    NewBlockMsg,
+    GetBlocksMsg,
 
-    GET_CHAINSTATE: GetChainstateMsg,
-});
+    NewTransactionMsg,
+    GetTransactionsMsg,
+
+    ChainstateMsg,
+    GetChainstateMsg,
+] as const);
+
+
 
 /** @tode Find a new Name for MessageRouter that is more accurate */
 export class MessageRouter {

@@ -22,7 +22,8 @@ export class NewBlockMsg extends LNAbstractMsgBody {
 }
 
 export namespace NewBlockMsg {
-    export const ID = LNMsgID.from("2096"); // NEW_BLOCK
+    export const Name = "NEW_BLOCK";
+    export const ID = LNMsgID.from("2096");
     
     export const Handler = new class Handler extends LNBroadcastingMsgHandler {
         async receive(data: NewBlockMsg) {
@@ -50,7 +51,8 @@ export class GetBlocksMsg extends LNAbstractMsgBody {
 }
 
 export namespace GetBlocksMsg {
-    export const ID = LNMsgID.from("d372"); // GET_BLOCKS
+    export const Name = "GET_BLOCKS";
+    export const ID = LNMsgID.from("d372");
 
     export const Handler = new class Handler extends LNMsgRequestHandler {
         async receive(data: GetBlocksMsg, socket: PeerSocket) {

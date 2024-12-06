@@ -1,4 +1,4 @@
-import Minter from "../objects/minter.js";
+import MinterData from "../objects/minter.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "low-level";
@@ -15,14 +15,14 @@ export class MinterDB extends LevelBasedStorageWithIndexes {
     public async getMinter(address: AddressHex) {
         const raw_minter_data = await this.getData(address);
         if (!raw_minter_data) return null;
-        return Minter.fromDecodedHex(address, raw_minter_data);
+        return MinterData.fromDecodedHex(address, raw_minter_data);
     }
 
-    public async setMinter(minter: Minter) {
+    public async setMinter(minter: MinterData) {
         return this.level.put(minter.address, minter.encodeToHex());
     }
 
-    public async removeMinter(minter: Minter) {
+    public async removeMinter(minter: MinterData) {
         return this.delData(minter.address);
     }
 

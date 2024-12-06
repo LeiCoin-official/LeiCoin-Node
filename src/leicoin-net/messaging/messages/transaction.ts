@@ -24,7 +24,8 @@ export class NewTransactionMsg extends LNAbstractMsgBody {
 }
 
 export namespace NewTransactionMsg {
-    export const ID = LNMsgID.from("8356"); // NEW_TRANSACTION
+    export const Name = "NEW_TRANSACTION";
+    export const ID = LNMsgID.from("8356");
     
     export const Handler = new class Handler extends LNBroadcastingMsgHandler {
 
@@ -59,7 +60,8 @@ export namespace NewTransactionMsg {
 export class GetTransactionsMsg extends LNAbstractMsgBody {}
 
 export namespace GetTransactionsMsg {
-    export const ID = LNMsgID.from("09aa"); // GET_TRANSACTIONS
+    export const Name = "GET_TRANSACTIONS";
+    export const ID = LNMsgID.from("09aa");
     
     export const Handler = new class Handler extends LNMsgRequestHandler {
         async receive(data: GetTransactionsMsg, socket: PeerSocket) {

@@ -49,8 +49,8 @@ export class OneTimeRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> 
 
 
 export namespace OneTimeRequestMsg {
-
-    export const ID = LNMsgID.from("5c5f"); // ONE_TIME_REQUEST
+    export const Name = "ONE_TIME_REQUEST";
+    export const ID = LNMsgID.from("5c5f");
 
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: OneTimeRequestMsg, socket: PeerSocket) {

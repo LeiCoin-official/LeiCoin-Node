@@ -2,9 +2,13 @@ import { Uint, Uint64 } from "low-level";
 
 export type ObjORNull<T> = T | null;
 
-export type Dict<T, K extends string | number = string | number> = Record<K, T>;
+export type Dict<T, K extends string | number = string> = Record<K, T>;
 
 export interface AnyObj extends Dict<any> {}
+
+export type ObjectiveArray<T extends readonly V[], V = unknown> = {
+    [K in keyof T as K extends `${number}` ? K : never]: T[K];
+};
 
 
 export class CStatic {

@@ -20,6 +20,7 @@ export class ErrorResponseMsg extends LNAbstractMsgBody {
 }
 
 export namespace ErrorResponseMsg {
-    export const ID = LNMsgID.from("fff0"); // ERROR_RESPONSE
+    export const Name = "ERROR_RESPONSE";
+    export const ID = LNMsgID.from("fff0");
     export const Handler = new class Handler extends LNMsgResponseHandler {}
 }

@@ -69,7 +69,8 @@ export class ChallengeMsg extends LNAbstractMsgBody {
 }
 
 export namespace ChallengeMsg {
-    export const ID = LNMsgID.from("77a9"); // CHALLENGE
+    export const Name = "CHALLENGE";
+    export const ID = LNMsgID.from("77a9");
 
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: ChallengeMsg, socket: PeerSocket) {
@@ -93,7 +94,8 @@ export class ChallengeREQMsg extends LNAbstractMsgBody {
 }
 
 export namespace ChallengeREQMsg {
-    export const ID = LNMsgID.from("51c1"); // CHALLENGE_REQ
+    export const Name = "CHALLENGE_REQ";
+    export const ID = LNMsgID.from("51c1");
 
     export const Handler = new class Handler extends LNMsgRequestHandler {
         async receive(data: ChallengeREQMsg, socket: PeerSocket, requestID: Uint32) {
@@ -129,6 +131,7 @@ export class ChallengeResponseMsg extends LNAbstractMsgBody {
 }
 
 export namespace ChallengeResponseMsg {
-    export const ID = LNMsgID.from("39a2"); // CHALLENGE_RESPONSE
+    export const Name = "CHALLENGE_RESPONSE";
+    export const ID = LNMsgID.from("39a2");
     export const Handler = new class Handler extends LNMsgResponseHandler {}
 }

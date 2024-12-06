@@ -6,7 +6,7 @@ import { PX } from "./prefix.js";
 import { PrivateKey } from "../crypto/cryptoKeys.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 
-export class Minter {
+export class MinterData {
 
     private readonly stake: Uint64;
 
@@ -27,16 +27,16 @@ export class Minter {
     }
 
     public encodeToHex() {
-        return ObjectEncoding.encode(this, Minter.encodingSettings, false).data;
+        return ObjectEncoding.encode(this, MinterData.encodingSettings, false).data;
     }
 
     public static fromDecodedHex(address: AddressHex, hexData: Uint) {
         try {
-            const resultData = ObjectEncoding.decode(hexData, Minter.encodingSettings);
+            const resultData = ObjectEncoding.decode(hexData, MinterData.encodingSettings);
             const data = resultData.data;
         
             if (data && data.version.eq(0)) {
-                return new Minter(address, data.stake, data.version);
+                return new MinterData(address, data.stake, data.version);
             }
         } catch (err: any) {
             cli.data.error(`Error loading Minter from Decoded Hex: ${err.stack}`);
@@ -68,4 +68,4 @@ export class MinterCredentials {
 
 }
 
-export default Minter;
+export default MinterData;
