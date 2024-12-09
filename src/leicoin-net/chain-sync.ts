@@ -6,6 +6,7 @@ import { type ForkChainstateData } from "../storage/chainstate.js";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
 import LeiCoinNetNode from "./index.js";
+import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
 
 export class NetworkSyncManager {
 
@@ -29,6 +30,12 @@ export class NetworkSyncManager {
         }
 
         return (await Promise.all(chainstates)).filter(cs => cs) as ForkChainstateData[];
+    }
+
+    private static async getRemoteBlock(socket: PeerSocket, index: Uint64) {
+
+        socket.request<BlocksMsg>(new GetBlocksMsg(index, Uint64.from(512)));
+
     }
 
     static async checkRemoteChainstates() {
