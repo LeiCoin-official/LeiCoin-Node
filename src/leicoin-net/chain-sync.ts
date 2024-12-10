@@ -34,7 +34,11 @@ export class NetworkSyncManager {
 
     private static async getRemoteBlock(socket: PeerSocket, index: Uint64) {
 
+        
+
         socket.request<BlocksMsg>(new GetBlocksMsg(index, Uint64.from(512)));
+
+
 
     }
 
