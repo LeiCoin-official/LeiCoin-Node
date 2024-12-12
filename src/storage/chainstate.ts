@@ -223,7 +223,7 @@ export class Chainstate {
         let previousBlock: Block | null = null;
 
         for (const chain of Object.values(this.getAllChainStates())) {
-            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.getBlock(block.index.sub(1)).data; 
+            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.get(block.index.sub(1)).data; 
 
             if (chainPreviousBlock?.hash.eq(block.previousHash)) {
                 parentChain = chain;
@@ -235,7 +235,7 @@ export class Chainstate {
         if (!parentChain || !previousBlock)
             return { status: 12532 }; // Previous block not found
 
-        const targetBlock = Blockchain.chains[parentChain.id].blocks.getBlock(block.index).data;
+        const targetBlock = Blockchain.chains[parentChain.id].blocks.get(block.index).data;
 
         if (targetBlock) {
             if (targetBlock?.hash.eq(block.hash))

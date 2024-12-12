@@ -13,7 +13,7 @@ export class BlockDB {
         BCUtils.ensureDirectoryExists('/blocks', this.chain);
     }
 
-    public addBlock(block: Block, overwrite = false) {
+    public add(block: Block, overwrite = false) {
         const blockIndex = block.index.toBigInt().toString();
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
@@ -32,7 +32,7 @@ export class BlockDB {
         }
     }
 
-    public getBlock(index: Uint64 | string) {
+    public get(index: Uint64 | string) {
         const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
@@ -53,7 +53,7 @@ export class BlockDB {
     /**
      * WARNING: Deleting Blocks from a chain is risky and should be done with caution. Dont use this method unless you know what you are doing.
      */
-    public deleteBlock(index: Uint64 | string, silent = false) {
+    public delete(index: Uint64 | string, silent = false) {
         const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;

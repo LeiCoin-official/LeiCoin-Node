@@ -24,7 +24,7 @@ let router = new Elysia({prefix: '/sendBlocks'})
 	}
 
     // Add the transaction to the mempool (replace with your blockchain logic)
-    Blockchain.blocks.addBlock(blockData);
+    Blockchain.blocks.add(blockData);
     //Blockchain.updateLatestBlockInfo(blockData.index, blockData.hash);
     mempool.clearMempoolbyBlock(blockData);
 

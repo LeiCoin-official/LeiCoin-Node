@@ -22,7 +22,7 @@ export class Execution {
             cli.pos.info(`New Fork ${targetChain} created from ${parentChain} at block ${block.index.toBigInt()}`);
         }
     
-        Blockchain.chains[targetChain].blocks.addBlock(block);
+        Blockchain.chains[targetChain].blocks.add(block);
         Blockchain.chainstate.updateChainStateByBlock(
             targetChain,
             parentChain,

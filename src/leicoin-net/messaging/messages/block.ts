@@ -94,7 +94,7 @@ export namespace GetBlocksMsg {
             const maxIndex = index.add(data.count);
             
             while (index.lt(maxIndex)) {
-                const block = Blockchain.blocks.getBlock(index);
+                const block = Blockchain.blocks.get(index);
                 if (block.cb !== CB.SUCCESS || !block.data) break;
                 blocks.push(block.data);
                 index = index.add(1);
