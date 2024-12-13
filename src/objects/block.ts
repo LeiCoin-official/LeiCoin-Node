@@ -1,15 +1,29 @@
 import { Transaction } from "./transaction.js";
-import cli from "../cli/cli.js";
 import LCrypt from "../crypto/index.js";
-import { Uint, Uint256, Uint64 } from "low-level";
+import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "./address.js";
-import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";
 import Signature from "../crypto/signature.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
-import { Container } from "./container.js";
+import { Container, HashableContainer } from "./container.js";
 
-export class Block extends Container {
+export class BlockBody extends Container{
+
+    constructor(
+        public transactions: Transaction[]
+    ) {super()}
+
+    protected static fromDict(obj: Dict<any>) {
+        return new BlockBody(obj.transactions);
+    }
+
+    protected static encodingSettings: DataEncoder[] = [
+        BE.Array("transactions", 2, Transaction)
+    ]
+
+}
+
+export class Block extends HashableContainer {
 
     constructor(
         public index: Uint64,
@@ -19,14 +33,12 @@ export class Block extends Container {
         public timestamp: Uint64,
         public minter: AddressHex,
         public signature: Signature,
-        public transactions: Transaction[],
-        //public body: BlockBody,
+        public body: BlockBody,
         public readonly version: PX = PX.A_00
     ) {super()}
 
     protected static fromDict(obj: Dict<any>) {
-
-        if (obj.version.eqn(0)) return null;
+        if (!obj.version.eq(0)) return null;
 
         const block = new Block(
             obj.index,
@@ -36,7 +48,7 @@ export class Block extends Container {
             obj.timestamp,
             null as any,
             obj.signature,
-            obj.transactions,
+            obj.body,
             obj.version
         );
 
@@ -53,24 +65,10 @@ export class Block extends Container {
         BE(Uint256, "previousHash"),
         BE.BigInt("timestamp"),
         BE(Signature,"signature", true),
-        BE.Array("transactions", 2, Transaction)
+        BE.Object("body", BlockBody),
     ]
 
-    public calculateHash() {
-        return LCrypt.sha256(this.encodeToHex(true));
-    }
-
 }
-
-
-export class BlockBody {
-
-    constructor(
-        public transactions: Transaction[]
-    ) {}
-
-}
-
 
 
 export default Block;

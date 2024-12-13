@@ -1,7 +1,7 @@
 import { describe, test, expect } from "bun:test";
 import Transaction from "../src/objects/transaction.js";
 import Wallet from "../src/objects/wallet.js";
-import Block from "../src/objects/block.js";
+import { Block, BlockBody } from "../src/objects/block.js";
 import Signature from "../src/crypto/signature.js";
 import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "../src/objects/address.js";
@@ -22,7 +22,7 @@ describe("encoding", () => {
             Uint64.from(0),
             address,
             Signature.empty(),
-            []
+            new BlockBody([])
         );
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());

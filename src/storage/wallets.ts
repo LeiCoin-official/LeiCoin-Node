@@ -63,7 +63,7 @@ export class WalletDB extends LevelBasedStorage {
 
             const promises: Promise<void>[] = [];
 
-            for (const transactionData of block.transactions) {
+            for (const transactionData of block.body.transactions) {
                 const amount = transactionData.amount;
                 promises.push(this.subtractMoneyFromWallet(transactionData.senderAddress, amount));
                 promises.push(this.addMoneyToWallet(transactionData.recipientAddress, amount));

@@ -23,7 +23,7 @@ class Mempool {
 
     public clearMempoolbyBlock(block: Block) {
 
-        for (const transactionData of block.transactions) {
+        for (const transactionData of block.body.transactions) {
             this.removeTransactionFromMempool(transactionData.txid);
         }
 

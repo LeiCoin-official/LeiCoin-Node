@@ -2,6 +2,7 @@ import { type Uint } from "low-level";
 import { type DataEncoder } from "../encoding/binaryEncoders.js";
 import ObjectEncoding from "../encoding/objects.js";
 import cli from "../cli/cli.js";
+import LCrypt from "../crypto/index.js";
 
 type NewContainer<T extends Container> = new (...args: any[]) => T;
 
@@ -49,4 +50,10 @@ export abstract class Container {
 
 }
 
+
+export abstract class HashableContainer extends Container {
+    public calculateHash() {
+        return LCrypt.sha256(this.encodeToHex(true));
+    }
+}
 

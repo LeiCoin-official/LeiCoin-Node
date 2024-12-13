@@ -53,7 +53,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         
         for (const blockIndex = parentLatestBlock.index.clone(); blockIndex.gte(baseBlock.index); blockIndex.isub(1)) {
 
-            for (const transactionData of (parentChain.blocks.get(blockIndex).data as Block).transactions) {
+            for (const transactionData of (parentChain.blocks.get(blockIndex).data as Block).body.transactions) {
 
                 const senderWallet = await parentChain.wallets.getWallet(transactionData.senderAddress);
                 const recipientWallet = await parentChain.wallets.getWallet(transactionData.recipientAddress);

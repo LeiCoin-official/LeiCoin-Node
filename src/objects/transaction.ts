@@ -7,8 +7,9 @@ import Signature from "../crypto/signature.js";
 import { PX } from "./prefix.js";
 import { MinterCredentials } from "./minter.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import { HashableContainer } from "./container.js";
 
-export class Transaction {
+export class Transaction extends HashableContainer {
 
     constructor(
         public txid: Uint256,
@@ -20,7 +21,7 @@ export class Transaction {
         public input: Uint,
         public signature: Signature,
         public readonly version = PX.V_00
-    ) {}
+    ) {super()}
 
     public static createCoinbaseTransaction(mc: MinterCredentials) {
 
@@ -42,46 +43,27 @@ export class Transaction {
         return coinbase;
     }
 
-    public encodeToHex(forHash = false) {
-        return ObjectEncoding.encode(this, Transaction.encodingSettings, forHash).data;
+    protected static fromDict(obj: any) {
+        if (!obj.version.eq(0)) return null;
+
+        const tx = new Transaction(
+            obj.txid,
+            null as any,
+            obj.recipientAddress,
+            obj.amount,
+            obj.nonce,
+            obj.timestamp,
+            obj.input,
+            obj.signature,
+            obj.version
+        );
+
+        tx.senderAddress = AddressHex.fromSignature(tx.txid, tx.signature);
+
+        return tx;
     }
 
-    public static fromDecodedHex(hexData: Uint, returnLength = false, withSenderAddress = true) {
-        try {
-            const returnData = ObjectEncoding.decode(hexData, Transaction.encodingSettings, returnLength);
-            const data = returnData.data;
-        
-            if (data && data.version.eq(0)) {
-
-                data.senderAddress = null
-                const instance = new Transaction(
-                    data.txid,
-                    null as any,
-                    data.recipientAddress,
-                    data.amount,
-                    data.nonce,
-                    data.timestamp,
-                    data.input,
-                    data.signature,
-                    data.version
-                )
-
-                if (withSenderAddress) {
-                    instance.senderAddress = AddressHex.fromSignature(data.txid, data.signature);
-                }
-
-                if (returnData.length) {
-                    return {data: instance, length: returnData.length};
-                }
-                return instance;
-            }
-        } catch (err: any) {
-            cli.data.error(`Error loading Transaction from Decoded Hex: ${err.stack}`);
-        }
-        return null;
-    }
-
-    private static encodingSettings: DataEncoder[] = [
+    protected static encodingSettings: DataEncoder[] = [
         BE(PX, "version"),
         BE(Uint256, "txid", true),
         BE(AddressHex, "recipientAddress"),
@@ -91,10 +73,6 @@ export class Transaction {
         BE.Custom("input", { type: "prefix", val: "unlimited" }),
         BE(Signature, "signature", true)
     ]
-
-    public calculateHash() {
-        return LCrypt.sha256(this.encodeToHex(true));
-    }
 
 }
 
