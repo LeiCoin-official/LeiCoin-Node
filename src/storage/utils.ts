@@ -5,7 +5,7 @@ import Utils from "../utils/index.js";
 import { Uint } from "low-level";
 import readline from "readline";
 
-class BCUtils {
+export class StorageUtils {
 
     private static getRelativePath(subpath: string, fork = "main") {
         let forkpath = "";
@@ -152,5 +152,3 @@ class BCUtils {
     
 }
 
-export { BCUtils as BlockchainUtils };
-export default BCUtils;

@@ -1,4 +1,4 @@
-import BCUtils from "./blockchainUtils.js";
+import { StorageUtils } from "./utils.js";
 import { Chainstate } from "./chainstate.js";
 import Chain from "./chain.js";
 import cli from "../cli/cli.js";
@@ -34,7 +34,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     }
 
     private static createStorageIfNotExists() {
-        BCUtils.ensureDirectoryExists('/forks', "main");
+        StorageUtils.ensureDirectoryExists('/forks', "main");
     }
 
     static async createFork(targetChainID: string, parentChainID: string, baseBlock: Block) {
@@ -42,7 +42,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         const parentLatestBlock = this.chainstate.getLatestBlock(parentChainID) as Block;
 
         if (parentChainID !== "main") {
-            BCUtils.copyChain(parentChainID, targetChainID);
+            StorageUtils.copyChain(parentChainID, targetChainID);
         }
 
         const forkChain = new Chain(targetChainID);

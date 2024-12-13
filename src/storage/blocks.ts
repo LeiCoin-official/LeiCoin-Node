@@ -1,7 +1,7 @@
 import { CB } from "../utils/callbacks.js";
 import cli from "../cli/cli.js";
 import Block from "../objects/block.js";
-import BCUtils from "./blockchainUtils.js";
+import { StorageUtils } from "./utils.js";
 import { Uint64 } from "low-level";
 
 export class BlockDB {
@@ -10,7 +10,7 @@ export class BlockDB {
     
     constructor(chain = "main") {
         this.chain = chain;
-        BCUtils.ensureDirectoryExists('/blocks', this.chain);
+        StorageUtils.ensureDirectoryExists('/blocks', this.chain);
     }
 
     public add(block: Block, overwrite = false) {
@@ -18,9 +18,9 @@ export class BlockDB {
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
             // Check if the block file already exists.
-            if (!BCUtils.existsPath(blockFilePath, this.chain) || overwrite) {
+            if (!StorageUtils.existsPath(blockFilePath, this.chain) || overwrite) {
                 // Write the block data to the block file.
-                BCUtils.writeFile(blockFilePath, this.chain, block.encodeToHex());
+                StorageUtils.writeFile(blockFilePath, this.chain, block.encodeToHex());
                 return { cb: CB.SUCCESS };
             } else {
                 cli.data.info(`Block ${blockIndex} in Chain: ${this.chain} already exists and cannot be overwritten.`);
@@ -36,8 +36,8 @@ export class BlockDB {
         const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
-            if (BCUtils.existsPath(blockFilePath, this.chain)) {
-                const hexData = BCUtils.readFile(blockFilePath, this.chain);
+            if (StorageUtils.existsPath(blockFilePath, this.chain)) {
+                const hexData = StorageUtils.readFile(blockFilePath, this.chain);
                 return {cb: CB.SUCCESS, data: Block.fromDecodedHex(hexData) as Block | null};
             } else {
                 //cli.data_message.error(`Block ${blockIndex} in Fork ${fork} was not found.`);
@@ -57,8 +57,8 @@ export class BlockDB {
         const blockIndex = index instanceof Uint64 ? index.toBigInt().toString() : index;
         try {
             const blockFilePath = `/blocks/${blockIndex}.lcb`;
-            if (BCUtils.existsPath(blockFilePath, this.chain)) {
-                BCUtils.delFile(blockFilePath, this.chain);
+            if (StorageUtils.existsPath(blockFilePath, this.chain)) {
+                StorageUtils.delFile(blockFilePath, this.chain);
                 return {cb: CB.SUCCESS};
             } else {
                 if (!silent) {

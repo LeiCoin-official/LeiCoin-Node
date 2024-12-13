@@ -3,10 +3,10 @@ import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "low-level";
 import LCrypt from "../crypto/index.js";
-import { LevelBasedStorageWithIndexes } from "./leveldb/levelBasedStorage.js";
+import { LevelBasedStateStorageWithIndexes } from "./leveldb/levelBasedStorage.js";
 import { PX } from "../objects/prefix.js";
 
-export class MinterDB extends LevelBasedStorageWithIndexes {
+export class MinterDB extends LevelBasedStateStorageWithIndexes {
     protected path = "/validators";
 
     protected keyByteLengthWithoutPrefix = 20;

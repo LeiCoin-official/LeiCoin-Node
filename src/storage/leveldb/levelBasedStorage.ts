@@ -1,10 +1,10 @@
 import path from "path";
 import LevelDB from "./index.js";
-import BCUtils from "../blockchainUtils.js";
+import { StorageUtils } from "../utils.js";
 import { Uint } from "low-level";
 import { LevelIndexes } from "./indexes.js";
 
-export abstract class LevelBasedStorage {
+export abstract class LevelBasedStateStorage {
 
     protected level: LevelDB = null as any;
     protected abstract path: string;
@@ -20,8 +20,8 @@ export abstract class LevelBasedStorage {
         if (this.initialized) return;
         this.initialized = true;
         
-        BCUtils.ensureDirectoryExists(this.path, this.chain);
-        this.level = new LevelDB(path.join(BCUtils.getBlockchainDataFilePath(this.path, this.chain)));
+        StorageUtils.ensureDirectoryExists(this.path, this.chain);
+        this.level = new LevelDB(path.join(StorageUtils.getBlockchainDataFilePath(this.path, this.chain)));
         await this.level.open();
     }
 
@@ -53,7 +53,7 @@ export abstract class LevelBasedStorage {
 
 }
 
-export abstract class LevelBasedStorageWithIndexes extends LevelBasedStorage {
+export abstract class LevelBasedStateStorageWithIndexes extends LevelBasedStateStorage {
 
     protected abstract keyByteLengthWithoutPrefix: number;
     protected keyPrefix: Uint = Uint.alloc(0);

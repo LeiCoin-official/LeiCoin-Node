@@ -7,7 +7,7 @@ import { PX } from "../objects/prefix.js";
 import { Uint, Uint256 } from "low-level";
 import { CB } from "../utils/callbacks.js";
 import { Dict } from "../utils/dataUtils.js";
-import BCUtils from "./blockchainUtils.js";
+import { StorageUtils } from "./utils.js";
 import { Blockchain } from "./blockchain.js";
 
 
@@ -144,13 +144,13 @@ export class Chainstate {
     private readonly chainStateData: ChainstateData;
 
     private constructor() {
-        BCUtils.ensureFileExists('/chainstate.lcb', "main", ChainstateData.createEmpty().encodeToHex());
+        StorageUtils.ensureFileExists('/chainstate.lcb', "main", ChainstateData.createEmpty().encodeToHex());
         this.chainStateData = this.getChainStateFile().data;
     }
 
     private getChainStateFile() {
         try {
-            const chainStateData = ChainstateData.fromDecodedHex(BCUtils.readFile('/chainstate.lcb', "main"));
+            const chainStateData = ChainstateData.fromDecodedHex(StorageUtils.readFile('/chainstate.lcb', "main"));
             return {cb: CB.SUCCESS, data: chainStateData};
         } catch (err: any) {
             cli.data.error(`Error reading Chainstate File: ${err.stack}`);
@@ -160,7 +160,7 @@ export class Chainstate {
     
     public updateChainStateFile() {
         try {    
-            BCUtils.writeFile('/chainstate.lcb', "main", this.chainStateData.encodeToHex());
+            StorageUtils.writeFile('/chainstate.lcb', "main", this.chainStateData.encodeToHex());
             return {cb: CB.SUCCESS};
         } catch (err: any) {
             cli.data.error(`Error updating Chainstate File: ${err.stack}`);
