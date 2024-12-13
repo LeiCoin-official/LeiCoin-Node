@@ -60,7 +60,7 @@ export class NetworkSyncManager {
     }
 
     static async checkRemoteChainstates() {
-        const latestLocalBlockIndex = Blockchain.chainstate.getLatestBlock("main")?.index || 0;
+        const latestLocalBlockIndex = Blockchain.chainstate.getLatestBlock("main")?.index || Uint64.from(0);
         const remoteChainstatesPromise = this.getRemoteChainstates();
     }
 
