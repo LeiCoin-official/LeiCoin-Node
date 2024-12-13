@@ -7,8 +7,9 @@ import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";
 import Signature from "../crypto/signature.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import { Container } from "./container.js";
 
-export class Block {
+export class Block extends Container {
 
     constructor(
         public index: Uint64,
@@ -19,50 +20,32 @@ export class Block {
         public minter: AddressHex,
         public signature: Signature,
         public transactions: Transaction[],
+        //public body: BlockBody,
         public readonly version: PX = PX.A_00
-    ) {}
+    ) {super()}
 
-    public encodeToHex(forHash = false) {
-        return ObjectEncoding.encode(this, Block.encodingSettings, forHash).data;
+    protected static fromDict(obj: Dict<any>) {
+
+        if (obj.version.eqn(0)) return null;
+
+        const block = new Block(
+            obj.index,
+            obj.slotIndex,
+            obj.hash,
+            obj.previousHash,
+            obj.timestamp,
+            null as any,
+            obj.signature,
+            obj.transactions,
+            obj.version
+        );
+
+        block.minter = AddressHex.fromSignature(block.calculateHash(), block.signature);
+
+        return block;
     }
 
-    public static fromDecodedHex(hexData: Uint, returnLength = false, withMinterAddress = true) {
-
-        try {
-            const returnData = ObjectEncoding.decode(hexData, Block.encodingSettings, returnLength);
-
-            const data = returnData.data;
-        
-            if (data && data.version.eq(0)) {
-                const block = new Block(
-                    data.index,
-                    data.slotIndex,
-                    data.hash,
-                    data.previousHash,
-                    data.timestamp,
-                    null as any,
-                    data.signature,
-                    data.transactions,
-                    data.version
-                );
-
-                if (withMinterAddress) {
-                    block.minter = AddressHex.fromSignature(block.calculateHash(), data.signature);
-                }
-
-                if (returnData.length) {
-                    return {data: block, length: returnData.length};
-                }
-                return block;
-            }
-        } catch (err: any) {
-            cli.data.error(`Error loading Block from Decoded Hex: ${err.stack}`);
-        }
-
-        return null;
-    }
-
-    private static encodingSettings: DataEncoder[] = [
+    protected static encodingSettings: DataEncoder[] = [
         BE(PX,"version"),
         BE.BigInt("index"),
         BE.BigInt("slotIndex"),
@@ -78,6 +61,16 @@ export class Block {
     }
 
 }
+
+
+export class BlockBody {
+
+    constructor(
+        public transactions: Transaction[]
+    ) {}
+
+}
+
 
 
 export default Block;

@@ -82,6 +82,7 @@ export class CMDFlagsParser<T extends FlagsSettings> {
                 case 'number':
                     const parsedValue = parseFloat(flagValue as string);
                     if (typeof parsedValue !== "number") return `Flag '${flagName}' requires a numeric value`;
+                    parsedFlags[flagName] = parsedValue;
                     break;
                 case "string":
                     if (!flagValue) return `Flag '${flagName}' requires a value`;
