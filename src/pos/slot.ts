@@ -85,6 +85,21 @@ export class Slot {
         return this.minter.eq(address);
     }
 
+    static async processPastSlot(index: Uint64, block?: Block) {
+
+        const minter = await Blockchain.minters.selectNextMinter(index);
+
+        //@ tdo verify minted block
+
+        if (!block) {
+            return;
+        }
+
+        const verification_result = await Verification.verifyBlock(block);
+        await Execution.executeBlock(block, verification_result)
+
+    }
+
 }
 
 export default Slot;
