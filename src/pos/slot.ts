@@ -95,6 +95,10 @@ export class Slot {
             return;
         }
 
+        if (block.minter.eqn(minter)) {
+            return;
+        }
+
         const verification_result = await Verification.verifyBlock(block);
         await Execution.executeBlock(block, verification_result)
 
