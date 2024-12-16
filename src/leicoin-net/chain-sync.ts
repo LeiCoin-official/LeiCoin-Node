@@ -1,7 +1,7 @@
 import { Uint64 } from "low-level";
 import { Blockchain } from "../storage/blockchain.js";
 import { Queue } from "../utils/linkedlist";
-import Block from "../objects/block.js";
+import type Block from "../objects/block.js";
 import { type ForkChainstateData } from "../storage/chainstate.js";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
@@ -33,29 +33,24 @@ export class NetworkSyncManager {
         return (await Promise.all(chainstates)).filter(cs => cs) as ForkChainstateData[];
     }
 
-    private static async getRemoteAllBlocks(socket: PeerSocket, index: Uint64) {
-        
-        const blocksLeft = true;
+    private static async getRemoteBlocks(sinceIndex: Uint64, socket: PeerSocket) {
 
-        whileLoop: while (true) {
+        const blocks: Block[] = [];
 
-            const response = await socket.request<BlocksMsg>(new GetBlocksMsg(index, Uint64.from(512)));
-            if (response.status !== 0 || !response.data) {
-                break whileLoop;
-            }
-            const blocks = response.data.blocks;
+        const currentBlockIndex = sinceIndex;
 
-            forLoop: for (const block of blocks) {
-                const verification_result = await Verification.verifyMintedBlock(block);
-                if (verification_result !== 12000) {
-                    break forLoop;
-                }
-                Blockchain.blocks.add(block);
-            }
+        while (true) {
+            const response = await socket.request<BlocksMsg>(new GetBlocksMsg(currentBlockIndex, Uint64.from(512)));
+            if (response.status !== 0 || !response.data) break;
 
-            index = blocks[blocks.length - 1].index.add(1);
+            blocks.push(...response.data.blocks);
 
+            if (response.data.blocks.length < 512) break;
+
+            currentBlockIndex.add(512);
         }
+
+        return blocks;
 
     }
 

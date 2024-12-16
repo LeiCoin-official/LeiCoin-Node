@@ -89,8 +89,6 @@ export class Slot {
 
         const minter = await Blockchain.minters.selectNextMinter(index);
 
-        //@ tdo verify minted block
-
         if (!block) {
             return;
         }
@@ -100,7 +98,7 @@ export class Slot {
         }
 
         const verification_result = await Verification.verifyBlock(block);
-        await Execution.executeBlock(block, verification_result)
+        await Execution.executeBlock(block, verification_result);
 
     }
 
