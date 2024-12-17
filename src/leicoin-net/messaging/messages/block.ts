@@ -32,6 +32,14 @@ export namespace NewBlockMsg {
     
     export const Handler = new class Handler extends LNBroadcastingMsgHandler {
         async receive(data: NewBlockMsg) {
+
+            if (NetworkSyncManager.state !== "synchronized") {
+                if (data.block && data.block.slotIndex.eq(POS.calulateCurrentSlotIndex())) {
+                    NetworkSyncManager.blockQueue.enqueue(data.block);
+                }
+                return null;
+            }
+
             const verification_result = await Verification.verifyMintedBlock(data.block);
     
             if (verification_result !== 12000) {
@@ -45,10 +53,6 @@ export namespace NewBlockMsg {
         }
 
         private async handleBlock(block: Block) {
-            if (NetworkSyncManager.state !== "synchronized") {
-                NetworkSyncManager.blockQueue.enqueue(block);
-                return;
-            }
             (await POS.getSlot(block.slotIndex))?.processBlock(block);
         }
     } as LNBroadcastingMsgHandler;

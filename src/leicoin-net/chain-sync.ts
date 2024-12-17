@@ -1,13 +1,14 @@
-import { Uint64 } from "low-level";
+import { Uint256, Uint64 } from "low-level";
 import { Blockchain } from "../storage/blockchain.js";
 import { Queue } from "../utils/linkedlist";
-import type Block from "../objects/block.js";
+import Block, { BlockBody } from "../objects/block.js";
 import { type ForkChainstateData } from "../storage/chainstate.js";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
 import LeiCoinNetNode from "./index.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
-import Verification from "../verification/index.js";
+import { AddressHex } from "../objects/address.js";
+import Signature from "../crypto/signature.js";
 
 export class NetworkSyncManager {
 
@@ -51,7 +52,6 @@ export class NetworkSyncManager {
         }
 
         return blocks;
-
     }
 
     static async checkRemoteChainstates() {
@@ -61,7 +61,28 @@ export class NetworkSyncManager {
 
     static async doStartupSync() {
 
+        const latestBlock = Blockchain.chainstate.getLatestBlock("main") || { index: Uint64.from(0), slotIndex: Uint64.from(0) };
+
+        /** @todo Do sync with multiple peers and check if no one is online*/
+
+        const syncPeers = LeiCoinNetNode.connections.values().all();
+
+        if (syncPeers.length === 0) {
+            throw new Error("No peers to sync with");
+        }
+
+        const blocks = await this.getRemoteBlocks(latestBlock.index, syncPeers[0]);
         
+        for (const block of blocks) {
+            
+        }
+
+        for (const block of this.blockQueue) {
+
+            
+
+            this.blockQueue.dequeue();
+        }
 
     }
 
