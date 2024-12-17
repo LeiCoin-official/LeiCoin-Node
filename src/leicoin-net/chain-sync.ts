@@ -1,14 +1,12 @@
-import { Uint256, Uint64 } from "low-level";
+import { Uint64 } from "low-level";
 import { Blockchain } from "../storage/blockchain.js";
 import { Queue } from "../utils/linkedlist";
-import Block, { BlockBody } from "../objects/block.js";
+import Block from "../objects/block.js";
 import { type ForkChainstateData } from "../storage/chainstate.js";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
 import LeiCoinNetNode from "./index.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
-import { AddressHex } from "../objects/address.js";
-import Signature from "../crypto/signature.js";
 
 export class NetworkSyncManager {
 
