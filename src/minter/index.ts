@@ -5,7 +5,7 @@ import cli from "../cli/cli.js";
 import Verification from "../verification/index.js";
 import { Uint256, Uint64 } from "low-level";
 import { Blockchain } from "../storage/blockchain.js";
-import Block from "../objects/block.js";
+import { Block, BlockBody } from "../objects/block.js";
 import mempool from "../storage/mempool.js";
 import Signature from "../crypto/signature.js";
 import LCrypt from "../crypto/index.js";
@@ -73,7 +73,10 @@ export class MinterClient {
 			Uint64.from(new Date().getTime()),
 			this.credentials.address,
 			Signature.empty(),
-			mempool.transactions.values().all()
+			
+			new BlockBody(
+				mempool.transactions.values().all()
+			)
 		)
 
 		block.hash.set(block.calculateHash());

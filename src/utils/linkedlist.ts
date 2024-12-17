@@ -28,16 +28,10 @@ export class LinkedList<T> {
 
     protected head: ListNode<T> | null = null;
     protected tail: ListNode<T> | null = null;
-
+    protected _size = 0;
 
     public get size() {
-        let size = 0;
-        let current = this.head;
-        while (current) {
-            size++;
-            current = current.next;
-        }
-        return size;
+        return this._size;
     }
 
 
@@ -45,6 +39,7 @@ export class LinkedList<T> {
         const node = new ListNode(data, this.head);
         this.head = node;
         if (!this.tail) this.tail = node;
+        this._size++;
     }
 
     public addLast(data: T) {
@@ -55,6 +50,7 @@ export class LinkedList<T> {
         } else {
             this.head = this.tail = node;
         }
+        this._size++;
     }
 
     public getFirst() { return this.head?.data; }
@@ -64,11 +60,13 @@ export class LinkedList<T> {
         if (!this.head) return false;
         this.head = this.head.next;
         if (!this.head) this.tail = null;
+        this._size--;
         return true;
     }
 
     public removeLast() {
         if (!this.head) return false;
+        this._size--;
         if (this.head === this.tail) {
             this.head = this.tail = null;
             return true;
@@ -129,10 +127,13 @@ export class Queue<T> {
     }
 
     public dequeue() {
-        const data = this.list.getFirst() as T;
+        const data = this.list.getFirst() || null;
         this.list.removeFirst();
         return data;
     }
+
+    public front() { return this.list.getFirst(); }
+    public back() { return this.list.getLast(); }
 
     public clear() { this.list.clear(); }
 

@@ -83,8 +83,8 @@ class LocalNodeTestNet {
 
         fs.writeFileSync(`${cwd}/config/peers.json`, JSON.stringify([`${nodes[otherIndex].host}:${nodes[otherIndex].port}`], null, 4));
 
-        await Bun.$`bun debug --cwd ${{ raw: cwd }} -c minterdb insert ${{ raw: credentials[0].address.toHex() }} 10000000 00`.quiet();
-        await Bun.$`bun debug --cwd ${{ raw: cwd }} -c minterdb insert ${{ raw: credentials[1].address.toHex() }} 10000000 00`.quiet();
+        await Bun.$`bun debug --cwd=${{ raw: cwd }} minterdb insert ${{ raw: credentials[0].address.toHex() }} 10000000 00`.quiet();
+        await Bun.$`bun debug --cwd=${{ raw: cwd }} minterdb insert ${{ raw: credentials[1].address.toHex() }} 10000000 00`.quiet();
     }
 
     private static async initNode(args: string[]) {
@@ -162,7 +162,7 @@ class LocalNodeTestNet {
             `./build/bin/leicoin-node` + (process.platform === "win32" ? ".exe" : "") :
             `bun debug`;
         
-        await Bun.$`${{ raw: cmd }} --cwd ${{ raw: cwd }}`
+        await Bun.$`${{ raw: cmd }} run --cwd=${{ raw: cwd }}`
         .catch(() => {})
         .finally(() => {
             server.stop();

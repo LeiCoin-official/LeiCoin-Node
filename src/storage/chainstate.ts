@@ -7,11 +7,11 @@ import { PX } from "../objects/prefix.js";
 import { Uint, Uint256 } from "low-level";
 import { CB } from "../utils/callbacks.js";
 import { Dict } from "../utils/dataUtils.js";
-import BCUtils from "./blockchainUtils.js";
+import { StorageUtils } from "./utils.js";
 import { Blockchain } from "./blockchain.js";
 
 
-class ForkChainstateData {
+export class ForkChainstateData {
     public readonly id: string;
     public readonly stateHash: Uint256;
     public readonly parentChain: Uint256;
@@ -73,11 +73,11 @@ class ForkChainstateData {
 }
 
 
-class ChainstateData {
+export class ChainstateData {
     public readonly chains: Dict<ForkChainstateData> = {};
     public readonly version: PX;
 
-    constructor(chains: ForkChainstateData[], version: PX) {
+    private constructor(chains: ForkChainstateData[], version: PX) {
         for (const chain of chains) {
             this.chains[chain.id] = chain;
         }
@@ -144,13 +144,13 @@ export class Chainstate {
     private readonly chainStateData: ChainstateData;
 
     private constructor() {
-        BCUtils.ensureFileExists('/chainstate.lcb', "main", ChainstateData.createEmpty().encodeToHex());
+        StorageUtils.ensureFileExists('/chainstate.lcb', "main", ChainstateData.createEmpty().encodeToHex());
         this.chainStateData = this.getChainStateFile().data;
     }
 
     private getChainStateFile() {
         try {
-            const chainStateData = ChainstateData.fromDecodedHex(BCUtils.readFile('/chainstate.lcb', "main"));
+            const chainStateData = ChainstateData.fromDecodedHex(StorageUtils.readFile('/chainstate.lcb', "main"));
             return {cb: CB.SUCCESS, data: chainStateData};
         } catch (err: any) {
             cli.data.error(`Error reading Chainstate File: ${err.stack}`);
@@ -160,7 +160,7 @@ export class Chainstate {
     
     public updateChainStateFile() {
         try {    
-            BCUtils.writeFile('/chainstate.lcb', "main", this.chainStateData.encodeToHex());
+            StorageUtils.writeFile('/chainstate.lcb', "main", this.chainStateData.encodeToHex());
             return {cb: CB.SUCCESS};
         } catch (err: any) {
             cli.data.error(`Error updating Chainstate File: ${err.stack}`);
@@ -223,7 +223,7 @@ export class Chainstate {
         let previousBlock: Block | null = null;
 
         for (const chain of Object.values(this.getAllChainStates())) {
-            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.getBlock(block.index.sub(1)).data; 
+            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.get(block.index.sub(1)).data; 
 
             if (chainPreviousBlock?.hash.eq(block.previousHash)) {
                 parentChain = chain;
@@ -235,7 +235,7 @@ export class Chainstate {
         if (!parentChain || !previousBlock)
             return { status: 12532 }; // Previous block not found
 
-        const targetBlock = Blockchain.chains[parentChain.id].blocks.getBlock(block.index).data;
+        const targetBlock = Blockchain.chains[parentChain.id].blocks.get(block.index).data;
 
         if (targetBlock) {
             if (targetBlock?.hash.eq(block.hash))
@@ -248,6 +248,3 @@ export class Chainstate {
 
 }
 
-export type { ForkChainstateData, ChainstateData };
-
-export default Chainstate;

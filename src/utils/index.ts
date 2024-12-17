@@ -30,13 +30,10 @@ class Utils {
         process.once("unhandledRejection", Utils.unhandledRejection);
     }
 
-    private static runStatus: "running" | "shutdown" | "shutdown_on_error" = "running";
-    static getRunStatus() { return this.runStatus; }
-
     static async gracefulShutdown(exitCode: number = 0) {
-        try {
-            this.runStatus = exitCode === 0 ? "shutdown" : "shutdown_on_error";
-            
+        try {            
+            cli.default.info('Shutting down...');
+
             await Promise.all([
                 this.stopService(HTTP_API),
                 this.stopService(POS),
@@ -44,14 +41,11 @@ class Utils {
             ]);
 
             await Blockchain.stop();
-            
-            cli.default.info('Shutting down...');
 
-            setTimeout(async() => {
-                cli.default.info(`LeiCoin-Node stopped with exit code ${exitCode}`);
-                await cli.close();
-                process.exit(exitCode);
-            }, 1000);
+            cli.default.info(`LeiCoin-Node stopped with exit code ${exitCode}`);
+            await cli.close();
+            process.exit(exitCode);
+
         } catch (error: any) {
             cli.default.error(`Uncaught Exception:\n${error.stack}`);
             this.forceShutdown();

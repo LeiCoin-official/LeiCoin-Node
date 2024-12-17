@@ -62,6 +62,7 @@ export interface LNMsgBodyConstructor<T extends LNAbstractMsgBody = LNAbstractMs
 }
 
 export interface LNMsgInfo extends LNMsgBodyConstructor {
+    readonly Name: string;
     readonly ID: LNMsgID;
     readonly Handler: LNBasicMsgHandler;
 }

@@ -4,7 +4,7 @@ import LCrypt from "../src/crypto/index.js"
 import { Address32, AddressHex } from "../src/objects/address.js";
 import { PX } from "../src/objects/prefix.js";
 
-describe("address_testing", () => {
+describe("address", () => {
     test("address32_enoding_and_decoding", () => {
 
         const privateKeyHex = PrivateKey.from("c2c53b8c95f84438d86ccabd9985651afdf8fe1307f691681f9638ff04bf9caa");

@@ -1,5 +1,5 @@
-import BCUtils from "./blockchainUtils.js";
-import Chainstate from "./chainstate.js";
+import { StorageUtils } from "./utils.js";
+import { Chainstate } from "./chainstate.js";
 import Chain from "./chain.js";
 import cli from "../cli/cli.js";
 import { BasicModuleLike } from "../utils/dataUtils.js";
@@ -34,7 +34,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     }
 
     private static createStorageIfNotExists() {
-        BCUtils.ensureDirectoryExists('/forks', "main");
+        StorageUtils.ensureDirectoryExists('/forks', "main");
     }
 
     static async createFork(targetChainID: string, parentChainID: string, baseBlock: Block) {
@@ -42,7 +42,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         const parentLatestBlock = this.chainstate.getLatestBlock(parentChainID) as Block;
 
         if (parentChainID !== "main") {
-            BCUtils.copyChain(parentChainID, targetChainID);
+            StorageUtils.copyChain(parentChainID, targetChainID);
         }
 
         const forkChain = new Chain(targetChainID);
@@ -53,7 +53,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
         
         for (const blockIndex = parentLatestBlock.index.clone(); blockIndex.gte(baseBlock.index); blockIndex.isub(1)) {
 
-            for (const transactionData of (parentChain.blocks.getBlock(blockIndex).data as Block).transactions) {
+            for (const transactionData of (parentChain.blocks.get(blockIndex).data as Block).body.transactions) {
 
                 const senderWallet = await parentChain.wallets.getWallet(transactionData.senderAddress);
                 const recipientWallet = await parentChain.wallets.getWallet(transactionData.recipientAddress);
@@ -66,7 +66,7 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
                 await forkChain.wallets.setWallet(recipientWallet);
             }
     
-            forkChain.blocks.deleteBlock(blockIndex, true);
+            forkChain.blocks.delete(blockIndex, true);
         }
 
     }
@@ -121,6 +121,8 @@ export class Blockchain implements BasicModuleLike<typeof Blockchain> {
     private static async setupEvents() {}
 
     static async stop() {
+        if (!this.initialized) return
+
         cli.data.info("Saving blockchain data...");
 
         await Promise.all(

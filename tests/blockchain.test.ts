@@ -5,7 +5,7 @@ import Signature from "../src/crypto/signature.js";
 import { Blockchain } from "../src/storage/blockchain.js";
 import { Uint256, Uint64 } from "low-level";
 
-describe("blockchain_testing", () => {
+describe("blockchain", () => {
     /*test("is_valid_genesis_block", () => {
         const result = Blockchain.chainstate.isBlockChainStateMatching(new Block(
             Uint64.from(0),

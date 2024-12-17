@@ -8,10 +8,17 @@ import { DataUtils } from "../../utils/dataUtils.js";
 export default class BlockDBCMD extends CLISubCMD {
     public name = "blockdb";
     public description = "Manage the Block database";
-    public usage = "blockdb <command> [args]";
+    public usage = "blockdb <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
+    }
+
+    async run(args: string[], parent_args: string[]) {
+        await Blockchain.init();
+        await Blockchain.waitAllChainsInit();
+
+        super.run(args, parent_args);
     }
 
 }
@@ -29,7 +36,7 @@ class ReadCMD extends CLICMD {
         }
 
         const blockIndex = args[0];
-        const block = Blockchain.blocks.getBlock(blockIndex).data as Block;
+        const block = Blockchain.blocks.get(blockIndex).data as Block;
         if (block) {
             cli.cmd.info(DataUtils.stringify(block, null, 2));
         } else {

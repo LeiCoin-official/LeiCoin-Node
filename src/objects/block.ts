@@ -1,14 +1,29 @@
 import { Transaction } from "./transaction.js";
-import cli from "../cli/cli.js";
 import LCrypt from "../crypto/index.js";
-import { Uint, Uint256, Uint64 } from "low-level";
+import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "./address.js";
-import ObjectEncoding from "../encoding/objects.js";
 import { PX } from "./prefix.js";
 import Signature from "../crypto/signature.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import { Container, HashableContainer } from "./container.js";
 
-export class Block {
+export class BlockBody extends Container{
+
+    constructor(
+        public transactions: Transaction[]
+    ) {super()}
+
+    protected static fromDict(obj: Dict<any>) {
+        return new BlockBody(obj.transactions);
+    }
+
+    protected static encodingSettings: DataEncoder[] = [
+        BE.Array("transactions", 2, Transaction)
+    ]
+
+}
+
+export class Block extends HashableContainer {
 
     constructor(
         public index: Uint64,
@@ -18,51 +33,31 @@ export class Block {
         public timestamp: Uint64,
         public minter: AddressHex,
         public signature: Signature,
-        public transactions: Transaction[],
+        public body: BlockBody,
         public readonly version: PX = PX.A_00
-    ) {}
+    ) {super()}
 
-    public encodeToHex(forHash = false) {
-        return ObjectEncoding.encode(this, Block.encodingSettings, forHash).data;
+    protected static fromDict(obj: Dict<any>) {
+        if (!obj.version.eq(0)) return null;
+
+        const block = new Block(
+            obj.index,
+            obj.slotIndex,
+            obj.hash,
+            obj.previousHash,
+            obj.timestamp,
+            null as any,
+            obj.signature,
+            obj.body,
+            obj.version
+        );
+
+        block.minter = AddressHex.fromSignature(block.calculateHash(), block.signature);
+
+        return block;
     }
 
-    public static fromDecodedHex(hexData: Uint, returnLength = false, withMinterAddress = true) {
-
-        try {
-            const returnData = ObjectEncoding.decode(hexData, Block.encodingSettings, returnLength);
-
-            const data = returnData.data;
-        
-            if (data && data.version.eq(0)) {
-                const block = new Block(
-                    data.index,
-                    data.slotIndex,
-                    data.hash,
-                    data.previousHash,
-                    data.timestamp,
-                    null as any,
-                    data.signature,
-                    data.transactions,
-                    data.version
-                );
-
-                if (withMinterAddress) {
-                    block.minter = AddressHex.fromSignature(block.calculateHash(), data.signature);
-                }
-
-                if (returnData.length) {
-                    return {data: block, length: returnData.length};
-                }
-                return block;
-            }
-        } catch (err: any) {
-            cli.data.error(`Error loading Block from Decoded Hex: ${err.stack}`);
-        }
-
-        return null;
-    }
-
-    private static encodingSettings: DataEncoder[] = [
+    protected static encodingSettings: DataEncoder[] = [
         BE(PX,"version"),
         BE.BigInt("index"),
         BE.BigInt("slotIndex"),
@@ -70,12 +65,8 @@ export class Block {
         BE(Uint256, "previousHash"),
         BE.BigInt("timestamp"),
         BE(Signature,"signature", true),
-        BE.Array("transactions", 2, Transaction)
+        BE.Object("body", BlockBody),
     ]
-
-    public calculateHash() {
-        return LCrypt.sha256(this.encodeToHex(true));
-    }
 
 }
 

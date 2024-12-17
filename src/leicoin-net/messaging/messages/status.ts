@@ -28,7 +28,8 @@ export class StatusMsg extends LNAbstractMsgBody {
 }
 
 export namespace StatusMsg {
-    export const ID = LNMsgID.from("1761"); // STATUS
+    export const Name = "STATUS";
+    export const ID = LNMsgID.from("1761");
 
     export const Handler = new class Handler extends LNMsgDefaultHandler {
         async receive(data: StatusMsg, socket: PeerSocket) {

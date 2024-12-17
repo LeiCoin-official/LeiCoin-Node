@@ -1,6 +1,6 @@
 import { AddressHex } from "../../objects/address.js";
 import { PX } from "../../objects/prefix.js";
-import Minter from "../../objects/minter.js";
+import MinterData from "../../objects/minter.js";
 import { Blockchain } from "../../storage/blockchain.js";
 import { Uint, Uint64 } from "low-level";
 import cli from "../cli.js";
@@ -11,13 +11,20 @@ import { DataUtils } from "../../utils/dataUtils.js";
 export default class MinterDBCMD extends CLISubCMD {
     public name = "minterdb";
     public description = "Manage the Minter database";
-    public usage = "minterdb <command> [args]";
+    public usage = "minterdb <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
         this.register(new InsertCMD());
         this.register(new RemoveCMD());
         this.register(new GetNextMinterCMD());
+    }
+
+    async run(args: string[], parent_args: string[]) {
+        await Blockchain.init();
+        await Blockchain.waitAllChainsInit();
+
+        super.run(args, parent_args);
     }
 
 }
@@ -70,7 +77,7 @@ class InsertCMD extends CLICMD {
             return;
         }
 
-        const minter = new Minter(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
+        const minter = new MinterData(AddressHex.from(args[0]), Uint64.from(parseInt(args[1])), PX.from(args[2]));
         await Blockchain.minters.setMinter(minter);
         cli.cmd.info("Minter inserted!");
     }

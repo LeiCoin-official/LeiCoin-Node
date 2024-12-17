@@ -81,10 +81,9 @@ export class LNRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> exten
     static create<T extends LNAbstractMsgBody>(data: T) {
         // Reserved Space for internal use
         
-        let randomID: Uint32;
-        while (true) {
+        let randomID = new Uint32(LCrypt.randomBytes(4));
+        while (randomID.lte(0xff)) {
             randomID = new Uint32(LCrypt.randomBytes(4));
-            if (randomID.gt(0xff)) break;
         }
 
         return new LNRequestMsg(randomID, data);

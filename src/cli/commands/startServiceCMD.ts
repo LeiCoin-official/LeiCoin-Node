@@ -4,9 +4,11 @@ import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD";
 
 export default class StartServiceCMD extends CLISubCMD {
-    public name = "start-service";
-    public description = "Start a service even after initial startup";
-    public usage = "start-service <service-name> [options]";
+    readonly name = "start-service";
+    readonly description = "Start a service even after initial startup";
+    readonly usage = "start-service <service-name> [options]";
+
+    readonly environment = "runtime";
 
     protected registerCommands() {
         this.register(new StartAPI());

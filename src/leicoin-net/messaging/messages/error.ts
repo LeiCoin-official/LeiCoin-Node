@@ -9,6 +9,10 @@ export class ErrorResponseMsg extends LNAbstractMsgBody {
         readonly id: Uint16,
     ) {super()}
 
+    static fromCode(code: number) {
+        return new ErrorResponseMsg(Uint16.from(code));
+    }
+
     protected static fromDict(obj: Dict<any>) {
         return new ErrorResponseMsg(obj.id);
     }
@@ -20,6 +24,7 @@ export class ErrorResponseMsg extends LNAbstractMsgBody {
 }
 
 export namespace ErrorResponseMsg {
-    export const ID = LNMsgID.from("fff0"); // ERROR_RESPONSE
+    export const Name = "ERROR_RESPONSE";
+    export const ID = LNMsgID.from("fff0");
     export const Handler = new class Handler extends LNMsgResponseHandler {}
 }

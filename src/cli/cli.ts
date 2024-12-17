@@ -5,7 +5,7 @@ import { dirname as path_dirname } from "path";
 import { Dict } from "../utils/dataUtils.js";
 import { DataUtils } from "../utils/dataUtils.js";
 import type CLICMDHandler from "./cliCMDHandler.js";
-import { BlockchainUtils } from "../storage/blockchainUtils.js";
+import { StorageUtils } from "../storage/utils.js";
 
 /**
  * @todo Add debug(message) method
@@ -299,7 +299,7 @@ class CLI {
 
         let lastLine = "";
         try {
-            lastLine = await BlockchainUtils.readLastNLines(cwd + "/logs/cli_history.log", 1);
+            lastLine = await StorageUtils.readLastNLines(cwd + "/logs/cli_history.log", 1);
         } catch {}
 
         if (lastLine === input) return;

@@ -11,12 +11,19 @@ import { DataUtils } from "../../utils/dataUtils.js";
 export default class WalletDBCMD extends CLISubCMD {
     public name = "walletdb";
     public description = "Manage the Wallet database";
-    public usage = "walletdb <command> [args]";
+    public usage = "walletdb <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
         this.register(new InsertCMD());
         this.register(new RemoveCMD());
+    }
+
+    async run(args: string[], parent_args: string[]) {
+        await Blockchain.init();
+        await Blockchain.waitAllChainsInit();
+
+        super.run(args, parent_args);
     }
 
 }

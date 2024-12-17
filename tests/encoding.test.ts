@@ -1,7 +1,7 @@
 import { describe, test, expect } from "bun:test";
 import Transaction from "../src/objects/transaction.js";
 import Wallet from "../src/objects/wallet.js";
-import Block from "../src/objects/block.js";
+import { Block, BlockBody } from "../src/objects/block.js";
 import Signature from "../src/crypto/signature.js";
 import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "../src/objects/address.js";
@@ -9,7 +9,7 @@ import { PrivateKey } from "../src/crypto/cryptoKeys.js";
 import Minter, { MinterCredentials } from "../src/objects/minter.js";
 import { ChainstateData } from "../src/storage/chainstate.js";
 
-describe("encoding_testing", () => {
+describe("encoding", () => {
     test("block_enoding_and_decoding", () => {
 
         const address = AddressHex.from("007f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
@@ -22,7 +22,7 @@ describe("encoding_testing", () => {
             Uint64.from(0),
             address,
             Signature.empty(),
-            []
+            new BlockBody([])
         );
 
         const decoded: any = Block.fromDecodedHex(block.encodeToHex());

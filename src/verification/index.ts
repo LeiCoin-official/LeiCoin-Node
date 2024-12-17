@@ -50,7 +50,7 @@ export class Verification {
             return { status: 12504 };
         }
         
-        for (const transactionData of block.transactions) {
+        for (const transactionData of block.body.transactions) {
             const transactionsValid = await this.verifyTransaction(transactionData);
             if (transactionsValid !== 12000) return { status: 12520 };
         }
