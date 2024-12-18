@@ -9,7 +9,8 @@ import LeiCoinNetNode from "./index.js";
 import { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
-import { Queue } from "../utils/linkedlist.js";
+import { AutoProcessingQueue, Queue } from "../utils/queue.js";
+import { LNDataChunk } from "./packets.js";
 
 
 export class PeerSocket {
@@ -17,12 +18,23 @@ export class PeerSocket {
     readonly host: string;
     public port: number;
     readonly uuid = new Uint256(LCrypt.randomBytes(32));
-    
     readonly challenge = new Uint256(LCrypt.randomBytes(32));
 
     private _state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
 
-    private _receiveQueue: Queue<Uint> | null = new Queue<Uint>();
+    private sendingQueue = new AutoProcessingQueue<Uint>(this.processOutgoingData.bind(this));
+    private recvQueue: Queue<Uint> | null = new Queue();
+
+    /**
+     * The buffer array stores Buffers with a maximum size of 8192 bytes per buffer.
+     * The Maximum size of the Array is 65536 which results in maximum storage capacity of 512 MB
+     */
+    private recvBufferArray: Uint[] = [];
+    /**
+     * The Maximum size of the buffer array is 65536.
+     * @todo maybe adjust this value later 
+     */
+    private recvBufferChunkLimit = 65536;
 
     constructor(
         protected readonly tcpSocket: Socket<any>,
@@ -61,22 +73,25 @@ export class PeerSocket {
         }
     }
 
+
     get uri() {
         return `${this.host}:${this.port}`;
     }
 
-    set state(state: "READY" | "VERIFIED" | "CLOSED") {
-        if (state === "READY" && this._state === "OPENING" && this._receiveQueue) {
-            for (const data of this._receiveQueue) {
-                this.receive(data);
-                this._receiveQueue.dequeue();
+
+    set state(newState: "READY" | "VERIFIED" | "CLOSED") {
+        if (newState === "READY" && this._state === "OPENING" && this.recvQueue) {
+
+            while (this.recvQueue.size > 0) {
+                const data = this.recvQueue.dequeue() as Uint;
+                this.handleIncomingMsg(data);
             }
-            this._receiveQueue = null;
+            this.recvQueue = null;
         }
-        if (state === "VERIFIED") {
+        if (newState === "VERIFIED") {
             LeiCoinNetNode.connections.moveFromQueue(this.uuid);
         }
-        this._state = state;
+        this._state = newState;
     }
     get state(): typeof this._state {
         return this._state;
@@ -92,9 +107,21 @@ export class PeerSocket {
         } else {
             raw = data;
         }
-
-        return this.tcpSocket.write(raw.getRaw());
+        return this.sendingQueue.enqueue(raw);
     }
+
+    private async processOutgoingData(data: Uint) {
+        const chunks = data.split(LNDataChunk.MAX_CHUNK_SIZE);
+
+        for (let i = 0; i < chunks.length - 1; i++) {
+            const chunk = LNDataChunk.create(chunks[i], false);
+            this.tcpSocket.write(chunk.encodeToHex().getRaw());
+        }
+
+        const lastChunk = LNDataChunk.create(chunks[chunks.length - 1], true);
+        this.tcpSocket.write(lastChunk.encodeToHex().getRaw());
+    }
+
 
     async request<T extends LNAbstractMsgBody>(data: LNRequestMsg | LNAbstractMsgBody): Promise<LNResponseData<T>> {
         let reqmsg: LNRequestMsg;
@@ -115,29 +142,42 @@ export class PeerSocket {
     }
     
 
-    async addToReceiveQueue(rawData: Uint) {
-        if (this.state === "OPENING" && this._receiveQueue) {
-            return this._receiveQueue.enqueue(rawData);
+    async receiveDataChunk(rawChunk: Uint) {
+        const chunk = LNDataChunk.fromDecodedHex(rawChunk);
+        if (!chunk) return;
+
+        if (this.recvBufferArray.length >= this.recvBufferChunkLimit) {
+            return;
         }
-        return this.receive(rawData);
+        this.recvBufferArray.push(chunk.data);
+
+        if (chunk.isLast()) {
+            const completeData = Uint.concat(this.recvBufferArray);
+            this.recvBufferArray = [];
+
+            if (this.state === "OPENING" && this.recvQueue) {
+                return this.recvQueue.enqueue(completeData);
+            }
+            return this.handleIncomingMsg(completeData);
+        }
     }
 
 
-    async receive(rawData: Uint) {
-        const handler = MessageRouter.getMsgInfo(rawData.slice(0, 2) as LNMsgID)?.Handler;
+    private async handleIncomingMsg(rawMsg: Uint) {
+        const handler = MessageRouter.getMsgInfo(rawMsg.slice(0, 2) as LNMsgID)?.Handler;
         if (!handler) return;
 
         switch (handler.type) {
 
             case "DEFAULT": {
-                const msg = LNStandartMsg.fromDecodedHex(rawData);
+                const msg = LNStandartMsg.fromDecodedHex(rawMsg);
                 if (!msg) return;
 
                 (handler as LNMsgDefaultHandler).receive(msg.data, this);
                 return;
             }
             case "REQUEST": {
-                const msg = LNRequestMsg.fromDecodedHex(rawData);
+                const msg = LNRequestMsg.fromDecodedHex(rawMsg);
                 if (!msg) return;
 
                 // Reserved Space for internal use
@@ -152,7 +192,7 @@ export class PeerSocket {
                 return;
             }
             case "RESPONSE": {
-                const msg = LNResponseMsg.fromDecodedHex(rawData);
+                const msg = LNResponseMsg.fromDecodedHex(rawMsg);
                 if (!msg) return;
 
                 const request = this.activeRequests.get((msg as LNResponseMsg).requestID);
@@ -162,7 +202,7 @@ export class PeerSocket {
                 return;
             }
             case "BROADCAST": {
-                const msg = LNBroadcastMsg.fromDecodedHex(rawData);
+                const msg = LNBroadcastMsg.fromDecodedHex(rawMsg);
                 if (!msg) return;
 
                 const cb = await (handler as LNBroadcastingMsgHandler).receive(msg.data);
@@ -229,7 +269,7 @@ export namespace LNSocketHandler {
         }
     
         async data(tcpSocket: Socket<PeerSocket>, data: Buffer) {
-            tcpSocket.data.addToReceiveQueue(new Uint(data));
+            tcpSocket.data.receiveDataChunk(new Uint(data));
         }
     
         async drain(tcpSocket: Socket<PeerSocket>) {
