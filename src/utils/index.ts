@@ -24,7 +24,7 @@ class Utils {
         }
 
         //process.on("SIGINT", this.gracefulShutdown);
-        process.once("SIGTERM", Utils.gracefulShutdown);
+        process.once("SIGTERM", Utils.gracefulShutdown.bind(Utils, 1));
 
         process.once("uncaughtException", Utils.uncaughtException);
         process.once("unhandledRejection", Utils.unhandledRejection);
@@ -35,9 +35,9 @@ class Utils {
             cli.default.info('Shutting down...');
 
             await Promise.all([
-                Utils.stopService(HTTP_API),
-                Utils.stopService(POS),
-                Utils.stopService(LeiCoinNetNode)
+                this.stopService(HTTP_API),
+                this.stopService(POS),
+                this.stopService(LeiCoinNetNode)
             ]);
 
             await Blockchain.stop();
@@ -48,7 +48,7 @@ class Utils {
 
         } catch (error: any) {
             cli.default.error(`Uncaught Exception:\n${error.stack}`);
-            Utils.forceShutdown();
+            this.forceShutdown();
         }
     }
 
