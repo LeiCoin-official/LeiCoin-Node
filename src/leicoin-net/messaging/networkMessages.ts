@@ -1,7 +1,7 @@
 import { type Uint, Uint32 } from "low-level";
 import cli from "../../cli/cli.js";
-import LCrypt from "../../crypto";
-import { BE, type DataEncoder } from "../../encoding/binaryEncoders";
+import LCrypt from "../../crypto/index.js";
+import { BE, type DataEncoder } from "../../encoding/binaryEncoders.js";
 import ObjectEncoding from "../../encoding/objects.js";
 import { MessageRouter } from "./index.js";
 import { type LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgID } from "./abstractMsg.js";

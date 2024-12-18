@@ -82,7 +82,7 @@ export namespace GetBlocksMsg {
     export const ID = LNMsgID.from("d372");
 
     export const Handler = new class Handler extends LNMsgRequestHandler {
-        async receive(data: GetBlocksMsg, socket: PeerSocket) {
+        async receive(data: GetBlocksMsg) {
             if (NetworkSyncManager.state !== "synchronized") {
                 return ErrorResponseMsg.fromCode(1);
             }

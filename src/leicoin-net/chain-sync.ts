@@ -1,7 +1,7 @@
 import { Uint64 } from "low-level";
 import { Blockchain } from "../storage/blockchain.js";
-import { Queue } from "../utils/linkedlist";
-import Block from "../objects/block.js";
+import { Queue } from "../utils/queue.js";
+import type Block from "../objects/block.js";
 import { type ForkChainstateData } from "../storage/chainstate.js";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
@@ -109,6 +109,12 @@ export class NetworkSyncManager {
             const result = await Slot.processPastSlot(block.slotIndex, block);
             if (result) blocksSuccessfullyProcessedCount++;
             this.blockQueue.dequeue();
+        }
+
+        while (this.blockQueue.size > 0) {
+            const block = this.blockQueue.dequeue() as Block;
+            const result = await Slot.processPastSlot(block.slotIndex, block);
+            if (result) blocksSuccessfullyProcessedCount++;
         }
 
         return { blocksSuccessfullyProcessedCount };

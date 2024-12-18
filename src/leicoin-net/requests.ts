@@ -1,7 +1,7 @@
 import { BasicBinaryMap, Uint32 } from "low-level";
 import { Deferred } from "../utils/deferred.js";
 import { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
-import { LNRequestMsg } from "./messaging/netPackets.js";
+import { LNRequestMsg } from "./messaging/networkMessages.js";
 import Schedule from "../utils/schedule.js";
 import { ErrorResponseMsg } from "./messaging/messages/error.js";
 

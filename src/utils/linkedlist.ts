@@ -7,7 +7,7 @@ export class ListNode<T> {
 }
 
 
-class LinkedListIterator<T> implements IterableIterator<T> {
+export class LinkedListIterator<T> implements IterableIterator<T> {
 
     constructor(protected list: LinkedList<T>, protected current = list.getHeadNode()) {}
     
@@ -87,6 +87,7 @@ export class LinkedList<T> {
 
     public clear() {
         this.head = this.tail = null;
+        this._size = 0;
     }
 
 
@@ -115,34 +116,3 @@ export class LinkedList<T> {
 
 }
 
-
-export class Queue<T> {
-
-    constructor(protected list = new LinkedList<T>()) {}
-
-    public get size() { return this.list.size; }
-
-    public enqueue(data: T) {
-        this.list.addLast(data);
-    }
-
-    public dequeue() {
-        const data = this.list.getFirst() || null;
-        this.list.removeFirst();
-        return data;
-    }
-
-    public front() { return this.list.getFirst(); }
-    public back() { return this.list.getLast(); }
-
-    public clear() { this.list.clear(); }
-
-    public values() { return this.list.values(); }
-    public [Symbol.iterator]() { return this.values(); }
-
-
-    get [Symbol.toStringTag]() { return this.constructor.name; }
-    [Symbol.toPrimitive](hint: "string") { return this.list.toString(); }
-    [Symbol.for('nodejs.util.inspect.custom')]() { return this.list.toString(); }
-
-}
