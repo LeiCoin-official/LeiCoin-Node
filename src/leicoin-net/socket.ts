@@ -232,7 +232,9 @@ export namespace LNSocketHandler {
             tcpSocket.data.addToReceiveQueue(new Uint(data));
         }
     
-        async drain(tcpSocket: Socket<PeerSocket>) {}
+        async drain(tcpSocket: Socket<PeerSocket>) {
+            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} drained.`);
+        }
     
         async handshake(tcpSocket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}
     }
