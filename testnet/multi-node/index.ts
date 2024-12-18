@@ -95,6 +95,8 @@ class LocalNodeTestNet {
 
         const index = parseInt(args[0]);
 
+        let started = false;
+
         Bun.serve({
             hostname: "127.0.0.1",
             port: 12291 + index,
@@ -102,8 +104,13 @@ class LocalNodeTestNet {
                 const relative_url = new URL(request.url);
                 switch (relative_url.pathname) {
                     case "/start":
+
+                        if (started) return Response.json({success: false});
                         const binary = relative_url.searchParams.get("binary") === "true";
-                        LocalNodeTestNet.startNode(index, server, binary);
+                        const doCleanup = relative_url.searchParams.get("clear") === "true";
+                        LocalNodeTestNet.startNode(index, server, binary, doCleanup);
+                        started = true;
+
                         return Response.json({success: true});
                     default:
                         return Response.json({success: false});
@@ -120,6 +127,7 @@ class LocalNodeTestNet {
         let startNode1 = true;
 
         let binary = false;
+        let doCleanup = false;
 
         if (args[0] === "0") {
             startNode1 = false;
@@ -135,34 +143,40 @@ class LocalNodeTestNet {
         }
 
         if (args[0] === "--clear" || args[0] === "-c") {
-            if (startNode0) await this.clearBlockchain(0);
-            if (startNode1) await this.clearBlockchain(1);
+            doCleanup = true;
+            args.shift();
         }
 
         await Promise.all([
-            startNode0 ? this.sendStartSignal(0, binary) : null,
-            startNode1 ? this.sendStartSignal(1, binary) : null,
+            startNode0 ? this.sendStartSignal(0, binary, doCleanup) : null,
+            startNode1 ? this.sendStartSignal(1, binary, doCleanup) : null,
         ]);
         console.log("All nodes started");
     }
 
-    private static async sendStartSignal(index: number, binary: boolean) {
+    private static async sendStartSignal(index: number, binary: boolean, doCleanup: boolean) {
         try {
             const port = 12291 + index;
-            await fetch(`http://127.0.0.1:${port}/start?binary=${binary}`);
+            await fetch(`http://127.0.0.1:${port}/start?binary=${binary}&clear=${doCleanup}`);
         } catch (error) {
             console.log(`Node${index} is not initialized yet. Run 'bun testnet multi-node init ${index}' to initialize it.`);
         }
     }
 
-    private static async startNode(index: number, server: Server, binary: boolean) {
+    private static async startNode(index: number, server: Server, binary: boolean, doCleanup: boolean) {
+
+        if (doCleanup) {
+            await this.clearBlockchain(index);
+            console.log(`Node${index} blockchain has been reset`);
+        }
+
         const cwd = `./localtests/testnet-nodes/Node${index}`;
 
         const cmd = binary ?
             `./build/bin/leicoin-node` + (process.platform === "win32" ? ".exe" : "") :
             `bun debug`;
         
-        await Bun.$`${{ raw: cmd }} run --cwd=${{ raw: cwd }}`
+        await Bun.$`${{ raw: cmd }} run --cwd=${{ raw: cwd }} --ignore-no-peers`
         .catch(() => {})
         .finally(() => {
             server.stop();

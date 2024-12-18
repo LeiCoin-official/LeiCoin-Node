@@ -94,14 +94,14 @@ export namespace GetBlocksMsg {
 
             const blocks: Block[] = [];
 
-            let index = data.startingIndex;
+            const index = data.startingIndex;
             const maxIndex = index.add(data.count);
             
             while (index.lt(maxIndex)) {
                 const block = Blockchain.blocks.get(index);
                 if (block.cb !== CB.SUCCESS || !block.data) break;
                 blocks.push(block.data);
-                index = index.add(1);
+                index.iadd(1);
             }
 
             return new BlocksMsg(blocks);

@@ -6,17 +6,17 @@ import { VCode } from "./codes.js";
 import { AddressHex } from "../objects/address.js";
 import { PX } from "../objects/prefix.js";
 
-
-interface BlockValidationValidResult {
-    status: 12000;
-    targetChain: string;
-    parentChain: string;
+export namespace ValidationResult {
+    export interface BlockValid {
+        status: 12000;
+        targetChain: string;
+        parentChain: string;
+    }
+    export interface BlockInvalid {
+        status: Exclude<VCode, 12000>;
+    }
+    export type BlockValidationResult = BlockValid | BlockInvalid;
 }
-interface BlockValidationInvalidResult {
-    status: Exclude<VCode, 12000>;
-}
-export type BlockValidationResult = BlockValidationValidResult | BlockValidationInvalidResult;
-
 
 export class Verification {
 
@@ -37,7 +37,7 @@ export class Verification {
         return 12000;
     }
 
-    public static async verifyBlock(block: Block): Promise<BlockValidationResult> {
+    public static async verifyBlock(block: Block): Promise<ValidationResult.BlockValidationResult> {
 
         if (!block) return { status: 12501 };
 

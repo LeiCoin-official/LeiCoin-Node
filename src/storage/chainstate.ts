@@ -223,7 +223,7 @@ export class Chainstate {
         let previousBlock: Block | null = null;
 
         for (const chain of Object.values(this.getAllChainStates())) {
-            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.get(block.index.sub(1)).data; 
+            const chainPreviousBlock = Blockchain.chains[chain.id].blocks.get(block.index.sub(1)).data;
 
             if (chainPreviousBlock?.hash.eq(block.previousHash)) {
                 parentChain = chain;

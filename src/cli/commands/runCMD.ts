@@ -1,5 +1,6 @@
 import { Configs } from "../../config/index.js";
 import HTTP_API from "../../http_api/index.js";
+import { NetworkSyncManager } from "../../leicoin-net/chain-sync.js";
 import LeiCoinNetNode from "../../leicoin-net/index.js";
 import Main from "../../main.js";
 import MinterClient from "../../minter/index.js";
@@ -30,6 +31,7 @@ export class RunCMD extends CLICMD {
             "bool",
             "Starts LeiCoin-Node in CLI Only mode. (Also known as Safe Mode)"
         ),
+        "--ignore-no-peers": new CMDFlag("bool", "Ignore if no peers are connected"),
         "--experimental": new CMDFlag("bool", "Enable experimental features"),
     });
 
@@ -73,6 +75,8 @@ export class RunCMD extends CLICMD {
             });
         }
 
+        await NetworkSyncManager.doStartupSync(flags["--ignore-no-peers"] as boolean);
+        
         const minters: MinterClient[] = [];
         if (config.minter?.active) {
             minters.push(
