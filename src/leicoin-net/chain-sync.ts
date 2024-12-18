@@ -74,10 +74,10 @@ export class NetworkSyncManager {
             this.state = "synchronized";
             cli.leicoin_net.success("Successfully synced the Blockchain. Blocks processed: " + result.blocksSuccessfullyProcessedCount);
         } catch (err: any) {
+            cli.leicoin_net.error(`Failed to sync the Blockchain: ${err.message}`);
             if (ignoreNoPeers) {
                 this.state = "synchronized";
             } else {
-                cli.leicoin_net.error(`Failed to sync the Blockchain: ${err.message}`);
                 Utils.gracefulShutdown(1);
             }
         }

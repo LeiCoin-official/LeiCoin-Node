@@ -35,9 +35,9 @@ class Utils {
             cli.default.info('Shutting down...');
 
             await Promise.all([
-                this.stopService(HTTP_API),
-                this.stopService(POS),
-                this.stopService(LeiCoinNetNode)
+                Utils.stopService(HTTP_API),
+                Utils.stopService(POS),
+                Utils.stopService(LeiCoinNetNode)
             ]);
 
             await Blockchain.stop();
@@ -48,7 +48,7 @@ class Utils {
 
         } catch (error: any) {
             cli.default.error(`Uncaught Exception:\n${error.stack}`);
-            this.forceShutdown();
+            Utils.forceShutdown();
         }
     }
 
