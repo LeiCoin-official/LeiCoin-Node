@@ -62,7 +62,7 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
         // Connect to other peer nodes and create peer-to-peer connections
         for (const targetData of peers) {
-            const dataArray = targetData.split(":");
+            const dataArray = targetData.split(/:(?=[^:]*$)/);
             const host = dataArray[0];
             const port = dataArray[1] ? parseInt(dataArray[1]) : 12200;
 
