@@ -9,6 +9,7 @@ import LeiCoinNetNode from "./index.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
 import Slot from "../pos/slot.js";
 import cli from "../cli/cli.js";
+import Utils from "../utils/index.js";
 
 export class NetworkSyncManager {
 
@@ -76,8 +77,8 @@ export class NetworkSyncManager {
             if (ignoreNoPeers) {
                 this.state = "synchronized";
             } else {
-                this.state = "synchronizing";
                 cli.leicoin_net.error(`Failed to sync the Blockchain: ${err.message}`);
+                Utils.gracefulShutdown(1);
             }
         }
 
