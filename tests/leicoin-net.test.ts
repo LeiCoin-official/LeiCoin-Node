@@ -2,7 +2,7 @@ import { describe, test, expect } from "bun:test";
 import { LNMsgRegistry } from "../src/leicoin-net/messaging/index.js";
 import { GetBlocksMsg } from "../src/leicoin-net/messaging/messages/block.js";
 import { Uint32, Uint64 } from "low-level";
-import { LNResponseMsg } from "../src/leicoin-net/messaging/netPackets.js";
+import { LNResponseMsg } from "../src/leicoin-net/messaging/networkMessages.js";
 import { NetworkSyncManager } from "../src/leicoin-net/chain-sync.js";
 
 describe("leicoin-net", () => {

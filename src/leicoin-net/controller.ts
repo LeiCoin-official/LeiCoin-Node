@@ -1,6 +1,6 @@
 import { type Uint, Uint16, Uint32 } from "low-level";
 import LeiCoinNetNode from "./index.js";
-import { type LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/netPackets";
+import { type LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/networkMessages.js";
 import { PeerSocket } from "./socket.js";
 import { Port } from "../objects/netinfo.js";
 import { StatusMsg } from "./messaging/messages/status.js";

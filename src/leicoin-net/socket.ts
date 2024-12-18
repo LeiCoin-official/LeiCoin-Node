@@ -2,7 +2,7 @@ import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256 } from "low-level";
 import LCrypt from "../crypto/index.js";
-import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/netPackets.js";
+import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/networkMessages.js";
 import { LNActiveRequests, LNResponseData } from "./requests.js";
 import type { LNMsgRequestHandler, LNBroadcastingMsgHandler, LNMsgDefaultHandler } from "./messaging/abstractMsgHandler.js";
 import LeiCoinNetNode from "./index.js";
