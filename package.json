@@ -1,6 +1,6 @@
 {
 	"name": "leicoin-node",
-	"version": "0.6.1",
+	"version": "0.6.3-beta.1",
 	"description": "",
 	"exports": "./src/index.ts",
 	"type": "module",
@@ -10,16 +10,16 @@
 		"clean": "rm -rf node_modules",
 		"test": "bun test",
 		"testnet": "bun run ./testnet",
-		"debug": "bun run ./src/index.ts run",
-		"debug:bundle": "bun run ./build/bundle/leicoin-node.js run",
-		"debug:newBundle": "bun run ./scripts/bundle && bun run ./build/bundle/leicoin-node.js run",
-		"debug:noCompact": "bun run ./build/src run",
-		"debug:noCompactNewTsc": "tsc && bun run build/src run",
+		"debug": "bun run ./src/index.ts",
+		"debug:bundle": "bun run ./build/bundle/leicoin-node.js",
+		"debug:newBundle": "bun run ./scripts/bundle && bun run ./build/bundle/leicoin-node.js",
+		"debug:noCompact": "bun run ./build/src",
+		"debug:noCompactNewTsc": "tsc && bun run build/src",
 		"bundle": "bun run ./scripts/bundle",
 		"tsc": "tsc",
 		"compile": "bun run ./scripts/compile",
 		"release": "bun run ./scripts/build/withEntryPoint",
-		"start": "./build/bin/leicoin-node run"
+		"start": "./build/bin/leicoin-node"
 	},
 	"repository": {
 		"type": "git",

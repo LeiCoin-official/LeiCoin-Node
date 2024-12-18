@@ -10,6 +10,7 @@ import POS from "./index.js";
 import { Deferred } from "../utils/deferred.js";
 import { formatDate } from "date-fns/format";
 import { UTCDate } from "@date-fns/utc/date";
+import { VCodes } from "../verification/codes.js";
 
 export class Slot {
 
@@ -76,9 +77,20 @@ export class Slot {
 
         const verification_result = await Verification.verifyBlock(block);
 
-        this.slot_finished.resolve(
-            await Execution.executeBlock(block, verification_result)
-        );
+        if (verification_result.status !== 12000) {
+            this.slot_finished.resolve();
+            cli.pos.error(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: Code: ${verification_result.status} Message: ${VCodes[verification_result.status]}`);
+            return;
+        }
+
+        const execution_result = await Execution.executeBlock(block, verification_result);
+        this.slot_finished.resolve();
+
+        if (execution_result.forked) {
+            cli.pos.info(`New Fork ${verification_result.targetChain} created from ${verification_result.parentChain} at block ${block.index.toBigInt()}`);
+            return;
+        }
+        cli.pos.success(`Block on Slot ${block.slotIndex.toBigInt()} has been validated, executed and added to Blockchain. (Hash: ${block.hash.toHex()}, Index ${block.index.toBigInt()}, Target Chain: ${verification_result.targetChain})`);
     }
 
     public isMinter(address: AddressHex) {
@@ -89,17 +101,18 @@ export class Slot {
 
         const minter = await Blockchain.minters.selectNextMinter(index);
 
-        if (!block) {
-            return;
-        }
-
-        if (block.minter.eqn(minter)) {
-            return;
+        if (!block || block.minter.eqn(minter)) {
+            return false;
         }
 
         const verification_result = await Verification.verifyBlock(block);
-        await Execution.executeBlock(block, verification_result);
 
+        if (verification_result.status !== 12000) {
+            return false;
+        }
+
+        await Execution.executeBlock(block, verification_result);
+        return true;
     }
 
 }

@@ -7,6 +7,8 @@ import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chain
 import { type PeerSocket } from "./socket.js";
 import LeiCoinNetNode from "./index.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
+import Slot from "../pos/slot.js";
+import cli from "../cli/cli.js";
 
 export class NetworkSyncManager {
 
@@ -57,7 +59,31 @@ export class NetworkSyncManager {
         const remoteChainstatesPromise = this.getRemoteChainstates();
     }
 
-    static async doStartupSync() {
+    static async doStartupSync(ignoreNoPeers = false) {
+        
+        cli.leicoin_net.info("Syncing the Blockchain...");
+
+        // wait so the node can establish connections
+        // maybe change this code later
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        try {
+            cli.leicoin_net.info("Checking local chainstate and puling latest blocks...");
+            const result = await this.syncChain();
+            this.state = "synchronized";
+            cli.leicoin_net.success("Successfully synced the Blockchain. Blocks processed: " + result.blocksSuccessfullyProcessedCount);
+        } catch (err: any) {
+            if (ignoreNoPeers) {
+                this.state = "synchronized";
+            } else {
+                this.state = "synchronizing";
+                cli.leicoin_net.error(`Failed to sync the Blockchain: ${err.message}`);
+            }
+        }
+
+    }
+
+    static async syncChain() {
 
         const latestBlock = Blockchain.chainstate.getLatestBlock("main") || { index: Uint64.from(0), slotIndex: Uint64.from(0) };
 
@@ -70,22 +96,21 @@ export class NetworkSyncManager {
         }
 
         const blocks = await this.getRemoteBlocks(latestBlock.index, syncPeers[0]);
-        
+
+        let blocksSuccessfullyProcessedCount = 0;
+
         for (const block of blocks) {
-            
+            const result = await Slot.processPastSlot(block.slotIndex, block);
+            if (result) blocksSuccessfullyProcessedCount++;
         }
 
         for (const block of this.blockQueue) {
-
-            
-
+            const result = await Slot.processPastSlot(block.slotIndex, block);
+            if (result) blocksSuccessfullyProcessedCount++;
             this.blockQueue.dequeue();
         }
 
-    }
-
-    static async syncChain() {
-        
+        return { blocksSuccessfullyProcessedCount };
     }
 
 

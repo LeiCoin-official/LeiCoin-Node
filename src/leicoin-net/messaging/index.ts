@@ -2,7 +2,7 @@ import { type LNMsgInfo, LNMsgID } from "./abstractMsg.js";
 import { ObjectiveArray, type Dict } from "../../utils/dataUtils.js";
 import { StatusMsg } from "./messages/status.js";
 import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messages/challenge.js";
-import { GetBlocksMsg, NewBlockMsg } from "./messages/block.js";
+import { BlocksMsg, GetBlocksMsg, NewBlockMsg } from "./messages/block.js";
 import { GetTransactionsMsg, NewTransactionMsg } from "./messages/transaction.js";
 import { ChainstateMsg, GetChainstateMsg } from "./messages/chainstate.js";
 import { OneTimeRequestMsg } from "./messages/oneTimeRequest.js";
@@ -38,6 +38,7 @@ export const LNMsgRegistry = LNMsgUtils.createLNMsgRegistry([
 
     NewBlockMsg,
     GetBlocksMsg,
+    BlocksMsg,
 
     NewTransactionMsg,
     GetTransactionsMsg,
