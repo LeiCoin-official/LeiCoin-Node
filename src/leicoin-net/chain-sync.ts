@@ -71,8 +71,14 @@ export class NetworkSyncManager {
 
         const blocks = await this.getRemoteBlocks(latestBlock.index, syncPeers[0]);
         
+        const latestSyncedSlotIndex = latestBlock.slotIndex;
+
         for (const block of blocks) {
             
+            if (block.slotIndex < latestSyncedSlotIndex) {
+                continue;
+            }
+
         }
 
         for (const block of this.blockQueue) {
