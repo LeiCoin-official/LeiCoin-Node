@@ -1,6 +1,6 @@
 import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
-import { Uint, Uint256 } from "low-level";
+import { Uint, Uint256, Uint32 } from "low-level";
 import LCrypt from "../crypto/index.js";
 import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/networkMessages.js";
 import { LNActiveRequests, LNResponseData } from "./requests.js";
@@ -9,8 +9,8 @@ import LeiCoinNetNode from "./index.js";
 import { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
-import { AutoProcessingQueue, Queue } from "../utils/queue.js";
-import { LNDataChunk } from "./packets.js";
+import { Queue } from "../utils/queue.js";
+import { LNDataPaket } from "./packets.js";
 
 
 export class PeerSocket {
@@ -22,19 +22,11 @@ export class PeerSocket {
 
     private _state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
 
-    private sendingQueue = new AutoProcessingQueue<Uint>(this.processOutgoingData.bind(this));
     private recvQueue: Queue<Uint> | null = new Queue();
 
-    /**
-     * The buffer array stores Buffers with a maximum size of 8192 bytes per buffer.
-     * The Maximum size of the Array is 65536 which results in maximum storage capacity of 512 MB
-     */
-    private recvBufferArray: Uint[] = [];
-    /**
-     * The Maximum size of the buffer array is 65536.
-     * @todo maybe adjust this value later 
-     */
-    private recvBufferChunkLimit = 65536;
+    private recvBuffer = Uint.alloc(0);
+    private revcBufferPackageSize = Uint32.from(0);
+
 
     constructor(
         protected readonly tcpSocket: Socket<any>,
@@ -107,21 +99,11 @@ export class PeerSocket {
         } else {
             raw = data;
         }
-        return this.sendingQueue.enqueue(raw);
-    }
+        
+        const packet = LNDataPaket.create(raw);
+        if (!packet) return;
 
-    private async processOutgoingData(data: Uint) {
-        if (data.getLen() === 0) return
-
-        const chunks = data.split(LNDataChunk.MAX_CHUNK_SIZE);
-
-        for (let i = 0; i < chunks.length - 1; i++) {
-            const chunk = LNDataChunk.create(chunks[i], false);
-            this.tcpSocket.write(chunk.encodeToHex().getRaw());
-        }
-
-        const lastChunk = LNDataChunk.create(chunks[chunks.length - 1], true);
-        this.tcpSocket.write(lastChunk.encodeToHex().getRaw());
+        this.tcpSocket.write(packet.encodeToHex().getRaw());
     }
 
 
@@ -144,23 +126,29 @@ export class PeerSocket {
     }
     
 
-    async receiveDataChunk(rawChunk: Uint) {
-        const chunk = LNDataChunk.fromDecodedHex(rawChunk);
-        if (!chunk) return;
+    async receiveData(rawChunk: Uint) {
+        this.recvBuffer = Uint.concat([this.recvBuffer, rawChunk]);
 
-        if (this.recvBufferArray.length >= this.recvBufferChunkLimit) {
-            return;
+        if (this.revcBufferPackageSize.eq(0) && this.recvBuffer.getLen() >= 4) {
+            this.revcBufferPackageSize = new Uint32(this.recvBuffer.slice(0, 4));
+            this.recvBuffer = this.recvBuffer.slice(4);
         }
-        this.recvBufferArray.push(chunk.data);
 
-        if (chunk.isLast()) {
-            const completeData = Uint.concat(this.recvBufferArray);
-            this.recvBufferArray = [];
+        if (this.recvBuffer.getLen("uint").gte(this.revcBufferPackageSize)) {
 
+            const completeData = this.recvBuffer.slice(0, this.revcBufferPackageSize.toInt());
+            
             if (this.state === "OPENING" && this.recvQueue) {
                 return this.recvQueue.enqueue(completeData);
             }
-            return this.handleIncomingMsg(completeData);
+            this.handleIncomingMsg(completeData);
+
+            const remaining = this.recvBuffer.slice(this.revcBufferPackageSize.toInt());
+            if (remaining.getLen() > 0) {
+                this.recvBuffer = Uint.alloc(0);
+                this.revcBufferPackageSize = Uint32.from(0);
+                this.receiveData(remaining);
+            }
         }
     }
 
@@ -271,7 +259,7 @@ export namespace LNSocketHandler {
         }
     
         async data(tcpSocket: Socket<PeerSocket>, data: Buffer) {
-            tcpSocket.data.receiveDataChunk(new Uint(data));
+            tcpSocket.data.receiveData(new Uint(data));
         }
     
         async drain(tcpSocket: Socket<PeerSocket>) {

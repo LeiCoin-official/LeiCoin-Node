@@ -1,57 +1,47 @@
-import { Uint, Uint8 } from "low-level";
+import { Uint, Uint32, Uint8 } from "low-level";
 
 /** @todo packages, can not connect from local to remote */
 /**
- * Represents a binary data chunk in the LeiCoin Network.
+ * Represents a binary data packet in the LeiCoin Network.
  */
-export class LNDataChunk {
+export class LNDataPaket {
 
     /**
-     * The maximum size of a data chunk.
+     * The maximum size of a data packet.
      */
-    static readonly MAX_CHUNK_SIZE = 8192;
+    static readonly MAX_BYTE_SIZE = 1024 * 1024 * 1024;
 
-    /**
-     * Creates an instance of LNDataChunk.
-     * 
-     * @param flag - A flag represented as a Uint8.
-     * 
-     * Flag Values:
-     * 
-     * 0xff - The data is the last chunk.
-     * 
-     * 
-     * @param data - The data represented as a Uint.
-     */
     constructor(
-        readonly flag: Uint8,
+        readonly length: Uint32,
         readonly data: Uint,
     ) {}
 
-    static create(data: Uint, isLast: boolean) {
-        const flag = Uint8.from(
-            isLast ? 0xff : 0x00
+    static create(data: Uint) {
+        if (data.getLen() > LNDataPaket.MAX_BYTE_SIZE) {
+            return null;
+        }
+        
+        return new LNDataPaket(
+            Uint32.from(data.getLen()),
+            data,
         );
-        return new LNDataChunk(flag, data);
-    }
-
-    
-    public isLast() {
-        return this.flag.eq(0xff);
     }
 
 
     public encodeToHex() {
-        return Uint.concat([this.flag, this.data]);
+        return Uint.concat([this.length, this.data]);
     }
 
     static fromDecodedHex(hexData: Uint) {
 
-        if (hexData.getLen() < 1 || hexData.getLen() > LNDataChunk.MAX_CHUNK_SIZE + 1) {
+        const length = new Uint32(hexData.slice(0, 4));
+        const data = hexData.slice(4);
+
+        if (length.gt(LNDataPaket.MAX_BYTE_SIZE) || data.getLen("uint").eqn(length)) {
             return null;
         }
         
-        return new LNDataChunk(
+        return new LNDataPaket(
             hexData.slice(0, 1),
             hexData.slice(1),
         );

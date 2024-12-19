@@ -1,6 +1,6 @@
 {
 	"name": "leicoin-node",
-	"version": "0.6.7-pre.2",
+	"version": "0.6.7-pre.5",
 	"description": "",
 	"exports": "./src/index.ts",
 	"type": "module",
