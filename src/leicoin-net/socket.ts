@@ -156,7 +156,7 @@ export class PeerSocket {
 
     async receiveData(rawChunk: Uint) {
         this.recvBuffer = Uint.concat([this.recvBuffer, rawChunk]);
-                cli.cmd.warn(this.recvBuffer.getLen(), this.revcBufferPackageSize.toInt());
+
         if (this.revcBufferPackageSize.eq(0) && this.recvBuffer.getLen() >= 4) {
             this.revcBufferPackageSize = new Uint32(this.recvBuffer.slice(0, 4));
             this.recvBuffer = this.recvBuffer.slice(4);
