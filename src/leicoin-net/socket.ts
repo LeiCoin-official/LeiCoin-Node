@@ -126,12 +126,13 @@ export class PeerSocket {
         while (this.currentSendProcess.data.getLen() > 0) {
             const written = this.tcpSocket.write(this.currentSendProcess.data.getRaw());
             if (written === 0) {
-                this.currentSendProcess.proccessed.resolve();
-                this.currentSendProcess = null;
-                return;
+                break;
             }
             this.currentSendProcess.data = this.currentSendProcess.data.slice(written);
         }
+        this.currentSendProcess.proccessed.resolve();
+        this.currentSendProcess = null;
+        return;
     }
 
 
