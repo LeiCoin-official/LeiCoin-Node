@@ -22,38 +22,25 @@ class Logger {
         ) => void
     ) {}
 
-    public info(message: string) {
-        this.logger.call(
-            CLI.getInstance(),
-            message,
-            "info",
-            this.prefix,
-            this.color
-        );
+    public info(...data: any[]) {
+        this.log(data, "info");
     }
-    public success(message: string) {
-        this.logger.call(
-            CLI.getInstance(),
-            message,
-            "success",
-            this.prefix,
-            this.color
-        );
+    public success(...data: any[]) {
+        this.log(data, "success");
     }
-    public error(message: string) {
-        this.logger.call(
-            CLI.getInstance(),
-            message,
-            "error",
-            this.prefix,
-            this.color
-        );
+    public error(...data: any[]) {
+        this.log(data, "error");
     }
-    public warn(message: string) {
+    public warn(...data: any[]) {
+        this.log(data, "warn");
+    }
+
+    private log(data: any[], type: LogType) {
+        const message = data.join(" ");
         this.logger.call(
             CLI.getInstance(),
             message,
-            "warn",
+            type,
             this.prefix,
             this.color
         );
