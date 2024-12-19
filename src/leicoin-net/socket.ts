@@ -111,6 +111,8 @@ export class PeerSocket {
     }
 
     private async processOutgoingData(data: Uint) {
+        if (data.getLen() === 0) return
+
         const chunks = data.split(LNDataChunk.MAX_CHUNK_SIZE);
 
         for (let i = 0; i < chunks.length - 1; i++) {

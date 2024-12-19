@@ -36,7 +36,13 @@ class Logger {
     }
 
     private log(data: any[], type: LogType) {
-        const message = data.join(" ");
+        if (data.length === 0) return;
+
+        let message = `${data[0]}`;
+        for (let i = 1; i < data.length - 1; i++) {
+            message += ` ${data[i]}`;
+        }
+
         this.logger.call(
             CLI.getInstance(),
             message,
