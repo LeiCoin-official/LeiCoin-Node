@@ -46,10 +46,11 @@ export class NetworkSyncManager {
             if (response.status !== 0 || !response.data) break;
 
             blocks.push(...response.data.blocks);
+            cli.data.info(`Received next ${response.data.blocks.length} Blocks. Received ${blocks.length} Blocks in total.`);
 
             if (response.data.blocks.length < 512) break;
 
-            currentBlockIndex.add(512);
+            currentBlockIndex.iadd(512);
         }
 
         return blocks;

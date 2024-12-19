@@ -23,7 +23,7 @@ export class PeerSocket {
     private _state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
 
     private sendingQueue = new AutoProcessingQueue<Uint>(this.processPackageSending.bind(this));
-    private sendBuffer: ProcessState<Uint> | null = null;
+    private currentSendProcess: ProcessState<Uint> | null = null;
 
     private recvQueue: Queue<Uint> | null = new Queue();
 
@@ -110,27 +110,27 @@ export class PeerSocket {
     }
 
     private async processPackageSending(ps: ProcessState<Uint>) {
-        this.sendBuffer = ps;
-        const written = this.tcpSocket.write(this.sendBuffer.data.getRaw());
+        this.currentSendProcess = ps;
+        const written = this.tcpSocket.write(this.currentSendProcess.data.getRaw());
         if (written > 0) {
-            this.sendBuffer.data = this.sendBuffer.data.slice(written);
+            this.currentSendProcess.data = this.currentSendProcess.data.slice(written);
         }
         if (ps.data.getLen() === 0) {
             ps.proccessed.resolve();
-            this.sendBuffer = null;
+            this.currentSendProcess = null;
         }
     }
 
     async writeDrained() {
-        if (!this.sendBuffer) return;
-        while (this.sendBuffer.data.getLen() > 0) {
-            const written = this.tcpSocket.write(this.sendBuffer.data.getRaw());
+        if (!this.currentSendProcess) return;
+        while (this.currentSendProcess.data.getLen() > 0) {
+            const written = this.tcpSocket.write(this.currentSendProcess.data.getRaw());
             if (written === 0) {
-                this.sendBuffer.proccessed.resolve();
-                this.sendBuffer = null;
+                this.currentSendProcess.proccessed.resolve();
+                this.currentSendProcess = null;
                 return;
             }
-            this.sendBuffer.data = this.sendBuffer.data.slice(written);
+            this.currentSendProcess.data = this.currentSendProcess.data.slice(written);
         }
     }
 
