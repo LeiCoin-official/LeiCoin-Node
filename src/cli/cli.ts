@@ -39,7 +39,7 @@ class Logger {
         if (data.length === 0) return;
 
         let message = `${data[0]}`;
-        for (let i = 1; i < data.length - 1; i++) {
+        for (let i = 1; i < data.length; i++) {
             message += ` ${data[i]}`;
         }
 
