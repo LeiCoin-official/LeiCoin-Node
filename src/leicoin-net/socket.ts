@@ -9,7 +9,7 @@ import LeiCoinNetNode from "./index.js";
 import { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
-import { Queue } from "../utils/queue.js";
+import { AutoProcessingQueue, ProcessState, Queue } from "../utils/queue.js";
 import { LNDataPaket } from "./packets.js";
 
 
@@ -21,6 +21,9 @@ export class PeerSocket {
     readonly challenge = new Uint256(LCrypt.randomBytes(32));
 
     private _state: "OPENING" | "READY" | "VERIFIED" | "CLOSED" = "OPENING";
+
+    private sendingQueue = new AutoProcessingQueue<Uint>(this.processPackageSending.bind(this));
+    private sendBuffer: ProcessState<Uint> | null = null;
 
     private recvQueue: Queue<Uint> | null = new Queue();
 
@@ -103,7 +106,32 @@ export class PeerSocket {
         const packet = LNDataPaket.create(raw);
         if (!packet) return;
 
-        this.tcpSocket.write(packet.encodeToHex().getRaw());
+        return this.sendingQueue.enqueue(packet.encodeToHex());
+    }
+
+    private async processPackageSending(ps: ProcessState<Uint>) {
+        this.sendBuffer = ps;
+        const written = this.tcpSocket.write(this.sendBuffer.data.getRaw());
+        if (written > 0) {
+            this.sendBuffer.data = this.sendBuffer.data.slice(written);
+        }
+        if (ps.data.getLen() === 0) {
+            ps.proccessed.resolve();
+            this.sendBuffer = null;
+        }
+    }
+
+    async writeDrained() {
+        if (!this.sendBuffer) return;
+        while (this.sendBuffer.data.getLen() > 0) {
+            const written = this.tcpSocket.write(this.sendBuffer.data.getRaw());
+            if (written === 0) {
+                this.sendBuffer.proccessed.resolve();
+                this.sendBuffer = null;
+                return;
+            }
+            this.sendBuffer.data = this.sendBuffer.data.slice(written);
+        }
     }
 
 
@@ -263,7 +291,8 @@ export namespace LNSocketHandler {
         }
     
         async drain(tcpSocket: Socket<PeerSocket>) {
-            cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} drained.`);
+            tcpSocket.data.writeDrained();
+            //cli.leicoin_net.info(`Connection to ${tcpSocket.data.uri} drained.`);
         }
     
         async handshake(tcpSocket: Socket<PeerSocket>, success: boolean, authorizationError: Error | null) {}

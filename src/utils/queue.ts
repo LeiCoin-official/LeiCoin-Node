@@ -34,9 +34,9 @@ export class Queue<T> {
 
 
 
-class ProcessState<T> {
+export class ProcessState<T> {
     constructor(
-        readonly data: T,
+        public data: T,
         readonly proccessed = new Deferred()
     ) {}
 }
@@ -47,7 +47,7 @@ export class AutoProcessingQueue<T> {
     protected processing = false;
 
     constructor(
-        protected readonly process: (data: T) => Promise<void>
+        protected readonly process: (ps: ProcessState<T>) => Promise<void>
     ) {}
 
     public async enqueue(data: T) {
@@ -63,8 +63,8 @@ export class AutoProcessingQueue<T> {
 
         while (this.queue.size > 0) {
             const ps = this.queue.dequeue() as ProcessState<T>;
-            await this.process(ps.data);
-            ps.proccessed.resolve();
+            this.process(ps);
+            await ps.proccessed.awaitResult();
         }
 
         this.processing = false;
