@@ -102,7 +102,7 @@ export class PeerSocket {
         
         const packet = LNDataPaket.create(raw);
         if (!packet) return;
-
+        cli.cmd.warn(packet.data.getLen());
         this.tcpSocket.write(packet.encodeToHex().getRaw());
     }
 
@@ -128,13 +128,13 @@ export class PeerSocket {
 
     async receiveData(rawChunk: Uint) {
         this.recvBuffer = Uint.concat([this.recvBuffer, rawChunk]);
-
+                cli.cmd.warn(this.recvBuffer.getLen(), this.revcBufferPackageSize.toInt());
         if (this.revcBufferPackageSize.eq(0) && this.recvBuffer.getLen() >= 4) {
             this.revcBufferPackageSize = new Uint32(this.recvBuffer.slice(0, 4));
             this.recvBuffer = this.recvBuffer.slice(4);
         }
 
-        if (this.recvBuffer.getLen("uint").gte(this.revcBufferPackageSize)) {
+        if (this.revcBufferPackageSize.lte(this.recvBuffer.getLen())) {
 
             const completeData = this.recvBuffer.slice(0, this.revcBufferPackageSize.toInt());
             
@@ -144,9 +144,9 @@ export class PeerSocket {
             this.handleIncomingMsg(completeData);
 
             const remaining = this.recvBuffer.slice(this.revcBufferPackageSize.toInt());
+            this.recvBuffer = Uint.alloc(0);
+            this.revcBufferPackageSize = Uint32.from(0);
             if (remaining.getLen() > 0) {
-                this.recvBuffer = Uint.alloc(0);
-                this.revcBufferPackageSize = Uint32.from(0);
                 this.receiveData(remaining);
             }
         }
