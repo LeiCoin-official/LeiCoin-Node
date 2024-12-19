@@ -105,13 +105,7 @@ export class NetworkSyncManager {
             const result = await Slot.processPastSlot(block.slotIndex, block);
             if (result) blocksSuccessfullyProcessedCount++;
         }
-
-        for (const block of this.blockQueue) {
-            const result = await Slot.processPastSlot(block.slotIndex, block);
-            if (result) blocksSuccessfullyProcessedCount++;
-            this.blockQueue.dequeue();
-        }
-
+        
         while (this.blockQueue.size > 0) {
             const block = this.blockQueue.dequeue() as Block;
             const result = await Slot.processPastSlot(block.slotIndex, block);
