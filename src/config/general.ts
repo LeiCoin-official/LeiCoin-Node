@@ -52,7 +52,7 @@ export class GeneralConfigParser {
 
     private readonly sample: GeneralConfigLike = {
         leicoin_net: {
-            host: "0.0.0.0",
+            host: "0:0:0:0:0:0:0:0",
             port: 12200
         },
         minter: {
@@ -66,7 +66,7 @@ export class GeneralConfigParser {
         },
         api: {
             active: false,
-            host: "0.0.0.0",
+            host: "0:0:0:0:0:0:0:0",
             port: 12280
         },
         experimental: false

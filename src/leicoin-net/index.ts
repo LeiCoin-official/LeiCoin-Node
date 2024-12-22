@@ -5,6 +5,7 @@ import { PeerConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import Utils from "../utils/index.js";
+import { NetworkUtils } from "../utils/network-utils.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
@@ -62,18 +63,13 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
         // Connect to other peer nodes and create peer-to-peer connections
         for (const targetData of peers) {
-            const dataArray = targetData.split(/:(?=[^:]*$)/);
-            const host = dataArray[0];
-            const port = dataArray[1] ? parseInt(dataArray[1]) : 12200;
+            let [host, port] = NetworkUtils.splitHostAndPort(targetData);
 
             if (!host) {
                 cli.leicoin_net.error(`Invalid Connection Data: ${targetData}`);
                 continue;
             }
-            if (!port) {
-                cli.leicoin_net.error(`Invalid Connection Data: ${targetData}`);
-                continue;
-            }
+            if (!port) port = 12200;
             
             async function saveConnect(host: string, port: number) {
                 const socket = await PeerSocket.connect(host, port);
