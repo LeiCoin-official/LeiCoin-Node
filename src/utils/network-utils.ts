@@ -4,7 +4,7 @@ export class NetworkUtils {
     static splitHostAndPort(uri: string): [string | null, number | null] {
 
         const dataArray = uri.split(/:(?=[^:]*$)/);
-        const host = dataArray[0] || null;
+        const host = NetworkUtils.normalizeIP(dataArray[0]) || null;
         const port = dataArray[1] ? parseInt(dataArray[1]) : null;
 
         return [host, port];
@@ -54,6 +54,32 @@ export class NetworkUtils {
         return null; // Invalid IP address format
     }
     
-    static formatIP
+    private static getIPv6WithBrackets(address: string): string | null {
+        // Remove surrounding brackets if present
+        if (address.startsWith("[") && address.endsWith("]")) {
+            address = address.slice(1, -1);
+        }
+    
+        // Normalize the IP address
+        const normalized = NetworkUtils.normalizeIP(address);
+        if (!normalized) return null; // Return null for invalid IP
+    
+        // Return IPv4 as-is, or wrap IPv6 in brackets
+        return NetworkUtils.isIPv4(normalized) ? normalized : `[${normalized}]`;
+    }
+
+    static formatIP(address: string): string | null {
+        const ipv6WithBrackets = NetworkUtils.getIPv6WithBrackets(address);
+        if (!ipv6WithBrackets) return null; // Return null for invalid IP
+    
+        return ipv6WithBrackets;
+    }
+
+    static formatAddress(host: string, port: number): string | null {
+        const formattedIP = NetworkUtils.formatIP(host);
+        if (!formattedIP) return null; // Return null for invalid IP
+    
+        return `${formattedIP}:${port}`;
+    }
 
 }

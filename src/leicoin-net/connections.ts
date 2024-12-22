@@ -38,6 +38,7 @@ abstract class AbstractPeerConnectionsMap {
 
 }
 
+/** @todo Avoid same node connecting multiple times */
 export class PeerConnections extends AbstractPeerConnectionsMap {
 
     readonly queue: PeerConnectionsQueue;

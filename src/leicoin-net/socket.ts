@@ -11,12 +11,15 @@ import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
 import { AutoProcessingQueue, ProcessState, Queue } from "../utils/queue.js";
 import { LNDataPaket } from "./packets.js";
+import { NetworkUtils } from "../utils/network-utils.js";
 
 
 export class PeerSocket {
     
     readonly host: string;
+    private readonly formattedHost: string;
     public port: number;
+
     readonly uuid = new Uint256(LCrypt.randomBytes(32));
     readonly challenge = new Uint256(LCrypt.randomBytes(32));
 
@@ -36,7 +39,8 @@ export class PeerSocket {
         readonly type: "INCOMING" | "OUTGOING",
         readonly activeRequests: LNActiveRequests = new LNActiveRequests()
     ) {
-        this.host = tcpSocket.remoteAddress;
+        this.host = NetworkUtils.normalizeIP(tcpSocket.remoteAddress) as string;
+        this.formattedHost = NetworkUtils.formatIP(this.host) as string;
         /** @todo Change this to `this.port = tcpSocket.remotePort;` when Bun has implemented scoket.remotePort */
         this.port = 0;
 
@@ -70,7 +74,7 @@ export class PeerSocket {
 
 
     get uri() {
-        return `${this.host}:${this.port}`;
+        return `${this.formattedHost}:${this.port}`;
     }
 
 
