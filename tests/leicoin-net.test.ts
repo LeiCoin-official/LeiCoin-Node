@@ -21,6 +21,7 @@ describe("leicoin-net", () => {
 
         // expect(response).not.toBeNull();
     });
+
     test("ip_checks", async () => {
         // IPv4 tests
         expect(NetworkUtils.isIPv4("192.168.1.1")).toBe(true); // Valid IPv4
@@ -53,5 +54,25 @@ describe("leicoin-net", () => {
         expect(NetworkUtils.isIPv6("2001:db8::")).toBe(true); // Valid IPv6 (compressed)
         expect(NetworkUtils.isIPv6("::ffff:192.168.1.256")).toBe(false); // Invalid (mapped IPv4 out of range)
         expect(NetworkUtils.isIPv6("2001::85a3::7334")).toBe(false); // Invalid (double "::" in incorrect positions)
+    });
+
+    test("normalizeIP", async () => {
+        // IPv4
+        expect(NetworkUtils.normalizeIP("192.168.1.1")).toBe("192.168.1.1");
+
+        // IPv6-mapped IPv4
+        expect(NetworkUtils.normalizeIP("::ffff:127.0.0.1")).toBe("127.0.0.1");
+
+        // Full expansion
+        expect(NetworkUtils.normalizeIP("2001:db8::1")).toBe("2001:db8:0:0:0:0:0:1");
+
+        // Loopback address
+        expect(NetworkUtils.normalizeIP("::1")).toBe("0:0:0:0:0:0:0:1");
+
+        // Unspecified address
+        expect(NetworkUtils.normalizeIP("::")).toBe("0:0:0:0:0:0:0:0");
+
+        // Invalid inputs
+        expect((NetworkUtils.normalizeIP("invalid"))).toBeNull();
     });
 });
