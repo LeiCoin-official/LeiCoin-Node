@@ -1,8 +1,8 @@
-FROM node:18
+FROM debian:11-slim
 
-RUN apt-get update && apt-get install -y git && apt-get install -y rsync
+RUN apt-get update && apt-get install -y curl ca-certificates openssl tar bash git rsync
 
-RUN adduser container --disabled-password
+RUN adduser --disabled-password --home /home/container container
 
 RUN chown -R container /home/container
 RUN chmod -R 775 /home/container
@@ -15,7 +15,12 @@ WORKDIR /home/container
 
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
-EXPOSE 12200
-EXPOSE 12280
+# LeiCoin Net Port
+EXPOSE 12200/tcp
+EXPOSE 12200/udp
+
+# API Port
+EXPOSE 12280/tcp
+EXPOSE 12280/udp
 
 CMD ["/bin/bash", "/docker-entrypoint.sh"]
