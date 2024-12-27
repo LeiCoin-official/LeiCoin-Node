@@ -14,28 +14,32 @@ export enum Platforms {
 
 export type PlatformArg = keyof typeof Platforms | "auto";
 
-class CompilerBuilder {
+class CompilerCommand {
 
     public sourcemap = true;
     public minify = true;
     public entrypoint = "./src/index.ts";
     public outfile = "./build/bin/leicoin-node";
+    public platform: PlatformArg = "auto";
     public env: NodeJS.ProcessEnv = {};
+    private additionalArgs: string[] = [];
 
     constructor(private baseCommand = "bun build --compile") {}
 
-    public setArg(arg: string) {
-        //this.command += ` ${arg}`;
+    public addArg(arg: string) {
+        this.additionalArgs.push(arg);
     }
 
     public getCommand() {
         return [
             this.baseCommand,
-            (this.sourcemap ? " --sourcemap" : ""),
-            (this.minify ? " --minify" : ""),
+            (this.sourcemap ? "--sourcemap" : ""),
+            (this.minify ? "--minify" : ""),
             this.entrypoint,
             "--outfile", this.outfile,
-            ...Object.entries(this.env).map(([key, value]) => `--define "process.env.${key}='${value}'"`)
+            (this.platform === "auto" ? "" : `--target=${Platforms[this.platform]}`),
+            ...Object.entries(this.env).map(([key, value]) => `--define "process.env.${key}='${value}'"`),
+            ...this.additionalArgs
         ].join(" ");
     }
 
@@ -43,7 +47,7 @@ class CompilerBuilder {
 
 export class Compiler {
 
-    private command = new CompilerBuilder();
+    private command = new CompilerCommand();
 
     constructor(
         private platform: PlatformArg,
@@ -54,11 +58,17 @@ export class Compiler {
             this.command.outfile += `-v${version}`;
         }
 
+        this.command.platform = platform;
+
         if (platform !== "auto") {
             if (Object.keys(Platforms).some(p => p === platform) === false) {
                 throw new Error(`Invalid platform: ${platform}`);
             }
-            this.command.outfile += `-${platform} --target=${Platforms[platform]}`;
+            this.command.outfile += `-${platform}`;
+        }
+
+        if (platform.startsWith("win") || process.platform === "win32") {
+            this.command.addArg("--windows-icon=./assets/leicoin-logo-win.ico");
         }
         
         this.command.env.LEICOIN_NODE_VERSION = version;
@@ -69,12 +79,10 @@ export class Compiler {
             const output = await Bun.$`
                 echo "Building from sources. Version: ${this.version} Platform: ${this.platform}";
                 ${{ raw: this.command.getCommand() }}
-                `.text()
+                `.text();
             console.log(output);
         } catch (err) {
-            console.log(`Failed with code ${err.exitCode}`);
-            console.log(err.stdout.toString());
-            console.log(err.stderr.toString());
+            console.log(`Failed: ${err.message}`);
         }
     }
 
