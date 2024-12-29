@@ -17,7 +17,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ${{ github.repository.toLower() }}
 
 jobs:
   publish:
@@ -30,6 +29,11 @@ jobs:
       - name: Setup Environment
         uses: ./.github/workflows/setup
 
+      - name: Setup ENV Variables
+        run: |
+          echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "FULL_IMAGE_NAME=${{ env.REGISTRY }}/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -41,7 +45,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
+          images: ${{ env.FULL_IMAGE_NAME }}
 
       - name: Build Binary
         run: bun compile linux-x64-baseline ${{ inputs.version }}
@@ -49,9 +53,9 @@ jobs:
       - name: Set Tags
         id: set-tags
         run: |
-          echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ inputs.version }}" >> $GITHUB_ENV
+          echo "tags=${{ env.FULL_IMAGE_NAME }}:${{ inputs.version }}" >> $GITHUB_ENV
           if [[ "${{ inputs.pre_release }}" == "false" ]]; then
-            echo "tags+=,${{ env.REGISTRY }}/${{ env.IMAGE }}:latest" >> $GITHUB_ENV
+            echo "tags+=,${{ env.FULL_IMAGE_NAME }}:latest" >> $GITHUB_ENV
           fi
 
       - name: Build and Push Docker Image
