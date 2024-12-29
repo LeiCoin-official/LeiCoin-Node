@@ -22,6 +22,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,38 +33,45 @@ jobs:
       - name: Setup Environment
         uses: ./.github/workflows/setup
 
+      - name: Setup ENV Variables
+        run: |
+          echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "FULL_IMAGE_NAME=${{ env.REGISTRY }}/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.PAT }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
 
       - name: Extract Docker Metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ${{ env.FULL_IMAGE_NAME }}
 
       - name: Build Binary
-        run: bun compile linux-x64-baseline ${{ inputs.version }}
+        run: bun compile linux-x64-baseline ${{ inputs.version }} --no-version-tag
 
       - name: Set Tags
         id: set-tags
         run: |
-          echo "tags=${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.version }}" >> $GITHUB_ENV
+          echo "tags=${{ env.FULL_IMAGE_NAME }}:${{ inputs.version }}" >> $GITHUB_ENV
           if [[ "${{ inputs.pre_release }}" == "false" ]]; then
-            echo "tags+=,${{ env.REGISTRY }}/${{ github.repository }}:latest" >> $GITHUB_ENV
+            echo "tags+=,${{ env.FULL_IMAGE_NAME }}:latest" >> $GITHUB_ENV
           fi
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
         with:
-          context: ./docker
+          context: .
+          file: ./docker/Dockerfile
           push: true
           tags: ${{ env.tags }}
           labels: |
-            org.opencontainers.image.title=${{ github.repository }}
+            org.opencontainers.image.title=${{ steps.meta.outputs.title }}
+            org.opencontainers.image.description=${{ steps.meta.outputs.description }}
             org.opencontainers.image.version=${{ inputs.version }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=${{ steps.meta.outputs.created }}
