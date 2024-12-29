@@ -1,21 +1,18 @@
-FROM node:18
+FROM debian:12-slim
 
-RUN apt-get update && apt-get install -y git && apt-get install -y rsync
+RUN apt-get update && apt-get install -y curl ca-certificates openssl tar bash git
 
-RUN adduser container --disabled-password
+RUN mkdir /data
+WORKDIR /data
 
-RUN chown -R container /home/container
-RUN chmod -R 775 /home/container
+COPY ../build/bin/leicoin-node /usr/local/bin/leicoin-node
 
-USER container
-ENV USER container
-ENV HOME /home/container
+# LeiCoin Net Port
+EXPOSE 12200/tcp
+EXPOSE 12200/udp
 
-WORKDIR /home/container
+# API Port
+EXPOSE 12280/tcp
+EXPOSE 12280/udp
 
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
-
-EXPOSE 12200
-EXPOSE 12280
-
-CMD ["/bin/bash", "/docker-entrypoint.sh"]
+CMD [ "/usr/local/bin/leicoin-node", "run" ]

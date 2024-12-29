@@ -5,6 +5,7 @@ import { PeerConnections } from "./connections.js";
 import { type EventEmitter } from "events";
 import { type ModuleLike } from "../utils/dataUtils.js";
 import Utils from "../utils/index.js";
+import { NetworkUtils } from "../utils/network-utils.js";
 
 export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     public static initialized = false;
@@ -45,13 +46,21 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
     private static async startServer(host: string, port: number) {
         try {
+
+            const hostIP = NetworkUtils.formatIP(host);
+            if (!hostIP) {
+                throw new Error(`Invalid Hostname: ${hostIP}`);
+            }
+
             this.server = Bun.listen({
-                hostname: host, port,
+                hostname: hostIP, port,
                 socket: LNSocketHandler.Server
             });
-            cli.leicoin_net.info(`LeiCoinNet-Node started on ${host}:${port}`);
+
+            cli.leicoin_net.info(`LeiCoinNet-Node started on ${NetworkUtils.formatAddress(host, port)}.`);
+
         } catch (error: any) {
-            cli.leicoin_net.error(`Failed to start server on ${host}:${port}, Error: ${error.stack}`);
+            cli.leicoin_net.error(`Failed to start Node on ${NetworkUtils.formatAddress(host, port)}. Error: ${error.stack}`);
             Utils.gracefulShutdown(1);
         }
     }
@@ -62,23 +71,18 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
 
         // Connect to other peer nodes and create peer-to-peer connections
         for (const targetData of peers) {
-            const dataArray = targetData.split(/:(?=[^:]*$)/);
-            const host = dataArray[0];
-            const port = dataArray[1] ? parseInt(dataArray[1]) : 12200;
+            let [host, port] = NetworkUtils.splitHostAndPort(targetData);
 
             if (!host) {
                 cli.leicoin_net.error(`Invalid Connection Data: ${targetData}`);
                 continue;
             }
-            if (!port) {
-                cli.leicoin_net.error(`Invalid Connection Data: ${targetData}`);
-                continue;
-            }
+            if (!port) port = 12200;
             
             async function saveConnect(host: string, port: number) {
                 const socket = await PeerSocket.connect(host, port);
                 if (!socket) {
-                    cli.leicoin_net.error(`Failed to connect to ${host}:${port}.`);
+                    cli.leicoin_net.error(`Failed to connect to ${NetworkUtils.formatAddress(host, port)}.`);
                     return Promise.resolve();
                 }
                 return socket;

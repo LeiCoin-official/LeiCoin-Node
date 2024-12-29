@@ -46,10 +46,11 @@ export class NetworkSyncManager {
             if (response.status !== 0 || !response.data) break;
 
             blocks.push(...response.data.blocks);
+            cli.data.info(`Received next ${response.data.blocks.length} Blocks. Received ${blocks.length} Blocks in total.`);
 
             if (response.data.blocks.length < 512) break;
 
-            currentBlockIndex.add(512);
+            currentBlockIndex.iadd(512);
         }
 
         return blocks;
@@ -104,13 +105,7 @@ export class NetworkSyncManager {
             const result = await Slot.processPastSlot(block.slotIndex, block);
             if (result) blocksSuccessfullyProcessedCount++;
         }
-
-        for (const block of this.blockQueue) {
-            const result = await Slot.processPastSlot(block.slotIndex, block);
-            if (result) blocksSuccessfullyProcessedCount++;
-            this.blockQueue.dequeue();
-        }
-
+        
         while (this.blockQueue.size > 0) {
             const block = this.blockQueue.dequeue() as Block;
             const result = await Slot.processPastSlot(block.slotIndex, block);
