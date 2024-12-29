@@ -15,55 +15,53 @@ on:
         type: boolean
 
 env:
-    REGISTRY: ghcr.io
-    IMAGE_NAME: ${{ github.repository }}
-    FULL_IMAGE_NAME: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-    
+  REGISTRY: ghcr.io
 
 jobs:
-    publish:
-        runs-on: ubuntu-latest
+  publish:
+    runs-on: ubuntu-latest
 
-        steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Setup Environment
-          uses: ./.github/workflows/setup
+      - name: Setup Environment
+        uses: ./.github/workflows/setup
 
-        - name: Login to GitHub Container Registry
-          uses: docker/login-action@v3
-          with:
-            registry: ${{ env.REGISTRY }}
-            username: ${{ github.actor }}
-            password: ${{ secrets.PAT }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT }}
 
-        - name: Extract Docker Metadata
-          id: meta
-          uses: docker/metadata-action@v5
-          with:
-            images: ${{ env.FULL_IMAGE_NAME }}
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
 
-        - name: Build Binary
-          run: bun compile linux-x64-baseline ${{ inputs.version }}
-        
-        - name: Build and Push Docker Image
-          uses: docker/build-push-action@v2
-          with:
-                context: ./docker
-                push: true
-                tags: |
-                    ${{ env.FULL_IMAGE_NAME }}:${{ inputs.version }}
-                    if ${{ inputs.pre_release }}; then
-                        ${{ env.FULL_IMAGE_NAME }}:${{ inputs.version }}-pre
-                    fi
-                labels: |
-                org.opencontainers.image.title=${{ env.IMAGE_NAME }}
-                org.opencontainers.image.version=${{ inputs.version }}
-                org.opencontainers.image.revision=${{ github.sha }}
-                org.opencontainers.image.created=${{ steps.meta.outputs.created }}
-                org.opencontainers.image.authors=${{ steps.meta.outputs.authors }}
-                org.opencontainers.image.url=${{ steps.meta.outputs.url }}
+      - name: Build Binary
+        run: bun compile linux-x64-baseline ${{ inputs.version }}
 
+      - name: Set Tags
+        id: set-tags
+        run: |
+          echo "tags=${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.version }}" >> $GITHUB_ENV
+          if [[ "${{ inputs.pre_release }}" == "false" ]]; then
+            echo "tags+=,${{ env.REGISTRY }}/${{ github.repository }}:latest" >> $GITHUB_ENV
+          fi
 
-        
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker
+          push: true
+          tags: ${{ env.tags }}
+          labels: |
+            org.opencontainers.image.title=${{ github.repository }}
+            org.opencontainers.image.version=${{ inputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.created }}
+            org.opencontainers.image.authors=${{ steps.meta.outputs.authors }}
+            org.opencontainers.image.url=${{ steps.meta.outputs.url }}
