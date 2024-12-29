@@ -34,6 +34,9 @@ jobs:
     with:
       version: ${{ github.event.inputs.version }}
       pre_release: ${{ github.event.inputs.pre_release }}
+    permissions:
+      contents: read
+      packages: write
 
   release:
     needs: build
