@@ -3,6 +3,16 @@ description: Publish Docker image for a new version.
 
 on:
   workflow_call:
+    inputs:
+      version:
+        description: 'Release version Format: x.y.z-[alpha|beta|pre].n'
+        required: true
+        type: string
+      pre_release:
+        description: 'Is this a pre-release?'
+        required: false
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
       version:
