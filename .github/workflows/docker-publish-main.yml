@@ -17,6 +17,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  IMAGE: ${{ github.repository.toLower() }}
 
 jobs:
   publish:
@@ -40,7 +41,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
 
       - name: Build Binary
         run: bun compile linux-x64-baseline ${{ inputs.version }}
@@ -48,9 +49,9 @@ jobs:
       - name: Set Tags
         id: set-tags
         run: |
-          echo "tags=${{ env.REGISTRY }}/${{ github.repository }}:${{ inputs.version }}" >> $GITHUB_ENV
+          echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ inputs.version }}" >> $GITHUB_ENV
           if [[ "${{ inputs.pre_release }}" == "false" ]]; then
-            echo "tags+=,${{ env.REGISTRY }}/${{ github.repository }}:latest" >> $GITHUB_ENV
+            echo "tags+=,${{ env.REGISTRY }}/${{ env.IMAGE }}:latest" >> $GITHUB_ENV
           fi
 
       - name: Build and Push Docker Image
