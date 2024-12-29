@@ -11,8 +11,8 @@ on:
       pre_release:
         description: 'Is this a pre-release?'
         required: false
-        default: false
-        type: boolean
+        default: "false"
+        type: string
   workflow_dispatch:
     inputs:
       version:
