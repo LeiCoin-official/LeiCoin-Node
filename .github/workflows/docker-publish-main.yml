@@ -61,7 +61,8 @@ jobs:
           push: true
           tags: ${{ env.tags }}
           labels: |
-            org.opencontainers.image.title=${{ github.repository }}
+            org.opencontainers.image.title=${{ steps.meta.outputs.title }}
+            org.opencontainers.image.description=${{ steps.meta.outputs.description }}
             org.opencontainers.image.version=${{ inputs.version }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=${{ steps.meta.outputs.created }}
