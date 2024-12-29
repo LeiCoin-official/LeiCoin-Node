@@ -1,0 +1,29 @@
+name: Docker Publish Pterodactyl Image
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version Format: x.y.z-[alpha|beta|pre].n'
+        required: true
+        type: string
+      pre_release:
+        description: 'Is this a pre-release?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+
+    publish:
+        runs-on: ubuntu-latest
+    
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+    
+            - name: Setup Environment
+              uses: ./.github/workflows/setup
+    
+            
