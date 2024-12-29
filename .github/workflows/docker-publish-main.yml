@@ -50,6 +50,9 @@ jobs:
       - name: Build Binary
         run: bun compile linux-x64-baseline ${{ inputs.version }}
 
+      - name: Build Docker Image
+        run: ls -la
+
       - name: Set Tags
         id: set-tags
         run: |
