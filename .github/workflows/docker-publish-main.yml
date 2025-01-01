@@ -76,8 +76,10 @@ jobs:
           if [[ "${{ inputs.pre_release }}" != "true" ]]; then
             echo "tags+=,${{ env.FULL_IMAGE_NAME }}:latest" >> $GITHUB_ENV
           fi
-          echo "${{ env.tags }}"
 
+      - name: Echo Tags
+        run: echo ${{ env.tags }}
+      
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
         with:
