@@ -9,10 +9,7 @@ COPY ./build/bin/leicoin-node-linux-x64-baseline /usr/local/bin/leicoin-node
 
 # LeiCoin Net Port
 EXPOSE 12200/tcp
-EXPOSE 12200/udp
-
 # API Port
 EXPOSE 12280/tcp
-EXPOSE 12280/udp
 
 CMD [ "/usr/local/bin/leicoin-node", "run" ]
