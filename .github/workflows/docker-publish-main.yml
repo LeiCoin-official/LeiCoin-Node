@@ -82,9 +82,6 @@ jobs:
           
           # Export tags to $GITHUB_ENV
           echo "tags=${tags}" >> $GITHUB_ENV
-
-      - name: Echo Tags
-        run: echo ${{ env.tags }}
       
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
