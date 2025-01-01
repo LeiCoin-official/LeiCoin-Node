@@ -73,7 +73,7 @@ jobs:
         id: set-tags
         run: |
           echo "tags=${{ env.FULL_IMAGE_NAME }}:${{ inputs.version }}" >> $GITHUB_ENV
-          if [[ "${{ inputs.pre_release }}" == "false" ]]; then
+          if [[ "${{ inputs.pre_release }}" != "true" ]]; then
             echo "tags+=,${{ env.FULL_IMAGE_NAME }}:latest" >> $GITHUB_ENV
           fi
 
