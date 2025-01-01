@@ -17,10 +17,7 @@ COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 # LeiCoin Net Port
 EXPOSE 12200/tcp
-EXPOSE 12200/udp
-
 # API Port
 EXPOSE 12280/tcp
-EXPOSE 12280/udp
 
 CMD ["/bin/bash", "/docker-entrypoint.sh"]
