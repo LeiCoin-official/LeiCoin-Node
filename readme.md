@@ -2,7 +2,7 @@
 
 ## Installation
 
-### With docker
+### Method 1: Using Docker
 
 ```bash
 docker run -it \
@@ -11,3 +11,4 @@ docker run -it \
   -p 12280:12280/tcp \
   ghcr.io/leicoin-official/leicoin-node:latest
 ```
+
