@@ -23,3 +23,49 @@ docker run -it \
 ```bash
 ./leicoin-node run
 ```
+
+## Configuration
+
+### Main Config
+The configuration file for LeiCoin-Node is located at `./config/config.json`. Below is an explanation of the sample configuration:
+
+```json
+{
+  "api": {
+    "active": false,
+    "host": "0.0.0.0",
+    "port": 12280
+  },
+  "leicoin_net": {
+    "host": "0.0.0.0",
+    "port": 12200
+  },
+  "minter": {
+    "active": true,
+    "credentials": [
+      {
+        "privateKey": "",
+        "address": ""
+      }
+    ]
+  },
+  "experimental": false
+}
+```
+
+- `api`: Configuration for the API server.
+  - `active`: Boolean to enable or disable the API server.
+  - `host`: The host address for the API server.
+  - `port`: The port on which the API server listens.
+
+- `leicoin_net`: Configuration for the LeiCoin network.
+  - `host`: The host address for the LeiCoin network.
+  - `port`: The port on which the LeiCoin network listens.
+
+- `minter`: Configuration for the minter.
+  - `active`: Boolean to enable or disable the minter.
+  - `credentials`: List of credentials for the minter.
+    - `privateKey`: The private key for the minter.
+    - `address`: The address associated with the private key.
+
+- `experimental`: Boolean to enable or disable experimental features.
