@@ -4,7 +4,7 @@ export class NetworkUtils {
     static splitHostAndPort(uri: string): [string | null, number | null] {
 
         const dataArray = uri.split(/:(?=[^:]*$)/);
-        const host = NetworkUtils.normalizeIP(dataArray[0]) || null;
+        const host = NetworkUtils.normalizeIP(dataArray[0]) || dataArray[0];
         const port = dataArray[1] ? parseInt(dataArray[1]) : null;
 
         return [host, port];
@@ -76,8 +76,8 @@ export class NetworkUtils {
     }
 
     static formatAddress(host: string, port: number): string | null {
-        const formattedIP = NetworkUtils.formatIP(host);
-        if (!formattedIP) return null; // Return null for invalid IP
+        const formattedIP = NetworkUtils.formatIP(host) || host;
+        //if (!formattedIP) return null; // Return null for invalid IP
     
         return `${formattedIP}:${port}`;
     }
