@@ -9,6 +9,7 @@ docker run -it \
   --name leicoin-node \
   -p 12200:12200/tcp \
   -p 12280:12280/tcp \
+  -v /path/to/local/data:/data \
   ghcr.io/leicoin-official/leicoin-node:latest
 ```
 
