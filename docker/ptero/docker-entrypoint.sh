@@ -49,7 +49,7 @@ function download_binary {
 
     echo "Downloading LeiCoin-Node version $version for architecture $arch..."
 
-    $http_response_code="$(curl --write-out '%{http_code}' -sL -o leicoin-node "$url")"
+    http_response_code="$(curl --write-out '%{http_code}' -sL -o leicoin-node "$url")"
 
     if [ "$http_response_code" != "200" ]; then
         echo "Failed to download LeiCoin-Node binary. HTTP response code: $http_response_code"
