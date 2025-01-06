@@ -1,54 +1,103 @@
 #!/bin/bash
-sleep 1
 
-cd /home/container
+function check_cpu_arch {
+    local arch=$(uname -m)
+    if [ "$arch" = "x86_64" ]; then
+        declare -g ARCH="linux-x64"
+    elif [ "$arch" = "aarch64" ]; then
+        declare -g ARCH="linux-arm64"
+    else
+        echo "Unsupported architecture: $arch"
+        exit 1
+    fi
+}
 
-echo "Starting..."
+function extract_env_bool {
+    local var_name=$1
+    if [[ "${!var_name}" == "1" ]]; then
+        eval "$var_name=true"
+    else
+        eval "$var_name=false"
+    fi
+}
 
-if [ -n "$STARTUP" ] && [[ "$STARTUP" == "start"* ]]; then
-    # Use parameter expansion to extract all content after "start"
-    args_after_start="${STARTUP#start }"
+function get_latest_version {
+    local include_prereleases=$1
+    local api_url="https://api.github.com/repos/LeiCoin-official/LeiCoin-Node/releases"
 
-    # Replace placeholders in args_after_start using eval and sed
-    MODIFIED_STARTUP=`eval echo $(echo ${args_after_start} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
+    # Fetch releases from GitHub API
+    local releases_json=$(curl -s "$api_url")
 
-    args=$MODIFIED_STARTUP
-else
-    args="$@"
-fi
+    if [ "$include_prereleases" == "true" ]; then
+        # Include prereleases
+        echo "$releases_json" | jq -r '.[0].tag_name'
+    else
+        # Exclude prereleases, find the first stable release
+        echo "$releases_json" | jq -r '[.[] | select(.prerelease == false)][0].tag_name'
+    fi
+}
 
-run_experimental=false
-branch_to_clone="main"
+function get_current_version {
+    local version=$(./leicoin-node --version)
+    echo $version | cut -d ' ' -f 2
+}
 
-if [[ "$args" == *"--experimental"* ]]; then
-    echo "Experimental mode is active!"
-    run_experimental=true
-    branch_to_clone="addfork"
-fi
+function download_binary {
+    local version=$1
+    local arch=$2
+    local url="https://github.com/LeiCoin-official/LeiCoin-Node/releases/download/${version}/leicoin-node-${version}-${arch}"
 
-# Clone the GitHub repo to /home/container/tmp with the "docker" branch
-git clone --single-branch --branch $branch_to_clone https://github.com/LeiCraft/LeiCoin-Node.git /home/container/gittmp
+    echo "Downloading LeiCoin-Node version $version for architecture $arch..."
 
-# Check the exit code of the git clone command
-clone_exit_code=$?
+    $http_response_code=$(curl --write-out '%{http_code}' -sL -o leicoin-node "$url")
 
-# Check if the clone was successful
-if [ $clone_exit_code -eq 0 ]; then
-    # Copy all files to /home/container while excluding .git, .github, and files listed in .gitignore
-    rsync -avq --delete --exclude='gittmp' --exclude='.git*' --exclude='docker' --exclude-from=/home/container/gittmp/.gitignore /home/container/gittmp/ /home/container/
+    if [ $http_response_code -ne 200 ]; then
+        echo "Failed to download LeiCoin-Node binary. HTTP response code: $http_response_code"
+        exit 1
+    fi
 
-    echo "GitHub repository cloned and files copied successfully."
-else
-    echo "Failed to clone the GitHub repository."
-fi
+    chmod +x leicoin-node
 
+    echo "LeiCoin-Node $version downloaded successfully."
+}
 
-# Start the Script
-if [[ "$run_experimental" == "true" ]]; then
+function main {
 
+    echo "Starting..."
+
+    cd /home/container
+
+    check_cpu_arch
+
+    # Extract Startup CMD
+    STARTUP_CMD=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
+    extract_env_bool EXPERIMENTAL
+    extract_env_bool VERSION
     
-    
-    node ./build/index.js $args
-else
-    node index.js $args
-fi
+    LOCAL_VERSION=$(get_current_version)
+
+    if [ "$VERSION" == "latest" ]; then
+        
+        REMOTE_VERSION=$(get_latest_version $EXPERIMENTAL)
+
+        if [ "$REMOTE_VERSION" != "v$LOCAL_VERSION" ]; then
+            echo "New version available: $REMOTE_VERSION. Downloading..."
+            download_binary $REMOTE_VERSION $ARCH
+        else
+            echo "The latest version is already installed. Continuing..."
+        fi
+    else
+        
+        if [[ "$VERSION" != "v$LOCAL_VERSION" ]]; then
+            echo "Requested version $VERSION is not installed. Downloading..."
+            download_binary $VERSION $ARCH
+        else
+            echo "Requested version $VERSION is already installed. Continuing..."
+        fi        
+
+    fi
+
+    ${STARTUP_CMD}
+}
+
+main
