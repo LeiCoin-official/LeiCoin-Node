@@ -38,7 +38,7 @@ function get_latest_version {
 }
 
 function get_current_version {
-    local version=$(./leicoin-node --version)
+    local version=$(leicoin-node --version 2>/dev/null)
     echo $version | cut -d ' ' -f 2
 }
 
@@ -49,9 +49,9 @@ function download_binary {
 
     echo "Downloading LeiCoin-Node version $version for architecture $arch..."
 
-    $http_response_code=$(curl --write-out '%{http_code}' -sL -o leicoin-node "$url")
+    http_response_code="$(curl --write-out '%{http_code}' -sL -o leicoin-node "$url")"
 
-    if [ $http_response_code -ne 200 ]; then
+    if [ "$http_response_code" != "200" ]; then
         echo "Failed to download LeiCoin-Node binary. HTTP response code: $http_response_code"
         exit 1
     fi
@@ -72,7 +72,6 @@ function main {
     # Extract Startup CMD
     STARTUP_CMD=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
     extract_env_bool EXPERIMENTAL
-    extract_env_bool VERSION
     
     LOCAL_VERSION=$(get_current_version)
 
