@@ -47,7 +47,8 @@ export class LeiCoinNetNode implements ModuleLike<typeof LeiCoinNetNode> {
     private static async startServer(host: string, port: number) {
         try {
 
-            const hostIP = NetworkUtils.formatIP(host);
+            const hostIP = NetworkUtils.normalizeIP(host);
+            console.log(hostIP);
             if (!hostIP) {
                 throw new Error(`Invalid Hostname: ${hostIP}`);
             }
