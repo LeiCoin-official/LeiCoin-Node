@@ -70,7 +70,7 @@ function main {
     check_cpu_arch
 
     # Extract Startup CMD
-    STARTUP_CMD=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
+    STARTUP_CMD=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
     extract_env_bool EXPERIMENTAL
     
     LOCAL_VERSION=$(get_current_version)
@@ -96,7 +96,7 @@ function main {
 
     fi
 
-    ${STARTUP_CMD}
+    eval ${STARTUP_CMD}
 }
 
 main
