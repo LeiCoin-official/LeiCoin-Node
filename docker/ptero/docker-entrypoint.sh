@@ -21,6 +21,17 @@ function extract_env_bool {
     fi
 }
 
+function ensure_config_file_exists {
+    local filepath="./config/config.json"
+
+    mkdir -p "$(dirname "$filepath")"
+
+    if [[ ! -f "$filepath" ]]; then
+        echo "{}" > "$filepath"
+        echo "File created with '{}': $filepath"
+    fi
+}
+
 function get_latest_version {
     local include_prereleases=$1
     local api_url="https://api.github.com/repos/LeiCoin-official/LeiCoin-Node/releases"
@@ -68,6 +79,7 @@ function main {
     cd /home/container
 
     check_cpu_arch
+    ensure_config_file_exists
 
     # Extract Startup CMD
     STARTUP_CMD=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
