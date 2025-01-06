@@ -41,9 +41,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./docker/ptero
-          file: Dockerfile
           push: true
-          tags: ptero-latest
+          tags: ${{ env.FULL_IMAGE_NAME }}:ptero-latest
           labels: |
             org.opencontainers.image.title=${{ steps.meta.outputs.title }}
             org.opencontainers.image.description=${{ steps.meta.outputs.description }}
