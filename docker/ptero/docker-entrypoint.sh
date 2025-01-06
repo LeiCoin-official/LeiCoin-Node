@@ -96,7 +96,7 @@ function main {
 
     fi
 
-    echo -e ":/home/container$ ./leicoin-node run --port=${SERVER_PORT} $AF"
+    # echo -e ":/home/container$ ./leicoin-node run --port=${SERVER_PORT} $AF"
     eval ${STARTUP_CMD}
 }
 
