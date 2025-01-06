@@ -12,4 +12,4 @@ EXPOSE 12200/tcp
 # API Port
 EXPOSE 12280/tcp
 
-CMD [ "/usr/local/bin/leicoin-node", "run" ]
+ENTRYPOINT [ "/usr/local/bin/leicoin-node" ]

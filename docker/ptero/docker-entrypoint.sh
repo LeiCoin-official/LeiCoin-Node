@@ -42,16 +42,11 @@ else
     echo "Failed to clone the GitHub repository."
 fi
 
-# Remove temporary directories
-rm -rf /home/container/gittmp
-
-# Install Node Packges
-npm i
 
 # Start the Script
 if [[ "$run_experimental" == "true" ]]; then
 
-    npm run build
+    
     
     node ./build/index.js $args
 else
