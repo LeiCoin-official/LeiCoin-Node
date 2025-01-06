@@ -38,7 +38,7 @@ function get_latest_version {
 }
 
 function get_current_version {
-    local version=$(/home/container/leicoin-node --version 2>/dev/null)
+    local version=$(./leicoin-node --version 2>/dev/null)
     echo $version | cut -d ' ' -f 2
 }
 
@@ -75,7 +75,7 @@ function main {
     
     LOCAL_VERSION=$(get_current_version)
 
-    get_current_version
+    ./leicoin-node
 
     if [ "$VERSION" == "latest" ]; then
         
