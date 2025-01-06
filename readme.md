@@ -10,7 +10,8 @@ docker run -it \
   -p 12200:12200/tcp \
   -p 12280:12280/tcp \
   -v /path/to/local/data:/data \
-  ghcr.io/leicoin-official/leicoin-node:latest
+  ghcr.io/leicoin-official/leicoin-node:latest \
+  run
 ```
 
 ### Method 2: Using GitHub Releases
