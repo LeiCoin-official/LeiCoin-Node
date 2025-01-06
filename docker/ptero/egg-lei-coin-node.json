@@ -4,19 +4,19 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2024-02-20T18:43:32+01:00",
-    "name": "LeiCoin Node Host",
+    "exported_at": "2025-01-06T17:59:44+01:00",
+    "name": "LeiCoin Node",
     "author": "leicraft@leicraftmc.de",
     "description": null,
     "features": null,
     "docker_images": {
-        "LeiCoin Node Latest": "ghcr.io\/leicraft\/leicoin-node:latest"
+        "LeiCoin Node Latest": "ghcr.io\/leicoin-official\/leicoin-node:ptero-latest"
     },
     "file_denylist": [],
-    "startup": "start internal-port={{SERVER_PORT}} internal-host={{SERVER_IP}} $(if [ {{EXPERIMENTAL}} -eq 1 ]; then echo '--experimental'; fi)",
+    "startup": ".\/leicoin-node run",
     "config": {
-        "files": "{}",
-        "startup": "{\r\n    \"done\": \"\",\r\n    \"userInteraction\": []\r\n}",
+        "files": "{\r\n    \"config\/config.json\": {\r\n        \"parser\": \"json\",\r\n        \"find\": {\r\n            \"leicoin_net.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \"[Global] LeiCoin-Node started\"\r\n}",
         "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
         "stop": "stop"
     },
@@ -36,6 +36,16 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "boolean|int",
+            "field_type": "text"
+        },
+        {
+            "name": "Version",
+            "description": "If you set Version to latest, the lastest Version will be pulled on every startup",
+            "env_variable": "VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
             "field_type": "text"
         }
     ]
