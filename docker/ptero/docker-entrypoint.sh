@@ -96,6 +96,7 @@ function main {
 
     fi
 
+    echo -e ":/home/container$ ${STARTUP_CMD}"
     eval ${STARTUP_CMD}
 }
 
