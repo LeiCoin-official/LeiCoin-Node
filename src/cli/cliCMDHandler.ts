@@ -9,6 +9,7 @@ import MinterDBCMD from "./commands/minterDBCMD.js";
 import { RunCMD } from "./commands/runCMD.js";
 import StartServiceCMD from "./commands/startServiceCMD.js";
 import StopCMD from "./commands/stopCMD.js";
+import { VersionCMD } from "./commands/versionCMD.js";
 import WalletDBCMD from "./commands/walletDBCMD.js";
 import { CMDFlag, CMDFlagsParser } from "./flags.js";
 
@@ -40,6 +41,7 @@ export class CLICMDHandler extends CLISubCMD {
         this.register(new BlockDBCMD());
         this.register(new ChainstateDataCMD());
         this.register(new StartServiceCMD())
+        this.register(new VersionCMD());
     }
 
     protected async run_empty(parent_args: string[]): Promise<void> {

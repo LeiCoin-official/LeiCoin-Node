@@ -1,6 +1,6 @@
 FROM debian:12-slim
 
-RUN apt-get update && apt-get install -y curl ca-certificates openssl tar bash git rsync
+RUN apt-get update && apt-get install -y curl ca-certificates openssl tar bash git rsync jq
 
 RUN adduser --disabled-password --home /home/container container
 
