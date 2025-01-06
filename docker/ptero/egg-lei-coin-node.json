@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2025-01-06T17:54:40+01:00",
+    "exported_at": "2025-01-06T17:59:44+01:00",
     "name": "LeiCoin Node",
     "author": "leicraft@leicraftmc.de",
     "description": null,
@@ -15,7 +15,7 @@
     "file_denylist": [],
     "startup": ".\/leicoin-node run",
     "config": {
-        "files": "{}",
+        "files": "{\r\n    \"config\/config.json\": {\r\n        \"parser\": \"json\",\r\n        \"find\": {\r\n            \"leicoin_net.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
         "startup": "{\r\n    \"done\": \"[Global] LeiCoin-Node started\"\r\n}",
         "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
         "stop": "stop"
