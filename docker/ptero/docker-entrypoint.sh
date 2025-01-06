@@ -75,7 +75,7 @@ function main {
     
     LOCAL_VERSION=$(get_current_version)
 
-    ./leicoin-node
+    ./leicoin-node --version
 
     if [ "$VERSION" == "latest" ]; then
         
