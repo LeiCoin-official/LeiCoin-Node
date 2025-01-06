@@ -26,6 +26,11 @@ docker run -it \
 ./leicoin-node run
 ```
 
+### Method 3: Using Pterodactyl
+1. <a href="https://raw.githubusercontent.com/LeiCoin-official/LeiCoin-Node/refs/heads/main/docker/ptero/egg-lei-coin-node.json" download>Download</a> the Pterodactyl-Egg from Github
+2. Put The File On your Pterodactyl Panel and create a Server with it
+3. Start the created Server
+
 ## Configuration
 
 ### Main Config
