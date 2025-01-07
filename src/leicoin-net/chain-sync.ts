@@ -61,7 +61,10 @@ export class NetworkSyncManager {
 
     private static async syncBlocks(socket: PeerSocket, sinceIndex: Uint64) {
 
-        let blocksSuccessfullyProcessedCount = 0;
+        const stats = {
+            blocksReceiveCount: Uint64.from(0),
+            blocksSuccessfullyProcessedCount: Uint64.from(0),
+        };
         const currentBlockIndex = sinceIndex;
 
         while (true) {
@@ -69,17 +72,20 @@ export class NetworkSyncManager {
             if (response.status !== 0 || !response.data) break;
 
             const blocks = response.data.blocks;
-            cli.data.info(`Received next ${response.data.blocks.length} Blocks. Received ${blocks.length} Blocks in total.`);
+
+            stats.blocksReceiveCount.iadd(blocks.length);
+            cli.data.info(`Received next ${blocks.length} Blocks. Received ${stats.blocksReceiveCount.toBigInt()} Blocks in total.`);
 
             const execution_result = await this.executeBlocks(blocks);
-            blocksSuccessfullyProcessedCount += execution_result.blocksSuccessfullyProcessedCount;
+
+            stats.blocksSuccessfullyProcessedCount.iadd(execution_result.blocksSuccessfullyProcessedCount);
+            cli.leicoin_net.info(`Executed ${execution_result.blocksSuccessfullyProcessedCount} / ${blocks.length} Blocks successfully.`);
 
             if (response.data.blocks.length < 512) break;
-
             currentBlockIndex.iadd(512);
         }
 
-        return { blocksSuccessfullyProcessedCount };
+        return stats;
     }
 
     static async checkRemoteChainstates() {
@@ -99,7 +105,7 @@ export class NetworkSyncManager {
             cli.leicoin_net.info("Checking local chainstate and puling latest blocks...");
             const result = await this.syncChain();
             this.state = "synchronized";
-            cli.leicoin_net.success("Successfully synced the Blockchain. Blocks processed: " + result.blocksSuccessfullyProcessedCount);
+            cli.leicoin_net.success(`Successfully synced the Blockchain. Blocks processed: ${result.blocksSuccessfullyProcessedCount.toBigInt()}`);
         } catch (err: any) {
             cli.leicoin_net.error(`Failed to sync the Blockchain: ${err.message}`);
             if (ignoreNoPeers) {
@@ -123,16 +129,15 @@ export class NetworkSyncManager {
             throw new Error("No peers to sync with");
         }
 
-        const sync_result = await this.syncBlocks(syncPeers[0], latestBlock.index);
-        let blocksSuccessfullyProcessedCount = sync_result.blocksSuccessfullyProcessedCount;
+        const sync_stats = await this.syncBlocks(syncPeers[0], latestBlock.index);
         
         while (this.blockQueue.size > 0) {
             const block = this.blockQueue.dequeue() as Block;
             const result = await Slot.processPastSlot(block.slotIndex, block);
-            if (result) blocksSuccessfullyProcessedCount++;
+            if (result) sync_stats.blocksSuccessfullyProcessedCount.iadd(1);
         }
 
-        return { blocksSuccessfullyProcessedCount };
+        return sync_stats;
     }
 
 
