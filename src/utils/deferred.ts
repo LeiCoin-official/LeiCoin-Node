@@ -39,7 +39,7 @@ export class Deferred<T = void> {
         return this.promise;
     }
 
-    public isResolved() {
+    public hasResolved() {
         return this.resolved;
     }
 
