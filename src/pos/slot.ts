@@ -7,33 +7,38 @@ import { Blockchain } from "../storage/blockchain.js";
 import cli from "../cli/cli.js";
 import Schedule from "../utils/schedule.js";
 import POS from "./index.js";
-import { Deferred } from "../utils/deferred.js";
 import { formatDate } from "date-fns/format";
 import { UTCDate } from "@date-fns/utc/date";
 import { VCodes } from "../verification/codes.js";
+import { ExecutionCheckpoint } from "../utils/executionCheckpoint.js";
 
 export class Slot {
 
     public block?: Block;
 
-    protected slot_started = false;
-    readonly slot_finished: Deferred<void>;
+    protected slot_started = new ExecutionCheckpoint();
+    readonly slot_finished = new ExecutionCheckpoint(() => {
+        this.slot_started.pass();
+        this.blockTimeout.cancel();
+    });
     protected readonly blockTimeout: Schedule;
 
     protected constructor(
         readonly index: Uint64,
         readonly minter: AddressHex,
     ) {
-        this.slot_finished = new Deferred();
-        new Schedule(async() => await this.onSlotStart(), 1000);
-        this.blockTimeout = new Schedule(async() => await this.onBlockNotMinted(), 6000);
+        let timeUntilSlotStart = POS.calculateSlotExecutionTime(index) - Date.now();
+        if (timeUntilSlotStart < 0) timeUntilSlotStart = 0;
+        new Schedule(async() => await this.onSlotStart(), timeUntilSlotStart);
+        this.blockTimeout = new Schedule(async() => await this.onBlockNotMinted(), timeUntilSlotStart + 5_000);
     }
 
     static async create(index: Uint64) {
         const latestSlot = await POS.getSlot(index.sub(1));
         if (latestSlot) {
             // Ensure minterdb was upodated before selecting the next minter
-            await latestSlot.slot_finished.awaitResult();
+            // problem: dont ensure that minterdb is updated before block executed
+            await latestSlot.slot_finished.passing();
         }
 
         const nextMinter = await Blockchain.minters.selectNextMinter(index);
@@ -41,8 +46,7 @@ export class Slot {
     }
 
     protected async onSlotStart() {
-        if (this.slot_finished.isResolved() || this.slot_started) return;
-        this.slot_started = true;
+        if (this.slot_finished.hasPassed()) return;
 
         cli.pos.info(`Starting new slot: ${this.index.toBigInt()} at ${formatDate(new UTCDate(), "dd-MMM-yyyy HH:mm:ss:SSS")}, Minter: ${this.minter.toHex()}`);
 
@@ -52,39 +56,38 @@ export class Slot {
                 break;
             }
         }
+
+        this.slot_started.pass();
     }
 
     protected async onBlockNotMinted() {
-        if (this.slot_finished.isResolved()) return;
+        if (this.slot_finished.hasPassed()) return;
+        this.slot_finished.pass();
 
-        this.slot_finished.resolve();
         cli.pos.error(`Minter ${this.minter.toHex()} did not mint a block on Slot ${this.index.toBigInt()}`);
     }
 
 
     public async processBlock(block: Block) {
-        if (this.slot_finished.isResolved() || this.blockTimeout.hasFinished()) return;
+        if (this.slot_finished.hasPassed()) return;
         this.blockTimeout.cancel();
 
-        if (this.block) { this.slot_finished.resolve(); return; }
+        if (this.block) return;
         this.block = block;
         
-        const latestSlot = await POS.getSlot(this.index.sub(1));
-        if (latestSlot) {
-            // Ensure minterdb was upodated before trying to verify and execute the next block
-            await latestSlot.slot_finished.awaitResult();
-        }
+        // Ensure all necessary procedures are finished before executing the block
+        await this.slot_started.passing();
 
         const verification_result = await Verification.verifyBlock(block);
 
         if (verification_result.status !== 12000) {
-            this.slot_finished.resolve();
+            this.slot_finished.pass();
             cli.pos.error(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: Code: ${verification_result.status} Message: ${VCodes[verification_result.status]}`);
             return;
         }
 
         const execution_result = await Execution.executeBlock(block, verification_result);
-        this.slot_finished.resolve();
+        this.slot_finished.pass();
 
         if (execution_result.forked) {
             cli.pos.info(`New Fork ${verification_result.targetChain} created from ${verification_result.parentChain} at block ${block.index.toBigInt()}`);

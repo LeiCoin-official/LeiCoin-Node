@@ -66,6 +66,10 @@ export class POS implements ModuleLike<typeof POS> {
         );
     }
 
+    static calculateSlotExecutionTime(index: Uint64) {
+        return Constants.GENESIS_TIME + index.toInt() * Constants.SLOT_TIME;
+    }
+
     static async startNewSlot(slotIndex: Uint64) {
         const newSlot = Slot.create(slotIndex);
         this.slots.set(slotIndex, newSlot);
@@ -78,7 +82,7 @@ export class POS implements ModuleLike<typeof POS> {
     static async forceFinishAndDeleteSlot(slotIndex: Uint64) {
         const slot = await this.getSlot(slotIndex);
         if (slot) {
-            slot.slot_finished.resolve();
+            slot.slot_finished.pass();
             this.endSlot(slotIndex);
         }
     }
