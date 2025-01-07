@@ -35,25 +35,51 @@ export class NetworkSyncManager {
         return (await Promise.all(chainstates)).filter(cs => cs) as ForkChainstateData[];
     }
 
-    private static async getRemoteBlocks(sinceIndex: Uint64, socket: PeerSocket) {
+    
+    /**
+     * Retrieves blocks from a remote peer starting from a specified index.
+     * @param socket - The peer socket to communicate with.
+     * @param sinceIndex - The index from which to start retrieving blocks.
+     * @param limit - The maximum number of blocks to retrieve. Have to be a integer between 1 and 512 (512 as default).
+     * @returns A promise that resolves to a `LNResponseData<BlocksMsg>` containing the requested blocks.
+     */
+    private static async getRemoteBlocks(socket: PeerSocket, sinceIndex: Uint64, limit = 512) {
+        const requestMSG = new GetBlocksMsg(sinceIndex, Uint64.from(limit));
+        return socket.request<BlocksMsg>(requestMSG);
+    }
 
-        const blocks: Block[] = [];
+    private static async executeBlocks(blocks: Block[]) {
+        let blocksSuccessfullyProcessedCount = 0;
 
+        for (const block of blocks) {
+            const result = await Slot.processPastSlot(block.slotIndex, block);
+            if (result) blocksSuccessfullyProcessedCount++;
+        }
+
+        return { blocksSuccessfullyProcessedCount };
+    }
+
+    private static async syncBlocks(socket: PeerSocket, sinceIndex: Uint64) {
+
+        let blocksSuccessfullyProcessedCount = 0;
         const currentBlockIndex = sinceIndex;
 
         while (true) {
-            const response = await socket.request<BlocksMsg>(new GetBlocksMsg(currentBlockIndex, Uint64.from(512)));
+            const response = await this.getRemoteBlocks(socket, currentBlockIndex);
             if (response.status !== 0 || !response.data) break;
 
-            blocks.push(...response.data.blocks);
+            const blocks = response.data.blocks;
             cli.data.info(`Received next ${response.data.blocks.length} Blocks. Received ${blocks.length} Blocks in total.`);
+
+            const execution_result = await this.executeBlocks(blocks);
+            blocksSuccessfullyProcessedCount += execution_result.blocksSuccessfullyProcessedCount;
 
             if (response.data.blocks.length < 512) break;
 
             currentBlockIndex.iadd(512);
         }
 
-        return blocks;
+        return { blocksSuccessfullyProcessedCount };
     }
 
     static async checkRemoteChainstates() {
@@ -97,14 +123,8 @@ export class NetworkSyncManager {
             throw new Error("No peers to sync with");
         }
 
-        const blocks = await this.getRemoteBlocks(latestBlock.index, syncPeers[0]);
-
-        let blocksSuccessfullyProcessedCount = 0;
-
-        for (const block of blocks) {
-            const result = await Slot.processPastSlot(block.slotIndex, block);
-            if (result) blocksSuccessfullyProcessedCount++;
-        }
+        const sync_result = await this.syncBlocks(syncPeers[0], latestBlock.index);
+        let blocksSuccessfullyProcessedCount = sync_result.blocksSuccessfullyProcessedCount;
         
         while (this.blockQueue.size > 0) {
             const block = this.blockQueue.dequeue() as Block;
