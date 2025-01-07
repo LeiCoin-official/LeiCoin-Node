@@ -99,5 +99,14 @@ describe("ip_tests", () => {
         // Invalid IP
         expect(NetworkUtils.formatIP("invalid")).toBe(null);
     });
+    test("spilt_host_port", async () => {
+
+        expect(NetworkUtils.splitHostAndPort("192.168.1.1:12200")).toEqual(["192.168.1.1", 12200]);
+        expect(NetworkUtils.splitHostAndPort("[2001:db8::1]:12200")).toEqual(["2001:db8:0:0:0:0:0:1", 12200]);
+        expect(NetworkUtils.splitHostAndPort(":::12200")).toEqual(["0:0:0:0:0:0:0:0", 12200]);
+
+        expect(NetworkUtils.splitHostAndPort("192.168.1.1")).toEqual(["192.168.1.1", null]);
+
+    });
 
 });

@@ -12,6 +12,7 @@ import { LNController, PeerSocketController } from "./controller.js";
 import { AutoProcessingQueue, ProcessState, Queue } from "../utils/queue.js";
 import { LNDataPaket } from "./packets.js";
 import { NetworkUtils } from "../utils/network-utils.js";
+import { BoundedExecutor } from "../utils/boundedExecutor.js";
 
 
 export class PeerSocket {
@@ -53,10 +54,16 @@ export class PeerSocket {
         skipStatusCheck = false
     ) {
         try {
-            const socket = (await Bun.connect({
-                hostname: host, port,
-                socket: LNSocketHandler.Client,
-            })).data;
+            const tcp_socket = await (new BoundedExecutor(() => {
+                return Bun.connect({
+                    hostname: host, port,
+                    socket: LNSocketHandler.Client,
+                });
+            }, 5_000)).awaitResult();
+
+            if (!tcp_socket) return null;
+
+            const socket = tcp_socket.data;
             socket.port = port;
 
             if (skipStatusCheck) {

@@ -78,7 +78,7 @@ export namespace ChallengeMsg {
             const challenge = ChallengeMsgStore.get(data.requestID);
             if (challenge) {
                 challenge.resolve(data.challenge);
-                socket.close(null, false);
+                socket.close(null, true);
                 return;
             }
         }
