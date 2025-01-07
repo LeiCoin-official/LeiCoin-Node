@@ -67,9 +67,11 @@ export class Compiler {
             this.command.outfile += `-${platform}`;
         }
 
+        /* Uncomment this if Bun fully support that also on cross-compiling
         if (platform.startsWith("win") || process.platform === "win32") {
             this.command.addArg("--windows-icon=./assets/leicoin-logo-win.ico");
         }
+        */
         
         this.command.env.LEICOIN_NODE_VERSION = version;
     }
