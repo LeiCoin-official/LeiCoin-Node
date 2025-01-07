@@ -38,7 +38,7 @@ function get_latest_version {
 }
 
 function get_current_version {
-    local version=$(./leicoin-node --version)
+    local version=$(./leicoin-node --version 2>/dev/null)
     echo $version | cut -d ' ' -f 2
 }
 
@@ -70,7 +70,7 @@ function main {
     check_cpu_arch
 
     # Extract Startup CMD
-    STARTUP_CMD=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
+    STARTUP_CMD=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
     extract_env_bool EXPERIMENTAL
     
     LOCAL_VERSION=$(get_current_version)
@@ -96,7 +96,8 @@ function main {
 
     fi
 
-    ${STARTUP_CMD}
+    # echo -e ":/home/container$ ./leicoin-node run --port=${SERVER_PORT} $AF"
+    eval ${STARTUP_CMD}
 }
 
 main

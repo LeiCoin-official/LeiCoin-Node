@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2025-01-06T18:38:17+01:00",
+    "exported_at": "2025-01-06T19:50:43+01:00",
     "name": "LeiCoin Node",
     "author": "leicraft@leicraftmc.de",
     "description": null,
@@ -13,10 +13,10 @@
         "LeiCoin Node Latest": "ghcr.io\/leicoin-official\/leicoin-node:ptero-latest"
     },
     "file_denylist": [],
-    "startup": ".\/leicoin-node run --port={{SERVER_PORT}}",
+    "startup": "if [[ {{ONLY_CLI}} == \"1\" ]]; then AF=\"$AF --only-cli\"; fi; \r\nif [[ {{IGNORE_NO_PEERS}} == \"1\" ]]; then AF=\"$AF --ignore-no-peers\"; fi; \r\n.\/leicoin-node run --port={{SERVER_PORT}} $AF",
     "config": {
         "files": "{}",
-        "startup": "{\r\n    \"done\": \"[Global] LeiCoin-Node started\"\r\n}",
+        "startup": "{\r\n    \"done\": \"LeiCoin-Node started\"\r\n}",
         "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
         "stop": "stop"
     },
@@ -46,6 +46,26 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Only CLI (Safe Mode)",
+            "description": "Start in Safe Mode",
+            "env_variable": "ONLY_CLI",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "boolean|int",
+            "field_type": "text"
+        },
+        {
+            "name": "Ignore No Peers to Sync with",
+            "description": "",
+            "env_variable": "IGNORE_NO_PEERS",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "boolean|int",
             "field_type": "text"
         }
     ]
