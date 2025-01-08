@@ -75,16 +75,14 @@ export class RunCMD extends CLICMD {
             });
         }
 
+        POS.init(
+            config.minter?.active ?
+                MinterClient.createMinters(config.minter.credentials) :
+                []
+        );
+
         await NetworkSyncManager.doStartupSync(flags["--ignore-no-peers"] as boolean);
         
-        const minters: MinterClient[] = [];
-        if (config.minter?.active) {
-            minters.push(
-                ...MinterClient.createMinters(config.minter.credentials)
-            );
-        }
-
-        POS.init(minters);
         POS.start();
 
         cli.default.info(`LeiCoin-Node started in Full Node mode`);

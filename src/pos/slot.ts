@@ -11,6 +11,7 @@ import { formatDate } from "date-fns/format";
 import { UTCDate } from "@date-fns/utc/date";
 import { VCodes } from "../verification/codes.js";
 import { ExecutionCheckpoint } from "../utils/executionCheckpoint.js";
+import { NewBlockMsg } from "../leicoin-net/messaging/messages/block.js";
 
 export class Slot {
 
@@ -75,6 +76,9 @@ export class Slot {
         if (this.block) return;
         this.block = block;
         
+        // Ensure IncomingBlockQueue is empty before processing this block
+        await NewBlockMsg.IncomingBlockQueue.back()?.proccessed.awaitResult();
+
         // Ensure all necessary procedures are finished before executing the block
         await this.slot_started.passing();
 

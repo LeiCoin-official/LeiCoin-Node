@@ -57,6 +57,9 @@ export class AutoProcessingQueue<T> {
         return ps.proccessed.awaitResult();
     }
 
+    public front() { return this.queue.front(); }
+    public back() { return this.queue.back(); }
+
     protected async processAll() {
         if (this.processing || this.queue.size === 0) return;
         this.processing = true;
