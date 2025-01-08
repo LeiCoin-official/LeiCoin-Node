@@ -80,6 +80,9 @@ export class PeerSocketController {
         const challenge_msg = ChallengeMsg.create(request_msg.requestID);
         await client.send(challenge_msg);
 
+        // Mark the Client as closed to prevent any unnessecary procedures
+        client.state = "CLOSED";
+
         const response = await request;
 
         client.close(null, true);

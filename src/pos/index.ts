@@ -42,7 +42,7 @@ export class POS implements ModuleLike<typeof POS> {
         cli.pos.info("POS started");
     }
 
-    static setupEvents() {}
+    private static async setupEvents() {}
     
     static async stop() {
         if (!this.started) return;
