@@ -28,6 +28,12 @@ export class NewBlockMsg extends LNAbstractMsgBody {
     ]
 }
 
+export const FallbackIncomingBlockQueue = new AutoProcessingQueue<Block>(async (ps) => {
+    const block = ps.data;
+    await Slot.processPastSlot(block.slotIndex, block);
+    ps.proccessed.resolve();
+});
+
 export namespace NewBlockMsg {
     export const Name = "NEW_BLOCK";
     export const ID = LNMsgID.from("2096");
@@ -51,7 +57,7 @@ export namespace NewBlockMsg {
                     
                     currentSlot.processBlock(block);
                 } else {
-                    IncomingBlockQueue.enqueue(block);
+                    FallbackIncomingBlockQueue.enqueue(block);
                 }
 
             } else {                
@@ -60,12 +66,6 @@ export namespace NewBlockMsg {
             return data;
         }
     } as LNBroadcastingMsgHandler;
-
-    export const IncomingBlockQueue = new AutoProcessingQueue<Block>(async (ps) => {
-        const block = ps.data;
-        await Slot.processPastSlot(block.slotIndex, block);
-        ps.proccessed.resolve();
-    });
 }
 
 
