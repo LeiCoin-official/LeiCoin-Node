@@ -284,10 +284,14 @@ export namespace LNSocketHandler {
             LeiCoinNetNode.connections.remove(tcpSocket.data);
         }
         async end(tcpSocket: Socket<PeerSocket>) {
+            const initialState = tcpSocket.data.state;
+
             tcpSocket.data.state = "CLOSED";
             LeiCoinNetNode.connections.remove(tcpSocket.data);
 
-            cli.leicoin_net.info(`${tcpSocket.data.uri} has ended the connection.`);
+            if (initialState !== "CLOSED") {
+                cli.leicoin_net.info(`${tcpSocket.data.uri} has ended the connection.`);
+            }
         }
     
         async timeout(tcpSocket: Socket<PeerSocket>) {

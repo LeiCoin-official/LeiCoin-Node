@@ -11,6 +11,7 @@ import { formatDate } from "date-fns/format";
 import { UTCDate } from "@date-fns/utc/date";
 import { VCodes } from "../verification/codes.js";
 import { ExecutionCheckpoint } from "../utils/executionCheckpoint.js";
+import { type FallbackIncomingBlockQueue } from "../leicoin-net/messaging/messages/block.js";
 
 export class Slot {
 
@@ -68,13 +69,16 @@ export class Slot {
     }
 
 
-    public async processBlock(block: Block) {
+    public async processBlock(block: Block, fallbackBlockQueue?: typeof FallbackIncomingBlockQueue) {
         if (this.slot_finished.hasPassed()) return;
         this.blockTimeout.cancel();
 
         if (this.block) return;
         this.block = block;
         
+        // Ensure IncomingBlockQueue is empty before processing this block
+        await fallbackBlockQueue?.back()?.proccessed.awaitResult();
+
         // Ensure all necessary procedures are finished before executing the block
         await this.slot_started.passing();
 

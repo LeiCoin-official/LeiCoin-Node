@@ -21,7 +21,7 @@ export class POS implements ModuleLike<typeof POS> {
 
         this.minters.push(...minters);
      
-        this.slotTask = new CronJob('4,9,14,19,24,29,34,39,44,49,54,59 * * * * *', () => {
+        this.slotTask = new CronJob('1,6,11,16,21,26,31,36,41,46,51,56 * * * * *', () => {
             const nextSlotIndex = Uint64.from(POS.calulateCurrentSlotIndex() + 1);
 
             //this.endSlot(this.currentSlot.index);
@@ -42,7 +42,7 @@ export class POS implements ModuleLike<typeof POS> {
         cli.pos.info("POS started");
     }
 
-    static setupEvents() {}
+    private static async setupEvents() {}
     
     static async stop() {
         if (!this.started) return;

@@ -12,6 +12,8 @@ import { Uint64 } from "low-level";
 import { ErrorResponseMsg } from "./error.js";
 import { Blockchain } from "../../../storage/blockchain.js";
 import { CB } from "../../../utils/callbacks.js";
+import { Slot } from "../../../pos/slot.js";
+import { AutoProcessingQueue } from "../../../utils/queue.js";
 
 export class NewBlockMsg extends LNAbstractMsgBody {
 
@@ -32,31 +34,40 @@ export namespace NewBlockMsg {
     
     export const Handler = new class Handler extends LNBroadcastingMsgHandler {
         async receive(data: NewBlockMsg) {
+            const block = data.block;
+            if (!block || block.slotIndex.eqn(POS.calulateCurrentSlotIndex())) return null;
 
-            if (NetworkSyncManager.state !== "synchronized") {
-                if (data.block && data.block.slotIndex.eq(POS.calulateCurrentSlotIndex())) {
-                    NetworkSyncManager.blockQueue.enqueue(data.block);
-                }
-                return null;
-            }
+            if (NetworkSyncManager.state === "synchronized") {
 
-            const verification_result = await Verification.verifyMintedBlock(data.block);
+                const currentSlot = await POS.getSlot(block.slotIndex);
+                if (currentSlot) {
+                    const verification_result = await Verification.verifyMintedBlock(data.block);
     
-            if (verification_result !== 12000) {
-                /** @todo CLI Debug Mode for log messages like this */
-                //cli.data.info(`Block rejected. Code: ${verification_result}, Message: ${VCodes[verification_result]}`);
-                return null;
+                    if (verification_result !== 12000) {
+                        /** @todo CLI Debug Mode for log messages like this */
+                        //cli.data.info(`Block rejected. Code: ${verification_result}, Message: ${VCodes[verification_result]}`);
+                        return null;
+                    }
+                    
+                    currentSlot.processBlock(block, FallbackIncomingBlockQueue);
+                } else {
+                    FallbackIncomingBlockQueue.enqueue(block);
+                }
+
+            } else {                
+                NetworkSyncManager.blockQueue.enqueue(block);
             }
-
-            this.handleBlock(data.block);
             return data;
-        }
-
-        private async handleBlock(block: Block) {
-            (await POS.getSlot(block.slotIndex))?.processBlock(block);
         }
     } as LNBroadcastingMsgHandler;
 }
+
+const FallbackIncomingBlockQueue = new AutoProcessingQueue<Block>(async (ps) => {
+    const block = ps.data;
+    await Slot.processPastSlot(block.slotIndex, block);
+    ps.proccessed.resolve();
+});
+export type { FallbackIncomingBlockQueue };
 
 
 export class GetBlocksMsg extends LNAbstractMsgBody {
