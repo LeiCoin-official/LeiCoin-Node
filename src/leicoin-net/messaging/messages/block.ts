@@ -41,7 +41,7 @@ export namespace NewBlockMsg {
 
                 const currentSlot = await POS.getSlot(block.slotIndex);
                 if (currentSlot) {
-                    const verification_result = await Verification.verifyMintedBlock(data.block);
+                    const verification_result = await Verification.verifyBlockProposal(data.block);
     
                     if (verification_result !== 12000) {
                         /** @todo CLI Debug Mode for log messages like this */

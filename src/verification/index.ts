@@ -59,7 +59,7 @@ export class Verification {
         return { status: 12000, targetChain: targetChain, parentChain: parentChain };
     }
 
-    public static async verifyMintedBlock(block: Block | null): Promise<VCode> {
+    public static async verifyBlockProposal(block: Block | null): Promise<VCode> {
         if (!block) return 12501;
 
         const currentSlot = await POS.getCurrentSlot();
