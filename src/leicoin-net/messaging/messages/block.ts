@@ -35,7 +35,12 @@ export namespace NewBlockMsg {
     export const Handler = new class Handler extends LNBroadcastingMsgHandler {
         async receive(data: NewBlockMsg) {
             const block = data.block;
-            if (!block || block.slotIndex.eqn(POS.calulateCurrentSlotIndex())) return null;
+            if (!block) return null;
+
+            if (!block.slotIndex.eqn(POS.calulateCurrentSlotIndex())) {
+                this.handleUnverifiableForkBlock(block);
+                return null;
+            }
 
             if (NetworkSyncManager.state === "synchronized") {
 
@@ -46,6 +51,7 @@ export namespace NewBlockMsg {
                     if (verification_result !== 12000) {
                         /** @todo CLI Debug Mode for log messages like this */
                         //cli.data.info(`Block rejected. Code: ${verification_result}, Message: ${VCodes[verification_result]}`);
+                        this.handleUnverifiableForkBlock(block);
                         return null;
                     }
                     
@@ -58,6 +64,18 @@ export namespace NewBlockMsg {
                 NetworkSyncManager.blockQueue.enqueue(block);
             }
             return data;
+        }
+
+        private async handleUnverifiableForkBlock(block: Block) {
+            const chainID = block.hash.toHex();
+            await Blockchain.createFork(chainID, chainID, block);
+        
+            Blockchain.chains[chainID].blocks.add(block);
+            Blockchain.chainstate.updateChainStateByBlock(
+                chainID,
+                chainID,
+                block,
+            );
         }
     } as LNBroadcastingMsgHandler;
 }
