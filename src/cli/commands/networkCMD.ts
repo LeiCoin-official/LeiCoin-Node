@@ -19,6 +19,7 @@ class StatsCMD extends CLICMD {
     readonly name = "stats";
     readonly description = "Show network stats";
     readonly usage = "stats";
+    readonly environment = "runtime";
 
     public async run(args: string[]): Promise<void> {
         
