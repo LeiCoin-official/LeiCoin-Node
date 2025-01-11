@@ -6,9 +6,9 @@ import CLIUtils from "../cliUtils.js";
 import { DataUtils } from "../../utils/dataUtils.js";
 
 export default class BlockDBCMD extends CLISubCMD {
-    public name = "blockdb";
-    public description = "Manage the Block database";
-    public usage = "blockdb <command> [...args]";
+    readonly name = "blockdb";
+    readonly description = "Manage the Block database";
+    readonly usage = "blockdb <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
@@ -25,9 +25,9 @@ export default class BlockDBCMD extends CLISubCMD {
 
 
 class ReadCMD extends CLICMD {
-    public name = "read";
-    public description = "Read the Block database";
-    public usage = "read <index>";
+    readonly name = "read";
+    readonly description = "Read the Block database";
+    readonly usage = "read <index>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {

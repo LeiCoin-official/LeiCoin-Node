@@ -16,9 +16,9 @@ export default class StartServiceCMD extends CLISubCMD {
 }
 
 class StartAPI extends CLICMD {
-    public name = "api";
-    public description = "Start the API service";
-    public usage = "api [options]";
+    readonly name = "api";
+    readonly description = "Start the API service";
+    readonly usage = "api [options]";
 
     public async run(args: string[], parent_args: string[]) {
         if (HTTP_API.started) {

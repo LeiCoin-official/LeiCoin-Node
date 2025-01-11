@@ -10,7 +10,7 @@ abstract class AbstractPeerConnectionsMap {
         this.store = new BasicBinaryMap<Uint256, PeerSocket>(Uint256, entries);
     }
 
-    public get size() { return this.store.size; }
+    public get count() { return this.store.size; }
 
     public add(socket: PeerSocket) {
         this.store.set(socket.uuid, socket);
