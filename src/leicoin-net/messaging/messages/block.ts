@@ -1,19 +1,19 @@
-import Verification from "../../../verification/index.js"
-import Block from "../../../objects/block.js";
-import POS from "../../../pos/index.js";
+import Verification from "@/verification/index.js"
+import Block from "@/objects/block.js";
+import POS from "@/pos/index.js";
 import { LNBroadcastingMsgHandler, LNMsgRequestHandler, LNMsgResponseHandler } from "../abstractMsgHandler.js";
-import cli from "../../../cli/cli.js";
-import { VCodes } from "../../../verification/codes.js";
+import cli from "@/cli/cli.js";
+import { VCodes } from "@/verification/codes.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { type PeerSocket } from "../../socket.js";
-import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
+import { BE, type DataEncoder } from "@/encoding/binaryEncoders.js";
 import { NetworkSyncManager } from "../../chain-sync.js";
 import { Uint64 } from "low-level";
 import { ErrorResponseMsg } from "./error.js";
-import { Blockchain } from "../../../storage/blockchain.js";
-import { CB } from "../../../utils/callbacks.js";
-import { Slot } from "../../../pos/slot.js";
-import { AutoProcessingQueue } from "../../../utils/queue.js";
+import { Blockchain } from "@/storage/blockchain.js";
+import { CB } from "@/utils/callbacks.js";
+import { Slot } from "@/pos/slot.js";
+import { AutoProcessingQueue } from "@/utils/queue.js";
 
 export class NewBlockMsg extends LNAbstractMsgBody {
 

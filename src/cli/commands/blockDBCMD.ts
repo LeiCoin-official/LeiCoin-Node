@@ -1,9 +1,9 @@
-import { type Block } from "../../objects/block.js";
-import { Blockchain } from "../../storage/blockchain.js";
+import { type Block } from "@/objects/block.js";
+import { Blockchain } from "@/storage/blockchain.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
-import { DataUtils } from "../../utils/dataUtils.js";
+import { DataUtils } from "@/utils/dataUtils.js";
 
 export default class BlockDBCMD extends CLISubCMD {
     readonly name = "blockdb";

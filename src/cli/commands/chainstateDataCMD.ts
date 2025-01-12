@@ -1,7 +1,7 @@
-import { Blockchain } from "../../storage/blockchain.js";
+import { Blockchain } from "@/storage/blockchain.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import { DataUtils } from "../../utils/dataUtils.js";
+import { DataUtils } from "@/utils/dataUtils.js";
 
 export default class ChainstateDataCMD extends CLISubCMD {
     readonly name = "chainstate";

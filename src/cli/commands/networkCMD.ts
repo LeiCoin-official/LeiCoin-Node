@@ -1,4 +1,4 @@
-import LeiCoinNetNode from "../../leicoin-net/index.js";
+import LeiCoinNetNode from "@/leicoin-net/index.js";
 import cli from "../cli.js";
 import { CLICMD, CLISubCMD } from "../cliCMD.js";
 

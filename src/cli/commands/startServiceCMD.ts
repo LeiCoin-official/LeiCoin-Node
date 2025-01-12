@@ -1,5 +1,5 @@
-import HTTP_API from "../../http_api/index.js";
-import Utils from "../../utils/index.js";
+import HTTP_API from "@/http_api/index.js";
+import Utils from "@/utils/index.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD";
 

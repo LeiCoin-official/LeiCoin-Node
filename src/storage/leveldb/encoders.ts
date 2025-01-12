@@ -1,4 +1,4 @@
-import { AddressHex } from "../../objects/address.js";
+import { AddressHex } from "@/objects/address.js";
 import { type IEncoding } from "level-transcoder";
 import { BasicUintConstructable, Uint, Uint256, Uint64 } from "low-level";
 

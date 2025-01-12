@@ -1,5 +1,5 @@
 import { type LNMsgInfo, LNMsgID } from "./abstractMsg.js";
-import { ObjectiveArray, type Dict } from "../../utils/dataUtils.js";
+import { ObjectiveArray, type Dict } from "@/utils/dataUtils.js";
 import { StatusMsg } from "./messages/status.js";
 import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messages/challenge.js";
 import { BlocksMsg, GetBlocksMsg, NewBlockMsg } from "./messages/block.js";

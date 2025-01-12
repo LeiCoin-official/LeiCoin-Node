@@ -1,8 +1,8 @@
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import { PrivateKey } from "../../crypto/cryptoKeys.js";
-import LCrypt from "../../crypto/index.js";
-import { Address32, AddressHex } from "../../objects/address.js";
-import { PX } from "../../objects/prefix.js";
+import { PrivateKey } from "@/crypto/cryptoKeys.js";
+import LCrypt from "@/crypto/index.js";
+import { Address32, AddressHex } from "@/objects/address.js";
+import { PX } from "@/objects/prefix.js";
 import cli from "../cli.js";
 import CLIUtils from "../cliUtils.js";
 

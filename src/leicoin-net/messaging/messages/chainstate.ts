@@ -1,9 +1,9 @@
 import { LNMsgRequestHandler, LNMsgResponseHandler } from "../abstractMsgHandler.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
-import { ForkChainstateData } from "../../../storage/chainstate.js";
-import { Dict } from "../../../utils/dataUtils.js";
-import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
-import { Blockchain } from "../../../storage/blockchain.js";
+import { ForkChainstateData } from "@/storage/chainstate.js";
+import { Dict } from "@/utils/dataUtils.js";
+import { BE, DataEncoder } from "@/encoding/binaryEncoders.js";
+import { Blockchain } from "@/storage/blockchain.js";
 import { ErrorResponseMsg } from "./error.js";
 import { NetworkSyncManager } from "../../chain-sync.js";
 
