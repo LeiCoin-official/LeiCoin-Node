@@ -1,16 +1,16 @@
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import { PrivateKey } from "../../crypto/cryptoKeys.js";
-import LCrypt from "../../crypto/index.js";
-import { Address32, AddressHex } from "../../objects/address.js";
-import { PX } from "../../objects/prefix.js";
+import { PrivateKey } from "@/crypto/cryptoKeys.js";
+import LCrypt from "@/crypto/index.js";
+import { Address32, AddressHex } from "@/objects/address.js";
+import { PX } from "@/objects/prefix.js";
 import cli from "../cli.js";
 import CLIUtils from "../cliUtils.js";
 
 
 export default class CryptoCMD extends CLISubCMD {
-    public name = "crypto";
-    public description = "Crypto commands";
-    public usage = "crypto <command> [...args]";
+    readonly name = "crypto";
+    readonly description = "Crypto commands";
+    readonly usage = "crypto <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new GenKeyPairCMD());
@@ -19,9 +19,9 @@ export default class CryptoCMD extends CLISubCMD {
 }
 
 class GenKeyPairCMD extends CLICMD {
-    public name = "genKeyPair";
-    public description = "Generate a new key pair";
-    public usage = "genKeyPair (wallet|minter|smart-contract)";
+    readonly name = "genKeyPair";
+    readonly description = "Generate a new key pair";
+    readonly usage = "genKeyPair (wallet|minter|smart-contract)";
 
     public async run(args: string[]): Promise<void> {
         if (args.length !== 1) {

@@ -1,12 +1,12 @@
-import { Blockchain } from "../../storage/blockchain.js";
+import { Blockchain } from "@/storage/blockchain.js";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import { DataUtils } from "../../utils/dataUtils.js";
+import { DataUtils } from "@/utils/dataUtils.js";
 
 export default class ChainstateDataCMD extends CLISubCMD {
-    public name = "chainstate";
-    public description = "Manage the local Chainstate";
-    public usage = "chainstate <command> [...args]";
+    readonly name = "chainstate";
+    readonly description = "Manage the local Chainstate";
+    readonly usage = "chainstate <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
@@ -23,9 +23,9 @@ export default class ChainstateDataCMD extends CLISubCMD {
 
 
 class ReadCMD extends CLICMD {
-    public name = "read";
-    public description = "Read the current Chainstate";
-    public usage = "read";
+    readonly name = "read";
+    readonly description = "Read the current Chainstate";
+    readonly usage = "read";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         const chainstate = Blockchain.chainstate.getCompleteChainStateData();

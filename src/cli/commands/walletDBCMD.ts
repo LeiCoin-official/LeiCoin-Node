@@ -1,17 +1,17 @@
-import { AddressHex } from "../../objects/address.js";
-import { PX } from "../../objects/prefix.js";
-import Wallet from "../../objects/wallet.js";
-import { Blockchain } from "../../storage/blockchain.js";
+import { AddressHex } from "@/objects/address.js";
+import { PX } from "@/objects/prefix.js";
+import Wallet from "@/objects/wallet.js";
+import { Blockchain } from "@/storage/blockchain.js";
 import { Uint64 } from "low-level";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
-import { DataUtils } from "../../utils/dataUtils.js";
+import { DataUtils } from "@/utils/dataUtils.js";
 
 export default class WalletDBCMD extends CLISubCMD {
-    public name = "walletdb";
-    public description = "Manage the Wallet database";
-    public usage = "walletdb <command> [...args]";
+    readonly name = "walletdb";
+    readonly description = "Manage the Wallet database";
+    readonly usage = "walletdb <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
@@ -30,9 +30,9 @@ export default class WalletDBCMD extends CLISubCMD {
 
 
 class ReadCMD extends CLICMD {
-    public name = "read";
-    public description = "Read the Wallet database";
-    public usage = "read (<wallet_address> | all)";
+    readonly name = "read";
+    readonly description = "Read the Wallet database";
+    readonly usage = "read (<wallet_address> | all)";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -66,9 +66,9 @@ class ReadCMD extends CLICMD {
 }
 
 class InsertCMD extends CLICMD {
-    public name = "insert";
-    public description = "Insert Data into the Wallet database";
-    public usage = "insert <wallet_address> <stake> <nonce> <version>";
+    readonly name = "insert";
+    readonly description = "Insert Data into the Wallet database";
+    readonly usage = "insert <wallet_address> <stake> <nonce> <version>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 4) {
@@ -88,9 +88,9 @@ class InsertCMD extends CLICMD {
 }
 
 class RemoveCMD extends CLICMD {
-    public name = "remove";
-    public description = "Remove Data from the Wallet database";
-    public usage = "remove <wallet_address>";
+    readonly name = "remove";
+    readonly description = "Remove Data from the Wallet database";
+    readonly usage = "remove <wallet_address>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {

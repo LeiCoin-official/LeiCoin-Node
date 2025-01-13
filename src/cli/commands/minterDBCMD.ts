@@ -1,17 +1,17 @@
-import { AddressHex } from "../../objects/address.js";
-import { PX } from "../../objects/prefix.js";
-import MinterData from "../../objects/minter.js";
-import { Blockchain } from "../../storage/blockchain.js";
+import { AddressHex } from "@/objects/address.js";
+import { PX } from "@/objects/prefix.js";
+import MinterData from "@/objects/minter.js";
+import { Blockchain } from "@/storage/blockchain.js";
 import { Uint, Uint64 } from "low-level";
 import cli from "../cli.js";
 import CLICMD, { CLISubCMD } from "../cliCMD.js";
 import CLIUtils from "../cliUtils.js";
-import { DataUtils } from "../../utils/dataUtils.js";
+import { DataUtils } from "@/utils/dataUtils.js";
 
 export default class MinterDBCMD extends CLISubCMD {
-    public name = "minterdb";
-    public description = "Manage the Minter database";
-    public usage = "minterdb <command> [...args]";
+    readonly name = "minterdb";
+    readonly description = "Manage the Minter database";
+    readonly usage = "minterdb <command> [...args]";
 
     protected registerCommands(): void {
         this.register(new ReadCMD());
@@ -31,9 +31,9 @@ export default class MinterDBCMD extends CLISubCMD {
 
 
 class ReadCMD extends CLICMD {
-    public name = "read";
-    public description = "Read the Minter database";
-    public usage = "read (<minter_address> | all)";
+    readonly name = "read";
+    readonly description = "Read the Minter database";
+    readonly usage = "read (<minter_address> | all)";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -67,9 +67,9 @@ class ReadCMD extends CLICMD {
 }
 
 class InsertCMD extends CLICMD {
-    public name = "insert";
-    public description = "Insert Data into the Minter database";
-    public usage = "insert <minter_address> <stake> <version>";
+    readonly name = "insert";
+    readonly description = "Insert Data into the Minter database";
+    readonly usage = "insert <minter_address> <stake> <version>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 3) {
@@ -84,9 +84,9 @@ class InsertCMD extends CLICMD {
 }
 
 class RemoveCMD extends CLICMD {
-    public name = "remove";
-    public description = "Remove Data from the Minter database";
-    public usage = "remove <minter_address>";
+    readonly name = "remove";
+    readonly description = "Remove Data from the Minter database";
+    readonly usage = "remove <minter_address>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {
@@ -106,9 +106,9 @@ class RemoveCMD extends CLICMD {
 }
 
 class GetNextMinterCMD extends CLICMD {
-    public name = "getnext";
-    public description = "Get the next minter for a slot";
-    public usage = "getnext <slot>";
+    readonly name = "getnext";
+    readonly description = "Get the next minter for a slot";
+    readonly usage = "getnext <slot>";
 
     public async run(args: string[], parent_args: string[]): Promise<void> {
         if (args.length !== 1) {

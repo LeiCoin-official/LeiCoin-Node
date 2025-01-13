@@ -1,11 +1,11 @@
 import { type Uint } from "low-level";
-import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
+import { BE, type DataEncoder } from "@/encoding/binaryEncoders.js";
 import { type PeerSocket } from "../../socket.js";
 import { LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgID } from "../abstractMsg.js";
 import { LNMsgDefaultHandler } from "../abstractMsgHandler";
 import { StatusMsg } from "./status.js";
-import ObjectEncoding from "../../../encoding/objects.js";
-import cli from "../../../cli/cli.js";
+import ObjectEncoding from "@/encoding/objects.js";
+import cli from "@/cli/cli.js";
 import { MessageRouter } from "../index.js";
 
 export class OneTimeRequestMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> extends LNAbstractMsgBody {

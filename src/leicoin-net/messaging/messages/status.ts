@@ -1,7 +1,7 @@
 import { Uint16, Uint32 } from "low-level";
-import { BE, type DataEncoder } from "../../../encoding/binaryEncoders.js";
-import { Port } from "../../../objects/netinfo.js";
-import { type Dict } from "../../../utils/dataUtils.js";
+import { BE, type DataEncoder } from "@/encoding/binaryEncoders.js";
+import { Port } from "@/objects/netinfo.js";
+import { type Dict } from "@/utils/dataUtils.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { LNMsgDefaultHandler } from "../abstractMsgHandler.js";
 import { type PeerSocket } from "../../socket.js";

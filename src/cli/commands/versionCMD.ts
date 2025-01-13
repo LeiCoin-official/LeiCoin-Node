@@ -1,4 +1,4 @@
-import Main from "../../main.js";
+import Main from "@/main.js";
 import cli from "../cli.js";
 import CLICMD from "../cliCMD.js";
 

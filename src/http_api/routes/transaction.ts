@@ -1,8 +1,8 @@
-import Verification from "../../verification/index.js";
-import mempool from "../../storage/mempool.js";
-import { VCodes } from "../../verification/codes.js";
+import Verification from "@/verification/index.js";
+import mempool from "@/storage/mempool.js";
+import { VCodes } from "@/verification/codes.js";
 import Elysia from "elysia";
-import { type Transaction } from "../../objects/transaction.js";
+import { type Transaction } from "@/objects/transaction.js";
 import { HTTPRouter405Route } from "../route.js";
 
 let router = new Elysia({prefix: '/sendTransactions'})

@@ -1,12 +1,12 @@
 import { BasicBinaryMap, Uint256, Uint32 } from "low-level";
-import { BE, DataEncoder } from "../../../encoding/binaryEncoders.js";
+import { BE, DataEncoder } from "@/encoding/binaryEncoders.js";
 import { type PeerSocket } from "../../socket.js";
 import { LNMsgDefaultHandler, LNMsgRequestHandler, LNMsgResponseHandler } from "../abstractMsgHandler.js";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
-import LCrypt from "../../../crypto/index.js";
-import { Deferred } from "../../../utils/deferred.js";
-import Schedule from "../../../utils/schedule.js";
-import cli from "../../../cli/cli.js";
+import LCrypt from "@/crypto/index.js";
+import { Deferred } from "@/utils/deferred.js";
+import Schedule from "@/utils/schedule.js";
+import cli from "@/cli/cli.js";
 
 class ChallengeMsgStoreItem {
     constructor(

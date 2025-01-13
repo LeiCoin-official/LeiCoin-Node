@@ -1,9 +1,9 @@
-import Verification from "../../verification/index.js";
-import { Blockchain } from "../../storage/blockchain.js";
-import mempool from "../../storage/mempool.js";
+import Verification from "@/verification/index.js";
+import { Blockchain } from "@/storage/blockchain.js";
+import mempool from "@/storage/mempool.js";
 import Elysia from "elysia";
-import { type Block } from "../../objects/block.js";
-import { VCodes } from "../../verification/codes.js";
+import { type Block } from "@/objects/block.js";
+import { VCodes } from "@/verification/codes.js";
 import { HTTPRouter405Route } from "../route.js";
 
 let router = new Elysia({prefix: '/sendBlocks'})
