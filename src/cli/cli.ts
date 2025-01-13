@@ -368,5 +368,5 @@ class CLI {
     }
 }
 
-const cli = CLI.getInstance();
+export const cli = CLI.getInstance();
 export default cli;
