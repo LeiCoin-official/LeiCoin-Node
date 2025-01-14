@@ -84,10 +84,7 @@ The peers configuration file for LeiCoin-Node is located at `./config/peers.json
 [
   "example.com:12200",
   "192.168.1.1:12200",
-  "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:12200",
-  "node.example.org:12200",
-  "10.0.0.2:12200",
-  "[fe80::1ff:fe23:4567:890a]:12200"
+  "[2001:0db8:85a3::1]:12200",
 ]
 ```
 
