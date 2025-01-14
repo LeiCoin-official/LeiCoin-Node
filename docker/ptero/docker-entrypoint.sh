@@ -75,7 +75,7 @@ function main {
     
     LOCAL_VERSION=$(get_current_version)
 
-    if [ "$VERSION" == "latest" ]; then
+    if [ "v$VERSION" == "latest" ]; then
         
         REMOTE_VERSION=$(get_latest_version $EXPERIMENTAL)
 
@@ -87,9 +87,9 @@ function main {
         fi
     else
         
-        if [[ "$VERSION" != "v$LOCAL_VERSION" ]]; then
+        if [[ "v$VERSION" != "v$LOCAL_VERSION" ]]; then
             echo "Requested version $VERSION is not installed. Downloading..."
-            download_binary $VERSION $ARCH
+            download_binary v$VERSION $ARCH
         else
             echo "Requested version $VERSION is already installed. Continuing..."
         fi        
