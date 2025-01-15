@@ -1,11 +1,11 @@
 import cli from "../cli/cli.js";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256, Uint32 } from "low-level";
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/networkMessages.js";
 import { LNActiveRequests, LNResponseData } from "./requests.js";
 import type { LNMsgRequestHandler, LNBroadcastingMsgHandler, LNMsgDefaultHandler } from "./messaging/abstractMsgHandler.js";
-import LeiCoinNetNode from "./index.js";
+import LeiCoinNetNode from "./node.js";
 import { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";

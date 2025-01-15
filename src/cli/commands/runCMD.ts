@@ -2,7 +2,7 @@ import { Configs } from "@/config/index.js";
 import HTTP_API from "@/http_api/index.js";
 import { NetworkSyncManager } from "@/leicoin-net/chain-sync.js";
 import LeiCoinNetNode from "@/leicoin-net/index.js";
-import Main from "@/main.js";
+import Main from "@leicoin/core";
 import MinterClient from "@/minter/index.js";
 import POS from "@/pos/index.js";
 import { Blockchain } from "@/storage/blockchain.js";

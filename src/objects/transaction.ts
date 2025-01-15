@@ -1,4 +1,4 @@
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 import ObjectEncoding from "../encoding/objects.js";
 import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";

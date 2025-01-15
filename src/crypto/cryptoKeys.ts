@@ -1,6 +1,6 @@
 import { type ec as ellipticCurve } from "elliptic";
 import { FixedUint, Uint, Uint256 } from "low-level";
-import LCrypt from "./index.js";
+import LCrypt from "./lcrypt.js";
 import Signature, { EllipticBinarySignature } from "./signature.js";
 
 type NewKeyPair<T> = new (keyPair: ellipticCurve.KeyPair) => T;

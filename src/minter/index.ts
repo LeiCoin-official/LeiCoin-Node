@@ -1,19 +1,11 @@
-import { PrivateKey } from "../crypto/cryptoKeys.js";
-import { AddressHex } from "../objects/address.js";
-import { PX } from "../objects/prefix.js";
-import cli from "../cli/cli.js";
-import Verification from "../verification/index.js";
+import { cli } from "@leicoin/cli";
+import { LCrypt, PrivateKey, Signature } from "@leicoin/crypto";
+import { AddressHex } from "@leicoin/objects/address";
+import Block, { BlockBody } from "@leicoin/objects/block";
+import { MinterCredentials } from "@leicoin/objects/minter";
+import { PX } from "@leicoin/objects/prefix";
+import { Verification } from "@leicoin/verification";
 import { Uint256, Uint64 } from "low-level";
-import { Blockchain } from "../storage/blockchain.js";
-import { Block, BlockBody } from "../objects/block.js";
-import mempool from "../storage/mempool.js";
-import Signature from "../crypto/signature.js";
-import LCrypt from "../crypto/index.js";
-import { MinterCredentials } from "../objects/minter.js";
-import { type Slot } from "../pos/slot.js";
-import { NewBlockMsg } from "../leicoin-net/messaging/messages/block.js";
-import { LNStandartMsg } from "../leicoin-net/messaging/networkMessages.js";
-import { LNController } from "../leicoin-net/controller.js";
 
 export class MinterClient {
 
@@ -96,4 +88,3 @@ export class MinterClient {
 
 }
 
-export default MinterClient;

@@ -1,22 +1,9 @@
-import Transaction from "../objects/transaction.js";
-import Block from "../objects/block.js";
-import { Blockchain } from "../storage/blockchain.js";
-import POS from "../pos/index.js";
-import { VCode } from "./codes.js";
-import { AddressHex } from "../objects/address.js";
-import { PX } from "../objects/prefix.js";
+import { AddressHex } from "@leicoin/objects/address";
+import { VCode, VCodes } from "./codes.js";
+import Transaction from "@leicoin/objects/transaction";
+import Block from "@leicoin/objects/block";
+import { PX } from "@leicoin/objects/prefix";
 
-export namespace ValidationResult {
-    export interface BlockValid {
-        status: 12000;
-        targetChain: string;
-        parentChain: string;
-    }
-    export interface BlockInvalid {
-        status: Exclude<VCode, 12000>;
-    }
-    export type BlockValidationResult = BlockValid | BlockInvalid;
-}
 
 export class Verification {
 
@@ -24,7 +11,7 @@ export class Verification {
         return address.slice(0, 1).eq(expectedPrefix);
     }
 
-    public static async verifyTransaction(tx: Transaction, chain = "main"): Promise<VCode> {
+    public static async verifyTransaction(tx: Transaction, chain = "main"): Promise<Verification.Code> {
         
         if (!tx) return 12501;
         if (tx.txid.eqn(tx.calculateHash())) return 12504;
@@ -37,7 +24,7 @@ export class Verification {
         return 12000;
     }
 
-    public static async verifyBlock(block: Block): Promise<ValidationResult.BlockValidationResult> {
+    public static async verifyBlock(block: Block): Promise<Verification.Result.Block> {
 
         if (!block) return { status: 12501 };
 
@@ -59,7 +46,7 @@ export class Verification {
         return { status: 12000, targetChain: targetChain, parentChain: parentChain };
     }
 
-    public static async verifyBlockProposal(block: Block | null): Promise<VCode> {
+    public static async verifyBlockProposal(block: Block | null): Promise<Verification.Code> {
         if (!block) return 12501;
 
         const currentSlot = await POS.getCurrentSlot();
@@ -76,4 +63,21 @@ export class Verification {
   
 }
 
-export default Verification;
+export namespace Verification {
+
+    export const Codes = VCodes;
+    export type Code = VCode;
+
+}
+
+export namespace Verification.Result {
+    export interface BlockValid {
+        status: 12000;
+        targetChain: string;
+        parentChain: string;
+    }
+    export interface BlockInvalid {
+        status: Exclude<Verification.Code, 12000>;
+    }
+    export type Block = BlockValid | BlockInvalid;
+}

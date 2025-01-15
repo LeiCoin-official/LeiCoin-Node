@@ -1,5 +1,5 @@
 import cli from "../cli/cli.js";
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 import ObjectEncoding from "../encoding/objects.js";
 import Block from "../objects/block.js";

@@ -5,7 +5,7 @@ import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
 import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
 import { PrivateKey } from "../crypto/cryptoKeys.js";
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 
 export class Wallet {
 

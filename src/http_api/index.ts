@@ -1,7 +1,7 @@
-import cli from "../cli/cli.js";
 import EventEmitter from "events";
 import { ModuleLike } from "../utils/dataUtils.js";
 import Elysia from "elysia";
+import { cli } from "@leicoin/cli";
 
 export class HTTP_API implements ModuleLike<typeof HTTP_API> {
     public static initialized = false;
@@ -50,4 +50,3 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API> {
     private static async setupEvents(eventHandler: EventEmitter) {}
 }
 
-export default HTTP_API;

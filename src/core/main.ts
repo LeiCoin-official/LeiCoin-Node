@@ -1,4 +1,4 @@
-import CLICMDHandler from "./cli/cliCMDHandler";
+import { CLICMDHandler } from "@leicoin/cli";
 
 export default class Main {
 

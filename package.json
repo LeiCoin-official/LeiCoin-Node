@@ -21,6 +21,9 @@
 		"release": "bun run ./scripts/build/withEntryPoint",
 		"start": "./build/bin/leicoin-node"
 	},
+	"workspaces": [
+		"src/*"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/LeiCraft/LeiCoin-Node.git"
@@ -33,6 +36,7 @@
 	},
 	"homepage": "https://github.com/LeiCraft/LeiCoin-Node#readme",
 	"dependencies": {
+		"@leicoin/core": "^1.0.0",
 		"@date-fns/utc": "^1.2.0",
 		"@elysiajs/cors": "^1.1.1",
 		"@noble/secp256k1": "^2.1.0",

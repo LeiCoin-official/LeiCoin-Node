@@ -1,5 +1,5 @@
 import { Transaction } from "./transaction.js";
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";

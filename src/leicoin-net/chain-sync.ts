@@ -5,7 +5,7 @@ import type Block from "../objects/block.js";
 import { type ForkChainstateData } from "../storage/chainstate.js";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
-import LeiCoinNetNode from "./index.js";
+import LeiCoinNetNode from "./node.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
 import Slot from "../pos/slot.js";
 import cli from "../cli/cli.js";

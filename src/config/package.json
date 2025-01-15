@@ -1,0 +1,12 @@
+{
+    "name": "@leicoin/config",
+    "version": "1.0.0",
+    "type": "module",
+    "exports": {
+      ".": "./index.ts"
+    },
+    "dependencies": {
+      "@leicoin/cli": "^1.0.0",
+      "@leicoin/utils": "^1.0.0"
+    }
+}

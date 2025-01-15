@@ -1,4 +1,4 @@
-import EncodingUtils from "../encoding/index.js";
+import EncodingUtils from "../encoding/utils.js";
 import { type Dict } from "../utils/dataUtils.js";
 
 type AllowedTypes = "string" | "number" | "bool";

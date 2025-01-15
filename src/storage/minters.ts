@@ -2,7 +2,7 @@ import MinterData from "../objects/minter.js";
 import Block from "../objects/block.js";
 import { AddressHex } from "../objects/address.js";
 import { Uint, Uint64 } from "low-level";
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 import { LevelBasedStateStorageWithIndexes } from "./leveldb/levelBasedStorage.js";
 import { PX } from "../objects/prefix.js";
 

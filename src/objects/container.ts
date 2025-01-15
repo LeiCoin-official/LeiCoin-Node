@@ -2,7 +2,7 @@ import { type Uint } from "low-level";
 import { type DataEncoder } from "../encoding/binaryEncoders.js";
 import ObjectEncoding from "../encoding/objects.js";
 import cli from "../cli/cli.js";
-import LCrypt from "../crypto/index.js";
+import LCrypt from "../crypto/lcrypt.js";
 
 type NewContainer<T extends Container> = new (...args: any[]) => T;
 

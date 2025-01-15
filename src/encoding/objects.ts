@@ -2,7 +2,7 @@ import { Uint } from "low-level";
 import { CB } from "../utils/callbacks.js";
 import { AnyObj, Dict } from "../utils/dataUtils.js";
 import { DataEncoder } from "./binaryEncoders.js";
-import EncodingUtils from "./index.js";
+import EncodingUtils from "./utils.js";
 
 
 interface OEDecodeStandardResult {
@@ -107,4 +107,4 @@ export class ObjectEncoding {
 }
 
 ObjectEncoding.init();
-export default ObjectEncoding;
+

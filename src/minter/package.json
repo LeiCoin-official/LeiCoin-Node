@@ -1,0 +1,16 @@
+{
+    "name": "@leicoin/minter",
+    "version": "1.0.0",
+    "type": "module",
+    "exports": {
+      ".": "./index.ts"
+    },
+    "dependencies": {
+      "@leicoin/cli": "^1.0.0",
+      "@leicoin/net": "^1.0.0",
+      "@leicoin/pos": "^1.0.0",
+      "@leicoin/objects": "^1.0.0",
+      "@leicoin/crypto": "^1.0.0",
+      "@leicoin/verification": "^1.0.0"
+    }
+}
