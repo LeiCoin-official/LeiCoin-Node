@@ -1,6 +1,6 @@
-import { Dict } from "../utils/dataUtils.js";
-import cli from "./cli.js";
-import CLIUtils from "./cliUtils.js";
+import { Dict } from "@leicoin/utils/dataUtils";
+import { cli } from "./cli.js";
+import { CLIUtils } from "./cliUtils.js";
 
 
 export abstract class CLICMD {
@@ -78,5 +78,5 @@ export abstract class CLISubCMD extends CLICMD {
 }
 
 
-export default CLICMD;
+
 

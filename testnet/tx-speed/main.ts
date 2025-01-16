@@ -8,7 +8,7 @@ import { PX } from "../../src/objects/prefix.js";
 import Signature from "../../src/crypto/signature.js";
 import Verification from "../../src/verification/index.js";
 import fs from "fs";
-import Block from "../../src/objects/block.js";
+import { Block } from "../../src/objects/block.js";
 
 class Wallets {
 

@@ -1,6 +1,6 @@
-import Main from "../main.js";
-import cli from "./cli.js";
-import type CLICMD from "./cliCMD.js";
+import Main from "@leicoin/core";
+import { cli } from "./cli.js";
+import { type CLICMD } from "./cliCMD.js";
 
 
 export class CLIUtils {
@@ -28,5 +28,4 @@ export class CLIUtils {
 }
 
 
-export default CLIUtils;
 

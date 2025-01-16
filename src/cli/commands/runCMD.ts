@@ -1,14 +1,14 @@
-import { Configs } from "@/config/index.js";
-import HTTP_API from "@/http_api/index.js";
-import { NetworkSyncManager } from "@/leicoin-net/chain-sync.js";
-import LeiCoinNetNode from "@/leicoin-net/index.js";
 import Main from "@leicoin/core";
-import MinterClient from "@/minter/index.js";
-import POS from "@/pos/index.js";
-import { Blockchain } from "@/storage/blockchain.js";
-import Utils from "@/utils/index.js";
-import cli from "../cli.js";
-import CLICMD from "../cliCMD.js";
+import { Configs } from "@leicoin/config";
+import { HTTP_API } from "@leicoin/http-api";
+import { NetworkSyncManager } from "@leicoin/net";
+import { LeiCoinNetNode } from "@leicoin/net";
+import { MinterClient } from "@leicoin/minter";
+import { POS } from "@leicoin/pos";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Utils } from "@leicoin/utils";
+import { cli } from "../cli.js";
+import { CLICMD } from "../cliCMD.js";
 import { CMDFlag, CMDFlagsParser, type FlagsParsingResult } from "../flags.js";
 
 export class RunCMD extends CLICMD {

@@ -1,11 +1,10 @@
-import Verification from "@/verification/index.js";
-import mempool from "@/storage/mempool.js";
-import { VCodes } from "@/verification/codes.js";
 import Elysia from "elysia";
-import { type Transaction } from "@/objects/transaction.js";
+import { type Transaction } from "@leicoin/objects/transaction";
 import { HTTPRouter405Route } from "../route.js";
+import { Mempool } from "@leicoin/storage/mempool";
+import { Verification } from "@leicoin/verification";
 
-let router = new Elysia({prefix: '/sendTransactions'})
+const router = new Elysia({prefix: '/sendTransactions'})
 
 .use(HTTPRouter405Route())
 
@@ -18,14 +17,13 @@ let router = new Elysia({prefix: '/sendTransactions'})
 
 	if (validationresult !== 12000) {
 		set.status = 400;
-		return Response.json({message: VCodes[validationresult]});
+		return Response.json({message: Verification.Codes[validationresult]});
 	}
 
 	// Add the transaction to the mempool (replace with your blockchain logic)
-	mempool.addTransactionToMempool(transactionData);
+	Mempool.addTransactionToMempool(transactionData);
 
 	return Response.json({code: validationresult, message: 'Transaction added to the mempool'});
 });
 
-const sendTransactions_route = router;
-export default sendTransactions_route;
+export const sendTransactions_route = router;

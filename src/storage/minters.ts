@@ -1,10 +1,10 @@
-import MinterData from "../objects/minter.js";
-import Block from "../objects/block.js";
-import { AddressHex } from "../objects/address.js";
+import { MinterData } from "@leicoin/objects/minter";
+import { Block } from "@leicoin/objects/block";
+import { AddressHex } from "@leicoin/objects/address";
 import { Uint, Uint64 } from "low-level";
-import LCrypt from "../crypto/lcrypt.js";
 import { LevelBasedStateStorageWithIndexes } from "./leveldb/levelBasedStorage.js";
-import { PX } from "../objects/prefix.js";
+import { PX } from "@leicoin/objects/prefix";
+import { LCrypt } from "@leicoin/crypto";
 
 export class MinterDB extends LevelBasedStateStorageWithIndexes {
     protected path = "/validators";
@@ -54,4 +54,3 @@ export class MinterDB extends LevelBasedStateStorageWithIndexes {
 
 }
 
-export default MinterDB;

@@ -1,11 +1,16 @@
 import { cli } from "@leicoin/cli";
 import { LCrypt, PrivateKey, Signature } from "@leicoin/crypto";
+import { LNController, LNMsgRegistry } from "@leicoin/net";
 import { AddressHex } from "@leicoin/objects/address";
-import Block, { BlockBody } from "@leicoin/objects/block";
+import { Block, BlockBody } from "@leicoin/objects/block";
 import { MinterCredentials } from "@leicoin/objects/minter";
 import { PX } from "@leicoin/objects/prefix";
+import { Slot } from "@leicoin/pos/slot";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Mempool } from "@leicoin/storage/mempool";
 import { Verification } from "@leicoin/verification";
 import { Uint256, Uint64 } from "low-level";
+
 
 export class MinterClient {
 
@@ -67,7 +72,7 @@ export class MinterClient {
 			Signature.empty(),
 			
 			new BlockBody(
-				mempool.transactions.values().all()
+				Mempool.transactions.values().all()
 			)
 		)
 
@@ -78,8 +83,8 @@ export class MinterClient {
 
     async mint(currentSlot: Slot) {
 		const block = await this.createNewBlock(currentSlot.index);
-		
-		LNController.broadcast(new LNStandartMsg(new NewBlockMsg(block)));
+
+		LNController.broadcast(new LNMsgRegistry.NEW_BLOCK(block));
 
 		currentSlot.processBlock(block);
 		

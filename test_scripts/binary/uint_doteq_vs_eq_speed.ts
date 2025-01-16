@@ -1,6 +1,6 @@
 import { Uint32 } from "low-level";
 import crypto from "crypto";
-import { startTimer, getElapsedTime } from "../utils/testUtils.js";
+import { startTimer, getElapsedTime } from "@leicoin/utils/testUtils";
 
 async function testDotEQ(iterationsCount: number) {
     let allEqual = true;

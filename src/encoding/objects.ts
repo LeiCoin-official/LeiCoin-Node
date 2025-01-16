@@ -1,8 +1,8 @@
 import { Uint } from "low-level";
-import { CB } from "../utils/callbacks.js";
-import { AnyObj, Dict } from "../utils/dataUtils.js";
+import { CB } from "@leicoin/utils/callbacks";
+import { AnyObj, Dict } from "@leicoin/utils/dataUtils";
 import { DataEncoder } from "./binaryEncoders.js";
-import EncodingUtils from "./utils.js";
+import { EncodingUtils } from "./utils.js";
 
 
 interface OEDecodeStandardResult {

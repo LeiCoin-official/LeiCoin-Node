@@ -1,8 +1,8 @@
 import { BasicBinaryMap, Uint32 } from "low-level";
-import { Deferred } from "../utils/deferred.js";
+import { Deferred } from "@leicoin/utils/deferred";
 import { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { LNRequestMsg } from "./messaging/networkMessages.js";
-import Schedule from "../utils/schedule.js";
+import { Schedule } from "@leicoin/utils/schedule";
 import { ErrorResponseMsg } from "./messaging/messages/error.js";
 
 class LNSucessResponse<T extends LNAbstractMsgBody> {

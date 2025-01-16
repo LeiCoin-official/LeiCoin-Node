@@ -1,15 +1,15 @@
 import { Uint64 } from "low-level";
-import { Blockchain } from "../storage/blockchain.js";
-import { Queue } from "../utils/queue.js";
-import type Block from "../objects/block.js";
-import { type ForkChainstateData } from "../storage/chainstate.js";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Queue } from "@leicoin/utils/queue";
+import { type ForkChainstateData } from "@leicoin/storage/chainstate";
 import { type ChainstateMsg, GetChainstateMsg } from "./messaging/messages/chainstate.js";
 import { type PeerSocket } from "./socket.js";
-import LeiCoinNetNode from "./node.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
-import Slot from "../pos/slot.js";
-import cli from "../cli/cli.js";
-import Utils from "../utils/index.js";
+import { cli } from "@leicoin/cli";
+import { Utils } from "@leicoin/utils";
+import { Block } from "@leicoin/objects/block";
+import { Slot } from "@leicoin/pos/slot";
+import { LeiCoinNetNode } from "./node.js";
 
 export class NetworkSyncManager {
 

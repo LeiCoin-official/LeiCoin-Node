@@ -1,10 +1,9 @@
 import { type Uint } from "low-level";
-import cli from "@/cli/cli.js";
-import { type DataEncoder } from "@/encoding/binaryEncoders.js";
-import ObjectEncoding from "@/encoding/objects.js";
-import { LockedUint } from "@/objects/prefix.js";
-import { type Dict } from "@/utils/dataUtils.js";
+import { cli } from "@leicoin/cli";
+import { LockedUint } from "@leicoin/objects/prefix";
+import { type Dict } from "@leicoin/utils/dataUtils";
 import { type LNBasicMsgHandler } from "./abstractMsgHandler.js";
+import { ObjectEncoding } from "@leicoin/encoding";
 
 /**
  * Stores the message types used in the LeiCoin network

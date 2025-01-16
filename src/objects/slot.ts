@@ -1,6 +1,6 @@
-// import { Uint64 } from "../utils/binary.js";
-// import Block from "./block.js";
-// import Slashing from "./slashing.js";
+// import { Uint64 } from "@leicoin/utils/binary";
+// import { Block } from "./block.js";
+// import { Slashing } from "./slashing.js";
 
 // interface SlotProposedBlock {
 //     status: "proposed";
@@ -26,4 +26,3 @@
 
 // }
 
-// export default Slot;

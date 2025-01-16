@@ -1,11 +1,9 @@
-import ObjectEncoding from "../encoding/objects.js";
 import { NumberLike, Uint, Uint256, Uint64 } from "low-level";
-import cli from "../cli/cli.js";
+import { cli } from "@leicoin/cli";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
-import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
-import { PrivateKey } from "../crypto/cryptoKeys.js";
-import LCrypt from "../crypto/lcrypt.js";
+import { PrivateKey, LCrypt } from "@leicoin/crypto";
+import { ObjectEncoding, DataEncoder, BE } from "@leicoin/encoding";
 
 export class Wallet {
 
@@ -135,4 +133,4 @@ export class SecretWallet extends Wallet {
 }
 
 
-export default Wallet;
+

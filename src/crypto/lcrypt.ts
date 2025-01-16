@@ -2,8 +2,8 @@ import crypto from "crypto";
 import { type curve, ec as ellipticCurve } from 'elliptic';
 import { Uint, Uint256 } from "low-level";
 import { Signature } from "./signature.js";
-import { KeyPair, PrivateKey, PublicKey, PublicKeyPair, SharedSecret } from "./cryptoKeys.js";
-import { PX } from "../objects/prefix.js";
+import { KeyPair, PrivateKey, PublicKey, PublicKeyPair } from "./cryptoKeys.js";
+import { PX } from "@leicoin/objects/prefix";
 
 export class LCrypt {
 
@@ -91,4 +91,3 @@ export class LCrypt {
 
 }
 
-export default LCrypt;

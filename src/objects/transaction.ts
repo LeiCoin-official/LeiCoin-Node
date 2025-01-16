@@ -1,13 +1,10 @@
-import LCrypt from "../crypto/lcrypt.js";
-import ObjectEncoding from "../encoding/objects.js";
-import cli from "../cli/cli.js";
 import { AddressHex } from "./address.js";
 import { Uint, Uint256, Uint64 } from "low-level";
-import Signature from "../crypto/signature.js";
 import { PX } from "./prefix.js";
 import { MinterCredentials } from "./minter.js";
-import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import { BE, DataEncoder } from "@leicoin/encoding";
 import { HashableContainer } from "./container.js";
+import { LCrypt, Signature } from "@leicoin/crypto";
 
 export class Transaction extends HashableContainer {
 
@@ -77,4 +74,3 @@ export class Transaction extends HashableContainer {
 }
 
 
-export default Transaction;

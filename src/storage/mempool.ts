@@ -1,27 +1,16 @@
-import Transaction from "../objects/transaction.js";
-import Block from "../objects/block.js";
-import { CB } from "../utils/callbacks.js";
+import { Transaction } from "@leicoin/objects/transaction";
+import { Block } from "@leicoin/objects/block";
+import { CB } from "@leicoin/utils/callbacks";
 import { Uint256 } from "low-level";
 import { UintMap } from "low-level";
 
-class Mempool {                                                                                                                                                                                                         
+export class Mempool {                                                                                                                                                                                                         
 
-    private static instance: Mempool;
-
-    public transactions: UintMap<Transaction>;
+    static readonly transactions = new UintMap<Transaction>();
   
-    private constructor() {
-        this.transactions = new UintMap<Transaction>();
-    }
-    
-    public static getInstance() {
-        if (!Mempool.instance) {
-            Mempool.instance = new Mempool();
-        }
-        return Mempool.instance;
-    }
+    private constructor() {}
 
-    public clearMempoolbyBlock(block: Block) {
+    static clearMempoolbyBlock(block: Block) {
 
         for (const transactionData of block.body.transactions) {
             this.removeTransactionFromMempool(transactionData.txid);
@@ -29,9 +18,8 @@ class Mempool {
 
     }
 
-
     // Function to add a transaction to the Mempool
-    public addTransactionToMempool(transaction: Transaction) {
+    static addTransactionToMempool(transaction: Transaction) {
         const txid = transaction.txid;
     
         if (txid.toHex() in this.transactions) {
@@ -44,7 +32,7 @@ class Mempool {
     }
     
     // Function to remove a transaction from the Mempool
-    public removeTransactionFromMempool(txid: Uint256) {
+    static removeTransactionFromMempool(txid: Uint256) {
     
         if (txid.toHex() in this.transactions) {
             this.transactions.delete(txid);
@@ -58,6 +46,3 @@ class Mempool {
 
 }
 
-
-const mempool = Mempool.getInstance();
-export default mempool;

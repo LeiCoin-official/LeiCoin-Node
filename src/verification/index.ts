@@ -1,8 +1,10 @@
 import { AddressHex } from "@leicoin/objects/address";
+import { Transaction } from "@leicoin/objects/transaction";
 import { VCode, VCodes } from "./codes.js";
-import Transaction from "@leicoin/objects/transaction";
-import Block from "@leicoin/objects/block";
 import { PX } from "@leicoin/objects/prefix";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Block } from "@leicoin/objects/block";
+import { POS } from "@leicoin/pos";
 
 
 export class Verification {

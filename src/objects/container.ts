@@ -1,8 +1,7 @@
 import { type Uint } from "low-level";
-import { type DataEncoder } from "../encoding/binaryEncoders.js";
-import ObjectEncoding from "../encoding/objects.js";
-import cli from "../cli/cli.js";
-import LCrypt from "../crypto/lcrypt.js";
+import { cli } from "@leicoin/cli";
+import { LCrypt } from "@leicoin/crypto";
+import { DataEncoder, ObjectEncoding } from "@leicoin/encoding";
 
 type NewContainer<T extends Container> = new (...args: any[]) => T;
 

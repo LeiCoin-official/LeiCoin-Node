@@ -1,17 +1,18 @@
 import { type Uint, Uint16, Uint32 } from "low-level";
-import LeiCoinNetNode from "./node.js";
+import { LeiCoinNetNode } from "./node.js";
 import { type LNBroadcastMsg, LNRequestMsg, LNStandartMsg } from "./messaging/networkMessages.js";
 import { PeerSocket } from "./socket.js";
-import { Port } from "../objects/netinfo.js";
+import { Port } from "@leicoin/objects/netinfo";
 import { StatusMsg } from "./messaging/messages/status.js";
 import { LNActiveRequest } from "./requests.js";
 import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messaging/messages/challenge.js";
-import cli from "../cli/cli.js";
+import { cli } from "@leicoin/cli";
+import { LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 
 
 export class LNController {
 
-    static async broadcast(data: LNBroadcastMsg | Uint) {
+    static async broadcast(data: LNAbstractMsgBody | LNBroadcastMsg | Uint) {
         for (const connection of LeiCoinNetNode.connections.values()) {
             connection.send(data);
         }

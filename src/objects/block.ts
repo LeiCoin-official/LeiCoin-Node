@@ -1,11 +1,10 @@
 import { Transaction } from "./transaction.js";
-import LCrypt from "../crypto/lcrypt.js";
 import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
-import Signature from "../crypto/signature.js";
-import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
+import { BE, DataEncoder } from "@leicoin/encoding";
 import { Container, HashableContainer } from "./container.js";
+import { Signature } from "@leicoin/crypto";
 
 export class BlockBody extends Container{
 
@@ -71,5 +70,4 @@ export class Block extends HashableContainer {
 }
 
 
-export default Block;
 

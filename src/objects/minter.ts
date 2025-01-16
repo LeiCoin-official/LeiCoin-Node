@@ -1,10 +1,9 @@
 import { NumberLike, Uint, Uint64 } from "low-level";
-import cli from "../cli/cli.js";
+import { cli } from "@leicoin/cli";
 import { AddressHex } from "./address.js";
 import { PX } from "./prefix.js";
-import { PrivateKey } from "../crypto/cryptoKeys.js";
-import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
-import { ObjectEncoding } from "@leicoin/encoding";
+import { BE, DataEncoder, ObjectEncoding } from "@leicoin/encoding";
+import { PrivateKey } from "@leicoin/crypto";
 
 export class MinterData {
 
@@ -68,4 +67,4 @@ export class MinterCredentials {
 
 }
 
-export default MinterData;
+

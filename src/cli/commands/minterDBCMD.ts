@@ -1,14 +1,14 @@
-import { AddressHex } from "@/objects/address.js";
-import { PX } from "@/objects/prefix.js";
-import MinterData from "@/objects/minter.js";
-import { Blockchain } from "@/storage/blockchain.js";
-import { Uint, Uint64 } from "low-level";
-import cli from "../cli.js";
-import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import CLIUtils from "../cliUtils.js";
-import { DataUtils } from "@/utils/dataUtils.js";
+import { AddressHex } from "@leicoin/objects/address";
+import { PX } from "@leicoin/objects/prefix";
+import { MinterData } from "@leicoin/objects/minter";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Uint64 } from "low-level";
+import { DataUtils } from "@leicoin/utils/dataUtils";
+import { cli } from "../cli.js";
+import { CLICMD, CLISubCMD } from "../cliCMD.js";
+import { CLIUtils } from "../cliUtils.js";
 
-export default class MinterDBCMD extends CLISubCMD {
+export class MinterDBCMD extends CLISubCMD {
     readonly name = "minterdb";
     readonly description = "Manage the Minter database";
     readonly usage = "minterdb <command> [...args]";

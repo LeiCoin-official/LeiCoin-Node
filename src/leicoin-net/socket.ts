@@ -1,18 +1,18 @@
-import cli from "../cli/cli.js";
+import { cli } from "@leicoin/cli";
 import type { Socket, SocketHandler } from "bun";
 import { Uint, Uint256, Uint32 } from "low-level";
-import LCrypt from "../crypto/lcrypt.js";
 import { LNBroadcastMsg, LNRequestMsg, LNResponseMsg, LNStandartMsg } from "./messaging/networkMessages.js";
 import { LNActiveRequests, LNResponseData } from "./requests.js";
 import type { LNMsgRequestHandler, LNBroadcastingMsgHandler, LNMsgDefaultHandler } from "./messaging/abstractMsgHandler.js";
-import LeiCoinNetNode from "./node.js";
 import { LNMsgID, LNAbstractMsgBody } from "./messaging/abstractMsg.js";
 import { MessageRouter } from "./messaging/index.js";
 import { LNController, PeerSocketController } from "./controller.js";
-import { AutoProcessingQueue, ProcessState, Queue } from "../utils/queue.js";
+import { AutoProcessingQueue, ProcessState, Queue } from "@leicoin/utils/queue";
 import { LNDataPaket } from "./packets.js";
-import { NetworkUtils } from "../utils/network-utils.js";
-import { BoundedExecutor } from "../utils/boundedExecutor.js";
+import { NetworkUtils } from "@leicoin/utils/network-utils";
+import { BoundedExecutor } from "@leicoin/utils/boundedExecutor";
+import { LCrypt } from "@leicoin/crypto";
+import { LeiCoinNetNode } from "./node.js";
 
 
 export class PeerSocket {

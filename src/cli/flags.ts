@@ -1,5 +1,5 @@
-import EncodingUtils from "../encoding/utils.js";
-import { type Dict } from "../utils/dataUtils.js";
+import { EncodingUtils } from "@leicoin/encoding";
+import { type Dict } from "@leicoin/utils/dataUtils";
 
 type AllowedTypes = "string" | "number" | "bool";
 

@@ -1,10 +1,9 @@
 import { type Uint, Uint32 } from "low-level";
-import cli from "@/cli/cli.js";
-import LCrypt from "@/crypto/index.js";
-import { BE, type DataEncoder } from "@/encoding/binaryEncoders.js";
-import ObjectEncoding from "@/encoding/objects.js";
+import { cli } from "@leicoin/cli";
 import { MessageRouter } from "./index.js";
 import { type LNAbstractMsgBody, type LNMsgBodyConstructor, LNMsgID } from "./abstractMsg.js";
+import { BE, DataEncoder, ObjectEncoding } from "@leicoin/encoding";
+import { LCrypt } from "@leicoin/crypto";
 
 
 export class LNStandartMsg<T extends LNAbstractMsgBody = LNAbstractMsgBody> {

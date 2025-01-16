@@ -1,9 +1,9 @@
 import { EventEmitter } from "events";
-import cli from "../cli/cli.js";
+import { cli } from "@leicoin/cli";
 import { HTTP_API } from "@leicoin/http-api";
-import POS from "../pos/index.js";
-import LeiCoinNetNode from "../leicoin-net/node.js";
-import { Blockchain } from "../storage/blockchain.js";
+import { POS } from "@leicoin/pos";
+import { LeiCoinNetNode } from "@leicoin/net";
+import { Blockchain } from "@leicoin/storage/blockchain";
 import { type IModuleLike } from "./dataUtils.js";
 
 export class Utils {

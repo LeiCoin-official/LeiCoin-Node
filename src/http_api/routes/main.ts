@@ -1,5 +1,5 @@
 import cors from "@elysiajs/cors";
-import sendTransactions_route from "./transaction.js";
+import { sendTransactions_route } from "./transaction.js";
 import Elysia from "elysia";
 import { HTTPRouter405Route } from "../route.js";
 

@@ -1,5 +1,5 @@
 import { type LNMsgInfo, LNMsgID } from "./abstractMsg.js";
-import { ObjectiveArray, type Dict } from "@/utils/dataUtils.js";
+import { ObjectiveArray, type Dict } from "@leicoin/utils/dataUtils";
 import { StatusMsg } from "./messages/status.js";
 import { ChallengeMsg, ChallengeREQMsg, ChallengeResponseMsg } from "./messages/challenge.js";
 import { BlocksMsg, GetBlocksMsg, NewBlockMsg } from "./messages/block.js";
@@ -20,7 +20,7 @@ class LNMsgUtils {
     static createLNMsgRegistry<T extends readonly LNMsgInfo[]>(msgs: T) {
         const registry: Dict<LNMsgInfo> = {};
         for (const msg of msgs) {
-            registry[msg.name] = msg;
+            registry[msg.Name] = msg;
         }
         return registry as LNMsgRegistry<T>;
     }
