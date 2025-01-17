@@ -45,7 +45,7 @@ export class MinterClient {
 				),
 			);
 
-			const mc_verification = mc.verifyCredentials()
+			const mc_verification = mc.verifyCredentials();
 
 			if (mc_verification.cb) {
 				clients.push(mc);
