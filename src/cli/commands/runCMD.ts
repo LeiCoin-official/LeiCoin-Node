@@ -1,4 +1,4 @@
-import Main from "@leicoin/core";
+import { Main } from "@leicoin/core";
 import { Configs } from "@leicoin/config";
 import { HTTP_API } from "@leicoin/http-api";
 import { NetworkSyncManager } from "@leicoin/net";

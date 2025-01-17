@@ -1,4 +1,4 @@
-import Main from "@leicoin/core";
+import { Main } from "@leicoin/core";
 import { cli } from "./cli.js";
 import { type CLICMD } from "./cliCMD.js";
 

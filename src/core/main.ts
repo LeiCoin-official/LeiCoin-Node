@@ -1,6 +1,6 @@
 import { CLICMDHandler } from "@leicoin/cli";
 
-export default class Main {
+export class Main {
 
     private static initialized = false;
 

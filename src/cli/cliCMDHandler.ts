@@ -1,4 +1,4 @@
-import Main from "@leicoin/core";
+import { Main } from "@leicoin/core";
 import { Utils } from "@leicoin/utils";
 import { cli } from "./cli.js";
 import { CLISubCMD } from "./cliCMD.js";
