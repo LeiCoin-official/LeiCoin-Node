@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "type": "module",
     "exports": {
-      ".": "./index.ts"
+      ".": "./index.ts",
+      "./types": "./types.ts"
     },
     "dependencies": {
       "@leicoin/core": "^1.0.0",

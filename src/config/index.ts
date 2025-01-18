@@ -4,9 +4,8 @@ import { PeersConfigParser } from "./peers.js";
 import fs from "fs";
 import path from "path";
 import { cli } from "@leicoin/cli";
+import { NodeStartupFlags } from "@leicoin/cli/types";
 import { Utils } from "@leicoin/utils";
-// @fix
-//import { type NodeStartupFlags } from "@leicoin/cli/commands/runCMD.js";
 
 export interface ConfigLike extends GeneralConfigLike, ENVConfigLike {
     peers: string[];
@@ -50,8 +49,7 @@ export class Configs {
         }
     }
 
-    static adjustConfigByProcessArgs(processFlags: any) {
-    //static adjustConfigByProcessArgs(processFlags: NodeStartupFlags) {
+    static adjustConfigByProcessArgs(processFlags: NodeStartupFlags) {
         const pArgs = processFlags;
         const netConfig = this.config.leicoin_net;
 
