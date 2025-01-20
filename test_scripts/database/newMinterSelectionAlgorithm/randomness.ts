@@ -4,7 +4,7 @@ import LCrypt from "../../../src/crypto/index.js";
 import { AddressHex } from "../../../src/objects/address.js";
 import type LevelDB from "../../../src/storage/leveldb/index.js";
 import { type LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
-import { getElapsedTime, startTimer } from "../../utils/testUtils.js";
+import { getElapsedTime, startTimer } from "../@leicoin/utils/testUtils";
 import { LevelDBUtils } from "../leveldb_utils.js";
 import { firstMetaAddress, generateMinterDB, indexDB, selectNextMinter } from "./utils.js";
 

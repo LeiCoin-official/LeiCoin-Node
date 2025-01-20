@@ -1,4 +1,4 @@
-import { startTimer, getElapsedTime } from './utils/testUtils.js';
+import { startTimer, getElapsedTime } from "@leicoin/utils/testUtils';
 import elliptic from 'elliptic';
 const { ec: EC } = elliptic;
 import crypto from 'crypto';

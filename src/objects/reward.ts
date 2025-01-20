@@ -1,8 +1,8 @@
-// import cli from "../cli/cli.js";
-// import Crypto from "../crypto/index.js";
-// import ObjectEncoding, { EncodingSettings } from "../encoding/objects.js";
-// import { Uint, Uint64 } from "../utils/binary.js";
-// import { DataUtils } from "../utils/dataUtils.js";
+// import { cli } from "@leicoin/cli";
+// import Crypto from "@leicoin/crypto";
+// import { ObjectEncoding, EncodingSettings } from "@leicoin/encoding";
+// import { Uint, Uint64 } from "@leicoin/utils/binary";
+// import { DataUtils } from "@leicoin/utils/dataUtils";
 // import { AddressHex } from "./address.js";
 
 
@@ -45,5 +45,4 @@
 
 // }
 
-// export default Reward;
 

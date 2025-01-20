@@ -1,9 +1,9 @@
-import HTTP_API from "@/http_api/index.js";
-import Utils from "@/utils/index.js";
-import cli from "../cli.js";
-import CLICMD, { CLISubCMD } from "../cliCMD";
+import { HTTP_API } from "@leicoin/http-api";
+import { Utils } from "@leicoin/utils";
+import { cli } from "../cli.js";
+import { CLICMD, CLISubCMD } from "../cliCMD";
 
-export default class StartServiceCMD extends CLISubCMD {
+export class StartServiceCMD extends CLISubCMD {
     readonly name = "start-service";
     readonly description = "Start a service even after initial startup";
     readonly usage = "start-service <service-name> [options]";

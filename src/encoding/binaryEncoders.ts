@@ -1,7 +1,7 @@
 import { FixedUint, Uint64, Uint8 } from "low-level";
 import { Uint } from "low-level";
-import ObjectEncoding from "./objects.js";
-import { AnyObj } from "../utils/dataUtils.js";
+import { ObjectEncoding } from "./objects.js";
+import { AnyObj } from "@leicoin/utils/dataUtils";
 
 
 interface EncodeableObjInstance {

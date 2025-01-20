@@ -1,7 +1,7 @@
-import BlockDB from "./blocks.js";
-import MinterDB from "./minters.js";
-import SmartContractStateDB from "./smart-contract-state.js";
-import WalletDB from "./wallets.js";
+import { BlockDB } from "./blocks.js";
+import { MinterDB } from "./minters.js";
+import { SmartContractStateDB } from "./smart-contract-state.js";
+import { WalletDB } from "./wallets.js";
 
 export class Chain {
 
@@ -37,4 +37,3 @@ export class Chain {
 
 }
 
-export default Chain;

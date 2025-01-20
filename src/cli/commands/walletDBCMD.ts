@@ -1,14 +1,14 @@
-import { AddressHex } from "@/objects/address.js";
-import { PX } from "@/objects/prefix.js";
-import Wallet from "@/objects/wallet.js";
-import { Blockchain } from "@/storage/blockchain.js";
+import { AddressHex } from "@leicoin/objects/address";
+import { PX } from "@leicoin/objects/prefix";
+import { Wallet } from "@leicoin/objects/wallet";
+import { Blockchain } from "@leicoin/storage/blockchain";
 import { Uint64 } from "low-level";
-import cli from "../cli.js";
-import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import CLIUtils from "../cliUtils.js";
-import { DataUtils } from "@/utils/dataUtils.js";
+import { DataUtils } from "@leicoin/utils/dataUtils";
+import { cli } from "../cli.js";
+import { CLICMD, CLISubCMD } from "../cliCMD.js";
+import { CLIUtils } from "../cliUtils.js";
 
-export default class WalletDBCMD extends CLISubCMD {
+export class WalletDBCMD extends CLISubCMD {
     readonly name = "walletdb";
     readonly description = "Manage the Wallet database";
     readonly usage = "walletdb <command> [...args]";

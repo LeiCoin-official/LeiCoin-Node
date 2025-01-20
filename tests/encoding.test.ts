@@ -1,12 +1,12 @@
 import { describe, test, expect } from "bun:test";
-import Transaction from "../src/objects/transaction.js";
-import Wallet from "../src/objects/wallet.js";
+import { Transaction } from "../src/objects/transaction.js";
+import  {Wallet } from "../src/objects/wallet.js";
 import { Block, BlockBody } from "../src/objects/block.js";
-import Signature from "../src/crypto/signature.js";
+import { Signature } from "../src/crypto/signature.js";
 import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "../src/objects/address.js";
 import { PrivateKey } from "../src/crypto/cryptoKeys.js";
-import Minter, { MinterCredentials } from "../src/objects/minter.js";
+import { MinterData, MinterCredentials } from "../src/objects/minter.js";
 import { ChainstateData } from "../src/storage/chainstate.js";
 
 describe("encoding", () => {
@@ -49,13 +49,13 @@ describe("encoding", () => {
 
         const address = AddressHex.from("0e7f9c9e31ac8256ca2f258583df262dbc7d6f68f2");
 
-        const minter = new Minter(
+        const minter = new MinterData(
             address,
             Uint64.from(32_0000_0000)
         );
 
-        const decoded: any = Minter.fromDecodedHex(address, minter.encodeToHex());
-        const decoded2 = Minter.fromDecodedHex(address, decoded.encodeToHex());
+        const decoded: any = MinterData.fromDecodedHex(address, minter.encodeToHex());
+        const decoded2 = MinterData.fromDecodedHex(address, decoded.encodeToHex());
 
         expect(JSON.stringify(decoded2)).toBe(JSON.stringify(minter));
 

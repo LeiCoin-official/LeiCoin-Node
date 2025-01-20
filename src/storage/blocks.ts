@@ -1,8 +1,8 @@
-import { CB } from "../utils/callbacks.js";
-import cli from "../cli/cli.js";
-import Block from "../objects/block.js";
+import { CB } from "@leicoin/utils/callbacks";
+import { cli } from "@leicoin/cli";
 import { StorageUtils } from "./utils.js";
 import { Uint64 } from "low-level";
+import { Block } from "@leicoin/objects/block";
 
 export class BlockDB {
     
@@ -108,4 +108,3 @@ export class BlockDB {
 }
 
 
-export default BlockDB;

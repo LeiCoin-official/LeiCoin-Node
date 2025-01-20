@@ -1,10 +1,10 @@
-import cli from "../cli/cli.js";
+import { cli } from "@leicoin/cli";
 import { Uint64, UintMap } from "low-level";
-import Constants from "../utils/constants.js";
-import Slot from "./slot.js";
-import { type MinterClient } from "../minter/index.js";
-import { type ModuleLike } from "../utils/dataUtils.js";
+import { Constants } from "@leicoin/utils/constants";
+import { type MinterClient } from "@leicoin/minter";
+import { type ModuleLike } from "@leicoin/utils/dataUtils";
 import { CronJob } from "cron";
+import { Slot } from "./slot";
 
 export class POS implements ModuleLike<typeof POS> {
     public static initialized = false;
@@ -97,4 +97,3 @@ export class POS implements ModuleLike<typeof POS> {
     
 }
 
-export default POS;

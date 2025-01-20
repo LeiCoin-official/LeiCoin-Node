@@ -1,12 +1,12 @@
 import { EventEmitter } from "events";
-import cli from "../cli/cli.js";
-import HTTP_API from "../http_api/index.js";
-import POS from "../pos/index.js";
-import LeiCoinNetNode from "../leicoin-net/index.js";
-import { Blockchain } from "../storage/blockchain.js";
+import { cli } from "@leicoin/cli";
+import { HTTP_API } from "@leicoin/http-api";
+import { POS } from "@leicoin/pos";
+import { LeiCoinNetNode } from "@leicoin/net";
+import { Blockchain } from "@leicoin/storage/blockchain";
 import { type IModuleLike } from "./dataUtils.js";
 
-class Utils {
+export class Utils {
     private static initialized = false;
 
     static readonly events = new EventEmitter();
@@ -84,4 +84,3 @@ class Utils {
 }
 
 Utils.init();
-export default Utils;

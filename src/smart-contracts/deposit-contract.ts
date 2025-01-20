@@ -1,4 +1,4 @@
-import { AddressHex } from "../objects/address.js";
+import { AddressHex } from "@leicoin/objects/address";
 
 export class DepositContract {
 
@@ -17,4 +17,3 @@ export class DepositContract {
 
 }
 
-export default DepositContract;

@@ -1,11 +1,10 @@
 import { createInterface, Interface as ReadlineInterface } from "readline";
-import type { Chalk } from "chalk";
+import { type Chalk } from "chalk";
 import fs from "fs";
 import { dirname as path_dirname } from "path";
-import { Dict } from "../utils/dataUtils.js";
-import { DataUtils } from "../utils/dataUtils.js";
-import type CLICMDHandler from "./cliCMDHandler.js";
-import { StorageUtils } from "../storage/utils.js";
+import { Dict, DataUtils } from "@leicoin/utils/dataUtils";
+import { type CLICMDHandler } from "./cliCMDHandler.js";
+import { StorageUtils } from "@leicoin/storage/utils";
 
 /**
  * @todo Add debug(message) method
@@ -307,7 +306,7 @@ class CLI {
         if (!this.cmdHandler) {
             this.cmdHandler = (
                 await import("./cliCMDHandler.js")
-            ).default.getInstance();
+            ).CLICMDHandler.getInstance();
         }
 
         if (!this.rl) {
@@ -369,4 +368,4 @@ class CLI {
 }
 
 export const cli = CLI.getInstance();
-export default cli;
+

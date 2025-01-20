@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-export default function findMostSimilarString(inputString, stringArray) {
+export function findMostSimilarString(inputString, stringArray) {
 		let highestSimilarity = -1;
 		let mostSimilarString = null;
 		let mostSimilarIndex = -1;

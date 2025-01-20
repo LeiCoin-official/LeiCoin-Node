@@ -1,10 +1,10 @@
 import { Uint16, Uint32 } from "low-level";
-import { BE, type DataEncoder } from "@/encoding/binaryEncoders.js";
-import { Port } from "@/objects/netinfo.js";
-import { type Dict } from "@/utils/dataUtils.js";
+import { Port } from "@leicoin/objects/netinfo";
+import { type Dict } from "@leicoin/utils/dataUtils";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { LNMsgDefaultHandler } from "../abstractMsgHandler.js";
 import { type PeerSocket } from "../../socket.js";
+import { BE, DataEncoder } from "@leicoin/encoding";
 
 export class StatusMsg extends LNAbstractMsgBody {
 

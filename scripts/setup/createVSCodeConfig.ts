@@ -27,7 +27,7 @@ function createSettingsFile() {
     console.log('settings.json file copied successfully.');
 }
 
-export default function () {
+export function createVSCodeConfig() {
     createVSCodeFolder();
     copyLaunchFile();
     createSettingsFile();

@@ -1,11 +1,11 @@
-import utils from "../utils/index.js";
 import { GeneralConfigLike, GeneralConfigParser } from "./general.js";
 import { ENVConfigLike, ENVConfigParser } from "./dotenv.js";
 import { PeersConfigParser } from "./peers.js";
 import fs from "fs";
 import path from "path";
-import cli from "../cli/cli.js";
-import type { NodeStartupFlags } from "../cli/commands/runCMD.js";
+import { cli } from "@leicoin/cli";
+import { NodeStartupFlags } from "@leicoin/cli/types";
+import { Utils } from "@leicoin/utils";
 
 export interface ConfigLike extends GeneralConfigLike, ENVConfigLike {
     peers: string[];
@@ -27,7 +27,7 @@ export class Configs {
             const envConfig = new ENVConfigParser().parse();
     
             if (!defaultConfig || !peersConfig || !envConfig) {
-                utils.gracefulShutdown(1);
+                Utils.gracefulShutdown(1);
                 return {} as ConfigLike;
             }
 
@@ -42,7 +42,7 @@ export class Configs {
     }
 
     private static createConfigDir() {
-        const configDir = path.join(utils.procCWD, '/config');
+        const configDir = path.join(Utils.procCWD, '/config');
         if (!fs.existsSync(configDir)) {
             fs.mkdirSync(configDir, { recursive: true });
             cli.data.info(`Directory /config was created because it was missing.`);

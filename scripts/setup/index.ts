@@ -1,4 +1,4 @@
 
-import createVSCodeConfig from "./createVSCodeConfig.js";
+import { createVSCodeConfig } from "./createVSCodeConfig.js";
 
 createVSCodeConfig();

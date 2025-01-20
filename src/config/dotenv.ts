@@ -1,9 +1,9 @@
 import path from "path";
-import { Dict } from "../utils/dataUtils.js";
+import { Dict } from "@leicoin/utils/dataUtils";
 import dotenv from "dotenv";
 import fs from "fs";
-import utils from "../utils/index.js";
-import cli from "../cli/cli.js";
+import { Utils } from "@leicoin/utils";
+import { cli } from "@leicoin/cli";
 
 export interface ENVConfigLike extends Dict<any> {}
 
@@ -19,7 +19,7 @@ export class ENVConfigParser {
     }
 
     public parse() {
-        const envFilePath = path.join(utils.procCWD, '/config/.env');
+        const envFilePath = path.join(Utils.procCWD, '/config/.env');
         try {
             if (fs.existsSync(envFilePath)) {
                 dotenv.config({ path: envFilePath });

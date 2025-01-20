@@ -1,12 +1,12 @@
-import mempool from "@/storage/mempool.js";
-import Transaction from "@/objects/transaction.js";
-import cli from "@/cli/cli.js";
-import Verification from "@/verification/index.js"
+import { Mempool } from "@leicoin/storage/mempool";
+import { Transaction } from "@leicoin/objects/transaction";
+import { cli } from "@leicoin/cli";
+import { Verification } from "@leicoin/verification"
 import { Uint } from "low-level";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { LNBroadcastingMsgHandler, LNMsgRequestHandler } from "../abstractMsgHandler.js";
-import { Dict } from "@/utils/dataUtils.js";
-import { BE, type DataEncoder } from "@/encoding/binaryEncoders.js";
+import { Dict } from "@leicoin/utils/dataUtils";
+import { BE, type DataEncoder } from "@leicoin/encoding";
 import { type PeerSocket } from "../../socket.js";
 
 export class NewTransactionMsg extends LNAbstractMsgBody {
@@ -33,13 +33,13 @@ export namespace NewTransactionMsg {
 
             const transaction = data.transaction;
         
-            if (!(transaction.txid.toHex() in mempool.transactions)) {
+            if (!(transaction.txid.toHex() in Mempool.transactions)) {
         
                 const validationresult = await Verification.verifyTransaction(transaction);
         
                 if (validationresult === 12000) {
 
-                    mempool.addTransactionToMempool(transaction);
+                    Mempool.addTransactionToMempool(transaction);
             
                     cli.leicoin_net.success(`Received Transaction with hash ${transaction.txid} has been validated. Adding to Mempool.`);
 

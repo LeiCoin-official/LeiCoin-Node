@@ -1,14 +1,14 @@
 import { ClassicLevel } from "classic-level";
 import LevelDB from "../../src/storage/leveldb/index.js";
 import { shuffleArray } from '../cryptoUtils.js';
-import { startTimer, getElapsedTime } from "../utils/testUtils.js";
+import { startTimer, getElapsedTime } from "@leicoin/utils/testUtils";
 import { Uint, Uint256, Uint64 } from "low-level";
 import { UintMap } from "low-level";
 import { AddressHex } from "../../src/objects/address.js";
 import { LCrypt } from "../../src/crypto/index.js";
 import { PX } from "../../src/objects/prefix.js";
 import { LevelDBUtils } from "./leveldb_utils.js";
-import { Dict } from "../../src/utils/dataUtils.js";
+import { Dict } from "../../s@leicoin/utils/dataUtils";
 import { gen_minter } from "./generateRandData.js";
 
 async function speedTest(db1: LevelDBUtils.DBs = "stake1", db2?: LevelDBUtils.DBs) {

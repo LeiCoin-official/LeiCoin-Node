@@ -28,4 +28,4 @@ export class LevelDB<K = Uint, V = Uint> extends ClassicLevel<K, V> {
 
 }
 
-export default LevelDB;
+

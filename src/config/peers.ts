@@ -1,7 +1,7 @@
 import path from "path";
-import utils from "../utils/index.js";
 import fs from "fs";
-import cli from "../cli/cli.js";
+import { Utils } from "@leicoin/utils";
+import { cli } from "@leicoin/cli";
 
 export type PeersConfigLike = string[];
 
@@ -17,7 +17,7 @@ export class PeersConfigParser {
     }
 
     public parse() {
-        const configFilePath = path.join(utils.procCWD, '/config/peers.json');
+        const configFilePath = path.join(Utils.procCWD, '/config/peers.json');
         try {
             if (fs.existsSync(configFilePath)) {
                 const configData = fs.readFileSync(configFilePath, 'utf-8');

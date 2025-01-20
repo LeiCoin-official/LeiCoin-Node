@@ -22,4 +22,4 @@ export class Schedule {
 
 }
 
-export default Schedule;
+
