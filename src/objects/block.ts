@@ -6,7 +6,7 @@ import { BE, DataEncoder } from "@leicoin/encoding";
 import { Container, HashableContainer } from "./container.js";
 import { Signature } from "@leicoin/crypto";
 
-export class BlockBody extends Container{
+export class BlockBody extends Container {
 
     constructor(
         public transactions: Transaction[]
