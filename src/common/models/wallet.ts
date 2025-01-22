@@ -1,7 +1,7 @@
 import { NumberLike, Uint, Uint256, Uint64 } from "low-level";
 import { cli } from "@leicoin/cli";
 import { AddressHex } from "./address.js";
-import { PX } from "./prefix.js";
+import { PX } from "../types/prefix.js";
 import { PrivateKey, LCrypt } from "@leicoin/crypto";
 import { ObjectEncoding, DataEncoder, BE } from "@leicoin/encoding";
 

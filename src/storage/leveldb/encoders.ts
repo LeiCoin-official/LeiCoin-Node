@@ -1,4 +1,4 @@
-import { AddressHex } from "@leicoin/objects/address";
+import { AddressHex } from "@leicoin/common/models/address";
 import { type IEncoding } from "level-transcoder";
 import { BasicUintConstructable, Uint, Uint256, Uint64 } from "low-level";
 

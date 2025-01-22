@@ -1,6 +1,6 @@
 import { type Uint } from "low-level";
 import { cli } from "@leicoin/cli";
-import { LockedUint } from "@leicoin/objects/prefix";
+import { LockedUint } from "@leicoin/common/types/prefix";
 import { type Dict } from "@leicoin/utils/dataUtils";
 import { type LNBasicMsgHandler } from "./abstractMsgHandler.js";
 import { DataEncoder, ObjectEncoding } from "@leicoin/encoding";

@@ -7,7 +7,7 @@ import { type PeerSocket } from "./socket.js";
 import { BlocksMsg, GetBlocksMsg } from "./messaging/messages/block.js";
 import { cli } from "@leicoin/cli";
 import { Utils } from "@leicoin/utils";
-import { Block } from "@leicoin/objects/block";
+import { Block } from "@leicoin/common/models/block";
 import { Slot } from "@leicoin/pos/slot";
 import { LeiCoinNetNode } from "./node.js";
 

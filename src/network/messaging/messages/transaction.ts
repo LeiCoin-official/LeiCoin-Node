@@ -1,5 +1,5 @@
 import { Mempool } from "@leicoin/storage/mempool";
-import { Transaction } from "@leicoin/objects/transaction";
+import { Transaction } from "@leicoin/common/models/transaction";
 import { cli } from "@leicoin/cli";
 import { Verification } from "@leicoin/verification"
 import { Uint } from "low-level";

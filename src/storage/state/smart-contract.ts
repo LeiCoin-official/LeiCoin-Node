@@ -1,6 +1,6 @@
-import { AddressHex } from "@leicoin/objects/address";
+import { AddressHex } from "@leicoin/common/models/address";
 import { Uint } from "low-level";
-import { LevelBasedStateStorage } from "./leveldb/levelBasedStorage.js";
+import { LevelBasedStateStorage } from "../leveldb/levelBasedStorage.js";
 
 export class SmartContractStateDB extends LevelBasedStateStorage {
 

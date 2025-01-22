@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { type Transaction } from "@leicoin/objects/transaction";
+import { type Transaction } from "@leicoin/common/models/transaction";
 import { HTTPRouter405Route } from "../route.js";
 import { Mempool } from "@leicoin/storage/mempool";
 import { Verification } from "@leicoin/verification";

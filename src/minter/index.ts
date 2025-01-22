@@ -1,10 +1,10 @@
 import { cli } from "@leicoin/cli";
 import { LCrypt, PrivateKey, Signature } from "@leicoin/crypto";
 import { LNController, LNMsgRegistry } from "@leicoin/net";
-import { AddressHex } from "@leicoin/objects/address";
-import { Block, BlockBody } from "@leicoin/objects/block";
-import { MinterCredentials } from "@leicoin/objects/minter";
-import { PX } from "@leicoin/objects/prefix";
+import { AddressHex } from "@leicoin/common/models/address";
+import { Block, BlockBody } from "@leicoin/common/models/block";
+import { MinterCredentials } from "@leicoin/common/models/minterData";
+import { PX } from "@leicoin/common/types/prefix";
 import { Slot } from "@leicoin/pos/slot";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { Mempool } from "@leicoin/storage/mempool";

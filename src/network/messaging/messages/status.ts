@@ -1,5 +1,5 @@
 import { Uint16, Uint32 } from "low-level";
-import { Port } from "@leicoin/objects/netinfo";
+import { Port } from "@leicoin/common/types/netinfo";
 import { type Dict } from "@leicoin/utils/dataUtils";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { LNMsgDefaultHandler } from "../abstractMsgHandler.js";

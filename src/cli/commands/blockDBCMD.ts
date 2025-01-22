@@ -1,4 +1,4 @@
-import { type Block } from "@leicoin/objects/block";
+import { type Block } from "@leicoin/common/models/block";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";

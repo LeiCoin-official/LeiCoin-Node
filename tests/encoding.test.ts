@@ -1,13 +1,11 @@
 import { describe, test, expect } from "bun:test";
-import { Transaction } from "../src/objects/transaction.js";
-import  {Wallet } from "../src/objects/wallet.js";
-import { Block, BlockBody } from "../src/objects/block.js";
-import { Signature } from "../src/crypto/signature.js";
-import { Uint256, Uint64 } from "low-level";
-import { AddressHex } from "../src/objects/address.js";
-import { PrivateKey } from "../src/crypto/cryptoKeys.js";
-import { MinterData, MinterCredentials } from "../src/objects/minter.js";
-import { ChainstateData } from "../src/storage/chainstate.js";
+import { MinterData, MinterCredentials } from "@leicoin/common/models/minterData";
+import { AddressHex } from "@leicoin/common/models/address";
+import { Block, BlockBody } from "@leicoin/common/models/block";
+import { Transaction } from "@leicoin/common/models/transaction";
+import { Wallet } from "@leicoin/common/models/wallet";
+import { Signature, PrivateKey } from "@leicoin/crypto";
+import { Uint64, Uint256 } from "low-level";
 
 describe("encoding", () => {
     test("block_enoding_and_decoding", () => {

@@ -1,5 +1,5 @@
-import { AddressHex } from "@leicoin/objects/address";
-import { type Block } from "@leicoin/objects/block";
+import { AddressHex } from "@leicoin/common/models/address";
+import { type Block } from "@leicoin/common/models/block";
 import { type Uint64 } from "low-level";
 import { Execution } from "./execution.js";
 import { cli } from "@leicoin/cli";

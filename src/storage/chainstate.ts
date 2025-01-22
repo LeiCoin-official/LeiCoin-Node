@@ -1,6 +1,6 @@
 import { cli } from "@leicoin/cli";
-import { Block } from "@leicoin/objects/block";
-import { PX } from "@leicoin/objects/prefix";
+import { Block } from "@leicoin/common/models/block";
+import { PX } from "@leicoin/common/types/prefix";
 import { Uint, Uint256 } from "low-level";
 import { CB } from "@leicoin/utils/callbacks";
 import { Dict } from "@leicoin/utils/dataUtils";

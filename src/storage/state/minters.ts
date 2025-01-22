@@ -1,9 +1,9 @@
-import { MinterData } from "@leicoin/objects/minter";
-import { Block } from "@leicoin/objects/block";
-import { AddressHex } from "@leicoin/objects/address";
+import { MinterData } from "@leicoin/common/models/minterData";
+import { Block } from "@leicoin/common/models/block";
+import { AddressHex } from "@leicoin/common/models/address";
 import { Uint, Uint64 } from "low-level";
-import { LevelBasedStateStorageWithIndexes } from "./leveldb/levelBasedStorage.js";
-import { PX } from "@leicoin/objects/prefix";
+import { LevelBasedStateStorageWithIndexes } from "../leveldb/levelBasedStorage.js";
+import { PX } from "@leicoin/common/types/prefix";
 import { LCrypt } from "@leicoin/crypto";
 
 export class MinterDB extends LevelBasedStateStorageWithIndexes {

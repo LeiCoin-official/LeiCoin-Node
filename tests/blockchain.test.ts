@@ -1,8 +1,8 @@
 import { describe, test, expect } from "bun:test";
-import { AddressHex } from "../src/objects/address.js";
-import { Block } from "../src/objects/block.js";
-import { Signature } from "../src/crypto/signature.js";
-import { Blockchain } from "../src/storage/blockchain.js";
+import { AddressHex } from "@leicoin/common/models/address";
+import { Block } from "@leicoin/common/models/block";
+import { Signature } from "@leicoin/crypto";
+import { Blockchain } from "@leicoin/storage/blockchain";
 import { Uint256, Uint64 } from "low-level";
 
 describe("blockchain", () => {

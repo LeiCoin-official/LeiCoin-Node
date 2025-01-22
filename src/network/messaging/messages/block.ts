@@ -6,7 +6,7 @@ import { ErrorResponseMsg } from "./error.js";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { CB } from "@leicoin/utils/callbacks";
 import { AutoProcessingQueue } from "@leicoin/utils/queue";
-import { Block } from "@leicoin/objects/block";
+import { Block } from "@leicoin/common/models/block";
 import { LNAbstractMsgBody, LNMsgID } from "../abstractMsg.js";
 import { POS } from "@leicoin/pos";
 import { Slot } from "@leicoin/pos/slot";

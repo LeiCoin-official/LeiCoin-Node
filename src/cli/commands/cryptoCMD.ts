@@ -1,6 +1,6 @@
 import { LCrypt } from "@leicoin/crypto";
-import { Address32, AddressHex } from "@leicoin/objects/address";
-import { PX } from "@leicoin/objects/prefix";
+import { Address32, AddressHex } from "@leicoin/common/models/address";
+import { PX } from "@leicoin/common/types/prefix";
 import { CLICMD, CLISubCMD } from "../cliCMD.js";
 import { cli } from "../cli.js";
 import { CLIUtils } from "../cliUtils.js";

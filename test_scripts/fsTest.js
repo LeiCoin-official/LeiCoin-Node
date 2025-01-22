@@ -1,6 +1,6 @@
 import fs from 'fs'
-import { Block } from "../build/src/objects/block.js"
-import { Uint } from "../build/s@leicoin/utils/binary"
+import { Block } from "@leicoin/common/models/block";
+import { Uint } from "low-level";
 import path from 'path';
 
 async function read() {

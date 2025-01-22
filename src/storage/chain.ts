@@ -1,6 +1,6 @@
-import { BlockDB } from "./blocks.js";
-import { MinterDB } from "./minters.js";
-import { SmartContractStateDB } from "./smart-contract-state.js";
+import { BlockDB } from "./state/blocks.js";
+import { MinterDB } from "./state/minters.js";
+import { SmartContractStateDB } from "./state/smart-contract.js";
 import { WalletDB } from "./wallets.js";
 
 export class Chain {

@@ -1,9 +1,9 @@
-import { AddressHex } from "@leicoin/objects/address";
-import { Transaction } from "@leicoin/objects/transaction";
+import { AddressHex } from "@leicoin/common/models/address";
+import { Transaction } from "@leicoin/common/models/transaction";
 import { VCode, VCodes } from "./codes.js";
-import { PX } from "@leicoin/objects/prefix";
+import { PX } from "@leicoin/common/types/prefix";
 import { Blockchain } from "@leicoin/storage/blockchain";
-import { Block } from "@leicoin/objects/block";
+import { Block } from "@leicoin/common/models/block";
 import { POS } from "@leicoin/pos";
 
 

@@ -2,7 +2,7 @@ import { StorageUtils } from "./utils.js";
 import { Chainstate } from "./chainstate.js";
 import { cli } from "@leicoin/cli";
 import { BasicModuleLike } from "@leicoin/utils/dataUtils";
-import { type Block } from "@leicoin/objects/block";
+import { type Block } from "@leicoin/common/models/block";
 import { Chain } from "./chain.js";
 
 export class Blockchain implements BasicModuleLike<typeof Blockchain> {

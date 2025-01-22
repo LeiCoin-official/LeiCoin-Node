@@ -1,12 +1,11 @@
-import { Transaction } from "@leicoin/objects/transaction";
-import { Block } from "@leicoin/objects/block";
+import { Transaction } from "@leicoin/common/models/transaction";
+import { Block } from "@leicoin/common/models/block";
 import { CB } from "@leicoin/utils/callbacks";
-import { Uint256 } from "low-level";
-import { UintMap } from "low-level";
+import { BasicBinaryMap, Uint256 } from "low-level";
 
 export class Mempool {                                                                                                                                                                                                         
 
-    static readonly transactions = new UintMap<Transaction>();
+    static readonly transactions = new BasicBinaryMap<Uint256, Transaction>(Uint256);
   
     private constructor() {}
 

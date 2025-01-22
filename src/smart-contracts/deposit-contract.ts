@@ -1,4 +1,4 @@
-import { AddressHex } from "@leicoin/objects/address";
+import { AddressHex } from "@leicoin/common/models/address";
 
 export class DepositContract {
 

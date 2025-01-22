@@ -1,4 +1,4 @@
-import { type Block } from "@leicoin/objects/block";
+import { type Block } from "@leicoin/common/models/block";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { Verification } from "@leicoin/verification";
 import { Mempool } from "@leicoin/storage/mempool";

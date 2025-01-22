@@ -1,7 +1,7 @@
 import { Transaction } from "./transaction.js";
 import { Uint256, Uint64 } from "low-level";
 import { AddressHex } from "./address.js";
-import { PX } from "./prefix.js";
+import { PX } from "../types/prefix.js";
 import { BE, DataEncoder } from "@leicoin/encoding";
 import { Container, HashableContainer } from "./container.js";
 import { Signature } from "@leicoin/crypto";

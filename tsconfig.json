@@ -118,7 +118,7 @@
     { "path": "./src/crypto" },
     { "path": "./src/encoding" },
     { "path": "./src/http_api" },
-    { "path": "./src/leicoin-net" },
+    { "path": "./src/network" },
     { "path": "./src/minter" },
     { "path": "./src/objects" },
     { "path": "./src/pos" },

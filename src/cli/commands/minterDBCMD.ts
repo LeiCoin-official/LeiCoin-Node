@@ -1,6 +1,6 @@
-import { AddressHex } from "@leicoin/objects/address";
-import { PX } from "@leicoin/objects/prefix";
-import { MinterData } from "@leicoin/objects/minter";
+import { AddressHex } from "@leicoin/common/models/address";
+import { PX } from "@leicoin/common/types/prefix";
+import { MinterData } from "@leicoin/common/models/minterData";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { Uint64 } from "low-level";
 import { DataUtils } from "@leicoin/utils/dataUtils";

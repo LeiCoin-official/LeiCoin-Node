@@ -1,9 +1,9 @@
 import { CB } from "@leicoin/utils/callbacks";
 import { cli } from "@leicoin/cli";
-import { Wallet } from "@leicoin/objects/wallet";
-import { Block } from "@leicoin/objects/block";
+import { Wallet } from "@leicoin/common/models/wallet";
+import { Block } from "@leicoin/common/models/block";
 import { Blockchain } from "./blockchain.js";
-import { AddressHex } from "@leicoin/objects/address";
+import { AddressHex } from "@leicoin/common/models/address";
 import { Uint, Uint64 } from "low-level";
 import { LevelBasedStateStorage } from "./leveldb/levelBasedStorage.js";
 

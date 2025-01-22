@@ -1,7 +1,7 @@
 import { AddressHex } from "./address.js";
 import { Uint, Uint256, Uint64 } from "low-level";
-import { PX } from "./prefix.js";
-import { MinterCredentials } from "./minter.js";
+import { PX } from "../types/prefix.js";
+import { MinterCredentials } from "./minterData.js";
 import { BE, DataEncoder } from "@leicoin/encoding";
 import { HashableContainer } from "./container.js";
 import { LCrypt, Signature } from "@leicoin/crypto";

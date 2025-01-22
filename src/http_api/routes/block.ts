@@ -1,7 +1,7 @@
 import { Verification } from "@leicoin/verification";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import Elysia from "elysia";
-import { type Block } from "@leicoin/objects/block";
+import { type Block } from "@leicoin/common/models/block";
 import { HTTPRouter405Route } from "../route.js";
 import { Mempool } from "@leicoin/storage/mempool";
 
