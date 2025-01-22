@@ -73,5 +73,8 @@
 		"@types/node": "^22.10.7",
 		"@types/readable-stream": "^4.0.18",
 		"typescript": "^5.7.3"
+	},
+	"patchedDependencies": {
+		"classic-level@1.4.1": "patches/classic-level@1.4.1.patch"
 	}
 }
