@@ -120,7 +120,7 @@
     { "path": "./src/http_api" },
     { "path": "./src/network" },
     { "path": "./src/minter" },
-    { "path": "./src/objects" },
+    { "path": "./src/common" },
     { "path": "./src/pos" },
     { "path": "./src/smart-contracts" },
     { "path": "./src/storage" },
