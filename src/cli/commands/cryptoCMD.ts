@@ -1,13 +1,12 @@
-import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import { PrivateKey } from "@/crypto/cryptoKeys.js";
-import LCrypt from "@/crypto/index.js";
-import { Address32, AddressHex } from "@/objects/address.js";
-import { PX } from "@/objects/prefix.js";
-import cli from "../cli.js";
-import CLIUtils from "../cliUtils.js";
+import { LCrypt } from "@leicoin/crypto";
+import { Address32, AddressHex } from "@leicoin/common/models/address";
+import { PX } from "@leicoin/common/types/prefix";
+import { CLICMD, CLISubCMD } from "../handler/command.js";
+import { cli } from "../cli.js";
+import { CLIUtils } from "../utils.js";
 
 
-export default class CryptoCMD extends CLISubCMD {
+export class CryptoCMD extends CLISubCMD {
     readonly name = "crypto";
     readonly description = "Crypto commands";
     readonly usage = "crypto <command> [...args]";

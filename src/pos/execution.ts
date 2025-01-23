@@ -1,14 +1,12 @@
-import cli from "../cli/cli.js";
-import { type Block } from "../objects/block.js";
-import { Blockchain } from "../storage/blockchain.js";
-import mempool from "../storage/mempool.js";
-import { VCodes } from "../verification/codes.js";
-import { type ValidationResult } from "../verification/index.js";
+import { type Block } from "@leicoin/common/models/block";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Verification } from "@leicoin/verification";
+import { Mempool } from "@leicoin/storage/mempool";
 
 
 export class Execution {
 
-    static async executeBlock(block: Block, validationresult: ValidationResult.BlockValid) {
+    static async executeBlock(block: Block, validationresult: Verification.Result.BlockValid) {
 
         let forked = false;
 
@@ -27,7 +25,7 @@ export class Execution {
         );
     
         if (targetChain === "main") {
-            mempool.clearMempoolbyBlock(block);
+            Mempool.clearMempoolbyBlock(block);
             
             await Blockchain.wallets.adjustWalletsByBlock(block);
         }

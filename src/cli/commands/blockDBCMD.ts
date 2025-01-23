@@ -1,11 +1,11 @@
-import { type Block } from "@/objects/block.js";
-import { Blockchain } from "@/storage/blockchain.js";
-import cli from "../cli.js";
-import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import CLIUtils from "../cliUtils.js";
-import { DataUtils } from "@/utils/dataUtils.js";
+import { type Block } from "@leicoin/common/models/block";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { DataUtils } from "@leicoin/utils/dataUtils";
+import { cli } from "../cli.js";
+import { CLICMD, CLISubCMD } from "../handler/command.js";
+import { CLIUtils } from "../utils.js";
 
-export default class BlockDBCMD extends CLISubCMD {
+export class BlockDBCMD extends CLISubCMD {
     readonly name = "blockdb";
     readonly description = "Manage the Block database";
     readonly usage = "blockdb <command> [...args]";

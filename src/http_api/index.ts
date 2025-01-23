@@ -1,7 +1,8 @@
-import cli from "../cli/cli.js";
 import EventEmitter from "events";
-import { ModuleLike } from "../utils/dataUtils.js";
+import { ModuleLike } from "@leicoin/utils/dataUtils";
 import Elysia from "elysia";
+import { cli } from "@leicoin/cli";
+import { NetworkUtils } from "@leicoin/utils/network-utils";
 
 export class HTTP_API implements ModuleLike<typeof HTTP_API> {
     public static initialized = false;
@@ -24,12 +25,17 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API> {
         if (this.started) return;
         this.started = true;
 
+        const host = NetworkUtils.normalizeIP(config.host);
+        if (!host) {
+            throw new Error(`Invalid Hostname: ${host}`);
+        }
+
         this.app = this.app.listen({
-            port: config.port,
-            hostname: config.host,
+            hostname: host,
+            port: config.port
         });
         if (this.app.server) {
-            cli.api.info(`API listening on ${config.host}:${config.port}`);
+            cli.api.info(`API listening on ${NetworkUtils.formatAddress(host, config.port)}`);
         }
         if (config.eventHandler) {
             await this.setupEvents(config.eventHandler);
@@ -50,4 +56,3 @@ export class HTTP_API implements ModuleLike<typeof HTTP_API> {
     private static async setupEvents(eventHandler: EventEmitter) {}
 }
 
-export default HTTP_API;

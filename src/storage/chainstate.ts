@@ -1,14 +1,13 @@
-import cli from "../cli/cli.js";
-import LCrypt from "../crypto/index.js";
-import { BE, DataEncoder } from "../encoding/binaryEncoders.js";
-import ObjectEncoding from "../encoding/objects.js";
-import Block from "../objects/block.js";
-import { PX } from "../objects/prefix.js";
+import { cli } from "@leicoin/cli";
+import { Block } from "@leicoin/common/models/block";
+import { PX } from "@leicoin/common/types/prefix";
 import { Uint, Uint256 } from "low-level";
-import { CB } from "../utils/callbacks.js";
-import { Dict } from "../utils/dataUtils.js";
+import { CB } from "@leicoin/utils/callbacks";
+import { Dict } from "@leicoin/utils/dataUtils";
 import { StorageUtils } from "./utils.js";
 import { Blockchain } from "./blockchain.js";
+import { LCrypt } from "@leicoin/crypto";
+import { ObjectEncoding, DataEncoder, BE } from "@leicoin/encoding";
 
 
 export class ForkChainstateData {

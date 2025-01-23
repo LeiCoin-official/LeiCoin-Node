@@ -1,12 +1,12 @@
 import { UintMap } from "low-level";
 import { Uint, Uint64 } from "low-level";
-import LCrypt from "../../../src/crypto/index.js";
-import { AddressHex } from "../../../src/objects/address.js";
-import type LevelDB from "../../../src/storage/leveldb/index.js";
 import { type LevelIndexes } from "../../../src/storage/leveldb/indexes.js";
-import { getElapsedTime, startTimer } from "../../utils/testUtils.js";
 import { LevelDBUtils } from "../leveldb_utils.js";
 import { firstMetaAddress, generateMinterDB, indexDB, selectNextMinter } from "./utils.js";
+import { AddressHex } from "@leicoin/common/models/address";
+import { getElapsedTime, startTimer } from "../../utils/testUtils.js";
+import { LevelDB } from "@leicoin/storage/leveldb/index";
+import { LCrypt } from "@leicoin/crypto";
 
 async function calulateResults(frequency: UintMap<Uint64>, slotsCount: number, prefixLength: number) {
     const expectedFrequency = slotsCount / 256 ** prefixLength;

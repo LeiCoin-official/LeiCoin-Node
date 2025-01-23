@@ -1,8 +1,8 @@
 import { describe, test, expect } from "bun:test";
 import { PrivateKey } from "../src/crypto/cryptoKeys.js";
-import LCrypt from "../src/crypto/index.js"
-import { Address32, AddressHex } from "../src/objects/address.js";
-import { PX } from "../src/objects/prefix.js";
+import { LCrypt } from "@leicoin/crypto";
+import { Address32, AddressHex } from "@leicoin/common/models/address";
+import { PX } from "@leicoin/common/types/prefix";
 
 describe("address", () => {
     test("address32_enoding_and_decoding", () => {

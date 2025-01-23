@@ -1,6 +1,6 @@
-import Main from "@/main.js";
-import cli from "../cli.js";
-import CLICMD from "../cliCMD.js";
+import { Main } from "@leicoin/core";
+import { cli } from "../cli.js";
+import { CLICMD } from "../handler/command.js";
 
 export class VersionCMD extends CLICMD {
     readonly name = "--version";

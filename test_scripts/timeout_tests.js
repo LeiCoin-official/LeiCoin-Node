@@ -1,4 +1,4 @@
-import { startTimer, getElapsedTime } from "./utils/testUtils.js";
+import { startTimer, getElapsedTime } from "@leicoin/utils/testUtils";
 
 async function callAsyncFunction(params) { return 1 + 1 };
 

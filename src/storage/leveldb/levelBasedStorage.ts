@@ -1,5 +1,5 @@
 import path from "path";
-import LevelDB from "./index.js";
+import { LevelDB } from "./index.js";
 import { StorageUtils } from "../utils.js";
 import { Uint } from "low-level";
 import { LevelIndexes } from "./indexes.js";

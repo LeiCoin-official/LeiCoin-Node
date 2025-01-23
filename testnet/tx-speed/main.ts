@@ -1,14 +1,13 @@
-import LCrypt from "../../src/crypto/index.js";
-import { AddressHex } from "../../src/objects/address.js";
-import Transaction from "../../src/objects/transaction.js";
-import Wallet, { SecretWallet } from "../../src/objects/wallet.js";
-import { Blockchain } from "../../src/storage/blockchain.js";
 import { Uint, Uint256, Uint64 } from "low-level";
-import { PX } from "../../src/objects/prefix.js";
-import Signature from "../../src/crypto/signature.js";
-import Verification from "../../src/verification/index.js";
+import { LCrypt, Signature } from "@leicoin/crypto";
+import { AddressHex } from "@leicoin/common/models/address";
+import { SecretWallet } from "@leicoin/common/models/wallet";
 import fs from "fs";
-import Block from "../../src/objects/block.js";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { PX } from "@leicoin/common/types/prefix";
+import { Transaction } from "@leicoin/common/models/transaction";
+import { Block, BlockBody } from "@leicoin/common/models/block";
+import { Verification } from "@leicoin/verification";
 
 class Wallets {
 
@@ -133,7 +132,9 @@ export class TXSpeedTest {
             Uint64.from(Date.now()),
             minterAddress,
             Signature.empty(),
-            transactions
+            new BlockBody(
+                transactions
+            )
         );
 
         this.block.hash.set(this.block.calculateHash());
@@ -146,7 +147,7 @@ export class TXSpeedTest {
 
         const promises: Promise<number>[] = [];
 
-        for (const tx of this.block.transactions) {
+        for (const tx of this.block.body.transactions) {
 
             promises.push(Verification.verifyTransaction(tx));
         }

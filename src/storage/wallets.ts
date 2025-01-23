@@ -1,9 +1,9 @@
-import { CB } from "../utils/callbacks.js";
-import cli from "../cli/cli.js";
-import Wallet from "../objects/wallet.js";
-import Block from "../objects/block.js";
+import { CB } from "@leicoin/utils/callbacks";
+import { cli } from "@leicoin/cli";
+import { Wallet } from "@leicoin/common/models/wallet";
+import { Block } from "@leicoin/common/models/block";
 import { Blockchain } from "./blockchain.js";
-import { AddressHex } from "../objects/address.js";
+import { AddressHex } from "@leicoin/common/models/address";
 import { Uint, Uint64 } from "low-level";
 import { LevelBasedStateStorage } from "./leveldb/levelBasedStorage.js";
 
@@ -85,4 +85,4 @@ export class WalletDB extends LevelBasedStateStorage {
 
 }
 
-export default WalletDB;
+
