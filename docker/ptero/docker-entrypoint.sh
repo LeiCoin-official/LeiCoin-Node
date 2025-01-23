@@ -23,7 +23,7 @@ function extract_env_bool {
 
 function get_latest_version {
     local include_prereleases=$1
-    local api_url="https://api.github.com/repos/LeiCoin-official/LeiCoin-Node/releases"
+    local api_url="https://api.github.com/repos/LeiCoin-project/LeiCoin-Node/releases"
 
     # Fetch releases from GitHub API
     local releases_json=$(curl -s "$api_url")
@@ -45,7 +45,7 @@ function get_current_version {
 function download_binary {
     local version=$1
     local arch=$2
-    local url="https://github.com/LeiCoin-official/LeiCoin-Node/releases/download/${version}/leicoin-node-${version}-${arch}"
+    local url="https://github.com/LeiCoin-project/LeiCoin-Node/releases/download/${version}/leicoin-node-${version}-${arch}"
 
     echo "Downloading LeiCoin-Node version $version for architecture $arch..."
 
