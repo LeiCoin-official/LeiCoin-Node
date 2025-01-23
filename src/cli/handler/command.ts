@@ -1,6 +1,6 @@
 import { Dict } from "@leicoin/utils/dataUtils";
-import { cli } from "./cli.js";
-import { CLIUtils } from "./cliUtils.js";
+import { cli } from "../cli.js";
+import { CLIUtils } from "../utils.js";
 
 
 export abstract class CLICMD {

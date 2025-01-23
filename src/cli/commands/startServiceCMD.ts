@@ -1,7 +1,7 @@
 import { HTTP_API } from "@leicoin/http-api";
 import { Utils } from "@leicoin/utils";
 import { cli } from "../cli.js";
-import { CLICMD, CLISubCMD } from "../cliCMD";
+import { CLICMD, CLISubCMD } from "../handler/command.js";
 
 export class StartServiceCMD extends CLISubCMD {
     readonly name = "start-service";

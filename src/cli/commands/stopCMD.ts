@@ -1,5 +1,5 @@
 import { Utils } from "@leicoin/utils";
-import { CLICMD } from "../cliCMD.js";
+import { CLICMD } from "../handler/command.js";
 
 export class StopCMD extends CLICMD {
     readonly name = "stop";

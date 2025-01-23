@@ -1,6 +1,6 @@
 import { LeiCoinNetNode } from "@leicoin/net";
 import { cli } from "../cli.js";
-import { CLICMD, CLISubCMD } from "../cliCMD.js";
+import { CLICMD, CLISubCMD } from "../handler/command.js";
 
 export class NetworkCMD extends CLISubCMD {
 

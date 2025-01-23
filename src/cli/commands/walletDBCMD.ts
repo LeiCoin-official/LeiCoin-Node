@@ -5,8 +5,8 @@ import { Blockchain } from "@leicoin/storage/blockchain";
 import { Uint64 } from "low-level";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
-import { CLICMD, CLISubCMD } from "../cliCMD.js";
-import { CLIUtils } from "../cliUtils.js";
+import { CLICMD, CLISubCMD } from "../handler/command.js";
+import { CLIUtils } from "../utils.js";
 
 export class WalletDBCMD extends CLISubCMD {
     readonly name = "walletdb";

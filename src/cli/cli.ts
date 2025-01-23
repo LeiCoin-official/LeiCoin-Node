@@ -3,7 +3,7 @@ import { type Chalk } from "chalk";
 import fs from "fs";
 import { dirname as path_dirname } from "path";
 import { Dict, DataUtils } from "@leicoin/utils/dataUtils";
-import { type CLICMDHandler } from "./cliCMDHandler.js";
+import { type CLICMDHandler } from "./handler/commandHandler";
 import { StorageUtils } from "@leicoin/storage/utils";
 
 /**
@@ -305,7 +305,7 @@ class CLI {
         }
         if (!this.cmdHandler) {
             this.cmdHandler = (
-                await import("./cliCMDHandler.js")
+                await import("./handler/commandHandler.js")
             ).CLICMDHandler.getInstance();
         }
 

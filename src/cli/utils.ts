@@ -1,6 +1,6 @@
 import { Main } from "@leicoin/core";
 import { cli } from "./cli.js";
-import { type CLICMD } from "./cliCMD.js";
+import { type CLICMD } from "./handler/command.js";
 
 
 export class CLIUtils {
