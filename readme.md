@@ -10,13 +10,13 @@ docker run -it \
   -p 12200:12200/tcp \
   -p 12280:12280/tcp \
   -v /path/to/local/data:/data \
-  ghcr.io/leicoin-official/leicoin-node:latest \
+  ghcr.io/leicoin-project/leicoin-node:latest \
   run
 ```
 
 ### Method 2: Using GitHub Releases
 
-1. Go to the [LeiCoin-Node GitHub Releases page](https://github.com/leicoin-official/leicoin-node/releases).
+1. Go to the [LeiCoin-Node GitHub Releases page](https://github.com/leicoin-project/leicoin-node/releases).
 2. Download the latest release for your operating system.
 3. Extract the downloaded archive.
 4. Navigate to the extracted directory.
@@ -27,7 +27,7 @@ docker run -it \
 ```
 
 ### Method 3: Using Pterodactyl
-1. <a href="https://raw.githubusercontent.com/LeiCoin-official/LeiCoin-Node/refs/heads/main/docker/ptero/egg-lei-coin-node.json" download="leicoin-node-egg.json" target="_blank">Download</a> the Pterodactyl-Egg from Github
+1. <a href="https://raw.githubusercontent.com/LeiCoin-project/LeiCoin-Node/refs/heads/main/docker/ptero/egg-lei-coin-node.json" download="leicoin-node-egg.json" target="_blank">Download</a> the Pterodactyl-Egg from Github
 2. Put The File On your Pterodactyl Panel and create a Server with it
 3. Start the created Server
 

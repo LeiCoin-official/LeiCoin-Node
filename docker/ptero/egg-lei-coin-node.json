@@ -10,7 +10,7 @@
     "description": null,
     "features": null,
     "docker_images": {
-        "LeiCoin Node Latest": "ghcr.io\/leicoin-official\/leicoin-node:ptero-latest"
+        "LeiCoin Node Latest": "ghcr.io\/leicoin-project\/leicoin-node:ptero-latest"
     },
     "file_denylist": [],
     "startup": "if [[ {{ONLY_CLI}} == \"1\" ]]; then AF=\"$AF --only-cli\"; fi; \r\nif [[ {{IGNORE_NO_PEERS}} == \"1\" ]]; then AF=\"$AF --ignore-no-peers\"; fi; \r\n.\/leicoin-node run --port={{SERVER_PORT}} $AF",
