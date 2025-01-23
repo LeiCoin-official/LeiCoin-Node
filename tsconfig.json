@@ -3,7 +3,7 @@
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
-    // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
+    "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
     // "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
     // "tsBuildInfoFile": "./.tsbuildinfo",              /* Specify the path to .tsbuildinfo incremental compilation file. */
     // "disableSourceOfProjectReferenceRedirect": true,  /* Disable preferring source files instead of declaration files when referencing composite projects. */
@@ -31,7 +31,7 @@
     "moduleResolution": "bundler",                     /* Specify how TypeScript looks up a file from a given module specifier. */
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     "paths": {  
-      "@/*": ["./src/*"]
+      //"@/*": ["./src/*"]
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
@@ -109,5 +109,22 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*.ts"]
+  //"include": ["src/**/*.ts"]
+  "files": ["./src/index.ts"],
+  "references": [
+    { "path": "./src/core" },
+    { "path": "./src/cli" },
+    { "path": "./src/config" },
+    { "path": "./src/crypto" },
+    { "path": "./src/encoding" },
+    { "path": "./src/http_api" },
+    { "path": "./src/network" },
+    { "path": "./src/minter" },
+    { "path": "./src/common" },
+    { "path": "./src/pos" },
+    { "path": "./src/smart-contracts" },
+    { "path": "./src/storage" },
+    { "path": "./src/utils" },
+    { "path": "./src/verification" }
+  ]
 }

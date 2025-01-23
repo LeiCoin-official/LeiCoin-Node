@@ -1,6 +1,6 @@
+import { PX } from "@leicoin/common/types/prefix";
 import elliptic from 'elliptic';
 import { FixedUint, Uint64, Uint8, UintUtils } from "low-level";
-import { PX } from '../objects/prefix.js';
 
 export interface EllipticBinarySignature extends elliptic.ec.Signature {
     recoveryParam: number;
@@ -70,5 +70,4 @@ export class FullSignature {
     }
 }
 
-export default Signature;
 

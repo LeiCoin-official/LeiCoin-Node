@@ -1,8 +1,7 @@
 import fs from "fs";
-import { type GeneralConfigLike } from "../../src/config/general.js";
-import LCrypt from "../../src/crypto/index.js";
-import { MinterCredentials } from "../../src/objects/minter.js";
+import { MinterCredentials } from "@leicoin/common/models/minterData";
 import { type Server } from "bun";
+import { GeneralConfigLike } from "../../src/config/general";
 
 class LocalNodeTestNet {
 

@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
-import cli from "../cli/cli.js";
-import Utils from "../utils/index.js";
+import { cli } from "@leicoin/cli";
+import { Utils } from "@leicoin/utils";
 
 export interface GeneralConfigLike {
     leicoin_net: {

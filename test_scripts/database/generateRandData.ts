@@ -1,9 +1,9 @@
 import { Uint, Uint256, Uint64 } from "low-level";
-import LCrypt from "../../src/crypto/index.js";
-import { AddressHex } from "../../src/objects/address.js";
-import { PX } from "../../src/objects/prefix.js";
 import { shuffleArray } from "../cryptoUtils.js";
 import { LevelDBUtils } from "./leveldb_utils.js";
+import { PX } from "@leicoin/common/types/prefix";
+import { LCrypt } from "@leicoin/crypto";
+import { AddressHex } from "@leicoin/common/models/address";
 
 export async function gen_old(size: number, db1: LevelDBUtils.DBs = "stake1", db2: LevelDBUtils.DBs = "stake2") {
 

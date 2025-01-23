@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Dict } from "../src/objects/dictonary.js"
+import { Dict } from "@leicoin/utils/dataUtils";
 
 interface Constructable<T> {
     new (...args: any[]): T;

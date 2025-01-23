@@ -1,19 +1,16 @@
-import { PrivateKey } from "../crypto/cryptoKeys.js";
-import { AddressHex } from "../objects/address.js";
-import { PX } from "../objects/prefix.js";
-import cli from "../cli/cli.js";
-import Verification from "../verification/index.js";
+import { cli } from "@leicoin/cli";
+import { LCrypt, PrivateKey, Signature } from "@leicoin/crypto";
+import { LNController, LNMsgRegistry } from "@leicoin/net";
+import { AddressHex } from "@leicoin/common/models/address";
+import { Block, BlockBody } from "@leicoin/common/models/block";
+import { MinterCredentials } from "@leicoin/common/models/minterData";
+import { PX } from "@leicoin/common/types/prefix";
+import { Slot } from "@leicoin/pos/slot";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Mempool } from "@leicoin/storage/mempool";
+import { Verification } from "@leicoin/verification";
 import { Uint256, Uint64 } from "low-level";
-import { Blockchain } from "../storage/blockchain.js";
-import { Block, BlockBody } from "../objects/block.js";
-import mempool from "../storage/mempool.js";
-import Signature from "../crypto/signature.js";
-import LCrypt from "../crypto/index.js";
-import { MinterCredentials } from "../objects/minter.js";
-import { type Slot } from "../pos/slot.js";
-import { NewBlockMsg } from "../leicoin-net/messaging/messages/block.js";
-import { LNStandartMsg } from "../leicoin-net/messaging/networkMessages.js";
-import { LNController } from "../leicoin-net/controller.js";
+
 
 export class MinterClient {
 
@@ -48,7 +45,7 @@ export class MinterClient {
 				),
 			);
 
-			const mc_verification = mc.verifyCredentials()
+			const mc_verification = mc.verifyCredentials();
 
 			if (mc_verification.cb) {
 				clients.push(mc);
@@ -75,7 +72,7 @@ export class MinterClient {
 			Signature.empty(),
 			
 			new BlockBody(
-				mempool.transactions.values().all()
+				Mempool.transactions.values().all()
 			)
 		)
 
@@ -86,8 +83,8 @@ export class MinterClient {
 
     async mint(currentSlot: Slot) {
 		const block = await this.createNewBlock(currentSlot.index);
-		
-		LNController.broadcast(new LNStandartMsg(new NewBlockMsg(block)));
+
+		LNController.broadcast(new LNMsgRegistry.NEW_BLOCK(block));
 
 		currentSlot.processBlock(block);
 		
@@ -96,4 +93,3 @@ export class MinterClient {
 
 }
 
-export default MinterClient;

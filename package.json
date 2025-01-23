@@ -5,8 +5,7 @@
 	"exports": "./src/index.ts",
 	"type": "module",
 	"scripts": {
-		"setup": "bun run ./scripts/setup && bun run patches",
-		"patches": "patch-package",
+		"setup": "bun run ./scripts/setup",
 		"clean": "rm -rf node_modules",
 		"test": "bun test",
 		"testnet": "bun run ./testnet",
@@ -21,6 +20,9 @@
 		"release": "bun run ./scripts/build/withEntryPoint",
 		"start": "./build/bin/leicoin-node"
 	},
+	"workspaces": [
+		"src/*"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/LeiCraft/LeiCoin-Node.git"
@@ -33,29 +35,45 @@
 	},
 	"homepage": "https://github.com/LeiCraft/LeiCoin-Node#readme",
 	"dependencies": {
+		"@leicoin/core": "^1.0.0",
+		"@leicoin/cli": "^1.0.0",
+		"@leicoin/config": "^1.0.0",
+		"@leicoin/crypto": "^1.0.0",
+		"@leicoin/encoding": "^1.0.0",
+		"@leicoin/http-api": "^1.0.0",
+		"@leicoin/net": "^1.0.0",
+		"@leicoin/minter": "^1.0.0",
+		"@leicoin/common": "^1.0.0",
+		"@leicoin/pos": "^1.0.0",
+		"@leicoin/smart-contracts": "^1.0.0",
+		"@leicoin/storage": "^1.0.0",
+		"@leicoin/utils": "^1.0.0",
+		"@leicoin/verification": "^1.0.0",
 		"@date-fns/utc": "^1.2.0",
-		"@elysiajs/cors": "^1.1.1",
-		"@noble/secp256k1": "^2.1.0",
+		"@elysiajs/cors": "^1.2.0",
+		"@noble/secp256k1": "^2.2.3",
 		"ansi-escapes": "^4.3.2",
-		"bun": "^1.1.42",
 		"chalk": "^4.1.2",
 		"classic-level": "^1.4.1",
-		"cron": "^3.1.7",
+		"cron": "^3.5.0",
 		"date-fns": "^3.6.0",
-		"dotenv": "^16.4.5",
-		"elliptic": "^6.5.7",
-		"elysia": "^1.1.16",
-		"level-read-stream": "^1.1.0",
-		"low-level": "^1.0.9",
-		"patch-package": "^8.0.0",
+		"dotenv": "^16.4.7",
+		"elliptic": "^6.6.1",
+		"elysia": "^1.2.10",
+		"level-read-stream": "^1.1.1",
+		"low-level": "^1.0.10",
 		"reflect-metadata": "^0.2.2"
 	},
 	"devDependencies": {
-		"@types/bun": "^1.1.14",
+		"bun": "^1.2.0",
+		"@types/bun": "^1.1.18",
 		"@types/cors": "^2.8.17",
 		"@types/elliptic": "^6.4.18",
-		"@types/node": "^22.7.3",
-		"@types/readable-stream": "^4.0.15",
-		"typescript": "^5.7.2"
+		"@types/node": "^22.10.7",
+		"@types/readable-stream": "^4.0.18",
+		"typescript": "^5.7.3"
+	},
+	"patchedDependencies": {
+		"classic-level@1.4.1": "patches/classic-level@1.4.1.patch"
 	}
 }

@@ -1,17 +1,16 @@
-import { AddressHex } from "../objects/address.js";
-import { type Block } from "../objects/block.js";
+import { AddressHex } from "@leicoin/common/models/address";
+import { type Block } from "@leicoin/common/models/block";
 import { type Uint64 } from "low-level";
-import Verification from "../verification/index.js";
 import { Execution } from "./execution.js";
-import { Blockchain } from "../storage/blockchain.js";
-import cli from "../cli/cli.js";
-import Schedule from "../utils/schedule.js";
-import POS from "./index.js";
+import { cli } from "@leicoin/cli";
+import { POS } from "./index.js";
 import { formatDate } from "date-fns/format";
 import { UTCDate } from "@date-fns/utc/date";
-import { VCodes } from "../verification/codes.js";
-import { ExecutionCheckpoint } from "../utils/executionCheckpoint.js";
-import { type FallbackIncomingBlockQueue } from "../leicoin-net/messaging/messages/block.js";
+import { ExecutionCheckpoint } from "@leicoin/utils/executionCheckpoint";
+import { Schedule } from "@leicoin/utils/schedule";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { Verification } from "@leicoin/verification";
+import { FallbackIncomingBlockQueue } from "@leicoin/net/types";
 
 export class Slot {
 
@@ -86,7 +85,7 @@ export class Slot {
 
         if (verification_result.status !== 12000) {
             this.slot_finished.pass();
-            cli.pos.error(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: Code: ${verification_result.status} Message: ${VCodes[verification_result.status]}`);
+            cli.pos.error(`Block with hash ${block.hash.toHex()} is invalid. Validation Result: Code: ${verification_result.status} Message: ${Verification.Codes[verification_result.status]}`);
             return;
         }
 
@@ -124,4 +123,3 @@ export class Slot {
 
 }
 
-export default Slot;

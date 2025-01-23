@@ -1,9 +1,9 @@
-import { Blockchain } from "@/storage/blockchain.js";
-import cli from "../cli.js";
-import CLICMD, { CLISubCMD } from "../cliCMD.js";
-import { DataUtils } from "@/utils/dataUtils.js";
+import { Blockchain } from "@leicoin/storage/blockchain";
+import { DataUtils } from "@leicoin/utils/dataUtils";
+import { cli } from "../cli.js";
+import { CLICMD, CLISubCMD } from "../handler/command.js";
 
-export default class ChainstateDataCMD extends CLISubCMD {
+export class ChainstateDataCMD extends CLISubCMD {
     readonly name = "chainstate";
     readonly description = "Manage the local Chainstate";
     readonly usage = "chainstate <command> [...args]";
