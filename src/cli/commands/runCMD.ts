@@ -8,7 +8,7 @@ import { POS } from "@leicoin/pos";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { Utils } from "@leicoin/utils";
 import { cli } from "../cli.js";
-import { CLICMD } from "../handler/command.js";
+import { CLICMD } from "@cleverjs/cli";
 import { CMDFlag, CMDFlagsParser, type FlagsParsingResult } from "../handler/commandFlags.js";
 
 export class RunCMD extends CLICMD {

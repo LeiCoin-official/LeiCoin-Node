@@ -5,8 +5,9 @@ import { Blockchain } from "@leicoin/storage/blockchain";
 import { Uint64 } from "low-level";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
-import { CLICMD, CLISubCMD } from "../handler/command.js";
+import { CLISubCMD } from "../handler/command.js";
 import { CLIUtils } from "../utils.js";
+import { CLICMD } from "@cleverjs/cli";
 
 export class MinterDBCMD extends CLISubCMD {
     readonly name = "minterdb";

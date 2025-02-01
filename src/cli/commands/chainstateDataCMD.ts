@@ -1,7 +1,8 @@
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
-import { CLICMD, CLISubCMD } from "../handler/command.js";
+import { CLISubCMD } from "../handler/command.js";
+import { CLICMD } from "@cleverjs/cli";
 
 export class ChainstateDataCMD extends CLISubCMD {
     readonly name = "chainstate";
