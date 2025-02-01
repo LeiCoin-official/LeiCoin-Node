@@ -1,18 +1,7 @@
 import { Dict } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
 import { CLIUtils } from "../utils.js";
-
-
-export abstract class CLICMD {
-
-    readonly abstract name: string;
-    readonly abstract description: string;
-    readonly abstract usage: string;
-    readonly environment: "all" | "runtime" | "shell" = "all";
-
-    abstract run(args: string[], parent_args: string[]): Promise<void>;
-
-}
+import { CLICMD } from "@cleverjs/cli";
 
 export abstract class CLISubCMD extends CLICMD {
     
