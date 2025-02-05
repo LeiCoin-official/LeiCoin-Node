@@ -2,9 +2,7 @@ import { type Block } from "@leicoin/common/models/block";
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
-import { CLICMD } from "@cleverjs/cli";
-import { CLIUtils } from "../utils.js";
-import { CLISubCMD } from "../handler/command.js";
+import { CLICMD, CLICMDExecMeta, CLISubCMD, CLIUtils } from "@cleverjs/cli";
 
 export class BlockDBCMD extends CLISubCMD {
     readonly name = "blockdb";
@@ -15,11 +13,11 @@ export class BlockDBCMD extends CLISubCMD {
         this.register(new ReadCMD());
     }
 
-    async run(args: string[], parent_args: string[]) {
+    async run(args: string[], meta: CLICMDExecMeta) {
         await Blockchain.init();
         await Blockchain.waitAllChainsInit();
 
-        super.run(args, parent_args);
+        super.run(args, meta);
     }
 
 }
@@ -30,7 +28,7 @@ class ReadCMD extends CLICMD {
     readonly description = "Read the Block database";
     readonly usage = "read <index>";
 
-    public async run(args: string[], parent_args: string[]): Promise<void> {
+    public async run(args: string[]): Promise<void> {
         if (args.length !== 1) {
             CLIUtils.invalidNumberOfArguments();
             return;

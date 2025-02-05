@@ -1,10 +1,8 @@
 import { LCrypt } from "@leicoin/crypto";
 import { Address32, AddressHex } from "@leicoin/common/models/address";
-import { PX } from "@leicoin/common/types/prefix";
-import { CLISubCMD } from "../handler/command.js";
 import { cli } from "../cli.js";
-import { CLIUtils } from "../utils.js";
-import { CLICMD } from "@cleverjs/cli";
+import { CLICMD, CLISubCMD, CLIUtils } from "@cleverjs/cli";
+import { PX } from "@leicoin/common/types/prefix";
 
 
 export class CryptoCMD extends CLISubCMD {

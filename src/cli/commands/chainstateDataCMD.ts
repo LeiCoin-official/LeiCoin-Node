@@ -1,8 +1,7 @@
 import { Blockchain } from "@leicoin/storage/blockchain";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
-import { CLISubCMD } from "../handler/command.js";
-import { CLICMD } from "@cleverjs/cli";
+import { CLICMD, CLICMDExecMeta, CLISubCMD } from "@cleverjs/cli";
 
 export class ChainstateDataCMD extends CLISubCMD {
     readonly name = "chainstate";
@@ -13,11 +12,11 @@ export class ChainstateDataCMD extends CLISubCMD {
         this.register(new ReadCMD());
     }
 
-    async run(args: string[], parent_args: string[]) {
+    async run(args: string[], meta: CLICMDExecMeta) {
         await Blockchain.init();
         await Blockchain.waitAllChainsInit();
 
-        super.run(args, parent_args);
+        super.run(args, meta);
     }
 
 }
@@ -28,7 +27,7 @@ class ReadCMD extends CLICMD {
     readonly description = "Read the current Chainstate";
     readonly usage = "read";
 
-    public async run(args: string[], parent_args: string[]): Promise<void> {
+    public async run(args: string[]): Promise<void> {
         const chainstate = Blockchain.chainstate.getCompleteChainStateData();
         cli.cmd.info(DataUtils.stringify(chainstate, null, 2));
     }
