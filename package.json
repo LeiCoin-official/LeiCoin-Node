@@ -35,7 +35,7 @@
 	},
 	"homepage": "https://github.com/LeiCraft/LeiCoin-Node#readme",
 	"dependencies": {
-		"@cleverjs/cli": "^0.1.1",
+		"@cleverjs/cli": "^0.2.0",
 		"@date-fns/utc": "^1.2.0",
 		"@elysiajs/cors": "^1.2.0",
 		"@leicoin/cli": "^1.0.0",

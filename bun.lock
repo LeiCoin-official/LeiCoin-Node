@@ -4,7 +4,7 @@
     "": {
       "name": "leicoin-node",
       "dependencies": {
-        "@cleverjs/cli": "^0.1.1",
+        "@cleverjs/cli": "^0.2.0",
         "@date-fns/utc": "^1.2.0",
         "@elysiajs/cors": "^1.2.0",
         "@leicoin/cli": "^1.0.0",
@@ -315,7 +315,7 @@
     "classic-level@1.4.1": "patches/classic-level@1.4.1.patch",
   },
   "packages": {
-    "@cleverjs/cli": ["@cleverjs/cli@0.1.1", "", {}, "sha512-1EIoamCPysNhdrEyOe43B4/UIlS2iGr/9lImQobY894qCqTvM45+5Z55SwE3jqDAJq4qqvbvkms7Wn+UJgSQIg=="],
+    "@cleverjs/cli": ["@cleverjs/cli@0.2.0", "", {}, "sha512-b7glFEhoHrsXKv5umm4NR2P1JgaPZorYTGtt1+MNQ65+ASpHZ8p75sePsoTZy4vYmC8AlsCI20b+QXIYCEUkLQ=="],
 
     "@date-fns/utc": ["@date-fns/utc@1.2.0", "", {}, "sha512-YLq+crMPJiBmIdkRmv9nZuZy1mVtMlDcUKlg4mvI0UsC/dZeIaGoGB5p/C4FrpeOhZ7zBTK03T58S0DFkRNMnw=="],
 
