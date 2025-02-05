@@ -83,4 +83,12 @@ export class CLICMDHandler extends CLIApp {
 
 }
 
+export class CommonCLIMessages {
+
+    static invalidNumberOfArguments(): void {
+        cli.cmd.info("Invalid number of arguments!");
+    }
+
+}
+
 

@@ -5,7 +5,8 @@ import { Blockchain } from "@leicoin/storage/blockchain";
 import { Uint64 } from "low-level";
 import { DataUtils } from "@leicoin/utils/dataUtils";
 import { cli } from "../cli.js";
-import { CLICMD, CLICMDExecMeta, CLISubCMD, CLIUtils } from "@cleverjs/cli";
+import { CLICMD, CLICMDExecMeta, CLISubCMD } from "@cleverjs/cli";
+import { CommonCLIMessages } from "../commandHandler.js";
 
 export class WalletDBCMD extends CLISubCMD {
     readonly name = "walletdb";
@@ -35,7 +36,7 @@ class ReadCMD extends CLICMD {
 
     public async run(args: string[]): Promise<void> {
         if (args.length !== 1) {
-            CLIUtils.invalidNumberOfArguments();
+            CommonCLIMessages.invalidNumberOfArguments();
             return;
         }
 
@@ -71,7 +72,7 @@ class InsertCMD extends CLICMD {
 
     public async run(args: string[]): Promise<void> {
         if (args.length !== 4) {
-            CLIUtils.invalidNumberOfArguments();
+            CommonCLIMessages.invalidNumberOfArguments();
             return;
         }
 
@@ -93,7 +94,7 @@ class RemoveCMD extends CLICMD {
 
     public async run(args: string[]): Promise<void> {
         if (args.length !== 1) {
-            CLIUtils.invalidNumberOfArguments();
+            CommonCLIMessages.invalidNumberOfArguments();
             return;
         }
 
